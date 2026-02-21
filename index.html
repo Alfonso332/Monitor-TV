@@ -7,19 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* Estilos base */
-        .history-item {
-            background: rgba(0, 100, 101, 0.15);
-            padding: 15px; margin-bottom: 12px;
-            border: 1px solid #006465; border-radius: 12px;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .history-actions { display: flex; gap: 8px; justify-content: flex-end; }
-        .btn-edit { background: #ffcc00 !important; color: black !important; padding: 6px 12px; border-radius: 5px; border:none; cursor:pointer; font-weight: bold;}
-        .btn-delete { background: #ff4d4d !important; color: white !important; padding: 6px 12px; border-radius: 5px; border:none; cursor:pointer; }
-        .btn-pdf { background: #006465 !important; color: white !important; width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-
-        /* Contenedor principal para que el texto no se escape */
+        /* AJUSTES CRÍTICOS PARA QUE EL TEXTO SE ACHIQUE */
         #display {
             flex: 1;
             display: flex;
@@ -27,39 +15,46 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 5vh 5vw; /* Espaciado relativo a la pantalla */
-            overflow: hidden; /* Evita scrolls */
-            height: 100vh;
+            padding: 40px;
+            height: calc(100vh - 100px); /* Espacio real restando header y footer */
+            overflow: hidden; /* Prohibido el scroll */
+            position: relative;
         }
 
         .info-block {
-            width: 100%;
-            height: 100%;
+            width: 95%;
+            max-height: 90%; /* Limite para el calculo de JS */
             display: flex;
             flex-direction: column;
             justify-content: center;
+            margin: auto;
         }
 
         #titleDisplay {
             margin-bottom: 20px;
-            line-height: 1.1;
-            word-wrap: break-word;
+            font-weight: 800;
+            line-height: 1;
+            text-transform: uppercase;
         }
 
         #messageDisplay {
-            line-height: 1.2;
-            word-wrap: break-word;
+            line-height: 1.1;
+            font-weight: 600;
             white-space: pre-wrap;
-            margin: 0 auto;
-            width: 100%;
+            word-wrap: break-word;
+            display: block;
         }
 
-        @media (max-width: 768px) {
-            .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: #0a1a1b; border-top: 1px solid #006465; justify-content: space-around; align-items: center; z-index: 9999; }
-            .nav-item { color: #00ff88; text-decoration: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; background: none; border: none; }
-            .drawer { width: 100% !important; height: 92vh !important; bottom: -100vh; right: 0 !important; top: auto !important; left: 0 !important; border-radius: 25px 25px 0 0; transition: bottom 0.5s; overflow-y: auto; padding-bottom: 120px; }
-            .drawer.active { bottom: 0 !important; }
+        /* ESTILOS HISTORIAL */
+        .history-item {
+            background: rgba(0, 100, 101, 0.2);
+            padding: 15px; margin-bottom: 12px;
+            border: 1px solid #006465; border-radius: 12px;
         }
+        .history-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+        .btn-edit { background: #ffcc00 !important; color: black !important; padding: 8px 15px; border-radius: 6px; border:none; font-weight: bold; cursor: pointer; }
+        .btn-delete { background: #ff4d4d !important; color: white !important; padding: 8px 15px; border-radius: 6px; border:none; font-weight: bold; cursor: pointer; }
+        .btn-pdf { background: #006465 !important; color: white !important; width: 100%; padding: 15px; border-radius: 8px; border: none; margin-bottom: 20px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -78,23 +73,17 @@
 
 <main id="display">
     <div id="ghostClock"></div>
-    <div class="info-block" id="container">
+    <div class="info-block">
         <div class="area" id="areaLabel">SISTEMA</div>
-        <h1 id="titleDisplay">CARGANDO...</h1>
-        <p id="messageDisplay">Sincronizando...</p>
+        <h1 id="titleDisplay">...</h1>
+        <p id="messageDisplay">Cargando datos...</p>
     </div>
 </main>
-
-<nav class="mobile-nav">
-    <button class="nav-item" id="mBtnNew"><span>➕</span><b>NUEVO</b></button>
-    <button class="nav-item" id="mBtnHistory"><span>📋</span><b>LISTA</b></button>
-</nav>
 
 <footer class="footer-bar"><div id="progressBar"></div></footer>
 
 <aside id="drawerForm" class="drawer">
-    <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
-    <h2 id="formTitle">Nuevo Evento</h2>
+    <h2 id="formTitle">Evento</h2>
     <form id="formRegistro">
         <input type="hidden" id="editIndex" value="-1">
         <select id="inputArea" required>
@@ -109,8 +98,8 @@
             <option value="high">Alta</option>
             <option value="critical">Crítica</option>
         </select>
-        <input type="text" id="inputTitle" placeholder="Título" maxlength="80" required>
-        <textarea id="inputMessage" rows="5" placeholder="Descripción larga..." required></textarea>
+        <input type="text" id="inputTitle" placeholder="Servicio" required>
+        <textarea id="inputMessage" rows="6" placeholder="Novedad" required></textarea>
         <div class="form-actions">
             <button type="button" class="btn-cancel" onclick="closeAllDrawers()">CANCELAR</button>
             <button type="submit" class="btn-publish">ACTUALIZAR TV</button>
@@ -119,8 +108,7 @@
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
-    <button class="btn-pdf" onclick="generatePDF()">📥 DESCARGAR NOVEDADES DIARIAS</button>
+    <button class="btn-pdf" onclick="generatePDF()">📥 REPORTE DIARIO</button>
     <div id="historyList"></div>
 </aside>
 
@@ -131,44 +119,59 @@
     let startTime = null;
     const DURATION = 15;
 
-    // --- FUNCIÓN DE AJUSTE DE TEXTO (LA CLAVE) ---
-    function fitText() {
-        const title = document.getElementById('titleDisplay');
-        const message = document.getElementById('messageDisplay');
-        const container = document.getElementById('display');
-
-        // Resetear a tamaños grandes para empezar a medir
-        let fontSizeTitle = 80; 
-        let fontSizeMessage = 120;
-
-        title.style.fontSize = fontSizeTitle + "px";
-        message.style.fontSize = fontSizeMessage + "px";
-
-        // Reducir progresivamente mientras el contenido supere el alto de la pantalla
-        while (container.scrollHeight > container.clientHeight && fontSizeMessage > 20) {
-            fontSizeMessage -= 2;
-            fontSizeTitle -= 1;
-            title.style.fontSize = fontSizeTitle + "px";
-            message.style.fontSize = fontSizeMessage + "px";
-        }
+    // --- CORRECCIÓN: BORRAR Y GUARDAR AHORA FORZAN EL ENVÍO ---
+    async function syncCloud() {
+        await fetch(DATABASE_URL, { 
+            method: 'PUT', 
+            body: JSON.stringify(registros.length > 0 ? registros : null) 
+        });
+        pullData(); // Forzar recarga tras subir
     }
 
-    async function pushData() { await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros) }); }
-    
     async function pullData() {
         try {
             const res = await fetch(DATABASE_URL);
             const data = await res.json();
-            if (data && JSON.stringify(data) !== JSON.stringify(registros)) {
-                registros = data; 
+            const nuevosRegistros = data || [];
+            if (JSON.stringify(nuevosRegistros) !== JSON.stringify(registros)) {
+                registros = nuevosRegistros;
                 render(currentIndex);
+                if(document.getElementById("drawerHistory").classList.contains("active")) renderHistory();
             }
         } catch (e) { console.error("Error nube"); }
     }
-    setInterval(pullData, 3000);
+
+    // --- FUNCIÓN DE AJUSTE AUTOMÁTICO DE LETRA ---
+    function fitText() {
+        const title = document.getElementById('titleDisplay');
+        const message = document.getElementById('messageDisplay');
+        const container = document.querySelector('.info-block');
+        const main = document.getElementById('display');
+
+        let sizeT = 70; // Tamaño inicial título
+        let sizeM = 100; // Tamaño inicial mensaje
+
+        title.style.fontSize = sizeT + "px";
+        message.style.fontSize = sizeM + "px";
+
+        // Reducción en bucle hasta que quepa en el alto del monitor
+        let safety = 0;
+        while ((main.scrollHeight > main.clientHeight) && safety < 50) {
+            sizeT -= 1;
+            sizeM -= 2;
+            title.style.fontSize = sizeT + "px";
+            message.style.fontSize = sizeM + "px";
+            safety++;
+        }
+    }
 
     function render(index){
-        if(!registros.length) return;
+        if(!registros.length){
+            document.getElementById("areaLabel").textContent = "SISTEMA";
+            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
+            document.getElementById("messageDisplay").textContent = "Monitor en espera";
+            return;
+        }
         const reg = registros[index % registros.length];
         document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
         document.getElementById("titleDisplay").textContent = reg.title;
@@ -177,12 +180,9 @@
         const colors = {low:"#00ff88", medium:"#00ccff", high:"#ffcc00", critical:"#ff4d4d"};
         document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
         
-        // Ejecutar el ajuste de texto después de renderizar
-        setTimeout(fitText, 50);
+        // Esperar un instante a que el DOM pinte para medir
+        setTimeout(fitText, 100);
     }
-
-    // Ajustar también cuando se cambie el tamaño de la ventana
-    window.onresize = fitText;
 
     function animate(timestamp){
         if(!registros.length) { requestAnimationFrame(animate); return; }
@@ -190,57 +190,44 @@
         const progress = (timestamp - startTime) / 1000;
         const percent = Math.min((progress / DURATION) * 100, 100);
         document.getElementById("progressBar").style.width = percent + "%";
-        if(progress >= DURATION){ currentIndex = (currentIndex + 1) % registros.length; render(currentIndex); startTime = timestamp; }
+        if(progress >= DURATION){ 
+            currentIndex = (currentIndex + 1) % registros.length; 
+            render(currentIndex); 
+            startTime = timestamp; 
+        }
         requestAnimationFrame(animate);
     }
-    requestAnimationFrame(animate);
-
-    // Lógica de UI y Drawers
-    const overlay = document.getElementById("drawerOverlay");
-    const dForm = document.getElementById("drawerForm");
-    const dHistory = document.getElementById("drawerHistory");
 
     const closeAllDrawers = () => {
-        dForm.classList.remove("active"); dHistory.classList.remove("active"); overlay.classList.remove("active");
+        document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active'));
         document.getElementById("formRegistro").reset();
         document.getElementById("editIndex").value = "-1";
     };
 
-    document.getElementById("btnNew").onclick = () => { dForm.classList.add("active"); overlay.classList.add("active"); };
-    document.getElementById("mBtnNew").onclick = () => { dForm.classList.add("active"); overlay.classList.add("active"); };
-    document.getElementById("btnManage").onclick = () => { renderHistory(); dHistory.classList.add("active"); overlay.classList.add("active"); };
-    document.getElementById("mBtnHistory").onclick = () => { renderHistory(); dHistory.classList.add("active"); overlay.classList.add("active"); };
-    overlay.onclick = closeAllDrawers;
+    document.getElementById("btnNew").onclick = () => { 
+        document.getElementById("drawerForm").classList.add("active");
+        document.getElementById("drawerOverlay").classList.add("active");
+    };
+
+    document.getElementById("btnManage").onclick = () => { 
+        renderHistory();
+        document.getElementById("drawerHistory").classList.add("active");
+        document.getElementById("drawerOverlay").classList.add("active");
+    };
 
     document.getElementById("formRegistro").onsubmit = async (e) => {
         e.preventDefault();
-        const index = parseInt(document.getElementById("editIndex").value);
+        const idx = parseInt(document.getElementById("editIndex").value);
         const nuevo = {
             area: document.getElementById("inputArea").value,
             priority: document.getElementById("inputPriority").value,
             title: document.getElementById("inputTitle").value,
             message: document.getElementById("inputMessage").value
         };
-        if(index === -1) registros.push(nuevo); else registros[index] = nuevo;
-        await pushData();
+        if(idx === -1) registros.push(nuevo); else registros[idx] = nuevo;
+        await syncCloud();
         closeAllDrawers();
-        render(currentIndex);
     };
-
-    function renderHistory() {
-        const container = document.getElementById("historyList");
-        container.innerHTML = "";
-        registros.forEach((reg, i) => {
-            const div = document.createElement("div");
-            div.className = "history-item";
-            div.innerHTML = `<div><strong>${reg.title}</strong><br><small>${reg.area}</small></div>
-                <div class="history-actions">
-                    <button class="btn-edit" onclick="editarEvento(${i})">EDITAR</button>
-                    <button class="btn-delete" onclick="eliminarEvento(${i})">BORRAR</button>
-                </div>`;
-            container.appendChild(div);
-        });
-    }
 
     window.editarEvento = (i) => {
         const reg = registros[i];
@@ -249,42 +236,42 @@
         document.getElementById("inputPriority").value = reg.priority;
         document.getElementById("inputTitle").value = reg.title;
         document.getElementById("inputMessage").value = reg.message;
-        dHistory.classList.remove("active");
-        dForm.classList.add("active");
+        document.getElementById("drawerHistory").classList.remove("active");
+        document.getElementById("drawerForm").classList.add("active");
     };
 
+    // --- CORRECCIÓN: BORRAR AHORA ELIMINA Y SINCRONIZA ---
     window.eliminarEvento = async (i) => {
-        if(confirm("¿Quitar de la TV?")) { registros.splice(i, 1); await pushData(); renderHistory(); }
+        if(confirm("¿Eliminar novedad?")) {
+            registros.splice(i, 1);
+            await syncCloud();
+            renderHistory();
+        }
     };
 
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFillColor(10, 26, 28);
-        doc.rect(0, 0, 210, 45, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(22);
-        doc.text("NOVEDADES OPERATIVAS DIARIAS", 20, 25);
-        doc.setTextColor(40, 40, 40);
-        let y = 60;
-        registros.forEach((reg) => {
-            if(y > 270) { doc.addPage(); y = 20; }
-            doc.setFont(undefined, 'bold');
-            doc.text(`${reg.area.toUpperCase()}: ${reg.title.toUpperCase()}`, 20, y);
-            doc.setFont(undefined, 'normal');
-            const lines = doc.splitTextToSize(reg.message, 170);
-            doc.text(lines, 20, y + 7);
-            y += (lines.length * 7) + 15;
-        });
-        doc.save("Reporte_CIO.pdf");
+    function renderHistory() {
+        const container = document.getElementById("historyList");
+        container.innerHTML = registros.map((reg, i) => `
+            <div class="history-item">
+                <strong>${reg.title}</strong><br><small>${reg.area}</small>
+                <div class="history-actions">
+                    <button class="btn-edit" onclick="editarEvento(${i})">EDITAR</button>
+                    <button class="btn-delete" onclick="eliminarEvento(${i})">BORRAR</button>
+                </div>
+            </div>
+        `).join('');
     }
 
     function updateClock(){
         document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
     }
+
     setInterval(updateClock, 1000);
-    document.getElementById("btnFullscreen").onclick = () => { document.documentElement.requestFullscreen(); };
+    setInterval(pullData, 3000);
+    requestAnimationFrame(animate);
     pullData();
+    document.getElementById("btnFullscreen").onclick = () => document.documentElement.requestFullscreen();
+    document.getElementById("drawerOverlay").onclick = closeAllDrawers;
 </script>
 </body>
 </html>
