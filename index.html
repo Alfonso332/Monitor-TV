@@ -13,6 +13,8 @@
             --dark-bg: #050d0e;
             --critico-pulso: #4d0000;
             --ticker-bg: #0a1a1b;
+            /* URL DE TU IMAGEN PROPORCIONADA */
+            --bg-url: url('https://media.licdn.com/dms/image/v2/D4D16AQFlbrVsBSIY8g/profile-displaybackgroundimage-shrink_200_800/B4DZZFypIVG8Ac-/0/1744927626681?e=2147483647&v=beta&t=49icTUy8i5rpfVAVyiYvfDbIeOaLnoMHaOLYm5-vsoI');
             
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column;
@@ -21,16 +23,28 @@
             overflow: hidden; margin: 0; padding: 0; z-index: 9999;
         }
 
+        /* CAPA DE IMAGEN DE FONDO PERSONALIZADA */
+        #cio-app::before {
+            content: "";
+            position: absolute; inset: 0;
+            background-image: var(--bg-url);
+            background-size: cover;
+            background-position: center center;
+            opacity: 0.18; /* Un poquito más de visibilidad para que se note el logo */
+            filter: blur(1px); /* Desenfoque sutil para que no moleste al texto */
+            z-index: -1;
+        }
+
         /* HEADER */
         #cio-app .main-header {
             height: 60px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(15px);
+            padding: 0 20px; background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.2); z-index: 100;
         }
 
         #cio-app .header-actions button {
             background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
-            color: #fff; padding: 8px 16px; border-radius: 12px; font-size: 12px;
+            color: #fff; padding: 8px 16px; border-radius: 15px; font-size: 12px;
             font-weight: bold; cursor: pointer; transition: 0.3s; margin-right: 8px;
         }
 
@@ -40,34 +54,35 @@
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
-            background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
+            /* El degradado ayuda a que el texto siempre sea legible sin importar el fondo */
+            background: radial-gradient(circle at center, transparent 0%, rgba(5, 13, 14, 0.8) 100%);
         }
 
         @keyframes pulso-cio {
-            0% { background-color: #050d0e; }
+            0% { background-color: transparent; }
             50% { background-color: var(--critico-pulso); }
-            100% { background-color: #050d0e; }
+            100% { background-color: transparent; }
         }
         #cio-app.es-critico #display-board { animation: pulso-cio 2s infinite ease-in-out; }
 
         #cio-app .info-container { width: 100%; max-width: 1100px; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        #cio-app #areaLabel { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--primary); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; opacity: 0.8; }
-        #cio-app #prioBadge { display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 800; border: 1px solid var(--primary); font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 20px; }
-        #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin: 0 0 20px 0; color: #fff; text-shadow: 0 0 20px rgba(0,212,216,0.3); }
-        #cio-app #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; }
+        #cio-app #areaLabel { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--primary); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
+        #cio-app #prioBadge { display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 800; border: 1px solid var(--primary); font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 20px; backdrop-filter: blur(5px); }
+        #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin: 0 0 20px 0; color: #fff; text-shadow: 0 2px 15px rgba(0,0,0,0.9); }
+        #cio-app #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
 
         /* TICKER INFERIOR */
-        #cio-app #ticker-bar { height: 40px; background: var(--ticker-bg); border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; }
+        #cio-app #ticker-bar { height: 40px; background: rgba(10, 26, 27, 0.95); border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; backdrop-filter: blur(10px); }
         #cio-app #ticker-content { white-space: nowrap; animation: ticker-scroll-cio 30s linear infinite; color: var(--primary); font-size: 0.9rem; font-weight: bold; }
         @keyframes ticker-scroll-cio { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
         /* NAVEGACIÓN MOBILE */
         #cio-app .nav-mobile {
-            display: none; height: 95px; background: #071213; border-top: 1px solid var(--primary);
+            display: none; height: 95px; background: rgba(7, 18, 19, 0.98); border-top: 1px solid var(--primary);
             justify-content: space-around; align-items: flex-start; padding-top: 15px;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(20px);
         }
         #cio-app .nav-mobile button {
             background: none; border: none; color: #fff; display: flex; flex-direction: column;
@@ -86,25 +101,26 @@
         #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; z-index: 1050; }
         #cio-app #overlay-cio.active { display: block; }
 
-        /* FORMULARIOS Y BOTONES */
+        /* FORMULARIOS Y BOTONES ESTÉTICOS */
         #cio-app h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
         #cio-app label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent);
-            border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--accent);
+            border-radius: 15px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
         }
-        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; }
-        #cio-app .btn-cancel { width: 100%; padding: 12px; background: rgba(255, 77, 77, 0.1); color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 12px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 18px; cursor: pointer; transition: 0.2s; }
+        #cio-app .btn-save:active { transform: scale(0.96); }
+        #cio-app .btn-cancel { width: 100%; padding: 12px; background: rgba(255, 77, 77, 0.1); color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 18px; margin-top: 10px; cursor: pointer; font-weight: bold; }
 
         /* LISTA HISTORIAL */
-        #cio-app .history-item { background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary); border-radius: 12px; }
-        #cio-app .history-item button { border-radius: 8px; cursor: pointer; border: none; padding: 8px 15px; font-weight: bold; }
+        #cio-app .history-item { background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary); border-radius: 15px; backdrop-filter: blur(5px); }
+        #cio-app .history-item button { border-radius: 12px; cursor: pointer; border: none; padding: 8px 15px; font-weight: bold; }
 
-        /* RESPONSIVE */
+        /* RESPONSIVE MOBILE */
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
             #cio-app .nav-mobile { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-left: none; border-top: 3px solid var(--primary); border-radius: 25px 25px 0 0; }
+            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-left: none; border-top: 3px solid var(--primary); border-radius: 30px 30px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
             #cio-app #display-board { padding-bottom: 140px; }
             #cio-app #clockDisplay { font-size: 1.2rem; }
@@ -183,7 +199,7 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2>Eventos Activos</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:12px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF</button>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:15px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF</button>
         <div id="listItems"></div>
         <button type="button" onclick="closeAll()" class="btn-cancel" style="margin-top: 20px;">✕ VOLVER AL MONITOR</button>
     </aside>
