@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CIO - Centro de Inteligencia Operativa</title>
+    <title>CIO - Monitor Operativo</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* --- DISPLAY PRINCIPAL --- */
+        /* --- ESTRUCTURA BASE --- */
         #display {
             display: flex !important;
             flex-direction: column !important;
@@ -15,42 +15,45 @@
             align-items: center !important;
             height: 100vh !important;
             width: 100vw !important;
-            padding: 40px !important;
+            padding: 60px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             position: fixed !important;
             top: 0; left: 0;
             background: #0a1a1b;
-            transition: background 0.5s ease;
             z-index: 1;
         }
 
-        /* --- RELOJ Y CABECERA --- */
+        /* --- CABECERA Y RELOJ (PC/TV) --- */
         .control-header {
-            position: fixed; top: 0; width: 100%; height: 60px;
+            position: fixed; top: 0; width: 100%; height: 70px;
             z-index: 1000; display: flex; justify-content: space-between;
-            align-items: center; padding: 0 25px; box-sizing: border-box;
-            transition: all 0.5s ease;
+            align-items: center; padding: 0 30px; box-sizing: border-box;
+            background: rgba(10, 26, 27, 0.8);
         }
 
         #clock {
             font-weight: bold; font-family: 'Courier New', monospace;
-            color: white; font-size: 1.4rem; transition: all 0.5s ease;
+            color: white; font-size: 1.8rem; transition: all 0.5s ease-in-out;
         }
 
         /* --- MODO FULLSCREEN (TV) --- */
-        :fullscreen .left-zone, :fullscreen .mobile-nav { display: none !important; }
+        :fullscreen .left-zone, :fullscreen .mobile-nav { 
+            display: none !important; 
+        }
         
         :fullscreen .control-header {
             justify-content: center !important;
-            height: 150px !important;
+            height: 250px !important;
+            background: transparent !important;
         }
 
         :fullscreen #clock {
-            font-size: 8rem !important; /* Reloj gigante */
+            font-size: 12rem !important; /* Reloj Masivo */
             color: #00ff88 !important;
-            text-shadow: 0 0 40px rgba(0, 255, 136, 0.7);
-            margin: 0 !important;
+            text-shadow: 0 0 50px rgba(0, 255, 136, 0.8);
+            position: absolute;
+            top: 50px;
         }
 
         /* --- EFECTO CRÍTICO --- */
@@ -61,32 +64,43 @@
         }
         .critico-total { animation: pulse-red 1.2s infinite !important; }
 
-        /* --- DRAWERS Y OVERLAY (CORREGIDO) --- */
+        /* --- CAPAS DE INTERFAZ (PC/TV FIX) --- */
         #drawerOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: none; z-index: 5000;
+            background: rgba(0,0,0,0.8); display: none; 
+            z-index: 4000; /* Debajo de los Drawers */
         }
         #drawerOverlay.active { display: block; }
 
         .drawer {
-            position: fixed; right: 0; top: 0; width: 400px; height: 100vh;
-            background: #0f2426; border-left: 2px solid #006465;
-            padding: 25px; box-sizing: border-box; transform: translateX(100%);
-            transition: transform 0.4s ease; z-index: 6000; overflow-y: auto;
+            position: fixed; right: 0; top: 0; width: 450px; height: 100vh;
+            background: #0f2426; border-left: 3px solid #006465;
+            padding: 30px; box-sizing: border-box; 
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out; 
+            z-index: 5000; /* Encima del Overlay */
+            overflow-y: auto;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
         .drawer.active { transform: translateX(0); }
 
-        /* --- AJUSTES CELULAR --- */
+        /* --- ESTILOS DE LOS ITEMS DEL HISTORIAL --- */
+        .history-card {
+            background: rgba(255,255,255,0.05); padding: 20px; 
+            margin-bottom: 15px; border-radius: 12px; 
+            border: 1px solid #006465;
+        }
+        .history-card button {
+            cursor: pointer; padding: 8px 15px; border-radius: 6px; 
+            font-weight: bold; border: none; margin-top: 10px;
+        }
+
+        /* --- RESPONSIVO PARA EL CELULAR (MANTENIDO) --- */
         @media (max-width: 768px) {
-            .drawer { width: 100% !important; height: 85vh !important; top: auto !important; bottom: -100vh; border-radius: 25px 25px 0 0; border-left: none; border-top: 2px solid #006465; transform: none; }
+            .drawer { width: 100% !important; height: 85vh !important; top: auto !important; bottom: -100vh; border-radius: 25px 25px 0 0; transform: none; }
             .drawer.active { bottom: 0 !important; }
             .left-zone { display: none !important; }
-            .mobile-nav {
-                display: flex !important; position: fixed; bottom: 0; left: 0; right: 0;
-                height: 70px; background: #0a1a1b; border-top: 1px solid #006465;
-                justify-content: space-around; align-items: center; z-index: 2000;
-            }
-            .nav-item { color: #00ff88; background: none; border: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; }
+            .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: #0a1a1b; z-index: 2000; justify-content: space-around; align-items: center; border-top: 1px solid #006465; }
         }
     </style>
 </head>
@@ -96,58 +110,56 @@
 
 <header class="control-header">
     <div class="left-zone">
-        <button id="btnNew" style="background:#006465; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;">＋ NUEVO</button>
-        <button id="btnManage" style="background:#006465; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; margin-left:10px;">☰ HISTORIAL</button>
-        <button id="btnFullscreen" style="background:none; border:1px solid #006465; color:#00ff88; padding:10px; border-radius:8px; cursor:pointer; margin-left:10px;">⛶ FULL</button>
+        <button id="btnNew" style="background:#00ff88; color:black; border:none; padding:12px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">＋ NUEVO</button>
+        <button id="btnManage" style="background:#006465; color:white; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; margin-left:10px;">☰ HISTORIAL</button>
+        <button id="btnFullscreen" style="background:transparent; border:1px solid #00ff88; color:#00ff88; padding:12px 20px; border-radius:8px; cursor:pointer; margin-left:10px;">⛶ PANTALLA COMPLETA</button>
     </div>
     <div id="clock">00:00:00</div>
 </header>
 
 <main id="display">
-    <div class="info-block">
-        <div id="areaLabel" style="font-size: 1.4rem; color: #00ff88; margin-bottom: 10px; font-weight: bold; letter-spacing: 3px;">SISTEMA</div>
-        <h1 id="titleDisplay">CARGANDO...</h1>
-        <p id="messageDisplay">Sincronizando registros en la nube</p>
+    <div class="info-block" style="text-align:center;">
+        <div id="areaLabel" style="font-size: 1.8rem; color: #00ff88; margin-bottom: 15px; font-weight: bold; letter-spacing: 5px;">SISTEMA</div>
+        <h1 id="titleDisplay" style="margin:0;">CARGANDO...</h1>
+        <p id="messageDisplay" style="margin:20px 0 0 0;">Esperando datos de Firebase</p>
     </div>
 </main>
 
 <nav class="mobile-nav" style="display:none;">
-    <button class="nav-item" id="mBtnNew"><span>➕</span><b>NUEVO</b></button>
-    <button class="nav-item" id="mBtnHistory"><span>📋</span><b>LISTA</b></button>
+    <button onclick="openNew()" style="background:none; border:none; color:#00ff88;">➕<br>NUEVO</button>
+    <button onclick="openHistory()" style="background:none; border:none; color:#00ff88;">📋<br>LISTA</button>
 </nav>
 
-<footer class="footer-bar" style="position:fixed; bottom:0; width:100%; height:8px; z-index:1500;"><div id="progressBar" style="height:100%; width:0%; transition: width 0.1s linear;"></div></footer>
-
 <aside id="drawerForm" class="drawer">
-    <h2 style="color:#00ff88; margin-top:0;">Nuevo Evento</h2>
-    <form id="formRegistro" style="display:flex; flex-direction:column; gap:15px;">
+    <h2 style="color:#00ff88;">Configurar Novedad</h2>
+    <form id="formRegistro" style="display:flex; flex-direction:column; gap:20px;">
         <input type="hidden" id="editIndex" value="-1">
-        <label style="color:white;">Área Responsable</label>
-        <select id="inputArea" style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;">
+        <select id="inputArea" style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
             <option value="Freschat">Freschat</option>
             <option value="Monitoreo">Monitoreo</option>
             <option value="Atención al Cliente">Atención al Cliente</option>
             <option value="Interno">Interno</option>
         </select>
-        <label style="color:white;">Prioridad</label>
-        <select id="inputPriority" style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;">
-            <option value="low">Baja</option>
-            <option value="medium">Media</option>
-            <option value="high">Alta</option>
-            <option value="critical">Crítica</option>
+        <select id="inputPriority" style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
+            <option value="low">Prioridad Baja</option>
+            <option value="medium">Prioridad Media</option>
+            <option value="high">Prioridad Alta</option>
+            <option value="critical">Prioridad Crítica</option>
         </select>
-        <input type="text" id="inputTitle" placeholder="Título" required style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;">
-        <textarea id="inputMessage" rows="5" placeholder="Descripción..." required style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;"></textarea>
-        <button type="submit" style="background:#00ff88; color:black; padding:15px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">ACTUALIZAR TV</button>
+        <input type="text" id="inputTitle" placeholder="Título / Servicio" required style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
+        <textarea id="inputMessage" rows="6" placeholder="Descripción de la novedad..." required style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;"></textarea>
+        <button type="submit" style="background:#00ff88; color:black; padding:18px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">ACTUALIZAR MONITOR</button>
         <button type="button" onclick="closeAllDrawers()" style="background:none; color:#ff4d4d; border:none; cursor:pointer;">CANCELAR</button>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <h2 style="color:#00ff88; margin-top:0;">Historial Activo</h2>
-    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:12px; border:none; border-radius:8px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR REPORTE</button>
+    <h2 style="color:#00ff88;">Novedades Activas</h2>
+    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:15px; border:none; border-radius:8px; margin-bottom:25px; cursor:pointer; font-weight:bold;">📥 GENERAR REPORTE PDF</button>
     <div id="historyList"></div>
 </aside>
+
+<footer class="footer-bar" style="position:fixed; bottom:0; width:100%; height:10px; z-index:1001;"><div id="progressBar" style="height:100%; width:0%; transition: width 0.1s linear;"></div></footer>
 
 <script>
     const DATABASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
@@ -156,21 +168,20 @@
     let startTime = null;
     const DURATION = 15;
 
-    // --- LÓGICA DE FUENTES ---
     function fitText() {
         const title = document.getElementById('titleDisplay');
         const message = document.getElementById('messageDisplay');
         const display = document.getElementById('display');
         const esMovil = window.innerWidth <= 768;
         
-        let sizeT = esMovil ? 35 : 80; 
-        let sizeM = esMovil ? 40 : 100;
+        let sizeT = esMovil ? 35 : 90; 
+        let sizeM = esMovil ? 40 : 110;
 
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
 
         let safety = 0;
-        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.65) && safety < 80) {
+        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.6) && safety < 100) {
             sizeT -= 1; sizeM -= 1.5;
             title.style.fontSize = sizeT + "px";
             message.style.fontSize = sizeM + "px";
@@ -201,7 +212,7 @@
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = "SISTEMA";
             document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
-            document.getElementById("messageDisplay").textContent = "En espera...";
+            document.getElementById("messageDisplay").textContent = "Esperando reportes...";
             return;
         }
         const reg = registros[index % registros.length];
@@ -219,19 +230,18 @@
         setTimeout(fitText, 50);
     }
 
-    // --- ACCIONES HISTORIAL (CORREGIDO Z-INDEX) ---
-    window.eliminarEvento = async (e, i) => {
-        e.stopPropagation(); // Evita que se cierre el drawer
-        if(confirm("¿Eliminar?")) {
-            registros.splice(i, 1);
+    // --- ACCIONES REPARADAS ---
+    window.eliminarEvento = async (idx) => {
+        if(confirm("¿Eliminar novedad definitivamente?")) {
+            registros.splice(idx, 1);
             await syncCloud();
             renderHistory();
         }
     };
 
-    window.editarEvento = (i) => {
-        const reg = registros[i];
-        document.getElementById("editIndex").value = i;
+    window.editarEvento = (idx) => {
+        const reg = registros[idx];
+        document.getElementById("editIndex").value = idx;
         document.getElementById("inputArea").value = reg.area;
         document.getElementById("inputPriority").value = reg.priority;
         document.getElementById("inputTitle").value = reg.title;
@@ -243,25 +253,24 @@
     function renderHistory() {
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:12px; border-radius:10px; border:1px solid #006465;">
-                <strong style="color:#00ff88; display:block; margin-bottom:5px;">${reg.title}</strong>
-                <div style="display:flex; gap:10px;">
-                    <button onclick="editarEvento(${i})" style="background:#ffcc00; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold;">EDITAR</button>
-                    <button onclick="eliminarEvento(event, ${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold;">BORRAR</button>
-                </div>
+            <div class="history-card">
+                <strong style="color:#00ff88; font-size:1.2rem;">${reg.title}</strong><br>
+                <small style="color:#aaa;">${reg.area} | ${reg.priority}</small><br>
+                <button onclick="editarEvento(${i})" style="background:#ffcc00; color:black;">EDITAR</button>
+                <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; margin-left:10px;">BORRAR</button>
             </div>
         `).join('');
     }
 
-    // --- INTERFAZ ---
     function closeAllDrawers() {
         document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active'));
     }
 
-    document.getElementById("btnNew").onclick = () => { document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
-    document.getElementById("mBtnNew").onclick = () => { document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
-    document.getElementById("btnManage").onclick = () => { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
-    document.getElementById("mBtnHistory").onclick = () => { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
+    function openNew() { document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
+    function openHistory() { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
+
+    document.getElementById("btnNew").onclick = openNew;
+    document.getElementById("btnManage").onclick = openHistory;
     document.getElementById("drawerOverlay").onclick = closeAllDrawers;
 
     document.getElementById("formRegistro").onsubmit = async (e) => {
@@ -289,14 +298,14 @@
     function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
         doc.setFillColor(10, 26, 28); doc.rect(0,0,210,40,'F');
-        doc.setTextColor(255,255,255); doc.setFontSize(20); doc.text("REPORTE CIO", 20, 25);
+        doc.setTextColor(255,255,255); doc.setFontSize(22); doc.text("REPORTE CIO OPERATIVO", 20, 25);
         let y = 55; doc.setTextColor(0,0,0);
         registros.forEach(r => {
             doc.setFont(undefined, 'bold'); doc.text(`${r.area}: ${r.title}`, 20, y);
             doc.setFont(undefined, 'normal'); const lines = doc.splitTextToSize(r.message, 170);
             doc.text(lines, 20, y + 7); y += (lines.length * 7) + 15;
         });
-        doc.save("Reporte_CIO.pdf");
+        doc.save("CIO_Reporte.pdf");
     }
 
     setInterval(() => document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}), 1000);
