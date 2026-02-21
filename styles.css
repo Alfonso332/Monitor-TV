@@ -1,539 +1,261 @@
-*{
+/* ============================================================
+   CIO MONITOR OPERATIVO - ESTILOS EXTERNOS
+   ============================================================ */
 
-margin:0;
-
-padding:0;
-
-box-sizing:border-box;
-
-font-family:"Segoe UI",sans-serif;
-
+/* 1. RESET Y BASE */
+#cio-app-root {
+    all: initial; /* Aísla de estilos externos */
+    display: block;
+    background: #050d0e;
+    color: #ffffff;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
 }
 
-
-
-body{
-
-background:
-
-radial-gradient(circle at 20% 20%, #003c3f 0%, transparent 40%),
-
-radial-gradient(circle at 80% 80%, #002224 0%, transparent 40%),
-
-#050d0e;
-
-color:#ffffff;
-
-height:100vh;
-
-overflow:hidden;
-
-display:flex;
-
-flex-direction:column;
-
+#cio-app-root * { 
+    box-sizing: border-box; 
+    font-family: inherit; 
 }
 
-
-
-/* ================= HEADER ================= */
-
-
-
-.control-header{
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-padding:18px 35px;
-
-background:rgba(0,0,0,0.45);
-
-backdrop-filter:blur(14px);
-
-border-bottom:1px solid #006465;
-
-z-index:1000;
-
-border-bottom-left-radius:20px;
-
-border-bottom-right-radius:20px;
-
+/* 2. PANTALLA DE VISUALIZACIÓN (MAIN) */
+#cio-app-root #display-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    text-align: center;
+    padding: 40px;
+    background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
+    transition: all 0.5s ease;
 }
 
-
-
-.control-header button{
-
-background:rgba(0,100,101,0.25);
-
-border:1px solid #006465;
-
-color:#00d4d8;
-
-padding:12px 24px;
-
-margin-right:12px;
-
-cursor:pointer;
-
-border-radius:40px;
-
-transition:0.3s;
-
-font-weight:500;
-
+#cio-app-root .content-wrap { 
+    width: 95%; 
+    max-width: 1600px; 
+    z-index: 10; 
 }
 
-
-
-.control-header button:hover{
-
-background:#006465;
-
-color:white;
-
-box-shadow:0 0 25px #006465;
-
-transform:scale(1.05);
-
+#cio-app-root #areaText {
+    font-size: 1.4rem;
+    color: #00d4d8;
+    letter-spacing: 7px;
+    margin-bottom: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
-
-
-.live-clock{
-
-font-size:1.5rem;
-
-letter-spacing:3px;
-
-color:#00d4d8;
-
+#cio-app-root #priorityTag {
+    display: inline-block;
+    padding: 5px 20px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.3);
 }
 
-
-
-/* ================= MAIN ================= */
-
-
-
-#display{
-
-flex:1;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-text-align:center;
-
-position:relative;
-
-transition:all 0.8s ease;
-
-padding:40px;
-
+#cio-app-root #titleDisplay { 
+    font-weight: 900; 
+    text-transform: uppercase; 
+    margin-bottom: 20px; 
+    line-height: 1; 
+    color: #fff;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
-
-
-.info-block{
-
-z-index:5;
-
-max-width:85%;
-
+#cio-app-root #messageDisplay { 
+    font-weight: 300; 
+    color: #d1dbdb; 
+    line-height: 1.3; 
+    max-width: 90%;
+    margin: 0 auto;
 }
 
-
-
-/* Área */
-
-
-
-.area{
-
-letter-spacing:6px;
-
-opacity:0.6;
-
-margin-bottom:20px;
-
-font-size:1.2rem;
-
+/* 3. CABECERA (TOP BAR) */
+#cio-app-root .top-bar {
+    position: fixed; 
+    top: 0; 
+    width: 100%; 
+    height: 70px;
+    background: rgba(0, 0, 0, 0.7); 
+    backdrop-filter: blur(12px);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 0 40px; 
+    z-index: 1000; 
+    border-bottom: 1px solid #004d4e;
 }
 
-
-
-/* Servicio */
-
-
-
-#titleDisplay{
-
-font-size:4rem;
-
-margin-bottom:35px;
-
-text-shadow:0 0 25px rgba(0,100,101,0.6);
-
-transition:0.8s;
-
-word-wrap:break-word;
-
-overflow-wrap:break-word;
-
-white-space:normal;
-
-line-height:1.1;
-
+#cio-app-root .nav-actions button {
+    background: rgba(0, 100, 101, 0.25); 
+    border: 1px solid #006465;
+    color: #00d4d8; 
+    padding: 10px 20px; 
+    border-radius: 5px;
+    font-weight: bold; 
+    cursor: pointer; 
+    margin-right: 10px; 
+    font-size: 0.75rem;
+    transition: 0.3s;
 }
 
-
-
-/* Novedad */
-
-
-
-#messageDisplay{
-
-font-size:8rem;
-
-opacity:2;
-
-line-height:1.6;
-
-max-width:90%;
-
-margin:auto;
-
-word-wrap:break-word;
-
-overflow-wrap:break-word;
-
-white-space:pre-wrap;
-
+#cio-app-root .nav-actions button:hover { 
+    background: #006465; 
+    color: white; 
 }
 
-
-
-/* ================= FOOTER ================= */
-
-
-
-.footer-bar{
-
-height:6px;
-
-background:#111;
-
-border-top:1px solid #006465;
-
+#cio-app-root #liveClock { 
+    font-family: 'Courier New', monospace; 
+    font-size: 1.6rem; 
+    font-weight: bold; 
+    color: #00d4d8; 
 }
 
-
-
-#progressBar{
-
-height:100%;
-
-width:0%;
-
-background:#006465;
-
-transition:width 0.1s linear;
-
+/* 4. MODO TV FULLSCREEN */
+#cio-app-root:fullscreen .top-bar {
+    height: 180px; 
+    background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
+    border: none; 
+    flex-direction: column; 
+    padding-top: 30px;
 }
 
-
-
-/* ================= DRAWER OVERLAY ================= */
-
-
-
-#drawerOverlay{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-background:rgba(0,0,0,0.5);
-
-opacity:0;
-
-pointer-events:none;
-
-transition:0.3s;
-
-z-index:1200;
-
+#cio-app-root:fullscreen #liveClock { 
+    font-size: 7rem; 
+    text-shadow: 0 0 40px rgba(0, 212, 216, 0.6); 
 }
 
-
-
-#drawerOverlay.active{
-
-opacity:1;
-
-pointer-events:auto;
-
+/* 5. ALERTA CRÍTICA (ANIMACIÓN) */
+@keyframes pulse-critical {
+    0% { box-shadow: inset 0 0 0px #ff0000; background-color: #050d0e; }
+    50% { box-shadow: inset 0 0 100px #610000; background-color: #260000; }
+    100% { box-shadow: inset 0 0 0px #ff0000; background-color: #050d0e; }
 }
 
-
-
-/* ================= DRAWERS ================= */
-
-
-
-.drawer{
-
-position:fixed;
-
-top:0;
-
-right:-420px;
-
-width:400px;
-
-height:100%;
-
-background:#0a1a1c;
-
-padding:35px;
-
-transition:0.4s;
-
-overflow-y:auto;
-
-border-left:1px solid #006465;
-
-z-index:1500;
-
-border-top-left-radius:35px;
-
-border-bottom-left-radius:35px;
-
-box-shadow:-10px 0 40px rgba(0,0,0,0.6);
-
+#cio-app-root.mode-critical #display-main { 
+    animation: pulse-critical 1.5s infinite; 
 }
 
-
-
-.drawer.active{
-
-right:0;
-
+/* 6. DRAWERS Y OVERLAY */
+#cio-app-root #ui-overlay {
+    position: fixed; 
+    inset: 0; 
+    background: rgba(0,0,0,0.85);
+    display: none; 
+    z-index: 4000; 
+    cursor: pointer;
 }
 
-
-
-.drawer h2{
-
-margin-bottom:25px;
-
-letter-spacing:2px;
-
+#cio-app-root #ui-overlay.active { 
+    display: block; 
 }
 
-
-
-.drawer input,
-
-.drawer textarea,
-
-.drawer select{
-
-width:100%;
-
-padding:14px;
-
-margin-bottom:18px;
-
-background:#081314;
-
-border:1px solid #006465;
-
-color:white;
-
-border-radius:18px;
-
-transition:0.3s;
-
+#cio-app-root .side-panel {
+    position: fixed; 
+    right: 0; 
+    top: 0; 
+    width: 420px; 
+    height: 100vh;
+    background: #091718; 
+    border-left: 2px solid #006465;
+    padding: 35px; 
+    transform: translateX(100%);
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 5000; 
+    overflow-y: auto;
 }
 
-
-
-.drawer input:focus,
-
-.drawer textarea:focus,
-
-.drawer select:focus{
-
-outline:none;
-
-box-shadow:0 0 12px #006465;
-
+#cio-app-root .side-panel.active { 
+    transform: translateX(0); 
 }
 
-
-
-.drawer button{
-
-background:#006465;
-
-border:none;
-
-padding:14px;
-
-color:white;
-
-cursor:pointer;
-
-border-radius:40px;
-
-transition:0.3s;
-
-font-weight:600;
-
+#cio-app-root .side-panel h2 { 
+    color: #00d4d8; 
+    margin-bottom: 25px; 
+    letter-spacing: 1px; 
 }
 
-
-
-.drawer button:hover{
-
-box-shadow:0 0 20px #006465;
-
-transform:scale(1.05);
-
+#cio-app-root .side-panel input, 
+#cio-app-root .side-panel textarea, 
+#cio-app-root .side-panel select {
+    width: 100%; 
+    padding: 14px; 
+    margin-bottom: 18px;
+    background: #000; 
+    border: 1px solid #006465; 
+    color: white; 
+    border-radius: 4px;
 }
 
-
-
-/* ================= CRITICAL MODE ================= */
-
-
-
-#criticalPulse{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-pointer-events:none;
-
-opacity:0;
-
-background:radial-gradient(circle, rgba(255,0,0,0.3) 0%, transparent 70%);
-
-z-index:900;
-
+/* 7. NAVEGACIÓN MÓVIL */
+#cio-app-root .bottom-nav { 
+    display: none; 
 }
 
+@media (max-width: 768px) {
+    #cio-app-root .nav-actions { display: none; }
+    #cio-app-root .top-bar { justify-content: center; background: none; border: none; }
+    
+    #cio-app-root .bottom-nav {
+        display: flex; 
+        position: fixed; 
+        bottom: 0; 
+        width: 100%; 
+        height: 75px;
+        background: #071314; 
+        border-top: 1px solid #006465;
+        justify-content: space-around; 
+        align-items: center; 
+        z-index: 2000;
+        padding-bottom: 10px;
+    }
 
+    #cio-app-root .bottom-nav button { 
+        background: none; 
+        border: none; 
+        color: #00d4d8; 
+        font-size: 0.75rem; 
+        font-weight: bold; 
+    }
 
-.pulse{
+    #cio-app-root .side-panel { 
+        width: 100%; 
+        top: auto; 
+        bottom: 0; 
+        height: 85vh; 
+        transform: translateY(100%); 
+        border-radius: 25px 25px 0 0; 
+        border-left: none; 
+        border-top: 2px solid #006465; 
+    }
 
-animation:pulseRed 1.5s infinite;
+    #cio-app-root .side-panel.active { 
+        transform: translateY(0); 
+    }
 
+    #cio-app-root #display-main { 
+        padding-bottom: 120px; 
+    }
+
+    #cio-app-root #liveClock { 
+        font-size: 1.3rem; 
+    }
 }
 
-
-
-@keyframes pulseRed{
-
-0%{opacity:0;}
-
-50%{opacity:0.9;}
-
-100%{opacity:0;}
-
-}
-
-
-
-/* ================= FULLSCREEN ================= */
-
-
-
-#ghostClock{
-
-position:fixed;
-
-top:25px;
-
-right:40px;
-
-font-size:6rem;
-
-opacity:10;
-
-pointer-events:none;
-
-color:#00d4d8;
-
-letter-spacing:5px;
-
-}
-
-
-
-body.fullscreen #ghostClock{
-
-opacity:2;
-
-}
-
-
-
-body.fullscreen .control-header{
-
-display:none;
-
-}
-
-
-
-body.fullscreen #display{
-
-padding:80px;
-
-}
-
-
-
-body.fullscreen #titleDisplay{
-
-font-size:6rem;
-
-line-height:1.05;
-
-}
-
-
-
-body.fullscreen #messageDisplay{
-
-font-size:8rem;
-
-max-width:85%;
-
-line-height:1.4;
-
+/* 8. BARRA DE PROGRESO */
+#cio-app-root #progress-line { 
+    height: 6px; 
+    position: fixed; 
+    bottom: 0; 
+    width: 0%; 
+    z-index: 2001; 
+    transition: width 0.1s linear; 
 }
