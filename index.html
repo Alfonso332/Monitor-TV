@@ -6,50 +6,47 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS TOTALMENTE INTEGRADO - DISEÑO 2026 */
+        /* CSS INTEGRADO - ENCAPSULADO */
         :root {
             --primary: #00d4d8;
             --accent: #006465;
             --dark-bg: #050d0e;
-            --panel-bg: #091718;
-            --critical: #ff4d4d;
         }
 
         html, body {
             margin: 0; padding: 0; width: 100%; height: 100%;
             background: var(--dark-bg); color: #ffffff;
             font-family: 'Segoe UI', system-ui, sans-serif;
-            overflow: hidden;
+            overflow: hidden; /* EVITA BARRAS DE DESPLAZAMIENTO EN TODO EL DOCUMENTO */
         }
 
         #cio-app {
             position: relative; width: 100%; height: 100%;
             display: flex; flex-direction: column;
+            overflow: hidden;
         }
 
-        /* DISPLAY PRINCIPAL */
+        /* DISPLAY CENTRAL */
         #display-board {
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center;
-            padding: 5vh 5vw;
+            padding: 2vh 5vw;
             background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
-            transition: all 0.5s ease;
+            overflow: hidden; /* EVITA BARRAS INTERNAS */
         }
 
-        /* EFECTO CRÍTICO */
-        @keyframes pulse-critico {
-            0% { background-color: var(--dark-bg); }
-            50% { background-color: #2b0000; }
-            100% { background-color: var(--dark-bg); }
+        .info-container { 
+            width: 100%; 
+            max-width: 95vw; 
+            z-index: 5; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
         }
-        #cio-app.es-critico #display-board { animation: pulse-critico 2s infinite; }
-
-        .info-container { width: 100%; max-width: 1200px; z-index: 5; }
         
         #areaLabel { 
-            font-size: clamp(0.8rem, 2vh, 1.2rem); 
-            color: var(--primary); letter-spacing: 5px; 
-            text-transform: uppercase; margin-bottom: 1vh;
+            font-size: clamp(0.8rem, 2vh, 1.2rem); color: var(--primary); 
+            letter-spacing: 5px; text-transform: uppercase; margin-bottom: 1vh;
         }
 
         #prioBadge {
@@ -58,103 +55,74 @@
             font-size: clamp(0.7rem, 1.5vh, 1rem); margin-bottom: 2vh;
         }
 
-        #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 2vh; }
+        #titleDisplay { 
+            font-weight: 800; text-transform: uppercase; line-height: 1.1; 
+            margin-bottom: 2vh; width: 100%;
+        }
         
+        /* CORRECCIÓN: CARGA HACIA ABAJO Y SIN SCROLL */
         #messageDisplay { 
-            font-weight: 300; color: #cedddd; line-height: 1.4;
-            max-width: 90%; margin: 0 auto;
-            white-space: pre-wrap; /* Permite saltos de línea y carga hacia abajo */
+            font-weight: 300; 
+            color: #cedddd; 
+            line-height: 1.3; 
+            width: 100%;
+            max-width: 900px; /* Limita el ancho para forzar el salto de línea */
+            margin: 0 auto;
+            white-space: pre-wrap; /* Respeta enters y hace saltos automáticos */
+            word-wrap: break-word; /* Rompe palabras largas si es necesario */
+            overflow: hidden; /* No permite barras */
         }
 
-        /* HEADER Y RELOJ (ELIMINACIÓN DE BARRA EN FULLSCREEN) */
+        /* HEADER Y FULLSCREEN */
         .main-header {
             position: absolute; top: 0; width: 100%; height: 60px;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 25px; z-index: 100;
             background: rgba(0,0,0,0.4); backdrop-filter: blur(10px);
-            box-sizing: border-box; transition: background 0.3s ease;
+            box-sizing: border-box;
         }
 
-        /* MODO FULLSCREEN ESTRICTO */
-        #cio-app:fullscreen .main-header {
-            background: transparent;
-            backdrop-filter: none;
-        }
-        #cio-app:fullscreen .actions {
-            display: none !important; /* Desaparecen botones en TV */
-        }
-        #cio-app:fullscreen #clockDisplay {
-            font-size: clamp(2rem, 5vh, 4rem);
-            margin-top: 40px;
-            opacity: 0.8;
-            text-shadow: 0 0 20px rgba(0,212,216,0.5);
-        }
+        #cio-app:fullscreen .main-header { background: transparent; backdrop-filter: none; }
+        #cio-app:fullscreen .actions { display: none !important; }
+        #cio-app:fullscreen #clockDisplay { font-size: clamp(2rem, 5vh, 4rem); margin-top: 40px; }
 
-        .actions { display: flex; gap: 10px; }
         .actions button {
             background: rgba(0, 100, 101, 0.4); border: 1px solid var(--primary);
-            color: #fff; padding: 8px 15px; border-radius: 4px;
-            font-size: 12px; font-weight: bold; cursor: pointer;
+            color: #fff; padding: 8px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;
         }
 
-        #clockDisplay { 
-            font-family: monospace; font-size: 1.4rem; color: var(--primary); 
-            font-weight: bold;
-        }
+        #clockDisplay { font-family: monospace; font-size: 1.4rem; color: var(--primary); font-weight: bold; }
 
-        /* PANELES LATERALES (RESPONSIVE CELULAR Y TV) */
+        /* PANELES */
+        .side-panel {
+            position: fixed; right: 0; top: 0; width: 30vw; min-width: 350px; height: 100%;
+            background: #091718; border-left: 3px solid var(--primary);
+            padding: 25px; transform: translateX(100%); transition: 0.4s; z-index: 1100; box-sizing: border-box;
+        }
+        .side-panel.active { transform: translateX(0); }
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1000; }
         #overlay.active { display: block; }
 
-        .side-panel {
-            position: fixed; right: 0; top: 0; 
-            width: 30vw; min-width: 350px; height: 100%;
-            background: var(--panel-bg); border-left: 3px solid var(--primary);
-            padding: 25px; transform: translateX(100%);
-            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1100; overflow-y: auto; box-sizing: border-box;
-        }
-        .side-panel.active { transform: translateX(0); }
-
-        .side-panel h2 { color: var(--primary); margin-top: 0; }
-        .side-panel label { font-size: 0.8rem; color: var(--primary); display: block; margin-top: 10px; }
-        
-        .side-panel input, .side-panel textarea, .side-panel select {
-            width: 100%; padding: 12px; margin-top: 5px;
-            background: #000; color: #fff; border: 1px solid var(--accent);
-            border-radius: 4px; font-size: 1rem; box-sizing: border-box;
+        input, textarea, select {
+            width: 100%; padding: 12px; margin: 10px 0; background: #000; color: #fff; 
+            border: 1px solid var(--accent); border-radius: 4px; box-sizing: border-box;
         }
 
-        .btn-main {
-            width: 100%; background: var(--primary); color: #000;
-            padding: 15px; border: none; border-radius: 4px;
-            font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1rem;
-        }
-
-        /* NAVEGACIÓN MÓVIL */
-        .nav-mobile { display: none; }
-
+        /* MOVIL */
         @media (max-width: 768px) {
             .actions { display: none; }
-            .main-header { justify-content: flex-end; background: none; }
+            .side-panel { width: 100%; height: 85%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 20px 20px 0 0; }
+            .side-panel.active { transform: translateY(0); }
+            #display-board { padding-bottom: 100px; }
             .nav-mobile {
                 display: flex; position: fixed; bottom: 0; width: 100%; height: 70px;
                 background: #061112; border-top: 1px solid var(--primary);
                 justify-content: space-around; align-items: center; z-index: 500;
             }
             .nav-mobile button { background: none; border: none; color: var(--primary); font-size: 0.8rem; font-weight: bold; }
-            
-            .side-panel { 
-                width: 100%; min-width: 100%; height: 85%;
-                top: auto; bottom: 0; transform: translateY(100%);
-                border-left: none; border-top: 4px solid var(--primary);
-                border-radius: 20px 20px 0 0;
-            }
-            .side-panel.active { transform: translateY(0); }
-            #display-board { padding-bottom: 100px; }
         }
 
-        #progressLine { position: fixed; bottom: 0; height: 4px; width: 0%; z-index: 999; transition: width 0.1s linear; }
+        #progressLine { position: fixed; bottom: 0; height: 4px; width: 0%; z-index: 999; }
     </style>
 </head>
 <body>
@@ -164,8 +132,8 @@
 
     <header class="main-header">
         <div class="actions">
-            <button onclick="openForm()">＋ NUEVA NOVEDAD</button>
-            <button onclick="openHistory()">📋 HISTORIAL</button>
+            <button onclick="openForm()">＋ NUEVO</button>
+            <button onclick="openHistory()">📋 LISTA</button>
             <button onclick="toggleFS()" style="border-color:#ffcc00; color:#ffcc00;">⛶ MODO TV</button>
         </div>
         <div id="clockDisplay">00:00:00</div>
@@ -180,43 +148,37 @@
         </div>
     </main>
 
-    <nav class="nav-mobile">
+    <nav class="nav-mobile" style="display:none;">
         <button onclick="openForm()">➕<br>NUEVO</button>
         <button onclick="openHistory()">📋<br>LISTA</button>
     </nav>
 
     <aside id="panelForm" class="side-panel">
-        <h2>Reportar Novedad</h2>
+        <h2>Nueva Novedad</h2>
         <form onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
-            <label>ÁREA DE ORIGEN</label>
             <select id="f-area">
                 <option value="Freschat">Freschat</option>
                 <option value="Monitoreo">Monitoreo</option>
                 <option value="Atención al Cliente">Atención al Cliente</option>
-                <option value="Interno">Interno</option>
             </select>
-            <label>PRIORIDAD</label>
             <select id="f-prio">
                 <option value="Baja">Baja</option>
                 <option value="Media">Media</option>
                 <option value="Alta">Alta</option>
                 <option value="Crítica">Crítica</option>
             </select>
-            <label>TÍTULO</label>
-            <input type="text" id="f-title" placeholder="Resumen del evento" required>
-            <label>DESCRIPCIÓN (Carga hacia abajo)</label>
-            <textarea id="f-msg" rows="6" placeholder="Detalle la información aquí..." required></textarea>
-            <button type="submit" class="btn-main">PUBLICAR EN MONITOR</button>
-            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:var(--critical); border:none; margin-top:15px; cursor:pointer;">CERRAR</button>
+            <input type="text" id="f-title" placeholder="Título" required>
+            <textarea id="f-msg" rows="6" placeholder="Descripción detallada..." required></textarea>
+            <button type="submit" style="width:100%; padding:15px; background:var(--primary); font-weight:bold; cursor:pointer;">ACTUALIZAR</button>
+            <button type="button" onclick="closeAll()" style="width:100%; margin-top:10px; background:none; color:red; border:none; cursor:pointer;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2>Eventos en Curso</h2>
-        <button onclick="generatePDF()" style="width:100%; background:var(--accent); color:#fff; border:none; padding:12px; font-weight:bold; margin-bottom:20px; cursor:pointer; border-radius:4px;">📥 DESCARGAR REPORTE PDF</button>
+        <h2>Historial</h2>
+        <button onclick="generatePDF()" style="width:100%; background:white; color:black; padding:10px; font-weight:bold; cursor:pointer; margin-bottom:15px;">📥 DESCARGAR PDF</button>
         <div id="listItems"></div>
-        <button type="button" onclick="closeAll()" style="width:100%; background:none; color:var(--critical); border:none; margin-top:20px; cursor:pointer;">CERRAR</button>
     </aside>
 
     <div id="progressLine"></div>
@@ -229,18 +191,25 @@
     let timerStart = null;
     const DISPLAY_TIME = 15;
 
-    // Ajuste dinámico de texto para que no se desborde
+    // LÓGICA DE AJUSTE PARA QUE NUNCA HAYA SCROLL
     function adjustText() {
         const t = document.getElementById('titleDisplay');
         const m = document.getElementById('messageDisplay');
         const container = document.getElementById('display-board');
-        let sizeT = window.innerWidth <= 768 ? 28 : 80; 
-        let sizeM = window.innerWidth <= 768 ? 16 : 45;
-        t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
+        
+        let sizeT = window.innerWidth <= 768 ? 24 : 70; 
+        let sizeM = window.innerWidth <= 768 ? 16 : 40;
+        
+        t.style.fontSize = sizeT + "px";
+        m.style.fontSize = sizeM + "px";
+
+        // Si el contenido es más alto que el 80% de la pantalla, reduce la letra hasta que quepa
         let limit = 0;
-        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.7) && limit < 50) {
-            sizeT -= 1; sizeM -= 0.5;
-            t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
+        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.8) && limit < 60) {
+            sizeT -= 1;
+            sizeM -= 0.8;
+            t.style.fontSize = sizeT + "px";
+            m.style.fontSize = sizeM + "px";
             limit++;
         }
     }
@@ -251,20 +220,13 @@
             const d = await r.json();
             dataStore = d || [];
             if(dataStore.length > 0) refreshView(currentIndex);
-        } catch(e) { console.error("Error de sincronización"); }
+        } catch(e) { console.error(e); }
     }
 
     function refreshView(idx) {
         if(!dataStore.length) return;
         const item = dataStore[idx % dataStore.length];
-        const app = document.getElementById("cio-app");
-        const badge = document.getElementById("prioBadge");
-        
-        app.classList.toggle("es-critico", item.priority === "Crítica");
-        badge.style.backgroundColor = item.priority === "Crítica" ? "var(--critical)" : "transparent";
-        badge.style.color = item.priority === "Crítica" ? "#fff" : "var(--primary)";
-
-        badge.textContent = "Prioridad " + item.priority;
+        document.getElementById("prioBadge").textContent = "Prioridad " + item.priority;
         document.getElementById("areaLabel").textContent = item.area;
         document.getElementById("titleDisplay").textContent = item.title;
         document.getElementById("messageDisplay").textContent = item.message;
@@ -289,110 +251,42 @@
         closeAll(); syncData();
     }
 
-    // Lógica de turnos según horario solicitado
-    function getTurnoInfo(hora) {
-        if (hora >= 6 && hora < 14) return "MAÑANA (06:00 - 14:00)";
-        if (hora >= 14 && hora < 22) return "TARDE (14:00 - 22:00)";
-        return "NOCHE (22:00 - 06:00)";
-    }
-
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const now = new Date();
-        const turno = getTurnoInfo(now.getHours());
-        
-        // Cabecera Estética Color #006465
-        doc.setFillColor(0, 100, 101); 
+        doc.setFillColor(0, 100, 101); // Color corporativo #006465
         doc.rect(0, 0, 210, 40, 'F');
-        
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(20);
-        doc.text("INFORME DE NOVEDADES CIO", 20, 20);
-        doc.setFontSize(10);
-        doc.text(`TURNO: ${turno}  |  FECHA: ${now.toLocaleDateString()}`, 20, 30);
-        
-        doc.setTextColor(0, 0, 0);
-        let y = 55;
+        doc.setTextColor(255);
+        doc.text("REPORTE CIO", 20, 25);
+        doc.setTextColor(0);
+        let y = 50;
         dataStore.forEach((item, i) => {
-            if (y > 270) { doc.addPage(); y = 20; }
-            doc.setFont(undefined, 'bold');
-            doc.setTextColor(0, 100, 101);
-            doc.text(`${i+1}. AREA: ${item.area} [Prioridad: ${item.priority}]`, 20, y);
-            y += 7;
-            doc.setFont(undefined, 'normal');
-            doc.setTextColor(50, 50, 50);
-            const textLines = doc.splitTextToSize(`TÍTULO: ${item.title}\nDESCRIPCIÓN: ${item.message}`, 170);
-            doc.text(textLines, 25, y);
-            y += (textLines.length * 6) + 10;
-            doc.setDrawColor(200, 200, 200);
-            doc.line(20, y-5, 190, y-5);
+            doc.text(`${i+1}. ${item.area} - ${item.title}`, 20, y);
+            y += 10;
         });
-        
-        doc.save(`Reporte_CIO_${now.toLocaleDateString().replace(/\//g,'-')}.pdf`);
+        doc.save("Reporte_CIO.pdf");
     }
 
-    window.onDelete = async (i) => {
-        if(!confirm("¿Eliminar entrada?")) return;
-        dataStore.splice(i, 1);
-        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore.length ? dataStore : null) });
-        openHistory(); syncData();
-    };
-
-    window.onEdit = (i) => {
-        const item = dataStore[i];
-        document.getElementById("editId").value = i;
-        document.getElementById("f-area").value = item.area;
-        document.getElementById("f-prio").value = item.priority;
-        document.getElementById("f-title").value = item.title;
-        document.getElementById("f-msg").value = item.message;
-        document.getElementById("panelHistory").classList.remove("active");
-        document.getElementById("panelForm").classList.add("active");
-    };
-
-    function openForm() { 
-        document.getElementById("editId").value = "-1";
-        document.getElementById("panelForm").classList.add("active"); 
-        document.getElementById("overlay").classList.add("active"); 
-    }
-    
+    function openForm() { document.getElementById("editId").value = "-1"; document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay").classList.add("active"); }
     function openHistory() { 
         const list = document.getElementById("listItems");
-        list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border:1px solid var(--primary); border-radius:4px;">
-                <div style="font-size:11px; color:var(--primary);">${item.area} | ${item.priority}</div>
-                <div style="font-weight:bold; margin:5px 0;">${item.title}</div>
-                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">EDITAR</button>
-                <button onclick="onDelete(${i})" style="background:var(--critical); color:white; border:none; padding:5px 10px; margin-left:5px; cursor:pointer; font-weight:bold;">ELIMINAR</button>
-            </div>
-        `).join('') : "<p style='opacity:0.5; text-align:center;'>No hay registros.</p>";
-        document.getElementById("panelHistory").classList.add("active"); 
-        document.getElementById("overlay").classList.add("active"); 
+        list.innerHTML = dataStore.map((item, i) => `<div style="border:1px solid var(--primary); padding:10px; margin-bottom:5px;">${item.title} <button onclick="onDelete(${i})">X</button></div>`).join('');
+        document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").classList.add("active"); 
     }
-
-    function closeAll() { 
-        document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active'));
-    }
-
-    function toggleFS() { 
-        const root = document.getElementById('cio-app');
-        if (!document.fullscreenElement) root.requestFullscreen();
-        else document.exitFullscreen();
-    }
+    function closeAll() { document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active')); }
+    window.onDelete = async (i) => { dataStore.splice(i, 1); await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore) }); syncData(); };
+    function toggleFS() { if (!document.fullscreenElement) document.getElementById('cio-app').requestFullscreen(); else document.exitFullscreen(); }
 
     function runLoop(ts) {
         if(!dataStore.length) { requestAnimationFrame(runLoop); return; }
         if(!timerStart) timerStart = ts;
         const elapsed = (ts - timerStart) / 1000;
-        document.getElementById("progressLine").style.width = Math.min((elapsed / DISPLAY_TIME) * 100, 100) + "%";
+        document.getElementById("progressLine").style.width = ((elapsed / DISPLAY_TIME) * 100) + "%";
         if(elapsed >= DISPLAY_TIME){ currentIndex++; refreshView(currentIndex); timerStart = ts; }
         requestAnimationFrame(runLoop);
     }
 
-    setInterval(() => {
-        document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
-    }, 1000);
-
+    setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}); }, 1000);
     setInterval(syncData, 10000);
     window.addEventListener('resize', adjustText);
     syncData();
