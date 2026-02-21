@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* --- FUERZA BRUTA PARA EL DISPLAY (AUTO-AJUSTE) --- */
+        /* --- AJUSTES DE DISPLAY --- */
         #display {
             display: flex !important;
             flex-direction: column !important;
@@ -24,6 +24,17 @@
             transition: background 0.5s ease;
         }
 
+        /* --- RELOJ EN FULLSCREEN (Más grande y visible) --- */
+        :fullscreen #clock {
+            font-size: 3.5rem !important;
+            color: #00ff88 !important;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            padding-right: 20px;
+        }
+        
+        /* Compatibilidad con Chrome/Safari */
+        :-webkit-full-screen #clock { font-size: 3.5rem !important; color: #00ff88 !important; }
+
         .info-block {
             width: 100% !important;
             max-height: 85vh !important;
@@ -36,7 +47,7 @@
         #titleDisplay { margin: 0 0 15px 0 !important; font-weight: 800; line-height: 1 !important; text-transform: uppercase; }
         #messageDisplay { margin: 0 !important; line-height: 1.1 !important; white-space: pre-wrap !important; word-wrap: break-word !important; }
 
-        /* --- EFECTO CRÍTICO MEJORADO --- */
+        /* --- EFECTO CRÍTICO --- */
         @keyframes pulse-red {
             0% { background-color: #0a1a1b; }
             50% { background-color: #5a0000; }
@@ -48,13 +59,12 @@
             text-shadow: 0 0 25px rgba(255, 0, 0, 0.8) !important;
         }
 
-        /* --- DISEÑO PARA MÓVILES (CELULAR) --- */
+        /* --- DISEÑO MÓVIL (Celular) --- */
         @media (max-width: 768px) {
             #ghostClock, #btnFullscreen, .left-zone { display: none !important; }
             .control-header { justify-content: center !important; height: 60px; }
             #display { padding: 20px !important; }
             
-            /* Menú inferior móvil */
             .mobile-nav {
                 display: flex !important;
                 position: fixed; bottom: 0; left: 0; right: 0;
@@ -64,24 +74,22 @@
                 z-index: 10002;
                 padding-bottom: env(safe-area-inset-bottom);
             }
-            .nav-item { color: #00ff88; background: none; border: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-            .nav-item span { font-size: 1.4rem; margin-bottom: 4px; }
-
-            /* Drawers (Ventanas emergentes desde abajo) */
+            .nav-item { color: #00ff88; background: none; border: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; }
+            
             .drawer {
-                width: 100% !important; height: 90vh !important;
+                width: 100% !important; height: 85vh !important;
                 bottom: -100vh; top: auto !important; left: 0 !important;
                 border-radius: 25px 25px 0 0;
                 transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
                 padding: 20px; z-index: 10005 !important;
+                background: #0f2426;
             }
             .drawer.active { bottom: 0 !important; }
             .footer-bar { bottom: 75px; height: 5px; }
         }
 
-        .mobile-nav { display: none; } /* Oculto en PC */
-        .drawer { z-index: 10005; }
-        #drawerOverlay { z-index: 10004; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; }
+        .mobile-nav { display: none; }
+        #drawerOverlay { z-index: 10004; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; }
         #drawerOverlay.active { display: block; }
     </style>
 </head>
@@ -89,20 +97,20 @@
 
 <div id="drawerOverlay"></div>
 
-<header class="control-header">
+<header class="control-header" style="position: fixed; top: 0; width: 100%; z-index: 10003; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
     <div class="left-zone">
         <button id="btnNew">＋ NUEVO</button>
         <button id="btnManage">☰ HISTORIAL</button>
         <button id="btnFullscreen">⛶ FULL</button>
     </div>
-    <div class="live-clock" id="clock">00:00:00</div>
+    <div class="live-clock" id="clock" style="font-weight: bold; font-family: monospace;">00:00:00</div>
 </header>
 
 <main id="display">
     <div class="info-block">
         <div id="areaLabel" class="area" style="font-size: 1.5rem; margin-bottom: 10px; color: #00ff88;">SISTEMA</div>
         <h1 id="titleDisplay">...</h1>
-        <p id="messageDisplay">Sincronizando...</p>
+        <p id="messageDisplay">Cargando...</p>
     </div>
 </main>
 
@@ -134,16 +142,16 @@
         </select>
         <input type="text" id="inputTitle" placeholder="Servicio/Título" required>
         <textarea id="inputMessage" rows="5" placeholder="Novedad..." required></textarea>
-        <div class="form-actions" style="display:flex; gap:10px; margin-top:15px;">
-            <button type="button" onclick="closeAllDrawers()" style="flex:1; background:#444;">CANCELAR</button>
-            <button type="submit" style="flex:2; background:#00ff88; color:#000;">GUARDAR EN TV</button>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button type="button" onclick="closeAllDrawers()" style="flex:1; background:#444; color:white; border:none; padding:12px; border-radius:8px;">CANCELAR</button>
+            <button type="submit" style="flex:2; background:#00ff88; color:#000; border:none; padding:12px; border-radius:8px; font-weight:bold;">GUARDAR EN TV</button>
         </div>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
     <div style="width: 40px; height: 5px; background: #333; margin: 0 auto 15px; border-radius: 10px;"></div>
-    <button class="btn-pdf" onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:15px;">📥 DESCARGAR REPORTE</button>
+    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:15px; border-radius:10px; border:none; margin-bottom:15px; font-weight:bold;">📥 DESCARGAR REPORTE</button>
     <div id="historyList"></div>
 </aside>
 
@@ -154,16 +162,23 @@
     let startTime = null;
     const DURATION = 15;
 
-    // --- AUTO-AJUSTE DE TEXTO ---
+    // --- AUTO-AJUSTE DINÁMICO ---
     function fitText() {
         const title = document.getElementById('titleDisplay');
         const message = document.getElementById('messageDisplay');
         const display = document.getElementById('display');
-        let sizeT = 80; let sizeM = 110;
+        
+        // Ajustar valores base según dispositivo
+        const esMovil = window.innerWidth <= 768;
+        let sizeT = esMovil ? 45 : 85; 
+        let sizeM = esMovil ? 55 : 110;
+
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
+
         let safety = 0;
-        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.75) && safety < 80) {
+        // Bucle de ajuste: si el texto es muy grande, reduce
+        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.7) && safety < 80) {
             sizeT -= 1; sizeM -= 1.5;
             title.style.fontSize = sizeT + "px";
             message.style.fontSize = sizeM + "px";
@@ -184,7 +199,6 @@
             if (JSON.stringify(nuevos) !== JSON.stringify(registros)) {
                 registros = nuevos;
                 render(currentIndex);
-                if(document.getElementById("drawerHistory").classList.contains("active")) renderHistory();
             }
         } catch (e) {}
     }
@@ -194,11 +208,12 @@
         if(!registros.length) {
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = "SISTEMA";
-            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
-            document.getElementById("messageDisplay").textContent = "En espera de reportes...";
+            document.getElementById("titleDisplay").textContent = "VACÍO";
+            document.getElementById("messageDisplay").textContent = "Sin novedades activas";
             return;
         }
         const reg = registros[index % registros.length];
+        
         if(reg.priority === "critical") {
             display.classList.add("critico-total");
             document.getElementById("areaLabel").textContent = "⚠️ " + reg.area.toUpperCase() + " ⚠️";
@@ -206,15 +221,18 @@
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
         }
+        
         document.getElementById("titleDisplay").textContent = reg.title;
         document.getElementById("messageDisplay").textContent = reg.message;
+        
         const colors = {low:"#00ff88", medium:"#00ccff", high:"#ffcc00", critical:"#ff4d4d"};
         document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
+        
         setTimeout(fitText, 50);
     }
 
     window.eliminarEvento = async (i) => {
-        if(confirm("¿Eliminar novedad?")) {
+        if(confirm("¿Eliminar definitivamente?")) {
             registros.splice(i, 1);
             await syncCloud();
             renderHistory();
@@ -235,11 +253,11 @@
     function renderHistory() {
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
-            <div style="background:rgba(0,100,101,0.2); padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid #006465;">
-                <strong>${reg.title}</strong><br><small>${reg.area}</small>
+            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid #006465;">
+                <strong style="color:#00ff88">${reg.title}</strong><br><small>${reg.area}</small>
                 <div style="margin-top:10px; display:flex; gap:10px; justify-content:flex-end;">
-                    <button onclick="editarEvento(${i})" style="background:#ffcc00; color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold;">EDITAR</button>
-                    <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold;">BORRAR</button>
+                    <button onclick="editarEvento(${i})" style="background:#ffcc00; color:black; border:none; padding:8px 15px; border-radius:6px; font-weight:bold;">EDITAR</button>
+                    <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:6px; font-weight:bold;">BORRAR</button>
                 </div>
             </div>
         `).join('');
