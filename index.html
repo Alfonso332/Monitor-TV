@@ -6,27 +6,22 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS DENTRO DEL HTML - SIN COLISIONES */
-        body, html {
-            margin: 0;
-            padding: 0;
-            background: #050d0e;
-            overflow: hidden;
-            height: 100%;
-            width: 100%;
-        }
-
-        #cio-master {
+        /* CSS INTERNO - EVITA CONFLICTOS */
+        #cio-app {
             position: relative;
             width: 100vw;
             height: 100vh;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #050d0e;
+            color: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
         }
 
-        /* FONDO Y DISPLAY */
-        #display {
+        #cio-app * { box-sizing: border-box; }
+
+        /* PANTALLA PRINCIPAL */
+        #display-board {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -35,318 +30,336 @@
             width: 100%;
             text-align: center;
             background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
-            transition: background 0.5s ease;
-            padding: 20px;
+            transition: all 0.5s ease;
+            padding: 30px;
         }
 
-        /* ANIMACIÓN CRÍTICA ROJO OSCURO */
-        @keyframes pulse-critical {
+        /* EFECTO CRÍTICO REFINADO */
+        @keyframes bg-critical {
             0% { background-color: #050d0e; }
-            50% { background-color: #300000; }
+            50% { background-color: #2b0000; }
             100% { background-color: #050d0e; }
         }
-        .is-critical #display {
-            animation: pulse-critical 1.5s infinite !important;
+        
+        #cio-app.es-critico #display-board {
+            animation: bg-critical 2s infinite ease-in-out;
         }
 
-        /* CONTENIDO DE TEXTO */
-        .info-block { z-index: 10; width: 90%; }
-        #areaLabel { font-size: 1.5rem; color: #00d4d8; letter-spacing: 5px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        #cio-app.es-critico #titleDisplay {
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+            color: #fff;
+        }
+
+        /* CONTENIDO */
+        .info-container { z-index: 5; width: 90%; max-width: 1400px; }
         
+        #areaLabel { 
+            font-size: 1.4rem; 
+            color: #00d4d8; 
+            letter-spacing: 6px; 
+            text-transform: uppercase; 
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
         #prioBadge {
             display: inline-block;
-            padding: 8px 25px;
-            border-radius: 5px;
-            font-weight: 800;
+            padding: 10px 30px;
+            border-radius: 6px;
+            font-weight: 900;
             text-transform: uppercase;
-            margin-bottom: 20px;
-            border: 2px solid rgba(255,255,255,0.2);
-            font-size: 1.1rem;
+            margin-bottom: 25px;
+            border: 2px solid rgba(255,255,255,0.1);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
         }
 
-        #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 15px; }
-        #messageDisplay { font-weight: 300; color: #b0c4c4; line-height: 1.3; }
+        #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 20px; transition: 0.3s; }
+        #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.4; max-width: 80%; margin: 0 auto; }
 
-        /* CABECERA Y BOTONES */
-        .control-header {
-            position: absolute; top: 0; width: 100%; height: 80px;
+        /* CABECERA PC */
+        .main-header {
+            position: absolute; top: 0; width: 100%; height: 75px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; z-index: 1000;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(0, 212, 216, 0.2);
+            padding: 0 40px; z-index: 100;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(0, 212, 216, 0.15);
         }
 
-        .header-btns button {
-            background: rgba(0, 100, 101, 0.4);
+        .actions button {
+            background: rgba(0, 100, 101, 0.3);
             border: 1px solid #00d4d8;
-            color: #fff; padding: 10px 20px; border-radius: 5px;
+            color: #fff; padding: 10px 18px; border-radius: 4px;
             font-weight: bold; cursor: pointer; margin-right: 10px;
-            transition: 0.3s;
+            font-size: 0.75rem;
         }
 
-        #clock { font-family: monospace; font-size: 1.8rem; color: #00d4d8; font-weight: bold; }
+        #clockDisplay { font-family: monospace; font-size: 1.6rem; color: #00d4d8; font-weight: bold; transition: 0.5s; }
 
-        /* MODO FULLSCREEN TV: OCULTA TODO LO QUE NO SEA RELOJ */
-        #cio-master:fullscreen .header-btns { display: none !important; }
-        #cio-master:fullscreen .control-header { 
-            background: transparent; border: none; justify-content: center; height: 200px; 
+        /* MODO TV (FULLSCREEN) */
+        #cio-app:fullscreen .actions { display: none !important; }
+        #cio-app:fullscreen .main-header { background: transparent; border: none; justify-content: center; height: 220px; }
+        #cio-app:fullscreen #clockDisplay { 
+            font-size: 8.5rem; 
+            text-shadow: 0 0 45px rgba(0, 212, 216, 0.5); 
+            margin-top: 80px; 
         }
-        #cio-master:fullscreen #clock { 
-            font-size: 8rem; text-shadow: 0 0 40px rgba(0, 212, 216, 0.6); margin-top: 60px; 
-        }
+        #cio-app:fullscreen.es-critico #clockDisplay { color: #ff4d4d; text-shadow: 0 0 45px rgba(255, 0, 0, 0.6); }
 
-        /* FORMULARIOS Y DRAWERS */
-        #drawerOverlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-            display: none; z-index: 2000; cursor: pointer;
+        /* FORMULARIOS Y PANELES */
+        #overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            display: none; z-index: 1000; cursor: pointer;
         }
-        #drawerOverlay.active { display: block; }
+        #overlay.active { display: block; }
 
-        .drawer {
-            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
-            background: #0a1a1c; border-left: 3px solid #00d4d8;
+        .side-panel {
+            position: fixed; right: 0; top: 0; width: 420px; height: 100%;
+            background: #081415; border-left: 3px solid #00d4d8;
             padding: 40px; transform: translateX(100%);
-            transition: 0.4s ease; z-index: 3000; overflow-y: auto;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1100; overflow-y: auto;
         }
-        .drawer.active { transform: translateX(0); }
+        .side-panel.active { transform: translateX(0); }
 
-        .drawer input, .drawer textarea, .drawer select {
+        .side-panel h2 { color: #00d4d8; margin-bottom: 25px; font-size: 1.5rem; }
+        .side-panel input, .side-panel textarea, .side-panel select {
             width: 100%; padding: 12px; margin-bottom: 15px;
-            background: #000; color: #fff; border: 1px solid #00d4d8; border-radius: 4px;
+            background: #000; color: #fff; border: 1px solid #006465; border-radius: 4px;
         }
 
-        /* MÓVIL (PANTALLA CHICA) */
-        .mobile-nav { display: none; }
+        /* NAVEGACIÓN MÓVIL */
+        .nav-mobile { display: none; }
 
         @media (max-width: 768px) {
-            .header-btns { display: none !important; }
-            .mobile-nav {
-                display: flex; position: fixed; bottom: 0; width: 100%; height: 80px;
-                background: #071314; border-top: 1px solid #00d4d8;
-                justify-content: space-around; align-items: center; z-index: 1500;
+            .actions { display: none !important; }
+            .main-header { justify-content: center; }
+            .nav-mobile {
+                display: flex; position: fixed; bottom: 0; width: 100%; height: 75px;
+                background: #061112; border-top: 1px solid #00d4d8;
+                justify-content: space-around; align-items: center; z-index: 500;
             }
-            .mobile-nav button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.8rem; }
-            .drawer { width: 100%; border-left: none; border-top: 3px solid #00d4d8; transform: translateY(100%); }
-            .drawer.active { transform: translateY(0); }
-            #display { padding-bottom: 100px; }
-            #clock { font-size: 1.4rem; }
+            .nav-mobile button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.8rem; }
+            .side-panel { width: 100%; transform: translateY(100%); border-radius: 20px 20px 0 0; border-top: 3px solid #00d4d8; }
+            .side-panel.active { transform: translateY(0); }
+            #display-board { padding-bottom: 100px; }
+            #clockDisplay { font-size: 1.4rem; }
         }
 
-        #progressBar { position: fixed; bottom: 0; height: 8px; width: 0%; z-index: 2500; transition: width 0.1s linear; }
+        #progressLine { position: fixed; bottom: 0; height: 6px; width: 0%; z-index: 999; transition: width 0.1s linear; }
     </style>
 </head>
 <body>
 
-<div id="cio-master">
-    <div id="drawerOverlay" onclick="closeAll()"></div>
+<div id="cio-app">
+    <div id="overlay" onclick="closeAll()"></div>
 
-    <header class="control-header">
-        <div class="header-btns">
+    <header class="main-header">
+        <div class="actions">
             <button onclick="openForm()">＋ NUEVO</button>
             <button onclick="openHistory()">📋 HISTORIAL</button>
-            <button onclick="toggleFS()" style="border-color:#ffcc00; color:#ffcc00;">⛶ PANTALLA COMPLETA</button>
+            <button onclick="toggleFS()" style="border-color:#ffcc00; color:#ffcc00;">⛶ MODO TV</button>
         </div>
-        <div id="clock">00:00:00</div>
+        <div id="clockDisplay">00:00:00</div>
     </header>
 
-    <main id="display">
-        <div class="info-block">
-            <div id="areaLabel">CARGANDO...</div>
+    <main id="display-board">
+        <div class="info-container">
+            <div id="areaLabel">CIO MONITOR</div>
             <div id="prioBadge">NORMAL</div>
-            <h1 id="titleDisplay">INICIALIZANDO SISTEMA</h1>
-            <p id="messageDisplay">Por favor, espera mientras sincronizamos los datos operativos.</p>
+            <h1 id="titleDisplay">Sincronizando...</h1>
+            <p id="messageDisplay">Conectando con la base de datos operativa.</p>
         </div>
     </main>
 
-    <nav class="mobile-nav">
-        <button onclick="openForm()">➕<br>AÑADIR</button>
-        <button onclick="openHistory()">📋<br>LISTA</button>
+    <nav class="nav-mobile">
+        <button onclick="openForm()">➕<br>NUEVO</button>
+        <button onclick="openHistory()">📋<br>HISTORIAL</button>
     </nav>
 
-    <aside id="drawerForm" class="drawer">
-        <h2 style="color:#00d4d8; margin-bottom:20px;">Nueva Novedad</h2>
-        <form onsubmit="saveData(event)">
-            <input type="hidden" id="editIdx" value="-1">
-            <label style="color:#00d4d8; font-size:0.8rem;">ÁREA RESPONSABLE</label>
-            <select id="inArea">
+    <aside id="panelForm" class="side-panel">
+        <h2>Nueva Novedad</h2>
+        <form onsubmit="handleSave(event)">
+            <input type="hidden" id="editId" value="-1">
+            <label style="color:#00d4d8; font-size:0.75rem;">ÁREA</label>
+            <select id="f-area">
                 <option value="Freschat">Freschat</option>
                 <option value="Monitoreo">Monitoreo</option>
                 <option value="Atención al Cliente">Atención al Cliente</option>
                 <option value="Interno">Interno</option>
             </select>
-            <label style="color:#00d4d8; font-size:0.8rem;">PRIORIDAD</label>
-            <select id="inPrio">
+            <label style="color:#00d4d8; font-size:0.75rem;">PRIORIDAD</label>
+            <select id="f-prio">
                 <option value="Baja">Baja</option>
                 <option value="Media">Media</option>
                 <option value="Alta">Alta</option>
                 <option value="Crítica">Crítica</option>
             </select>
-            <input type="text" id="inTitle" placeholder="Título del Evento" required>
-            <textarea id="inMsg" rows="5" placeholder="Descripción detallada..." required></textarea>
-            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:15px; border:none; font-weight:bold; cursor:pointer; border-radius:5px;">ACTUALIZAR MONITOR</button>
+            <input type="text" id="f-title" placeholder="Título" required>
+            <textarea id="f-msg" rows="5" placeholder="Descripción de la novedad..." required></textarea>
+            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:15px; border:none; font-weight:bold; cursor:pointer; border-radius:4px;">ACTUALIZAR MONITOR</button>
             <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:15px; cursor:pointer;">CANCELAR</button>
         </form>
     </aside>
 
-    <aside id="drawerHistory" class="drawer">
-        <h2 style="color:#00d4d8; margin-bottom:20px;">Novedades Activas</h2>
-        <button onclick="makePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; font-weight:bold; margin-bottom:20px; cursor:pointer; border-radius:5px;">GENERAR REPORTE PDF</button>
-        <div id="historyItems"></div>
+    <aside id="panelHistory" class="side-panel">
+        <h2>Historial de Eventos</h2>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; font-weight:bold; margin-bottom:20px; cursor:pointer; border-radius:4px;">DESCARGAR PDF</button>
+        <div id="listItems"></div>
     </aside>
 
-    <div id="progressBar"></div>
+    <div id="progressLine"></div>
 </div>
 
 <script>
-    const API = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
-    let store = [];
-    let cur = 0;
-    let start = null;
-    const TIME = 15;
+    const API_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    let dataStore = [];
+    let currentIndex = 0;
+    let timerStart = null;
+    const DISPLAY_TIME = 15;
 
-    function fit() {
+    function adjustText() {
         const t = document.getElementById('titleDisplay');
         const m = document.getElementById('messageDisplay');
-        const d = document.getElementById('display');
-        let sT = window.innerWidth <= 768 ? 30 : 90; 
-        let sM = window.innerWidth <= 768 ? 20 : 55;
-        t.style.fontSize = sT + "px"; m.style.fontSize = sM + "px";
-        let safety = 0;
-        while ((t.offsetHeight + m.offsetHeight > d.offsetHeight * 0.6) && safety < 60) {
-            sT -= 1; sM -= 1;
-            t.style.fontSize = sT + "px"; m.style.fontSize = sM + "px";
-            safety++;
+        const container = document.getElementById('display-board');
+        let sizeT = window.innerWidth <= 768 ? 32 : 90; 
+        let sizeM = window.innerWidth <= 768 ? 20 : 55;
+        t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
+        let limit = 0;
+        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.6) && limit < 50) {
+            sizeT -= 1; sizeM -= 1;
+            t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
+            limit++;
         }
     }
 
-    async function sync() {
+    async function syncData() {
         try {
-            const r = await fetch(API);
+            const r = await fetch(API_URL);
             const d = await r.json();
-            store = d || [];
-            if(store.length > 0) render(cur);
-        } catch(e) {}
+            dataStore = d || [];
+            if(dataStore.length > 0) refreshView(currentIndex);
+        } catch(e) { console.error("Sync Error"); }
     }
 
-    function render(i) {
-        if(!store.length) return;
-        const item = store[i % store.length];
-        const master = document.getElementById("cio-master");
+    function refreshView(idx) {
+        if(!dataStore.length) return;
+        const item = dataStore[idx % dataStore.length];
+        const app = document.getElementById("cio-app");
         const badge = document.getElementById("prioBadge");
         
-        // Efecto Crítico
+        // Manejo de prioridad Crítica
         if(item.priority === "Crítica") {
-            master.classList.add("is-critical");
+            app.classList.add("es-critico");
             badge.style.background = "#ff4d4d";
-            badge.style.color = "white";
+            badge.style.color = "#fff";
+            badge.style.transform = "scale(1.1)";
         } else {
-            master.classList.remove("is-critical");
+            app.classList.remove("es-critico");
             badge.style.background = "transparent";
             badge.style.color = "#00d4d8";
+            badge.style.transform = "scale(1.0)";
         }
 
-        badge.textContent = "PRIORIDAD " + item.priority;
+        badge.textContent = "Prioridad " + item.priority;
         document.getElementById("areaLabel").textContent = item.area;
         document.getElementById("titleDisplay").textContent = item.title;
         document.getElementById("messageDisplay").textContent = item.message;
         
         const colors = {"Baja":"#00d4d8", "Media":"#00ccff", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
-        document.getElementById("progressBar").style.background = colors[item.priority] || "#00d4d8";
+        document.getElementById("progressLine").style.background = colors[item.priority] || "#00d4d8";
         
-        setTimeout(fit, 50);
+        setTimeout(adjustText, 50);
     }
 
-    async function saveData(e) {
+    async function handleSave(e) {
         e.preventDefault();
-        const idx = parseInt(document.getElementById("editIdx").value);
-        const obj = {
-            area: document.getElementById("inArea").value,
-            priority: document.getElementById("inPrio").value,
-            title: document.getElementById("inTitle").value,
-            message: document.getElementById("inMsg").value
+        const id = parseInt(document.getElementById("editId").value);
+        const entry = {
+            area: document.getElementById("f-area").value,
+            priority: document.getElementById("f-prio").value,
+            title: document.getElementById("f-title").value,
+            message: document.getElementById("f-msg").value
         };
-        if(idx === -1) store.push(obj); else store[idx] = obj;
-        await fetch(API, { method: 'PUT', body: JSON.stringify(store) });
-        closeAll(); sync();
+        if(id === -1) dataStore.push(entry); else dataStore[id] = entry;
+        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore) });
+        closeAll(); syncData();
     }
 
-    window.del = async (i) => {
-        if(!confirm("¿Eliminar novedad?")) return;
-        store.splice(i, 1);
-        await fetch(API, { method: 'PUT', body: JSON.stringify(store.length ? store : null) });
-        openHistory(); sync();
+    window.onDelete = async (i) => {
+        if(!confirm("¿Borrar novedad?")) return;
+        dataStore.splice(i, 1);
+        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore.length ? dataStore : null) });
+        openHistory(); syncData();
     };
 
-    window.edit = (i) => {
-        const item = store[i];
-        document.getElementById("editIdx").value = i;
-        document.getElementById("inArea").value = item.area;
-        document.getElementById("inPrio").value = item.priority;
-        document.getElementById("inTitle").value = item.title;
-        document.getElementById("inMsg").value = item.message;
-        document.getElementById("drawerHistory").classList.remove("active");
-        document.getElementById("drawerForm").classList.add("active");
+    window.onEdit = (i) => {
+        const item = dataStore[i];
+        document.getElementById("editId").value = i;
+        document.getElementById("f-area").value = item.area;
+        document.getElementById("f-prio").value = item.priority;
+        document.getElementById("f-title").value = item.title;
+        document.getElementById("f-msg").value = item.message;
+        document.getElementById("panelHistory").classList.remove("active");
+        document.getElementById("panelForm").classList.add("active");
     };
 
     function openForm() { 
-        document.getElementById("editIdx").value = "-1";
-        document.getElementById("drawerForm").classList.add("active"); 
-        document.getElementById("drawerOverlay").classList.add("active"); 
+        document.getElementById("editId").value = "-1";
+        document.getElementById("panelForm").classList.add("active"); 
+        document.getElementById("overlay").classList.add("active"); 
     }
     
     function openHistory() { 
-        const cont = document.getElementById("historyItems");
-        cont.innerHTML = store.length ? store.map((item, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border:1px solid #00d4d8; border-radius:5px;">
-                <strong style="color:#00d4d8; display:block; margin-bottom:5px;">${item.title}</strong>
-                <button onclick="edit(${i})" style="background:#ffcc00; border:none; padding:5px 10px; font-size:11px; cursor:pointer; font-weight:bold;">EDITAR</button>
-                <button onclick="del(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; font-size:11px; margin-left:5px; cursor:pointer; font-weight:bold;">BORRAR</button>
+        const list = document.getElementById("listItems");
+        list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
+            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border:1px solid #00d4d8; border-radius:4px;">
+                <div style="font-size:0.7rem; color:#00d4d8; margin-bottom:5px;">${item.area} | ${item.priority}</div>
+                <strong style="display:block; margin-bottom:10px;">${item.title}</strong>
+                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; padding:5px 10px; font-size:10px; cursor:pointer; font-weight:bold; border-radius:2px;">EDITAR</button>
+                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; font-size:10px; margin-left:5px; cursor:pointer; font-weight:bold; border-radius:2px;">BORRAR</button>
             </div>
-        `).join('') : "<p>No hay novedades registradas.</p>";
-        document.getElementById("drawerHistory").classList.add("active"); 
-        document.getElementById("drawerOverlay").classList.add("active"); 
+        `).join('') : "<p>No hay registros.</p>";
+        document.getElementById("panelHistory").classList.add("active"); 
+        document.getElementById("overlay").classList.add("active"); 
     }
 
     function closeAll() { 
-        document.getElementById("drawerForm").classList.remove("active");
-        document.getElementById("drawerHistory").classList.remove("active");
-        document.getElementById("drawerOverlay").classList.remove("active");
+        document.getElementById("panelForm").classList.remove("active");
+        document.getElementById("panelHistory").classList.remove("active");
+        document.getElementById("overlay").classList.remove("active");
     }
 
     function toggleFS() { 
-        const elem = document.getElementById('cio-master');
-        if (!document.fullscreenElement) elem.requestFullscreen().catch(err => alert(err.message));
+        const root = document.getElementById('cio-app');
+        if (!document.fullscreenElement) root.requestFullscreen();
         else document.exitFullscreen();
     }
 
-    function loop(ts) {
-        if(!store.length) { requestAnimationFrame(loop); return; }
-        if(!start) start = ts;
-        const prog = (ts - start) / 1000;
-        document.getElementById("progressBar").style.width = Math.min((prog / TIME) * 100, 100) + "%";
-        if(prog >= TIME){ cur++; render(cur); start = ts; }
-        requestAnimationFrame(loop);
+    function runLoop(ts) {
+        if(!dataStore.length) { requestAnimationFrame(runLoop); return; }
+        if(!timerStart) timerStart = ts;
+        const elapsed = (ts - timerStart) / 1000;
+        document.getElementById("progressLine").style.width = Math.min((elapsed / DISPLAY_TIME) * 100, 100) + "%";
+        if(elapsed >= DISPLAY_TIME){ currentIndex++; refreshView(currentIndex); timerStart = ts; }
+        requestAnimationFrame(runLoop);
     }
 
-    function makePDF() {
+    function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(18); doc.text("REPORTE OPERATIVO CIO", 20, 20);
-        doc.setFontSize(12);
-        store.forEach((r, i) => {
-            doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 40 + (i*10));
-        });
+        doc.setFontSize(18); doc.text("MONITOR CIO - REPORTE", 20, 20);
+        dataStore.forEach((r, i) => doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 40 + (i*10)));
         doc.save("Reporte_CIO.pdf");
     }
 
     setInterval(() => {
-        document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
+        document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
     }, 1000);
 
-    setInterval(sync, 10000);
-    window.addEventListener('resize', fit);
-    sync();
-    requestAnimationFrame(loop);
+    setInterval(syncData, 10000);
+    window.addEventListener('resize', adjustText);
+    syncData();
+    requestAnimationFrame(runLoop);
 </script>
 </body>
 </html>
