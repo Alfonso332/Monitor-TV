@@ -30,7 +30,7 @@
 
         #cio-app .header-actions button {
             background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
-            color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 12px;
+            color: #fff; padding: 8px 16px; border-radius: 12px; font-size: 12px;
             font-weight: bold; cursor: pointer; transition: 0.3s; margin-right: 8px;
         }
 
@@ -65,7 +65,7 @@
 
         /* NAVEGACIÓN MOBILE */
         #cio-app .nav-mobile {
-            display: none; height: 90px; background: #071213; border-top: 1px solid var(--primary);
+            display: none; height: 95px; background: #071213; border-top: 1px solid var(--primary);
             justify-content: space-around; align-items: flex-start; padding-top: 15px;
             padding-bottom: env(safe-area-inset-bottom);
         }
@@ -86,27 +86,32 @@
         #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; z-index: 1050; }
         #cio-app #overlay-cio.active { display: block; }
 
-        /* FORMULARIOS */
+        /* FORMULARIOS Y BOTONES */
         #cio-app h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
         #cio-app label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent);
-            border-radius: 6px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
+            border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
         }
-        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 6px; cursor: pointer; }
+        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; }
+        #cio-app .btn-cancel { width: 100%; padding: 12px; background: rgba(255, 77, 77, 0.1); color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 12px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+
+        /* LISTA HISTORIAL */
+        #cio-app .history-item { background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary); border-radius: 12px; }
+        #cio-app .history-item button { border-radius: 8px; cursor: pointer; border: none; padding: 8px 15px; font-weight: bold; }
 
         /* RESPONSIVE */
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
             #cio-app .nav-mobile { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-left: none; border-top: 3px solid var(--primary); border-radius: 20px 20px 0 0; }
+            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-left: none; border-top: 3px solid var(--primary); border-radius: 25px 25px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
-            #cio-app #display-board { padding-bottom: 130px; } /* Ajuste para que no tape el texto */
+            #cio-app #display-board { padding-bottom: 140px; }
             #cio-app #clockDisplay { font-size: 1.2rem; }
         }
 
         #cio-app #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; z-index: 999; }
-        @media (max-width: 768px) { #cio-app #progressLine { bottom: 130px; } }
+        @media (max-width: 768px) { #cio-app #progressLine { bottom: 135px; } }
     </style>
 </head>
 <body>
@@ -141,7 +146,7 @@
         <button onclick="openForm()"><span class="icon">➕</span>NUEVO</button>
         <button onclick="openHistory()"><span class="icon">📋</span>LISTA</button>
         <button onclick="handleCerrarTurno()"><span class="icon">🔒</span>TURNO</button>
-        </nav>
+    </nav>
 
     <aside id="panelForm" class="side-panel">
         <h2>Nueva Entrada</h2>
@@ -172,15 +177,15 @@
             <textarea id="f-msg" rows="4" placeholder="Detalle la novedad..." required></textarea>
             
             <button type="submit" class="btn-save">ACTUALIZAR MONITOR</button>
-            
-            <button type="button" onclick="closeAll()" style="width:100%; padding:12px; background:rgba(255, 77, 77, 0.1); color:#ff4d4d; border:1px solid #ff4d4d; border-radius:6px; margin-top:10px; cursor:pointer; font-weight:bold;">✕ CANCELAR</button>
+            <button type="button" onclick="closeAll()" class="btn-cancel">✕ CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
         <h2>Eventos Activos</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:6px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF</button>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:12px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF</button>
         <div id="listItems"></div>
+        <button type="button" onclick="closeAll()" class="btn-cancel" style="margin-top: 20px;">✕ VOLVER AL MONITOR</button>
     </aside>
 
     <div id="progressLine"></div>
@@ -295,12 +300,12 @@
     function openHistory() {
         const list = document.getElementById("listItems");
         list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-left:4px solid var(--primary); border-radius:4px;">
+            <div class="history-item">
                 <small style="color:var(--primary); font-weight:bold;">${item.type.toUpperCase()}</small>
                 <div style="font-weight:bold; margin:5px 0;">${item.title}</div>
                 <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button onclick="onEdit(${i})" style="background:var(--primary); border:none; padding:5px 15px; font-weight:bold; border-radius:4px; cursor:pointer;">EDITAR</button>
-                    <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 15px; font-weight:bold; border-radius:4px; cursor:pointer;">BORRAR</button>
+                    <button onclick="onEdit(${i})" style="background:var(--primary); color:#000;">EDITAR</button>
+                    <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white;">BORRAR</button>
                 </div>
             </div>
         `).join('') : "<p style='opacity:0.5; text-align:center;'>No hay novedades activas.</p>";
