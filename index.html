@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* AJUSTES CRÍTICOS PARA QUE EL TEXTO SE ACHIQUE */
+        /* AJUSTE DINÁMICO DE PANTALLA */
         #display {
             flex: 1;
             display: flex;
@@ -16,41 +16,41 @@
             align-items: center;
             text-align: center;
             padding: 40px;
-            height: calc(100vh - 100px); /* Espacio real restando header y footer */
-            overflow: hidden; /* Prohibido el scroll */
-            position: relative;
+            height: calc(100vh - 100px);
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* ANIMACIÓN PARA ALERTAS CRÍTICAS */
+        @keyframes pulse-critical {
+            0% { background-color: #0a1a1b; }
+            50% { background-color: #4d0000; }
+            100% { background-color: #0a1a1b; }
+        }
+
+        .is-critical {
+            animation: pulse-critical 1.5s infinite !important;
+        }
+
+        .is-critical #titleDisplay, .is-critical #messageDisplay {
+            color: #ff4d4d !important;
+            text-shadow: 0 0 20px rgba(255, 77, 77, 0.8);
         }
 
         .info-block {
             width: 95%;
-            max-height: 90%; /* Limite para el calculo de JS */
+            max-height: 90%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             margin: auto;
         }
 
-        #titleDisplay {
-            margin-bottom: 20px;
-            font-weight: 800;
-            line-height: 1;
-            text-transform: uppercase;
-        }
+        #titleDisplay { margin-bottom: 20px; font-weight: 800; line-height: 1; text-transform: uppercase; }
+        #messageDisplay { line-height: 1.1; font-weight: 600; white-space: pre-wrap; word-wrap: break-word; }
 
-        #messageDisplay {
-            line-height: 1.1;
-            font-weight: 600;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            display: block;
-        }
-
-        /* ESTILOS HISTORIAL */
-        .history-item {
-            background: rgba(0, 100, 101, 0.2);
-            padding: 15px; margin-bottom: 12px;
-            border: 1px solid #006465; border-radius: 12px;
-        }
+        /* HISTORIAL Y BOTONES */
+        .history-item { background: rgba(0, 100, 101, 0.2); padding: 15px; margin-bottom: 12px; border: 1px solid #006465; border-radius: 12px; }
         .history-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
         .btn-edit { background: #ffcc00 !important; color: black !important; padding: 8px 15px; border-radius: 6px; border:none; font-weight: bold; cursor: pointer; }
         .btn-delete { background: #ff4d4d !important; color: white !important; padding: 8px 15px; border-radius: 6px; border:none; font-weight: bold; cursor: pointer; }
@@ -59,7 +59,6 @@
 </head>
 <body>
 
-<div id="criticalPulse"></div>
 <div id="drawerOverlay"></div>
 
 <header class="control-header">
@@ -76,7 +75,7 @@
     <div class="info-block">
         <div class="area" id="areaLabel">SISTEMA</div>
         <h1 id="titleDisplay">...</h1>
-        <p id="messageDisplay">Cargando datos...</p>
+        <p id="messageDisplay">Cargando datos operativos...</p>
     </div>
 </main>
 
@@ -86,20 +85,24 @@
     <h2 id="formTitle">Evento</h2>
     <form id="formRegistro">
         <input type="hidden" id="editIndex" value="-1">
+        <label>Área Responsable</label>
         <select id="inputArea" required>
             <option value="Freschat">Freschat</option>
             <option value="Monitoreo">Monitoreo</option>
             <option value="Atención al Cliente">Atención al Cliente</option>
             <option value="Interno">Interno</option>
         </select>
+        <label>Prioridad</label>
         <select id="inputPriority">
             <option value="low">Baja</option>
             <option value="medium">Media</option>
             <option value="high">Alta</option>
             <option value="critical">Crítica</option>
         </select>
-        <input type="text" id="inputTitle" placeholder="Servicio" required>
-        <textarea id="inputMessage" rows="6" placeholder="Novedad" required></textarea>
+        <label>Título / Servicio</label>
+        <input type="text" id="inputTitle" placeholder="Ej: Falla masiva de red" required>
+        <label>Novedad</label>
+        <textarea id="inputMessage" rows="6" placeholder="Describa lo ocurrido..." required></textarea>
         <div class="form-actions">
             <button type="button" class="btn-cancel" onclick="closeAllDrawers()">CANCELAR</button>
             <button type="submit" class="btn-publish">ACTUALIZAR TV</button>
@@ -108,7 +111,7 @@
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <button class="btn-pdf" onclick="generatePDF()">📥 REPORTE DIARIO</button>
+    <button class="btn-pdf" onclick="generatePDF()">📥 DESCARGAR NOVEDADES DIARIAS</button>
     <div id="historyList"></div>
 </aside>
 
@@ -119,46 +122,38 @@
     let startTime = null;
     const DURATION = 15;
 
-    // --- CORRECCIÓN: BORRAR Y GUARDAR AHORA FORZAN EL ENVÍO ---
     async function syncCloud() {
         await fetch(DATABASE_URL, { 
             method: 'PUT', 
             body: JSON.stringify(registros.length > 0 ? registros : null) 
         });
-        pullData(); // Forzar recarga tras subir
+        pullData();
     }
 
     async function pullData() {
         try {
             const res = await fetch(DATABASE_URL);
             const data = await res.json();
-            const nuevosRegistros = data || [];
-            if (JSON.stringify(nuevosRegistros) !== JSON.stringify(registros)) {
-                registros = nuevosRegistros;
+            const nuevos = data || [];
+            if (JSON.stringify(nuevos) !== JSON.stringify(registros)) {
+                registros = nuevos;
                 render(currentIndex);
                 if(document.getElementById("drawerHistory").classList.contains("active")) renderHistory();
             }
         } catch (e) { console.error("Error nube"); }
     }
 
-    // --- FUNCIÓN DE AJUSTE AUTOMÁTICO DE LETRA ---
     function fitText() {
         const title = document.getElementById('titleDisplay');
         const message = document.getElementById('messageDisplay');
-        const container = document.querySelector('.info-block');
         const main = document.getElementById('display');
-
-        let sizeT = 70; // Tamaño inicial título
-        let sizeM = 100; // Tamaño inicial mensaje
-
+        let sizeT = 70;
+        let sizeM = 100;
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
-
-        // Reducción en bucle hasta que quepa en el alto del monitor
         let safety = 0;
-        while ((main.scrollHeight > main.clientHeight) && safety < 50) {
-            sizeT -= 1;
-            sizeM -= 2;
+        while ((main.scrollHeight > main.clientHeight) && safety < 60) {
+            sizeT -= 1; sizeM -= 2;
             title.style.fontSize = sizeT + "px";
             message.style.fontSize = sizeM + "px";
             safety++;
@@ -166,21 +161,31 @@
     }
 
     function render(index){
-        if(!registros.length){
+        if(!registros.length) {
+            document.getElementById("display").classList.remove("is-critical");
             document.getElementById("areaLabel").textContent = "SISTEMA";
             document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
-            document.getElementById("messageDisplay").textContent = "Monitor en espera";
+            document.getElementById("messageDisplay").textContent = "Monitor operativo";
             return;
         }
         const reg = registros[index % registros.length];
-        document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
+        const displayDiv = document.getElementById("display");
+        
+        // Efecto Crítico
+        if(reg.priority === "critical") {
+            displayDiv.classList.add("is-critical");
+            document.getElementById("areaLabel").textContent = `⚠️ ${reg.area.toUpperCase()} ⚠️`;
+        } else {
+            displayDiv.classList.remove("is-critical");
+            document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
+        }
+
         document.getElementById("titleDisplay").textContent = reg.title;
         document.getElementById("messageDisplay").textContent = reg.message;
         
         const colors = {low:"#00ff88", medium:"#00ccff", high:"#ffcc00", critical:"#ff4d4d"};
         document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
         
-        // Esperar un instante a que el DOM pinte para medir
         setTimeout(fitText, 100);
     }
 
@@ -240,9 +245,8 @@
         document.getElementById("drawerForm").classList.add("active");
     };
 
-    // --- CORRECCIÓN: BORRAR AHORA ELIMINA Y SINCRONIZA ---
     window.eliminarEvento = async (i) => {
-        if(confirm("¿Eliminar novedad?")) {
+        if(confirm("¿Eliminar novedad permanentemente?")) {
             registros.splice(i, 1);
             await syncCloud();
             renderHistory();
@@ -253,7 +257,7 @@
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
             <div class="history-item">
-                <strong>${reg.title}</strong><br><small>${reg.area}</small>
+                <strong>${reg.title}</strong><br><small>${reg.area} - ${reg.priority}</small>
                 <div class="history-actions">
                     <button class="btn-edit" onclick="editarEvento(${i})">EDITAR</button>
                     <button class="btn-delete" onclick="eliminarEvento(${i})">BORRAR</button>
@@ -262,11 +266,29 @@
         `).join('');
     }
 
-    function updateClock(){
-        document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(10, 26, 28);
+        doc.rect(0, 0, 210, 45, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text("NOVEDADES OPERATIVAS DIARIAS", 20, 25);
+        doc.setTextColor(40, 40, 40);
+        let y = 60;
+        registros.forEach((reg) => {
+            if(y > 270) { doc.addPage(); y = 20; }
+            doc.setFont(undefined, 'bold');
+            doc.text(`${reg.area.toUpperCase()}: ${reg.title.toUpperCase()} (${reg.priority})`, 20, y);
+            doc.setFont(undefined, 'normal');
+            const lines = doc.splitTextToSize(reg.message, 170);
+            doc.text(lines, 20, y + 7);
+            y += (lines.length * 7) + 15;
+        });
+        doc.save("Reporte_CIO.pdf");
     }
 
-    setInterval(updateClock, 1000);
+    setInterval(() => document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}), 1000);
     setInterval(pullData, 3000);
     requestAnimationFrame(animate);
     pullData();
