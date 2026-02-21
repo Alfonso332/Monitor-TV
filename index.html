@@ -6,7 +6,6 @@
     <title>CIO - Centro de Inteligencia Operativa</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Estilos base del historial */
         .history-item {
             background: rgba(0, 100, 101, 0.15);
             padding: 15px; margin-bottom: 12px;
@@ -19,27 +18,41 @@
             border: none; border-radius: 5px; color: white;
         }
 
-        /* ================= MODO APP MÓVIL ================= */
+        /* Estilos de los nuevos botones de acción */
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-cancel {
+            background: #444 !important;
+            color: white !important;
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-publish {
+            background: #00ff88 !important;
+            color: #000 !important;
+            flex: 2;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
             #ghostClock, #btnFullscreen { display: none !important; }
-            
-            .control-header { 
-                justify-content: center; 
-                padding: 15px;
-                background: rgba(0,0,0,0.8);
-            }
+            .control-header { justify-content: center; padding: 15px; background: rgba(0,0,0,0.8); }
             .left-zone { display: none; } 
-
-            #display { 
-                height: 80vh; 
-                padding: 20px;
-                display: flex;
-                align-items: center;
-            }
+            #display { height: 80vh; padding: 20px; display: flex; align-items: center; }
             .fullscreen-title { font-size: 1.8rem !important; }
             .fullscreen-message { font-size: 2rem !important; }
 
-            /* BARRA DE NAVEGACIÓN INFERIOR */
             .mobile-nav {
                 display: flex !important;
                 position: fixed;
@@ -50,47 +63,26 @@
                 justify-content: space-around;
                 align-items: center;
                 z-index: 9999;
-                padding-bottom: env(safe-area-inset-bottom); /* Para iPhones nuevos */
+                padding-bottom: env(safe-area-inset-bottom);
             }
-            .nav-item {
-                color: #00ff88;
-                text-decoration: none;
-                font-size: 0.7rem;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                background: none;
-                border: none;
-            }
+            .nav-item { color: #00ff88; text-decoration: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; background: none; border: none; }
             .nav-item span { font-size: 1.4rem; }
 
-            /* VENTANA EMERGENTE (DRAWER) CORREGIDA */
             .drawer {
                 width: 100% !important;
-                height: 92vh !important; /* SUBE CASI HASTA ARRIBA */
-                bottom: -100vh; /* Empieza fuera de pantalla por debajo */
+                height: 92vh !important;
+                bottom: -100vh;
                 right: 0 !important;
                 top: auto !important;
                 left: 0 !important;
                 border-radius: 25px 25px 0 0;
                 transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                overflow-y: auto; /* Permite scroll si el teclado tapa algo */
-                padding-bottom: 100px; /* Espacio extra al final para el botón */
+                overflow-y: auto;
+                padding-bottom: 120px;
             }
-            .drawer.active { 
-                bottom: 0 !important; 
-            }
-            
+            .drawer.active { bottom: 0 !important; }
             .footer-bar { bottom: 75px; height: 4px; }
-
-            /* Estilo para los inputs en móvil */
-            input, select, textarea {
-                font-size: 16px !important; /* Evita que iOS haga zoom automático */
-                background: rgba(255,255,255,0.05) !important;
-                color: white !important;
-                border: 1px solid #006465 !important;
-                margin-bottom: 15px !important;
-            }
+            input, select, textarea { font-size: 16px !important; background: rgba(255,255,255,0.05) !important; color: white !important; border: 1px solid #006465 !important; margin-bottom: 15px !important; }
         }
 
         .mobile-nav { display: none; }
@@ -121,19 +113,11 @@
 </main>
 
 <nav class="mobile-nav">
-    <button class="nav-item" id="mBtnNew">
-        <span>➕</span>
-        <b>NUEVO</b>
-    </button>
-    <button class="nav-item" id="mBtnHistory">
-        <span>📋</span>
-        <b>LISTA</b>
-    </button>
+    <button class="nav-item" id="mBtnNew"><span>➕</span><b>NUEVO</b></button>
+    <button class="nav-item" id="mBtnHistory"><span>📋</span><b>LISTA</b></button>
 </nav>
 
-<footer class="footer-bar">
-    <div id="progressBar"></div>
-</footer>
+<footer class="footer-bar"><div id="progressBar"></div></footer>
 
 <aside id="drawerForm" class="drawer">
     <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
@@ -157,13 +141,20 @@
         <input type="text" id="inputTitle" maxlength="50" required>
         <label>Novedad</label>
         <textarea id="inputMessage" rows="5" required></textarea>
-        <button type="submit" style="width: 100%; padding: 15px; font-weight: bold;">PUBLICAR EN TV</button>
+        
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closeAllDrawers()">CANCELAR</button>
+            <button type="submit" class="btn-publish">PUBLICAR</button>
+        </div>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
     <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
-    <h2>Eventos Activos</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>Eventos Activos</h2>
+        <button onclick="closeAllDrawers()" style="background:none; border:none; color:#ff4d4d; font-weight:bold; cursor:pointer;">CERRAR</button>
+    </div>
     <div id="historyList" class="history-container"></div>
 </aside>
 
@@ -174,20 +165,14 @@
     let startTime = null;
     const DURATION = 15;
 
-    async function pushData() {
-        await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros) });
-    }
+    async function pushData() { await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros) }); }
 
     async function pullData() {
         try {
             const res = await fetch(DATABASE_URL);
             const data = await res.json();
-            if (data) {
-                if (JSON.stringify(data) !== JSON.stringify(registros)) {
-                    registros = data;
-                    render(currentIndex);
-                }
-            } else { registros = []; render(0); }
+            if (data) { if (JSON.stringify(data) !== JSON.stringify(registros)) { registros = data; render(currentIndex); } } 
+            else { registros = []; render(0); }
         } catch (e) { console.error("Error nube"); }
     }
     setInterval(pullData, 3000);
@@ -222,11 +207,7 @@
         const progress = (timestamp - startTime) / 1000;
         const percent = Math.min((progress / DURATION) * 100, 100);
         document.getElementById("progressBar").style.width = percent + "%";
-        if(progress >= DURATION){
-            currentIndex = (currentIndex + 1) % registros.length;
-            render(currentIndex);
-            startTime = timestamp;
-        }
+        if(progress >= DURATION){ currentIndex = (currentIndex + 1) % registros.length; render(currentIndex); startTime = timestamp; }
         requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
@@ -235,6 +216,10 @@
     const dForm = document.getElementById("drawerForm");
     const dHistory = document.getElementById("drawerHistory");
 
+    const closeAllDrawers = () => {
+        dForm.classList.remove("active"); dHistory.classList.remove("active"); overlay.classList.remove("active");
+    };
+
     const openForm = () => { dForm.classList.add("active"); overlay.classList.add("active"); };
     const openHistory = () => { renderHistory(); dHistory.classList.add("active"); overlay.classList.add("active"); };
 
@@ -242,10 +227,7 @@
     document.getElementById("mBtnNew").onclick = openForm;
     document.getElementById("btnManage").onclick = openHistory;
     document.getElementById("mBtnHistory").onclick = openHistory;
-    
-    overlay.onclick = () => {
-        dForm.classList.remove("active"); dHistory.classList.remove("active"); overlay.classList.remove("active");
-    };
+    overlay.onclick = closeAllDrawers;
 
     document.getElementById("formRegistro").onsubmit = async (e) => {
         e.preventDefault();
@@ -258,7 +240,7 @@
         registros.push(nuevo);
         await pushData();
         e.target.reset();
-        overlay.onclick();
+        closeAllDrawers();
     };
 
     function renderHistory() {
@@ -267,22 +249,13 @@
         registros.forEach((reg, i) => {
             const div = document.createElement("div");
             div.className = "history-item";
-            div.innerHTML = `<div><strong>${reg.title}</strong></div>
-                             <button class="btn-delete" onclick="eliminar(${i})">BORRAR</button>`;
+            div.innerHTML = `<div><strong>${reg.title}</strong></div><button class="btn-delete" onclick="eliminar(${i})">BORRAR</button>`;
             container.appendChild(div);
         });
     }
 
-    window.eliminar = async (i) => {
-        registros.splice(i, 1);
-        await pushData();
-        renderHistory();
-    };
-
-    document.getElementById("btnFullscreen").onclick = () => {
-        document.documentElement.requestFullscreen();
-        document.body.classList.add("fullscreen");
-    };
+    window.eliminar = async (i) => { registros.splice(i, 1); await pushData(); renderHistory(); };
+    document.getElementById("btnFullscreen").onclick = () => { document.documentElement.requestFullscreen(); document.body.classList.add("fullscreen"); };
 
     pullData();
 </script>
