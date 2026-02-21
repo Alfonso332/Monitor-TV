@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO - Monitor Operativo</title>
+    <title>CIO - Monitor Operativo Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS INTEGRADO - MANTENIENDO TU BASE Y AÑADIENDO MEJORAS */
         :root {
             --primary: #00d4d8;
             --accent: #006465;
@@ -29,7 +28,6 @@
             overflow: hidden;
         }
 
-        /* DISPLAY CENTRAL */
         #display-board {
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center;
@@ -63,10 +61,8 @@
         #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 2vh; width: 100%; }
         #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.4; width: 100%; max-width: 90%; margin: 0 auto; white-space: pre-wrap; word-wrap: break-word; }
         
-        /* ALERTA ANTIGUEDAD */
-        #timeWarning { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 15px; display: none; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        #timeWarning { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 15px; display: none; }
 
-        /* HEADER */
         .main-header {
             position: absolute; top: 0; width: 100%; height: 60px;
             display: flex; justify-content: space-between; align-items: center;
@@ -86,7 +82,6 @@
 
         #clockDisplay { font-family: monospace; font-size: 1.4rem; color: var(--primary); font-weight: bold; }
 
-        /* TICKER BAR */
         #ticker-bar {
             height: 35px; background: var(--ticker-bg); border-top: 1px solid var(--primary);
             display: flex; align-items: center; overflow: hidden; white-space: nowrap; z-index: 10;
@@ -94,7 +89,6 @@
         #ticker-content { display: inline-block; padding-left: 100%; animation: ticker-scroll 25s linear infinite; color: var(--primary); font-weight: bold; font-size: 0.85rem; }
         @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* PANELES */
         .side-panel {
             position: fixed; right: 0; top: 0; width: 30vw; min-width: 350px; height: 100%;
             background: #091718; border-left: 3px solid var(--primary);
@@ -109,12 +103,10 @@
         label { font-size: 0.7rem; color: var(--primary); display: block; margin-bottom: 5px; margin-top: 10px; }
         input, textarea, select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
 
-        /* NAVEGACIÓN MÓVIL */
         .nav-mobile { display: none; }
 
         @media (max-width: 768px) {
             .actions { display: none; }
-            .main-header { justify-content: flex-end; background: none; }
             .nav-mobile {
                 display: flex; position: fixed; bottom: 35px; width: 100%; height: 70px;
                 background: #061112; border-top: 2px solid var(--primary);
@@ -150,12 +142,12 @@
             <div id="prioBadge">Sincronizando</div>
             <h1 id="titleDisplay">Monitor Operativo</h1>
             <p id="messageDisplay">Cargando novedades...</p>
-            <div id="timeWarning">⚠️ ESTA NOVEDAD TIENE MÁS DE 4 HORAS</div>
+            <div id="timeWarning">⚠️ +4 HORAS DE ANTIGÜEDAD</div>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">CARGANDO ÚLTIMA ACTUALIZACIÓN...</div>
+        <div id="ticker-content">ESPERANDO NOVEDADES...</div>
     </div>
 
     <nav class="nav-mobile">
@@ -168,9 +160,9 @@
         <h2>Nueva Novedad</h2>
         <form onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
-            <label>TIPO DE PERMANENCIA</label>
+            <label>TIPO</label>
             <select id="f-type">
-                <option value="turno">De Turno (Se borra al cerrar turno)</option>
+                <option value="turno">De Turno (Se borra al cerrar)</option>
                 <option value="diaria">Diaria (Dura 24 horas)</option>
             </select>
             <label>ÁREA</label>
@@ -190,7 +182,7 @@
             <label>TÍTULO</label>
             <input type="text" id="f-title" placeholder="Resumen corto" required>
             <label>DESCRIPCIÓN</label>
-            <textarea id="f-msg" rows="6" placeholder="Escriba el detalle aquí..." required></textarea>
+            <textarea id="f-msg" rows="6" placeholder="Detalle..." required></textarea>
             <button type="submit" style="width:100%; padding:15px; background:var(--primary); color:black; font-weight:bold; border:none; border-radius:4px; margin-top:15px; cursor:pointer;">ACTUALIZAR MONITOR</button>
             <button type="button" onclick="closeAll()" style="width:100%; margin-top:10px; background:none; color:#ff4d4d; border:none; cursor:pointer;">CANCELAR</button>
         </form>
@@ -217,19 +209,21 @@
         try {
             const r = await fetch(API_URL);
             const d = await r.json();
-            const rawData = d || [];
+            const raw = d || [];
             const now = Date.now();
-
-            // Filtrar las diarias que tengan más de 24hs
-            dataStore = rawData.filter(item => {
+            
+            // Limpieza automática de diarias > 24hs
+            dataStore = raw.filter(item => {
                 if(item.type === 'diaria' && (now - item.timestamp > 86400000)) return false;
                 return true;
             });
 
             if(dataStore.length > 0) {
-                const ultima = dataStore[dataStore.length - 1];
-                document.getElementById("ticker-content").textContent = `[RECIENTE] ${ultima.area}: ${ultima.title} ——— `;
+                const last = dataStore[dataStore.length - 1];
+                document.getElementById("ticker-content").textContent = `[RECIENTE] ${last.area}: ${last.title} --- `;
                 if(!timerStart) refreshView(currentIndex);
+            } else {
+                document.getElementById("ticker-content").textContent = "SIN NOVEDADES ACTIVAS";
             }
         } catch(e) { console.error("Sync Error"); }
     }
@@ -245,9 +239,8 @@
             const badge = document.getElementById("prioBadge");
             const warning = document.getElementById("timeWarning");
 
-            // Lógica de +4 horas
-            const diffHoras = (Date.now() - item.timestamp) / 3600000;
-            warning.style.display = diffHoras > 4 ? "block" : "none";
+            const hrs = (Date.now() - item.timestamp) / 3600000;
+            warning.style.display = hrs > 4 ? "block" : "none";
 
             if(item.priority === "Crítica") {
                 app.classList.add("es-critico");
@@ -257,7 +250,7 @@
                 badge.style.backgroundColor = "transparent"; badge.style.color = "var(--primary)";
             }
 
-            badge.textContent = `Prioridad ${item.priority} | ${item.type.toUpperCase()}`;
+            badge.textContent = `Prio: ${item.priority} | ${item.type.toUpperCase()}`;
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
@@ -290,38 +283,41 @@
     }
 
     async function handleCerrarTurno() {
-        if(!confirm("Se descargará el PDF y se ELIMINARÁN todas las novedades 'De Turno'. ¿Desea continuar?")) return;
+        if(!confirm("¿Cerrar turno? Se descargará el reporte y se borrarán novedades de TURNO.")) return;
+        
+        // 1. Descargar PDF con los datos actuales
         generatePDF();
-        // Mantener solo las que son diarias
-        const soloDiarias = dataStore.filter(item => item.type === 'diaria');
-        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(soloDiarias.length ? soloDiarias : null) });
+        
+        // 2. Filtrar para quedarse solo con Diarias
+        const diarias = dataStore.filter(i => i.type === 'diaria');
+        
+        // 3. Actualizar DB
+        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(diarias.length ? diarias : null) });
+        
         syncData();
-        alert("Turno cerrado con éxito.");
+        alert("Turno cerrado y reporte descargado.");
     }
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const hora = new Date().getHours();
-        let config = { t: "NOCTURNO", r: "Caroline Riaño" };
-        
-        if (hora >= 6 && hora < 14) config = { t: "MATUTINO", r: "Alfonso Carballo" };
-        else if (hora >= 14 && hora < 22) config = { t: "VESPERTINO", r: "Manuel Méndez" };
+        const h = new Date().getHours();
+        let conf = { t: "NOCTURNO", r: "Caroline Riaño" };
+        if(h >= 6 && h < 14) conf = { t: "MATUTINO", r: "Alfonso Carballo" };
+        else if(h >= 14 && h < 22) conf = { t: "VESPERTINO", r: "Manuel Méndez" };
 
         doc.setFillColor(0, 100, 101);
         doc.rect(0, 0, 210, 45, 'F');
         doc.setTextColor(255);
-        doc.setFontSize(16); doc.setFont(undefined, 'bold');
-        doc.text(`NOVEDADES OPERATIVAS - TURNO ${config.t}`, 20, 20);
-        doc.setFontSize(11); doc.setFont(undefined, 'normal');
-        doc.text(`Responsable: ${config.r}`, 20, 30);
-        doc.text(`Fecha/Hora de emisión: ${new Date().toLocaleString()}`, 20, 37);
+        doc.setFontSize(16); doc.text(`NOVEDADES OPERATIVAS - TURNO ${conf.t}`, 20, 20);
+        doc.setFontSize(11); doc.text(`Responsable: ${conf.r}`, 20, 30);
+        doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, 37);
 
         let y = 60;
-        let stats = { Crítica: 0, Alta: 0, Media: 0, Baja: 0 };
+        let st = { Crítica: 0, Alta: 0, Media: 0, Baja: 0 };
 
         dataStore.forEach((item, i) => {
-            stats[item.priority]++;
+            st[item.priority]++;
             if(y > 270) { doc.addPage(); y = 20; }
             doc.setFont(undefined, 'bold');
             doc.text(`${i+1}. [${item.priority}] [${item.type.toUpperCase()}] AREA: ${item.area}`, 20, y);
@@ -332,15 +328,12 @@
             y += (lines.length * 7) + 10;
         });
 
-        // ESTADÍSTICAS AL FINAL
         if(y > 240) { doc.addPage(); y = 20; }
-        doc.setDrawColor(0, 100, 101); doc.line(20, y, 190, y); y += 10;
-        doc.setFont(undefined, 'bold'); doc.text("RESUMEN ESTADÍSTICO DEL TURNO:", 20, y); y += 10;
-        doc.setFont(undefined, 'normal');
-        doc.text(`Novedades Totales: ${dataStore.length}`, 25, y); y += 7;
-        doc.text(`Prioridades: Críticas (${stats.Crítica}), Altas (${stats.Alta}), Medias (${stats.Media}), Bajas (${stats.Baja})`, 25, y);
+        doc.line(20, y, 190, y); y += 10;
+        doc.text("RESUMEN:", 20, y); y += 10;
+        doc.text(`Total: ${dataStore.length} | C: ${st.Crítica} | A: ${st.Alta} | M: ${st.Media} | B: ${st.Baja}`, 20, y);
 
-        doc.save(`Reporte_CIO_${config.r.replace(" ", "_")}.pdf`);
+        doc.save(`Reporte_CIO_${conf.r.replace(" ", "_")}.pdf`);
     }
 
     function adjustText() {
@@ -351,7 +344,7 @@
         let sizeM = window.innerWidth <= 768 ? 16 : 42;
         t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
         let limit = 0;
-        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.70) && limit < 50) {
+        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.7) && limit < 50) {
             sizeT -= 1; sizeM -= 0.8;
             t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
             limit++;
@@ -366,14 +359,18 @@
 
     function openHistory() { 
         const list = document.getElementById("listItems");
-        list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border:1px solid var(--primary); border-radius:4px;">
-                <small style="color:var(--primary)">${item.type.toUpperCase()} | ${item.area} | ${item.priority}</small>
-                <div style="font-weight:bold; margin:5px 0;">${item.title}</div>
-                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; padding:4px 8px; font-size:10px; font-weight:bold; cursor:pointer;">EDITAR</button>
-                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white; border:none; padding:4px 8px; font-size:10px; margin-left:5px; font-weight:bold; cursor:pointer;">BORRAR</button>
-            </div>
-        `).join('') : "<p style='text-align:center; opacity:0.5;'>Sin novedades.</p>";
+        if (!dataStore || dataStore.length === 0) {
+            list.innerHTML = "<p style='text-align:center; opacity:0.5;'>Sin novedades activas.</p>";
+        } else {
+            list.innerHTML = dataStore.map((item, i) => `
+                <div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border:1px solid var(--primary); border-radius:4px;">
+                    <small style="color:var(--primary)">${item.type.toUpperCase()} | ${item.priority}</small>
+                    <div style="font-weight:bold; margin:5px 0;">${item.title}</div>
+                    <button onclick="onEdit(${i})" style="background:#ffcc00; color:black; border:none; padding:4px 8px; font-size:10px; font-weight:bold; cursor:pointer; border-radius:2px;">EDITAR</button>
+                    <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white; border:none; padding:4px 8px; font-size:10px; margin-left:5px; font-weight:bold; cursor:pointer; border-radius:2px;">BORRAR</button>
+                </div>
+            `).join('');
+        }
         document.getElementById("panelHistory").classList.add("active"); 
         document.getElementById("overlay").classList.add("active"); 
     }
@@ -391,7 +388,7 @@
     };
 
     window.onDelete = async (i) => {
-        if(!confirm("¿Eliminar entrada?")) return;
+        if(!confirm("¿Eliminar?")) return;
         dataStore.splice(i, 1);
         await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore.length ? dataStore : null) });
         openHistory(); syncData();
