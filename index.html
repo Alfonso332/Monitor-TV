@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* FUERZA BRUTA PARA EL DISPLAY (Ignora el CSS externo) */
+        /* --- FUERZA BRUTA PARA EL DISPLAY (AUTO-AJUSTE) --- */
         #display {
             display: flex !important;
             flex-direction: column !important;
@@ -15,7 +15,7 @@
             align-items: center !important;
             height: 100vh !important;
             width: 100vw !important;
-            padding: 50px !important;
+            padding: 40px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             position: fixed !important;
@@ -26,52 +26,63 @@
 
         .info-block {
             width: 100% !important;
-            max-height: 80vh !important;
+            max-height: 85vh !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: center !important;
-            pointer-events: none;
+            text-align: center;
         }
 
-        /* RESET DE FUENTES PARA EL AUTO-AJUSTE */
-        #titleDisplay {
-            margin: 0 0 20px 0 !important;
-            padding: 0 !important;
-            line-height: 1 !important;
-            display: block !important;
-            text-transform: uppercase;
-        }
+        #titleDisplay { margin: 0 0 15px 0 !important; font-weight: 800; line-height: 1 !important; text-transform: uppercase; }
+        #messageDisplay { margin: 0 !important; line-height: 1.1 !important; white-space: pre-wrap !important; word-wrap: break-word !important; }
 
-        #messageDisplay {
-            margin: 0 !important;
-            padding: 0 !important;
-            line-height: 1.1 !important;
-            display: block !important;
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
-        }
-
-        /* EFECTO CRÍTICO (Pulso Rojo) */
+        /* --- EFECTO CRÍTICO MEJORADO --- */
         @keyframes pulse-red {
             0% { background-color: #0a1a1b; }
-            50% { background-color: #610000; }
+            50% { background-color: #5a0000; }
             100% { background-color: #0a1a1b; }
         }
-
-        .critico-total {
-            animation: pulse-red 1s infinite !important;
-        }
-
-        .critico-total #titleDisplay, 
-        .critico-total #messageDisplay {
+        .critico-total { animation: pulse-red 1.2s infinite !important; }
+        .critico-total #titleDisplay, .critico-total #messageDisplay {
             color: #ff4d4d !important;
-            text-shadow: 0 0 30px rgba(255, 0, 0, 1) !important;
+            text-shadow: 0 0 25px rgba(255, 0, 0, 0.8) !important;
         }
 
-        /* AJUSTES DE UI */
-        .drawer { z-index: 10000 !important; }
-        #drawerOverlay { z-index: 9999 !important; }
-        .control-header { z-index: 10001 !important; position: relative; }
+        /* --- DISEÑO PARA MÓVILES (CELULAR) --- */
+        @media (max-width: 768px) {
+            #ghostClock, #btnFullscreen, .left-zone { display: none !important; }
+            .control-header { justify-content: center !important; height: 60px; }
+            #display { padding: 20px !important; }
+            
+            /* Menú inferior móvil */
+            .mobile-nav {
+                display: flex !important;
+                position: fixed; bottom: 0; left: 0; right: 0;
+                height: 75px; background: #0a1a1b;
+                border-top: 1px solid #006465;
+                justify-content: space-around; align-items: center;
+                z-index: 10002;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .nav-item { color: #00ff88; background: none; border: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+            .nav-item span { font-size: 1.4rem; margin-bottom: 4px; }
+
+            /* Drawers (Ventanas emergentes desde abajo) */
+            .drawer {
+                width: 100% !important; height: 90vh !important;
+                bottom: -100vh; top: auto !important; left: 0 !important;
+                border-radius: 25px 25px 0 0;
+                transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 20px; z-index: 10005 !important;
+            }
+            .drawer.active { bottom: 0 !important; }
+            .footer-bar { bottom: 75px; height: 5px; }
+        }
+
+        .mobile-nav { display: none; } /* Oculto en PC */
+        .drawer { z-index: 10005; }
+        #drawerOverlay { z-index: 10004; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; }
+        #drawerOverlay.active { display: block; }
     </style>
 </head>
 <body>
@@ -89,15 +100,21 @@
 
 <main id="display">
     <div class="info-block">
-        <div id="areaLabel" class="area" style="font-size: 2rem; margin-bottom: 10px;">SISTEMA</div>
-        <h1 id="titleDisplay">CARGANDO</h1>
-        <p id="messageDisplay">Sincronizando registros...</p>
+        <div id="areaLabel" class="area" style="font-size: 1.5rem; margin-bottom: 10px; color: #00ff88;">SISTEMA</div>
+        <h1 id="titleDisplay">...</h1>
+        <p id="messageDisplay">Sincronizando...</p>
     </div>
 </main>
 
-<footer class="footer-bar" style="z-index: 10001;"><div id="progressBar"></div></footer>
+<nav class="mobile-nav">
+    <button class="nav-item" id="mBtnNew"><span>➕</span><b>NUEVO</b></button>
+    <button class="nav-item" id="mBtnHistory"><span>📋</span><b>LISTA</b></button>
+</nav>
+
+<footer class="footer-bar"><div id="progressBar"></div></footer>
 
 <aside id="drawerForm" class="drawer">
+    <div style="width: 40px; height: 5px; background: #333; margin: 0 auto 15px; border-radius: 10px;"></div>
     <h2 id="formTitle">Evento</h2>
     <form id="formRegistro">
         <input type="hidden" id="editIndex" value="-1">
@@ -115,17 +132,18 @@
             <option value="high">Alta</option>
             <option value="critical">Crítica</option>
         </select>
-        <input type="text" id="inputTitle" placeholder="Título" required>
-        <textarea id="inputMessage" rows="6" placeholder="Novedad" required></textarea>
-        <div class="form-actions">
-            <button type="button" onclick="closeAllDrawers()">CANCELAR</button>
-            <button type="submit" style="background:#00ff88; color:#000;">ACTUALIZAR TV</button>
+        <input type="text" id="inputTitle" placeholder="Servicio/Título" required>
+        <textarea id="inputMessage" rows="5" placeholder="Novedad..." required></textarea>
+        <div class="form-actions" style="display:flex; gap:10px; margin-top:15px;">
+            <button type="button" onclick="closeAllDrawers()" style="flex:1; background:#444;">CANCELAR</button>
+            <button type="submit" style="flex:2; background:#00ff88; color:#000;">GUARDAR EN TV</button>
         </div>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <button class="btn-pdf" onclick="generatePDF()">📥 DESCARGAR REPORTE</button>
+    <div style="width: 40px; height: 5px; background: #333; margin: 0 auto 15px; border-radius: 10px;"></div>
+    <button class="btn-pdf" onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:12px; border-radius:8px; border:none; margin-bottom:15px;">📥 DESCARGAR REPORTE</button>
     <div id="historyList"></div>
 </aside>
 
@@ -136,26 +154,20 @@
     let startTime = null;
     const DURATION = 15;
 
-    // --- LÓGICA DE AUTO-AJUSTE ---
+    // --- AUTO-AJUSTE DE TEXTO ---
     function fitText() {
         const title = document.getElementById('titleDisplay');
         const message = document.getElementById('messageDisplay');
-        const container = document.getElementById('display');
-
-        let sizeT = 100; // Empezamos gigante
-        let sizeM = 120;
-
+        const display = document.getElementById('display');
+        let sizeT = 80; let sizeM = 110;
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
-
-        // Bucle: Mientras el contenido sea más alto que la ventana, achica
-        let loop = 0;
-        while (title.offsetHeight + message.offsetHeight > container.offsetHeight * 0.7 && loop < 100) {
-            sizeT -= 1;
-            sizeM -= 2;
+        let safety = 0;
+        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.75) && safety < 80) {
+            sizeT -= 1; sizeM -= 1.5;
             title.style.fontSize = sizeT + "px";
             message.style.fontSize = sizeM + "px";
-            loop++;
+            safety++;
         }
     }
 
@@ -172,6 +184,7 @@
             if (JSON.stringify(nuevos) !== JSON.stringify(registros)) {
                 registros = nuevos;
                 render(currentIndex);
+                if(document.getElementById("drawerHistory").classList.contains("active")) renderHistory();
             }
         } catch (e) {}
     }
@@ -181,14 +194,11 @@
         if(!registros.length) {
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = "SISTEMA";
-            document.getElementById("titleDisplay").textContent = "VACÍO";
-            document.getElementById("messageDisplay").textContent = "No hay novedades activas";
+            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
+            document.getElementById("messageDisplay").textContent = "En espera de reportes...";
             return;
         }
-
         const reg = registros[index % registros.length];
-        
-        // Aplicar Efecto Crítico
         if(reg.priority === "critical") {
             display.classList.add("critico-total");
             document.getElementById("areaLabel").textContent = "⚠️ " + reg.area.toUpperCase() + " ⚠️";
@@ -196,19 +206,15 @@
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
         }
-
         document.getElementById("titleDisplay").textContent = reg.title;
         document.getElementById("messageDisplay").textContent = reg.message;
-        
         const colors = {low:"#00ff88", medium:"#00ccff", high:"#ffcc00", critical:"#ff4d4d"};
         document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
-
-        setTimeout(fitText, 50); // Ajustar letra tras pintar
+        setTimeout(fitText, 50);
     }
 
-    // --- ELIMINAR (CORREGIDO) ---
     window.eliminarEvento = async (i) => {
-        if(confirm("¿Eliminar?")) {
+        if(confirm("¿Eliminar novedad?")) {
             registros.splice(i, 1);
             await syncCloud();
             renderHistory();
@@ -229,10 +235,12 @@
     function renderHistory() {
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
-            <div style="background:rgba(255,255,255,0.1); padding:10px; margin-bottom:10px; border-radius:8px;">
-                <strong>${reg.title}</strong><br>
-                <button onclick="editarEvento(${i})">EDITAR</button>
-                <button onclick="eliminarEvento(${i})" style="color:red">BORRAR</button>
+            <div style="background:rgba(0,100,101,0.2); padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid #006465;">
+                <strong>${reg.title}</strong><br><small>${reg.area}</small>
+                <div style="margin-top:10px; display:flex; gap:10px; justify-content:flex-end;">
+                    <button onclick="editarEvento(${i})" style="background:#ffcc00; color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold;">EDITAR</button>
+                    <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:4px; font-weight:bold;">BORRAR</button>
+                </div>
             </div>
         `).join('');
     }
@@ -251,33 +259,41 @@
         closeAllDrawers();
     };
 
+    function closeAllDrawers() { document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active')); }
+    document.getElementById("btnNew").onclick = () => { document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
+    document.getElementById("mBtnNew").onclick = () => { document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
+    document.getElementById("btnManage").onclick = () => { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
+    document.getElementById("mBtnHistory").onclick = () => { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
+    document.getElementById("drawerOverlay").onclick = closeAllDrawers;
+
     function animate(timestamp){
         if(!registros.length) { requestAnimationFrame(animate); return; }
         if(!startTime) startTime = timestamp;
         const progress = (timestamp - startTime) / 1000;
         const percent = Math.min((progress / DURATION) * 100, 100);
         document.getElementById("progressBar").style.width = percent + "%";
-        if(progress >= DURATION){ 
-            currentIndex = (currentIndex + 1) % registros.length; 
-            render(currentIndex); 
-            startTime = timestamp; 
-        }
+        if(progress >= DURATION){ currentIndex = (currentIndex + 1) % registros.length; render(currentIndex); startTime = timestamp; }
         requestAnimationFrame(animate);
     }
 
-    function closeAllDrawers() {
-        document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active'));
+    function generatePDF() {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+        doc.setFillColor(10, 26, 28); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(20); doc.text("NOVEDADES OPERATIVAS DIARIAS", 20, 25);
+        let y = 55; doc.setTextColor(0,0,0);
+        registros.forEach(reg => {
+            doc.setFont(undefined, 'bold'); doc.text(`${reg.area}: ${reg.title}`, 20, y);
+            doc.setFont(undefined, 'normal'); const lines = doc.splitTextToSize(reg.message, 170);
+            doc.text(lines, 20, y + 7); y += (lines.length * 7) + 15;
+        });
+        doc.save("Reporte_CIO.pdf");
     }
 
-    document.getElementById("btnNew").onclick = () => { document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
-    document.getElementById("btnManage").onclick = () => { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); };
-    document.getElementById("drawerOverlay").onclick = closeAllDrawers;
-
-    function updateClock(){ document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}); }
-    setInterval(updateClock, 1000);
+    setInterval(() => document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}), 1000);
     setInterval(pullData, 3000);
     requestAnimationFrame(animate);
     pullData();
+    document.getElementById("btnFullscreen").onclick = () => document.documentElement.requestFullscreen();
 </script>
 </body>
 </html>
