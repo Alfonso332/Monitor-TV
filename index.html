@@ -13,7 +13,6 @@
             --dark-bg: #050d0e;
             --critico-fondo: #1a0000;
             --critico-pulso: #3d0000;
-            --transition-speed: 0.6s;
         }
 
         html, body {
@@ -29,7 +28,7 @@
             overflow: hidden;
         }
 
-        /* DISPLAY PRINCIPAL */
+        /* DISPLAY CENTRAL */
         #display-board {
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center;
@@ -39,7 +38,7 @@
             overflow: hidden;
         }
 
-        /* ANIMACIÓN DE ENTRADA Y SALIDA (FORMAL) */
+        /* CONTENEDOR DE INFORMACIÓN CON ANIMACIÓN */
         .info-container { 
             width: 100%; 
             max-width: 1200px; 
@@ -47,20 +46,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease, filter var(--transition-speed) ease;
+            /* Transición suave de opacidad y posición */
+            transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0px);
         }
 
-        /* Estado cuando el contenido está cambiando */
-        .info-container.cambiando {
+        /* Clases para el efecto de transición */
+        .oculto {
             opacity: 0;
-            transform: translateY(-20px);
+            transform: translateY(-30px);
             filter: blur(10px);
         }
 
-        /* Estado normal / entrada */
-        .info-container.entrando {
+        .pre-entrada {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(30px);
             filter: blur(10px);
         }
 
@@ -95,7 +97,7 @@
             white-space: pre-wrap; word-wrap: break-word;
         }
 
-        /* HEADER */
+        /* HEADER Y BOTONES */
         .main-header {
             position: absolute; top: 0; width: 100%; height: 60px;
             display: flex; justify-content: space-between; align-items: center;
@@ -116,7 +118,7 @@
 
         #clockDisplay { font-family: monospace; font-size: 1.4rem; color: var(--primary); font-weight: bold; }
 
-        /* PANELES */
+        /* PANELES LATERALES */
         .side-panel {
             position: fixed; right: 0; top: 0; width: 350px; height: 100%;
             background: #091718; border-left: 3px solid var(--primary);
@@ -133,7 +135,7 @@
             border-radius: 4px; font-size: 1rem; box-sizing: border-box;
         }
 
-        /* MÓVIL */
+        /* NAVEGACIÓN MÓVIL (VISTA EN CELULAR) */
         .nav-mobile { display: none; }
         @media (max-width: 768px) {
             .actions { display: none; }
@@ -142,8 +144,8 @@
                 background: #061112; border-top: 2px solid var(--primary);
                 justify-content: space-around; align-items: center; z-index: 500;
             }
-            .nav-mobile button { background: none; border: none; color: var(--primary); font-size: 0.8rem; font-weight: bold; }
-            .side-panel { width: 100%; height: 85%; top: auto; bottom: 0; border-left: none; border-top: 4px solid var(--primary); border-radius: 20px 20px 0 0; }
+            .nav-mobile button { background: none; border: none; color: var(--primary); font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+            .side-panel { width: 100%; height: 85%; top: auto; bottom: 0; border-radius: 20px 20px 0 0; border-left: none; border-top: 3px solid var(--primary); }
             #display-board { padding-bottom: 90px; }
         }
 
@@ -165,7 +167,7 @@
     </header>
 
     <main id="display-board">
-        <div id="container" class="info-container">
+        <div id="infoCont" class="info-container">
             <div id="areaLabel">SISTEMA CIO</div>
             <div id="prioBadge">Sincronizando</div>
             <h1 id="titleDisplay">Monitor</h1>
@@ -174,8 +176,8 @@
     </main>
 
     <nav class="nav-mobile">
-        <button onclick="openForm()"><span>➕</span>NUEVO</button>
-        <button onclick="openHistory()"><span>📋</span>LISTA</button>
+        <button onclick="openForm()"><span>➕</span><br>NUEVO</button>
+        <button onclick="openHistory()"><span>📋</span><br>LISTA</button>
     </nav>
 
     <aside id="panelForm" class="side-panel">
@@ -195,15 +197,15 @@
                 <option value="Crítica">Crítica</option>
             </select>
             <input type="text" id="f-title" placeholder="Título" required>
-            <textarea id="f-msg" rows="8" placeholder="Descripción..." required></textarea>
-            <button type="submit" style="width:100%; padding:15px; background:var(--primary); font-weight:bold; border:none; border-radius:4px; cursor:pointer;">PUBLICAR</button>
+            <textarea id="f-msg" rows="8" placeholder="Descripción detallada..." required></textarea>
+            <button type="submit" style="width:100%; padding:15px; background:var(--primary); color:black; font-weight:bold; border:none; border-radius:4px; cursor:pointer;">ACTUALIZAR</button>
             <button type="button" onclick="closeAll()" style="width:100%; margin-top:10px; background:none; color:#ff4d4d; border:none; cursor:pointer;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--primary)">Activos</h2>
-        <button onclick="generatePDF()" style="width:100%; background:white; color:black; padding:12px; font-weight:bold; cursor:pointer; margin-bottom:15px; border-radius:4px;">📥 DESCARGAR PDF</button>
+        <button onclick="generatePDF()" style="width:100%; background:white; color:black; padding:10px; font-weight:bold; cursor:pointer; margin-bottom:15px;">📥 DESCARGAR PDF</button>
         <div id="listItems"></div>
     </aside>
 
@@ -238,31 +240,29 @@
             const d = await r.json();
             dataStore = d || [];
             if(dataStore.length > 0 && !timerStart) refreshView(currentIndex);
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Error Sync"); }
     }
 
-    // EFECTO DE CAMBIO ELEGANTE
+    // FUNCIÓN DE REFRESCO CON ANIMACIÓN GARANTIZADA
     function refreshView(idx) {
         if(!dataStore.length) return;
-        const cont = document.getElementById("container");
+        const cont = document.getElementById("infoCont");
         
-        // Fase 1: Salida
-        cont.classList.add("cambiando");
-        
+        // 1. Iniciar salida
+        cont.classList.add("oculto");
+
         setTimeout(() => {
+            // 2. Cambiar datos mientras está invisible
             const item = dataStore[idx % dataStore.length];
             const app = document.getElementById("cio-app");
             const badge = document.getElementById("prioBadge");
 
-            // Prioridad Crítica
             if(item.priority === "Crítica") {
                 app.classList.add("es-critico");
-                badge.style.backgroundColor = "#ff0000";
-                badge.style.color = "#fff";
+                badge.style.background = "#ff0000"; badge.style.color = "#fff";
             } else {
                 app.classList.remove("es-critico");
-                badge.style.backgroundColor = "transparent";
-                badge.style.color = "var(--primary)";
+                badge.style.background = "transparent"; badge.style.color = "var(--primary)";
             }
 
             badge.textContent = "Prioridad " + item.priority;
@@ -275,15 +275,16 @@
             
             adjustText();
 
-            // Fase 2: Entrada
-            cont.classList.remove("cambiando");
-            cont.classList.add("entrando");
-            
-            setTimeout(() => {
-                cont.classList.remove("entrando");
-            }, 50);
+            // 3. Preparar entrada (posicionar abajo)
+            cont.classList.remove("oculto");
+            cont.classList.add("pre-entrada");
 
-        }, 600); // Sincronizado con --transition-speed
+            // Forzar reflujo del navegador para que reconozca el cambio de clase
+            void cont.offsetWidth;
+
+            // 4. Ejecutar entrada
+            cont.classList.remove("pre-entrada");
+        }, 600); 
     }
 
     async function handleSave(e) {
@@ -306,7 +307,7 @@
         doc.setFillColor(0, 100, 101);
         doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(255);
-        doc.text("REPORTE OPERATIVO CIO", 20, 25);
+        doc.text("REPORTE CIO", 20, 25);
         doc.save("Reporte_CIO.pdf");
     }
 
