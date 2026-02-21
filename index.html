@@ -6,14 +6,14 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS INTERNO - ESTRUCTURA FLUIDA */
+        /* CSS INTERNO - REFINAMIENTO DE PROPORCIONES */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             background: #050d0e;
-            overflow: hidden; /* Evita barras de desplazamiento */
+            overflow: hidden;
         }
 
         #cio-app {
@@ -22,7 +22,7 @@
             height: 100%;
             background: #050d0e;
             color: #ffffff;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             display: flex;
             flex-direction: column;
         }
@@ -35,141 +35,157 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
+            padding: 5% 10%; /* Márgenes generosos para evitar que toque los bordes */
             background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
             transition: all 0.5s ease;
             width: 100%;
             box-sizing: border-box;
-            overflow: hidden; /* Garantiza que el texto no genere scroll */
+            overflow: hidden;
         }
 
-        /* EFECTO CRÍTICO ROJO OSCURO */
+        /* EFECTO CRÍTICO */
         @keyframes bg-critical {
             0% { background-color: #050d0e; }
             50% { background-color: #2b0000; }
             100% { background-color: #050d0e; }
         }
-        
-        #cio-app.es-critico #display-board {
-            animation: bg-critical 2s infinite ease-in-out;
-        }
+        #cio-app.es-critico #display-board { animation: bg-critical 2s infinite ease-in-out; }
 
-        /* CONTENIDO ADAPTATIVO */
         .info-container { 
             z-index: 5; 
-            width: 95%; 
-            max-width: 1600px;
+            width: 100%; 
+            max-width: 1200px; /* Evita que en TV 4K se estire demasiado */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         
         #areaLabel { 
-            font-size: clamp(1rem, 3vw, 1.4rem); 
+            font-size: clamp(0.9rem, 2vw, 1.2rem); 
             color: #00d4d8; 
-            letter-spacing: 5px; 
+            letter-spacing: 4px; 
             text-transform: uppercase; 
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            opacity: 0.9;
         }
 
         #prioBadge {
             display: inline-block;
-            padding: 8px 20px;
+            padding: 6px 18px;
             border-radius: 4px;
-            font-weight: 900;
+            font-weight: 800;
             text-transform: uppercase;
             margin-bottom: 15px;
-            border: 2px solid rgba(255,255,255,0.15);
-            font-size: clamp(0.7rem, 2.5vw, 1.1rem);
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
         }
 
         #titleDisplay { 
             font-weight: 800; 
             text-transform: uppercase; 
-            line-height: 1; 
-            margin-bottom: 15px; 
+            line-height: 1.1; 
+            margin-bottom: 20px; 
             width: 100%;
-            word-wrap: break-word;
         }
 
         #messageDisplay { 
             font-weight: 300; 
             color: #cedddd; 
-            line-height: 1.2; 
-            max-width: 95%; 
+            line-height: 1.4; 
+            max-width: 85%; 
             margin: 0 auto;
-            word-wrap: break-word;
         }
 
-        /* CABECERA PC */
+        /* CABECERA */
         .main-header {
-            position: absolute; top: 0; width: 100%; height: 70px;
+            position: absolute; top: 0; width: 100%; height: 60px;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 30px; z-index: 100;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(0, 212, 216, 0.15);
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
 
         .actions button {
-            background: rgba(0, 100, 101, 0.3);
+            background: rgba(0, 100, 101, 0.2);
             border: 1px solid #00d4d8;
-            color: #fff; padding: 8px 15px; border-radius: 4px;
-            font-weight: bold; cursor: pointer; margin-right: 8px;
-            font-size: 0.7rem;
+            color: #fff; padding: 6px 12px; border-radius: 4px;
+            font-weight: bold; cursor: pointer; margin-right: 5px;
+            font-size: 0.65rem;
+            transition: 0.2s;
         }
+        .actions button:hover { background: #00d4d8; color: #000; }
 
-        #clockDisplay { font-family: monospace; font-size: 1.5rem; color: #00d4d8; font-weight: bold; transition: all 0.4s ease; }
+        #clockDisplay { font-family: 'Courier New', monospace; font-size: 1.3rem; color: #00d4d8; font-weight: bold; }
 
-        /* MODO TV (FULLSCREEN) - RELOJ A LA DERECHA DISCRETO */
+        /* MODO TV (FULLSCREEN) */
         #cio-app:fullscreen .actions { display: none !important; }
         #cio-app:fullscreen .main-header { 
             background: transparent; border: none; 
-            justify-content: flex-end; /* Mueve el reloj a la derecha */
-            padding-top: 20px;
-            height: 100px;
+            justify-content: flex-end; 
+            padding-top: 25px;
         }
         #cio-app:fullscreen #clockDisplay { 
-            font-size: 3.5rem; /* Tamaño optimizado para no tapar */
-            text-shadow: 0 0 20px rgba(0, 212, 216, 0.4);
-            margin-right: 40px;
+            font-size: 2.5rem; 
+            margin-right: 30px;
+            opacity: 0.8;
         }
 
-        /* FORMULARIOS Y PANELES */
+        /* PANELES LATERALES (PC / TV) */
         #overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             display: none; z-index: 1000; cursor: pointer;
         }
         #overlay.active { display: block; }
 
         .side-panel {
-            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
-            background: #081415; border-left: 3px solid #00d4d8;
-            padding: 30px; transform: translateX(100%);
+            position: fixed; right: 0; top: 0; 
+            width: 25%; /* Ancho reducido para que no se vea gigante */
+            min-width: 350px;
+            height: 100%;
+            background: #091718; border-left: 2px solid #00d4d8;
+            padding: 25px; transform: translateX(100%);
             transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1100; overflow-y: auto;
         }
         .side-panel.active { transform: translateX(0); }
 
-        /* NAVEGACIÓN MÓVIL */
+        .side-panel h2 { color: #00d4d8; font-size: 1.2rem; margin-bottom: 20px; }
+        
+        /* INPUTS MÁS ESTILIZADOS */
+        .side-panel input, .side-panel textarea, .side-panel select {
+            width: 100%; padding: 10px; margin-bottom: 12px;
+            background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #004d4e; border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        /* MÓVIL REFINADO */
         .nav-mobile { display: none; }
 
         @media (max-width: 768px) {
             .actions { display: none !important; }
-            .main-header { height: 60px; justify-content: center; background: none; border: none; }
+            .main-header { height: 50px; background: none; }
             .nav-mobile {
-                display: flex; position: fixed; bottom: 0; width: 100%; height: 70px;
+                display: flex; position: fixed; bottom: 0; width: 100%; height: 65px;
                 background: #061112; border-top: 1px solid #00d4d8;
                 justify-content: space-around; align-items: center; z-index: 500;
+                padding-bottom: env(safe-area-inset-bottom);
             }
-            .nav-mobile button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.75rem; }
-            .side-panel { width: 100%; transform: translateY(100%); border-radius: 20px 20px 0 0; border-top: 3px solid #00d4d8; border-left: none; }
-            .side-panel.active { transform: translateY(0); }
-            #display-board { padding-bottom: 80px; }
-            #clockDisplay { font-size: 1.2rem; }
+            .nav-mobile button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.7rem; }
+            
+            .side-panel { 
+                width: 100%; min-width: 100%; 
+                height: 75vh; /* Altura parcial en móvil para mejor ergonomía */
+                top: auto; bottom: 0; 
+                transform: translateY(100%); 
+                border-radius: 15px 15px 0 0; border-left: none; border-top: 3px solid #00d4d8; 
+            }
+            .side-panel.active { transform: translateY(0); transform: translateX(0); }
+            
+            #display-board { padding-bottom: 100px; }
+            #clockDisplay { font-size: 1.1rem; }
         }
 
-        #progressLine { position: fixed; bottom: 0; height: 5px; width: 0%; z-index: 999; transition: width 0.1s linear; }
+        #progressLine { position: fixed; bottom: 0; height: 4px; width: 0%; z-index: 999; transition: width 0.1s linear; }
     </style>
 </head>
 <body>
@@ -180,8 +196,8 @@
     <header class="main-header">
         <div class="actions">
             <button onclick="openForm()">＋ NUEVO</button>
-            <button onclick="openHistory()">📋 HISTORIAL</button>
-            <button onclick="toggleFS()" style="border-color:#ffcc00; color:#ffcc00;">⛶ MODO TV</button>
+            <button onclick="openHistory()">📋 LISTA</button>
+            <button onclick="toggleFS()" style="border-color:#ffcc00; color:#ffcc00;">⛶ TV</button>
         </div>
         <div id="clockDisplay">00:00:00</div>
     </header>
@@ -197,44 +213,45 @@
 
     <nav class="nav-mobile">
         <button onclick="openForm()">➕<br>NUEVO</button>
-        <button onclick="openHistory()">📋<br>HISTORIAL</button>
+        <button onclick="openHistory()">📋<br>LISTA</button>
     </nav>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:#00d4d8;">Nueva Novedad</h2>
+        <h2>Configurar Novedad</h2>
         <form onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
-            <select id="f-area" style="width:100%; padding:10px; margin-bottom:12px; background:#000; color:#fff; border:1px solid #00d4d8;">
+            <label style="color:#00d4d8; font-size:0.7rem;">ORIGEN</label>
+            <select id="f-area">
                 <option value="Freschat">Freschat</option>
                 <option value="Monitoreo">Monitoreo</option>
                 <option value="Atención al Cliente">Atención al Cliente</option>
                 <option value="Interno">Interno</option>
             </select>
-            <select id="f-prio" style="width:100%; padding:10px; margin-bottom:12px; background:#000; color:#fff; border:1px solid #00d4d8;">
+            <label style="color:#00d4d8; font-size:0.7rem;">URGENCIA</label>
+            <select id="f-prio">
                 <option value="Baja">Baja</option>
                 <option value="Media">Media</option>
                 <option value="Alta">Alta</option>
                 <option value="Crítica">Crítica</option>
             </select>
-            <input type="text" id="f-title" placeholder="Título" required style="width:100%; padding:12px; margin-bottom:12px; background:#000; color:#fff; border:1px solid #00d4d8;">
-            <textarea id="f-msg" rows="6" placeholder="Descripción..." required style="width:100%; padding:12px; margin-bottom:12px; background:#000; color:#fff; border:1px solid #00d4d8;"></textarea>
-            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:15px; border:none; font-weight:bold; cursor:pointer; border-radius:4px;">ACTUALIZAR MONITOR</button>
-            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:15px; cursor:pointer; font-weight:bold;">CANCELAR</button>
+            <input type="text" id="f-title" placeholder="Título corto" required>
+            <textarea id="f-msg" rows="5" placeholder="Descripción detallada..." required></textarea>
+            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:12px; border:none; font-weight:bold; cursor:pointer; border-radius:4px; font-size:0.9rem;">ACTUALIZAR</button>
+            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:10px; cursor:pointer; font-weight:bold; font-size:0.8rem;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:#00d4d8;">Historial Activo</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; font-weight:bold; margin-bottom:15px; cursor:pointer; border-radius:4px;">EXPORTAR PDF</button>
+        <h2>Novedades Activas</h2>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:10px; font-weight:bold; margin-bottom:15px; cursor:pointer; border-radius:4px; font-size:0.8rem;">PDF REPORTE</button>
         <div id="listItems"></div>
-        <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:20px; cursor:pointer; font-weight:bold;">CERRAR LISTA</button>
+        <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:20px; cursor:pointer; font-weight:bold; font-size:0.8rem;">CERRAR</button>
     </aside>
 
     <div id="progressLine"></div>
 </div>
 
 <script>
-    /* LÓGICA DE FUNCIONAMIENTO */
     const API_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     let dataStore = [];
     let currentIndex = 0;
@@ -245,18 +262,12 @@
         const t = document.getElementById('titleDisplay');
         const m = document.getElementById('messageDisplay');
         const container = document.getElementById('display-board');
-        
-        // Tamaños base
-        let sizeT = window.innerWidth <= 768 ? 28 : 85; 
-        let sizeM = window.innerWidth <= 768 ? 16 : 50;
-        
-        t.style.fontSize = sizeT + "px"; 
-        m.style.fontSize = sizeM + "px";
-        
+        let sizeT = window.innerWidth <= 768 ? 26 : 75; 
+        let sizeM = window.innerWidth <= 768 ? 16 : 42;
+        t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
         let limit = 0;
-        // Ajuste dinámico para evitar scrolls
         while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.65) && limit < 50) {
-            sizeT -= 1; sizeM -= 1;
+            sizeT -= 1; sizeM -= 0.5;
             t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
             limit++;
         }
@@ -268,7 +279,7 @@
             const d = await r.json();
             dataStore = d || [];
             if(dataStore.length > 0) refreshView(currentIndex);
-        } catch(e) { console.error("Error sincronización"); }
+        } catch(e) { console.error("Sync Error"); }
     }
 
     function refreshView(idx) {
@@ -279,12 +290,10 @@
         
         if(item.priority === "Crítica") {
             app.classList.add("es-critico");
-            badge.style.background = "#ff4d4d";
-            badge.style.color = "#fff";
+            badge.style.background = "#ff4d4d"; badge.style.color = "#fff";
         } else {
             app.classList.remove("es-critico");
-            badge.style.background = "transparent";
-            badge.style.color = "#00d4d8";
+            badge.style.background = "transparent"; badge.style.color = "#00d4d8";
         }
 
         badge.textContent = "Prioridad " + item.priority;
@@ -313,7 +322,7 @@
     }
 
     window.onDelete = async (i) => {
-        if(!confirm("¿Borrar novedad?")) return;
+        if(!confirm("¿Borrar?")) return;
         dataStore.splice(i, 1);
         await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore.length ? dataStore : null) });
         openHistory(); syncData();
@@ -339,13 +348,13 @@
     function openHistory() { 
         const list = document.getElementById("listItems");
         list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border:1px solid #00d4d8; border-radius:4px;">
-                <small style="color:#00d4d8">${item.priority}</small><br>
-                <strong style="display:block; margin:5px 0;">${item.title}</strong>
-                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; font-size:10px; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:3px;">EDITAR</button>
-                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:#fff; border:none; font-size:10px; padding:5px 10px; margin-left:5px; cursor:pointer; font-weight:bold; border-radius:3px;">BORRAR</button>
+            <div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:8px; border:1px solid #00d4d8; border-radius:4px;">
+                <small style="color:#00d4d8; font-size:0.6rem;">${item.priority}</small><br>
+                <strong style="display:block; margin:3px 0; font-size:0.85rem;">${item.title}</strong>
+                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; font-size:9px; padding:3px 6px; cursor:pointer; font-weight:bold; border-radius:2px;">EDITAR</button>
+                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:#fff; border:none; font-size:9px; padding:3px 6px; margin-left:4px; cursor:pointer; font-weight:bold; border-radius:2px;">BORRAR</button>
             </div>
-        `).join('') : "<p style='text-align:center; color:#666;'>No hay novedades registradas.</p>";
+        `).join('') : "<p style='font-size:0.8rem; color:#666;'>Sin datos.</p>";
         document.getElementById("panelHistory").classList.add("active"); 
         document.getElementById("overlay").classList.add("active"); 
     }
@@ -371,11 +380,8 @@
 
     function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(16); doc.text("REPORTE CIO OPERATIVO", 20, 20);
-        dataStore.forEach((r, i) => {
-            doc.setFontSize(11);
-            doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 35 + (i*10));
-        });
+        doc.text("REPORTE CIO", 20, 20);
+        dataStore.forEach((r, i) => doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 35 + (i*10)));
         doc.save("Reporte_CIO.pdf");
     }
 
