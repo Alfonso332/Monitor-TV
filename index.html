@@ -2,62 +2,27 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CIO - Monitor Operativo</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 
 /* ========================= */
-/* BASE */
+/* BASE GENERAL */
 /* ========================= */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
 body{
-    margin:0;
-    background:#0a1a1b;
-    font-family:Segoe UI, sans-serif;
-}
-
-#display{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    width:100vw;
-    padding:20px;
-    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+    background: radial-gradient(circle at top, #0f2426 0%, #0a1a1b 60%);
+    color:white;
     overflow:hidden;
-    position:fixed;
-    top:0;left:0;
-    background:#0a1a1b;
-}
-
-/* ========================= */
-/* TEXTO PRINCIPAL */
-/* ========================= */
-
-.info-block{
-    width:95%;
-    max-width:1800px;
-    max-height:85vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    text-align:center;
-}
-
-#titleDisplay{
-    margin:0 0 10px 0;
-    font-weight:800;
-    line-height:1;
-    text-transform:uppercase;
-}
-
-#messageDisplay{
-    margin:0;
-    line-height:1.1;
-    word-wrap:break-word;
 }
 
 /* ========================= */
@@ -69,75 +34,150 @@ body{
     top:0;
     width:100%;
     height:70px;
-    z-index:1000;
     display:flex;
     justify-content:space-between;
     align-items:center;
     padding:0 30px;
-    box-sizing:border-box;
-    background:rgba(0,100,101,0.9);
+    background:rgba(0,100,101,0.25);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(0,255,200,0.2);
+    z-index:1000;
 }
 
 #clock{
-    font-weight:bold;
-    font-family:'Courier New', monospace;
-    color:white;
     font-size:1.8rem;
+    font-weight:bold;
+    letter-spacing:2px;
+    text-shadow:0 0 10px rgba(0,255,200,0.6);
+}
+
+/* BOTONES */
+
+.left-zone button{
+    padding:10px 18px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+    transition:all .3s ease;
+}
+
+#btnNew{
+    background:#00ff88;
+    color:#001c1d;
+}
+
+#btnManage{
+    background:#006465;
+    color:white;
+    margin-left:10px;
+}
+
+#btnFullscreen{
+    background:transparent;
+    border:1px solid #00ff88;
+    color:#00ff88;
+    margin-left:10px;
+}
+
+.left-zone button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 6px 20px rgba(0,255,200,0.3);
 }
 
 /* ========================= */
-/* DRAWERS */
+/* DISPLAY PRINCIPAL */
 /* ========================= */
 
-#drawerOverlay{
+#display{
     position:fixed;
-    top:0;left:0;
     width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.8);
-    display:none;
-    z-index:4000;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:40px;
 }
 
-#drawerOverlay.active{
-    display:block;
+.info-block{
+    max-width:1200px;
+    padding:40px;
+    border-radius:25px;
+    background:rgba(0,100,101,0.1);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(0,255,200,0.2);
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
 }
+
+#areaLabel{
+    font-size:1.3rem;
+    letter-spacing:4px;
+    color:#00ffcc;
+    margin-bottom:20px;
+}
+
+#titleDisplay{
+    font-size:3rem;
+    font-weight:900;
+    margin-bottom:15px;
+}
+
+#messageDisplay{
+    font-size:1.5rem;
+    opacity:0.9;
+}
+
+/* ========================= */
+/* DRAWER */
+/* ========================= */
 
 .drawer{
     position:fixed;
     right:0;
     top:0;
-    width:450px;
+    width:400px;
     height:100vh;
     background:#0f2426;
-    border-left:3px solid #006465;
+    border-left:2px solid #006465;
     padding:30px;
-    box-sizing:border-box;
     transform:translateX(100%);
-    transition:transform 0.3s ease-out;
-    z-index:5000;
-    overflow-y:auto;
+    transition:all .3s ease;
+    z-index:3000;
 }
 
 .drawer.active{
     transform:translateX(0);
 }
 
-/* ========================= */
-/* SELECT Y FORM (FIX BLANCO) */
-/* ========================= */
-
-select,
-select option{
-    color:white !important;
+.drawer h2{
+    margin-bottom:20px;
+    color:#00ffcc;
 }
 
-select{
-    background:#1a3a3d !important;
+input,textarea,select{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:10px;
+    border:1px solid #006465;
+    background:#1a3a3d;
+    color:white;
 }
 
-select option{
-    background:#0f2426 !important;
+button[type="submit"]{
+    background:#00ff88;
+    color:black;
+    padding:15px;
+    border-radius:12px;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button[type="submit"]:hover{
+    box-shadow:0 5px 25px rgba(0,255,150,0.5);
 }
 
 /* ========================= */
@@ -150,45 +190,50 @@ select option{
 
 @media (max-width:768px){
 
-    /* ocultar botones superiores */
     .control-header .left-zone{
-        display:none !important;
+        display:none;
     }
 
-    /* mostrar barra inferior */
     .mobile-nav{
-        display:flex !important;
+        display:flex;
         position:fixed;
         bottom:0;
-        left:0;
         width:100%;
-        height:75px;
-        background:#0a1a1b;
-        z-index:2000;
+        height:70px;
+        background:rgba(0,100,101,0.3);
+        backdrop-filter:blur(15px);
         justify-content:space-around;
         align-items:center;
-        border-top:1px solid #006465;
+        border-top:1px solid rgba(0,255,200,0.3);
     }
 
     .mobile-nav button{
         background:none;
         border:none;
-        color:#00ff88;
+        color:#00ffcc;
         font-weight:bold;
-        font-size:14px;
     }
 
     .drawer{
-        width:100% !important;
-        height:85vh !important;
-        top:auto !important;
+        width:100%;
+        height:85vh;
+        top:auto;
         bottom:-100vh;
         border-radius:25px 25px 0 0;
         transform:none;
+        transition:.3s;
     }
 
     .drawer.active{
-        bottom:0 !important;
+        bottom:0;
+    }
+
+    #titleDisplay{
+        font-size:2rem;
+    }
+
+    #messageDisplay{
+        font-size:1.2rem;
     }
 }
 
@@ -197,77 +242,50 @@ select option{
 
 <body>
 
-<div id="drawerOverlay"></div>
-
 <header class="control-header">
 <div class="left-zone">
-<button id="btnNew" style="background:#00ff88;color:black;border:none;padding:12px 20px;border-radius:8px;font-weight:bold;cursor:pointer;">＋ NUEVO</button>
-<button id="btnManage" style="background:#006465;color:white;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;margin-left:10px;">☰ HISTORIAL</button>
-<button id="btnFullscreen" style="background:transparent;border:1px solid #00ff88;color:#00ff88;padding:12px 20px;border-radius:8px;cursor:pointer;margin-left:10px;">⛶ TV FULL</button>
+<button id="btnNew">＋ NUEVO</button>
+<button id="btnManage">☰ HISTORIAL</button>
+<button id="btnFullscreen">⛶ TV FULL</button>
 </div>
 <div id="clock">00:00:00</div>
 </header>
 
 <main id="display">
 <div class="info-block">
-<div id="areaLabel" style="font-size:1.8rem;color:#00ff88;margin-bottom:15px;font-weight:bold;letter-spacing:5px;">SISTEMA</div>
-<h1 id="titleDisplay">CARGANDO...</h1>
-<p id="messageDisplay">Sincronizando con el CIO Central</p>
+<div id="areaLabel">SISTEMA</div>
+<h1 id="titleDisplay">MONITOR OPERATIVO</h1>
+<p id="messageDisplay">Sistema listo para recibir novedades</p>
 </div>
 </main>
 
-<!-- BARRA MOBILE CORREGIDA -->
 <nav class="mobile-nav">
 <button onclick="openHistory()">📋<br>HISTORIAL</button>
 <button onclick="openNew()">➕<br>NUEVO</button>
 </nav>
 
 <aside id="drawerForm" class="drawer">
-<h2 style="color:#00ff88;">Configurar Novedad</h2>
-<form id="formRegistro" style="display:flex;flex-direction:column;gap:20px;">
-<input type="hidden" id="editIndex" value="-1">
-
-<select id="inputArea" style="padding:12px;border:1px solid #006465;border-radius:8px;">
-<option value="Freschat">Freschat</option>
-<option value="Monitoreo">Monitoreo</option>
-<option value="Atención al Cliente">Atención al Cliente</option>
-<option value="Interno">Interno</option>
+<h2>Nueva Novedad</h2>
+<select>
+<option>Freschat</option>
+<option>Monitoreo</option>
+<option>Atención al Cliente</option>
+<option>Interno</option>
 </select>
-
-<select id="inputPriority" style="padding:12px;border:1px solid #006465;border-radius:8px;">
-<option value="low">Prioridad Baja</option>
-<option value="medium">Prioridad Media</option>
-<option value="high">Prioridad Alta</option>
-<option value="critical">Prioridad Crítica</option>
-</select>
-
-<input type="text" id="inputTitle" placeholder="Título" required style="padding:12px;background:#1a3a3d;color:white;border:1px solid #006465;border-radius:8px;">
-
-<textarea id="inputMessage" rows="6" placeholder="Detalles de la novedad..." required style="padding:12px;background:#1a3a3d;color:white;border:1px solid #006465;border-radius:8px;"></textarea>
-
-<button type="submit" style="background:#00ff88;color:black;padding:18px;border-radius:10px;border:none;font-weight:bold;cursor:pointer;">ACTUALIZAR MONITOR</button>
-<button type="button" onclick="closeAllDrawers()" style="background:none;color:#ff4d4d;border:none;cursor:pointer;">CANCELAR</button>
-</form>
+<input type="text" placeholder="Título">
+<textarea placeholder="Detalle"></textarea>
+<button type="submit">ACTUALIZAR MONITOR</button>
 </aside>
 
 <script>
 
 function openNew(){
 document.getElementById("drawerForm").classList.add("active");
-document.getElementById("drawerOverlay").classList.add("active");
 }
 
 function openHistory(){
-alert("Aquí iría historial");
+alert("Aquí iría el historial");
 }
-
-function closeAllDrawers(){
-document.querySelectorAll('.drawer,#drawerOverlay').forEach(el=>el.classList.remove("active"));
-}
-
-document.getElementById("btnNew").onclick=openNew;
-document.getElementById("btnManage").onclick=openHistory;
-document.getElementById("drawerOverlay").onclick=closeAllDrawers;
 
 setInterval(()=>{
 document.getElementById("clock").textContent=
