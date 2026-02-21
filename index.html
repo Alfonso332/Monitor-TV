@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* --- AJUSTES DE DISPLAY --- */
+        /* --- AJUSTES DE DISPLAY PRINCIPAL --- */
         #display {
             display: flex !important;
             flex-direction: column !important;
@@ -24,16 +24,17 @@
             transition: background 0.5s ease;
         }
 
-        /* --- RELOJ EN FULLSCREEN (Más grande y visible) --- */
-        :fullscreen #clock {
-            font-size: 3.5rem !important;
-            color: #00ff88 !important;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-            padding-right: 20px;
+        /* --- RELOJ FULLSCREEN (SOLO PARA TV/PC) --- */
+        @media (min-width: 769px) {
+            :fullscreen #clock {
+                font-size: 4rem !important;
+                color: #00ff88 !important;
+                text-shadow: 0 0 25px rgba(0, 255, 136, 0.6);
+                margin-right: 30px;
+                transition: all 0.5s ease;
+            }
+            :-webkit-full-screen #clock { font-size: 4rem !important; color: #00ff88 !important; }
         }
-        
-        /* Compatibilidad con Chrome/Safari */
-        :-webkit-full-screen #clock { font-size: 3.5rem !important; color: #00ff88 !important; }
 
         .info-block {
             width: 100% !important;
@@ -47,7 +48,7 @@
         #titleDisplay { margin: 0 0 15px 0 !important; font-weight: 800; line-height: 1 !important; text-transform: uppercase; }
         #messageDisplay { margin: 0 !important; line-height: 1.1 !important; white-space: pre-wrap !important; word-wrap: break-word !important; }
 
-        /* --- EFECTO CRÍTICO --- */
+        /* --- EFECTO CRÍTICO PARPADEANTE --- */
         @keyframes pulse-red {
             0% { background-color: #0a1a1b; }
             50% { background-color: #5a0000; }
@@ -59,12 +60,16 @@
             text-shadow: 0 0 25px rgba(255, 0, 0, 0.8) !important;
         }
 
-        /* --- DISEÑO MÓVIL (Celular) --- */
+        /* --- AJUSTES MÓVIL (Celular) --- */
         @media (max-width: 768px) {
             #ghostClock, #btnFullscreen, .left-zone { display: none !important; }
             .control-header { justify-content: center !important; height: 60px; }
-            #display { padding: 20px !important; }
+            #display { padding: 25px !important; }
             
+            /* Ajuste de letra base más chica para celular */
+            #titleDisplay { font-size: 30px !important; }
+            #messageDisplay { font-size: 35px !important; }
+
             .mobile-nav {
                 display: flex !important;
                 position: fixed; bottom: 0; left: 0; right: 0;
@@ -97,20 +102,20 @@
 
 <div id="drawerOverlay"></div>
 
-<header class="control-header" style="position: fixed; top: 0; width: 100%; z-index: 10003; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+<header class="control-header" style="position: fixed; top: 0; width: 100%; z-index: 10003; display: flex; justify-content: space-between; align-items: center; padding: 0 25px;">
     <div class="left-zone">
         <button id="btnNew">＋ NUEVO</button>
         <button id="btnManage">☰ HISTORIAL</button>
         <button id="btnFullscreen">⛶ FULL</button>
     </div>
-    <div class="live-clock" id="clock" style="font-weight: bold; font-family: monospace;">00:00:00</div>
+    <div class="live-clock" id="clock" style="font-weight: bold; font-family: 'Courier New', Courier, monospace; color: white; font-size: 1.2rem;">00:00:00</div>
 </header>
 
 <main id="display">
     <div class="info-block">
-        <div id="areaLabel" class="area" style="font-size: 1.5rem; margin-bottom: 10px; color: #00ff88;">SISTEMA</div>
+        <div id="areaLabel" class="area" style="font-size: 1.4rem; margin-bottom: 12px; color: #00ff88; letter-spacing: 2px;">SISTEMA</div>
         <h1 id="titleDisplay">...</h1>
-        <p id="messageDisplay">Cargando...</p>
+        <p id="messageDisplay">Cargando CIO Monitor...</p>
     </div>
 </main>
 
@@ -123,7 +128,7 @@
 
 <aside id="drawerForm" class="drawer">
     <div style="width: 40px; height: 5px; background: #333; margin: 0 auto 15px; border-radius: 10px;"></div>
-    <h2 id="formTitle">Evento</h2>
+    <h2 id="formTitle">Evento Operativo</h2>
     <form id="formRegistro">
         <input type="hidden" id="editIndex" value="-1">
         <label>Área</label>
@@ -140,18 +145,18 @@
             <option value="high">Alta</option>
             <option value="critical">Crítica</option>
         </select>
-        <input type="text" id="inputTitle" placeholder="Servicio/Título" required>
-        <textarea id="inputMessage" rows="5" placeholder="Novedad..." required></textarea>
+        <input type="text" id="inputTitle" placeholder="Título del incidente" required>
+        <textarea id="inputMessage" rows="5" placeholder="Detalles de la novedad..." required></textarea>
         <div style="display:flex; gap:10px; margin-top:15px;">
-            <button type="button" onclick="closeAllDrawers()" style="flex:1; background:#444; color:white; border:none; padding:12px; border-radius:8px;">CANCELAR</button>
-            <button type="submit" style="flex:2; background:#00ff88; color:#000; border:none; padding:12px; border-radius:8px; font-weight:bold;">GUARDAR EN TV</button>
+            <button type="button" onclick="closeAllDrawers()" style="flex:1; background:#444; color:white; border:none; padding:15px; border-radius:10px;">CANCELAR</button>
+            <button type="submit" style="flex:2; background:#00ff88; color:#000; border:none; padding:15px; border-radius:10px; font-weight:bold;">ACTUALIZAR TV</button>
         </div>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
     <div style="width: 40px; height: 5px; background: #333; margin: 0 auto 15px; border-radius: 10px;"></div>
-    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:15px; border-radius:10px; border:none; margin-bottom:15px; font-weight:bold;">📥 DESCARGAR REPORTE</button>
+    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:15px; border-radius:10px; border:none; margin-bottom:15px; font-weight:bold; text-transform:uppercase;">📥 Reporte PDF Diario</button>
     <div id="historyList"></div>
 </aside>
 
@@ -162,22 +167,21 @@
     let startTime = null;
     const DURATION = 15;
 
-    // --- AUTO-AJUSTE DINÁMICO ---
+    // --- AJUSTE DINÁMICO DE FUENTES ---
     function fitText() {
         const title = document.getElementById('titleDisplay');
         const message = document.getElementById('messageDisplay');
         const display = document.getElementById('display');
         
-        // Ajustar valores base según dispositivo
         const esMovil = window.innerWidth <= 768;
-        let sizeT = esMovil ? 45 : 85; 
-        let sizeM = esMovil ? 55 : 110;
+        // Valores iniciales más conservadores para el celular
+        let sizeT = esMovil ? 40 : 85; 
+        let sizeM = esMovil ? 45 : 110;
 
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
 
         let safety = 0;
-        // Bucle de ajuste: si el texto es muy grande, reduce
         while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.7) && safety < 80) {
             sizeT -= 1; sizeM -= 1.5;
             title.style.fontSize = sizeT + "px";
@@ -208,8 +212,8 @@
         if(!registros.length) {
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = "SISTEMA";
-            document.getElementById("titleDisplay").textContent = "VACÍO";
-            document.getElementById("messageDisplay").textContent = "Sin novedades activas";
+            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
+            document.getElementById("messageDisplay").textContent = "En espera de nuevos reportes...";
             return;
         }
         const reg = registros[index % registros.length];
@@ -254,7 +258,7 @@
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
             <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:12px; border:1px solid #006465;">
-                <strong style="color:#00ff88">${reg.title}</strong><br><small>${reg.area}</small>
+                <strong style="color:#00ff88">${reg.title}</strong><br><small>${reg.area} - ${reg.priority}</small>
                 <div style="margin-top:10px; display:flex; gap:10px; justify-content:flex-end;">
                     <button onclick="editarEvento(${i})" style="background:#ffcc00; color:black; border:none; padding:8px 15px; border-radius:6px; font-weight:bold;">EDITAR</button>
                     <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:8px 15px; border-radius:6px; font-weight:bold;">BORRAR</button>
