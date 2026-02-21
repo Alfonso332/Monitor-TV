@@ -1,298 +1,290 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CIO - Monitor Operativo</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CIO - Centro de Inteligencia Operativa</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Estilos base */
+        .history-item {
+            background: rgba(0, 100, 101, 0.15);
+            padding: 15px; margin-bottom: 12px;
+            border: 1px solid #006465; border-radius: 12px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .history-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-edit { background: #ffcc00 !important; color: black !important; padding: 6px 12px; border-radius: 5px; border:none; cursor:pointer; font-weight: bold;}
+        .btn-delete { background: #ff4d4d !important; color: white !important; padding: 6px 12px; border-radius: 5px; border:none; cursor:pointer; }
+        .btn-pdf { background: #006465 !important; color: white !important; width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
-<style>
+        /* Contenedor principal para que el texto no se escape */
+        #display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 5vh 5vw; /* Espaciado relativo a la pantalla */
+            overflow: hidden; /* Evita scrolls */
+            height: 100vh;
+        }
 
-/* ========================= */
-/* BASE GENERAL */
-/* ========================= */
+        .info-block {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
+        #titleDisplay {
+            margin-bottom: 20px;
+            line-height: 1.1;
+            word-wrap: break-word;
+        }
 
-body{
-    font-family:'Segoe UI',sans-serif;
-    background: radial-gradient(circle at top, #0f2426 0%, #0a1a1b 60%);
-    color:white;
-    overflow:hidden;
-}
+        #messageDisplay {
+            line-height: 1.2;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            margin: 0 auto;
+            width: 100%;
+        }
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
-
-.control-header{
-    position:fixed;
-    top:0;
-    width:100%;
-    height:70px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 30px;
-    background:rgba(0,100,101,0.25);
-    backdrop-filter:blur(12px);
-    border-bottom:1px solid rgba(0,255,200,0.2);
-    z-index:1000;
-}
-
-#clock{
-    font-size:1.8rem;
-    font-weight:bold;
-    letter-spacing:2px;
-    text-shadow:0 0 10px rgba(0,255,200,0.6);
-}
-
-/* BOTONES */
-
-.left-zone button{
-    padding:10px 18px;
-    border-radius:12px;
-    border:none;
-    cursor:pointer;
-    font-weight:bold;
-    transition:all .3s ease;
-}
-
-#btnNew{
-    background:#00ff88;
-    color:#001c1d;
-}
-
-#btnManage{
-    background:#006465;
-    color:white;
-    margin-left:10px;
-}
-
-#btnFullscreen{
-    background:transparent;
-    border:1px solid #00ff88;
-    color:#00ff88;
-    margin-left:10px;
-}
-
-.left-zone button:hover{
-    transform:translateY(-3px);
-    box-shadow:0 6px 20px rgba(0,255,200,0.3);
-}
-
-/* ========================= */
-/* DISPLAY PRINCIPAL */
-/* ========================= */
-
-#display{
-    position:fixed;
-    width:100%;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    padding:40px;
-}
-
-.info-block{
-    max-width:1200px;
-    padding:40px;
-    border-radius:25px;
-    background:rgba(0,100,101,0.1);
-    backdrop-filter:blur(15px);
-    border:1px solid rgba(0,255,200,0.2);
-    box-shadow:0 20px 60px rgba(0,0,0,0.6);
-}
-
-#areaLabel{
-    font-size:1.3rem;
-    letter-spacing:4px;
-    color:#00ffcc;
-    margin-bottom:20px;
-}
-
-#titleDisplay{
-    font-size:3rem;
-    font-weight:900;
-    margin-bottom:15px;
-}
-
-#messageDisplay{
-    font-size:1.5rem;
-    opacity:0.9;
-}
-
-/* ========================= */
-/* DRAWER */
-/* ========================= */
-
-.drawer{
-    position:fixed;
-    right:0;
-    top:0;
-    width:400px;
-    height:100vh;
-    background:#0f2426;
-    border-left:2px solid #006465;
-    padding:30px;
-    transform:translateX(100%);
-    transition:all .3s ease;
-    z-index:3000;
-}
-
-.drawer.active{
-    transform:translateX(0);
-}
-
-.drawer h2{
-    margin-bottom:20px;
-    color:#00ffcc;
-}
-
-input,textarea,select{
-    width:100%;
-    padding:12px;
-    margin-bottom:15px;
-    border-radius:10px;
-    border:1px solid #006465;
-    background:#1a3a3d;
-    color:white;
-}
-
-button[type="submit"]{
-    background:#00ff88;
-    color:black;
-    padding:15px;
-    border-radius:12px;
-    border:none;
-    font-weight:bold;
-    cursor:pointer;
-    transition:.3s;
-}
-
-button[type="submit"]:hover{
-    box-shadow:0 5px 25px rgba(0,255,150,0.5);
-}
-
-/* ========================= */
-/* MOBILE */
-/* ========================= */
-
-.mobile-nav{
-    display:none;
-}
-
-@media (max-width:768px){
-
-    .control-header .left-zone{
-        display:none;
-    }
-
-    .mobile-nav{
-        display:flex;
-        position:fixed;
-        bottom:0;
-        width:100%;
-        height:70px;
-        background:rgba(0,100,101,0.3);
-        backdrop-filter:blur(15px);
-        justify-content:space-around;
-        align-items:center;
-        border-top:1px solid rgba(0,255,200,0.3);
-    }
-
-    .mobile-nav button{
-        background:none;
-        border:none;
-        color:#00ffcc;
-        font-weight:bold;
-    }
-
-    .drawer{
-        width:100%;
-        height:85vh;
-        top:auto;
-        bottom:-100vh;
-        border-radius:25px 25px 0 0;
-        transform:none;
-        transition:.3s;
-    }
-
-    .drawer.active{
-        bottom:0;
-    }
-
-    #titleDisplay{
-        font-size:2rem;
-    }
-
-    #messageDisplay{
-        font-size:1.2rem;
-    }
-}
-
-</style>
+        @media (max-width: 768px) {
+            .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: #0a1a1b; border-top: 1px solid #006465; justify-content: space-around; align-items: center; z-index: 9999; }
+            .nav-item { color: #00ff88; text-decoration: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; background: none; border: none; }
+            .drawer { width: 100% !important; height: 92vh !important; bottom: -100vh; right: 0 !important; top: auto !important; left: 0 !important; border-radius: 25px 25px 0 0; transition: bottom 0.5s; overflow-y: auto; padding-bottom: 120px; }
+            .drawer.active { bottom: 0 !important; }
+        }
+    </style>
 </head>
-
 <body>
 
+<div id="criticalPulse"></div>
+<div id="drawerOverlay"></div>
+
 <header class="control-header">
-<div class="left-zone">
-<button id="btnNew">＋ NUEVO</button>
-<button id="btnManage">☰ HISTORIAL</button>
-<button id="btnFullscreen">⛶ TV FULL</button>
-</div>
-<div id="clock">00:00:00</div>
+    <div class="left-zone">
+        <button id="btnNew">＋ NUEVO</button>
+        <button id="btnManage">☰ HISTORIAL</button>
+        <button id="btnFullscreen">⛶ FULL</button>
+    </div>
+    <div class="live-clock" id="clock"></div>
 </header>
 
 <main id="display">
-<div class="info-block">
-<div id="areaLabel">SISTEMA</div>
-<h1 id="titleDisplay">MONITOR OPERATIVO</h1>
-<p id="messageDisplay">Sistema listo para recibir novedades</p>
-</div>
+    <div id="ghostClock"></div>
+    <div class="info-block" id="container">
+        <div class="area" id="areaLabel">SISTEMA</div>
+        <h1 id="titleDisplay">CARGANDO...</h1>
+        <p id="messageDisplay">Sincronizando...</p>
+    </div>
 </main>
 
 <nav class="mobile-nav">
-<button onclick="openHistory()">📋<br>HISTORIAL</button>
-<button onclick="openNew()">➕<br>NUEVO</button>
+    <button class="nav-item" id="mBtnNew"><span>➕</span><b>NUEVO</b></button>
+    <button class="nav-item" id="mBtnHistory"><span>📋</span><b>LISTA</b></button>
 </nav>
 
+<footer class="footer-bar"><div id="progressBar"></div></footer>
+
 <aside id="drawerForm" class="drawer">
-<h2>Nueva Novedad</h2>
-<select>
-<option>Freschat</option>
-<option>Monitoreo</option>
-<option>Atención al Cliente</option>
-<option>Interno</option>
-</select>
-<input type="text" placeholder="Título">
-<textarea placeholder="Detalle"></textarea>
-<button type="submit">ACTUALIZAR MONITOR</button>
+    <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
+    <h2 id="formTitle">Nuevo Evento</h2>
+    <form id="formRegistro">
+        <input type="hidden" id="editIndex" value="-1">
+        <select id="inputArea" required>
+            <option value="Freschat">Freschat</option>
+            <option value="Monitoreo">Monitoreo</option>
+            <option value="Atención al Cliente">Atención al Cliente</option>
+            <option value="Interno">Interno</option>
+        </select>
+        <select id="inputPriority">
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+            <option value="critical">Crítica</option>
+        </select>
+        <input type="text" id="inputTitle" placeholder="Título" maxlength="80" required>
+        <textarea id="inputMessage" rows="5" placeholder="Descripción larga..." required></textarea>
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closeAllDrawers()">CANCELAR</button>
+            <button type="submit" class="btn-publish">ACTUALIZAR TV</button>
+        </div>
+    </form>
+</aside>
+
+<aside id="drawerHistory" class="drawer">
+    <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
+    <button class="btn-pdf" onclick="generatePDF()">📥 DESCARGAR NOVEDADES DIARIAS</button>
+    <div id="historyList"></div>
 </aside>
 
 <script>
+    const DATABASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    let registros = [];
+    let currentIndex = 0;
+    let startTime = null;
+    const DURATION = 15;
 
-function openNew(){
-document.getElementById("drawerForm").classList.add("active");
-}
+    // --- FUNCIÓN DE AJUSTE DE TEXTO (LA CLAVE) ---
+    function fitText() {
+        const title = document.getElementById('titleDisplay');
+        const message = document.getElementById('messageDisplay');
+        const container = document.getElementById('display');
 
-function openHistory(){
-alert("Aquí iría el historial");
-}
+        // Resetear a tamaños grandes para empezar a medir
+        let fontSizeTitle = 80; 
+        let fontSizeMessage = 120;
 
-setInterval(()=>{
-document.getElementById("clock").textContent=
-new Date().toLocaleTimeString("es-UY",{hour12:false});
-},1000);
+        title.style.fontSize = fontSizeTitle + "px";
+        message.style.fontSize = fontSizeMessage + "px";
 
+        // Reducir progresivamente mientras el contenido supere el alto de la pantalla
+        while (container.scrollHeight > container.clientHeight && fontSizeMessage > 20) {
+            fontSizeMessage -= 2;
+            fontSizeTitle -= 1;
+            title.style.fontSize = fontSizeTitle + "px";
+            message.style.fontSize = fontSizeMessage + "px";
+        }
+    }
+
+    async function pushData() { await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros) }); }
+    
+    async function pullData() {
+        try {
+            const res = await fetch(DATABASE_URL);
+            const data = await res.json();
+            if (data && JSON.stringify(data) !== JSON.stringify(registros)) {
+                registros = data; 
+                render(currentIndex);
+            }
+        } catch (e) { console.error("Error nube"); }
+    }
+    setInterval(pullData, 3000);
+
+    function render(index){
+        if(!registros.length) return;
+        const reg = registros[index % registros.length];
+        document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
+        document.getElementById("titleDisplay").textContent = reg.title;
+        document.getElementById("messageDisplay").textContent = reg.message;
+        
+        const colors = {low:"#00ff88", medium:"#00ccff", high:"#ffcc00", critical:"#ff4d4d"};
+        document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
+        
+        // Ejecutar el ajuste de texto después de renderizar
+        setTimeout(fitText, 50);
+    }
+
+    // Ajustar también cuando se cambie el tamaño de la ventana
+    window.onresize = fitText;
+
+    function animate(timestamp){
+        if(!registros.length) { requestAnimationFrame(animate); return; }
+        if(!startTime) startTime = timestamp;
+        const progress = (timestamp - startTime) / 1000;
+        const percent = Math.min((progress / DURATION) * 100, 100);
+        document.getElementById("progressBar").style.width = percent + "%";
+        if(progress >= DURATION){ currentIndex = (currentIndex + 1) % registros.length; render(currentIndex); startTime = timestamp; }
+        requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // Lógica de UI y Drawers
+    const overlay = document.getElementById("drawerOverlay");
+    const dForm = document.getElementById("drawerForm");
+    const dHistory = document.getElementById("drawerHistory");
+
+    const closeAllDrawers = () => {
+        dForm.classList.remove("active"); dHistory.classList.remove("active"); overlay.classList.remove("active");
+        document.getElementById("formRegistro").reset();
+        document.getElementById("editIndex").value = "-1";
+    };
+
+    document.getElementById("btnNew").onclick = () => { dForm.classList.add("active"); overlay.classList.add("active"); };
+    document.getElementById("mBtnNew").onclick = () => { dForm.classList.add("active"); overlay.classList.add("active"); };
+    document.getElementById("btnManage").onclick = () => { renderHistory(); dHistory.classList.add("active"); overlay.classList.add("active"); };
+    document.getElementById("mBtnHistory").onclick = () => { renderHistory(); dHistory.classList.add("active"); overlay.classList.add("active"); };
+    overlay.onclick = closeAllDrawers;
+
+    document.getElementById("formRegistro").onsubmit = async (e) => {
+        e.preventDefault();
+        const index = parseInt(document.getElementById("editIndex").value);
+        const nuevo = {
+            area: document.getElementById("inputArea").value,
+            priority: document.getElementById("inputPriority").value,
+            title: document.getElementById("inputTitle").value,
+            message: document.getElementById("inputMessage").value
+        };
+        if(index === -1) registros.push(nuevo); else registros[index] = nuevo;
+        await pushData();
+        closeAllDrawers();
+        render(currentIndex);
+    };
+
+    function renderHistory() {
+        const container = document.getElementById("historyList");
+        container.innerHTML = "";
+        registros.forEach((reg, i) => {
+            const div = document.createElement("div");
+            div.className = "history-item";
+            div.innerHTML = `<div><strong>${reg.title}</strong><br><small>${reg.area}</small></div>
+                <div class="history-actions">
+                    <button class="btn-edit" onclick="editarEvento(${i})">EDITAR</button>
+                    <button class="btn-delete" onclick="eliminarEvento(${i})">BORRAR</button>
+                </div>`;
+            container.appendChild(div);
+        });
+    }
+
+    window.editarEvento = (i) => {
+        const reg = registros[i];
+        document.getElementById("editIndex").value = i;
+        document.getElementById("inputArea").value = reg.area;
+        document.getElementById("inputPriority").value = reg.priority;
+        document.getElementById("inputTitle").value = reg.title;
+        document.getElementById("inputMessage").value = reg.message;
+        dHistory.classList.remove("active");
+        dForm.classList.add("active");
+    };
+
+    window.eliminarEvento = async (i) => {
+        if(confirm("¿Quitar de la TV?")) { registros.splice(i, 1); await pushData(); renderHistory(); }
+    };
+
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(10, 26, 28);
+        doc.rect(0, 0, 210, 45, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.text("NOVEDADES OPERATIVAS DIARIAS", 20, 25);
+        doc.setTextColor(40, 40, 40);
+        let y = 60;
+        registros.forEach((reg) => {
+            if(y > 270) { doc.addPage(); y = 20; }
+            doc.setFont(undefined, 'bold');
+            doc.text(`${reg.area.toUpperCase()}: ${reg.title.toUpperCase()}`, 20, y);
+            doc.setFont(undefined, 'normal');
+            const lines = doc.splitTextToSize(reg.message, 170);
+            doc.text(lines, 20, y + 7);
+            y += (lines.length * 7) + 15;
+        });
+        doc.save("Reporte_CIO.pdf");
+    }
+
+    function updateClock(){
+        document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
+    }
+    setInterval(updateClock, 1000);
+    document.getElementById("btnFullscreen").onclick = () => { document.documentElement.requestFullscreen(); };
+    pullData();
 </script>
-
 </body>
 </html>
