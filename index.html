@@ -6,7 +6,7 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS INTERNO - REFINAMIENTO DE PROPORCIONES */
+        /* CSS DENTRO DEL HTML - SIN COLISIONES */
         html, body {
             margin: 0;
             padding: 0;
@@ -27,7 +27,7 @@
             flex-direction: column;
         }
 
-        /* DISPLAY PRINCIPAL */
+        /* DISPLAY PRINCIPAL - CENTRADO Y SIN SCROLL */
         #display-board {
             flex: 1;
             display: flex;
@@ -35,7 +35,7 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 5% 10%; /* Márgenes generosos para evitar que toque los bordes */
+            padding: 40px;
             background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
             transition: all 0.5s ease;
             width: 100%;
@@ -54,7 +54,7 @@
         .info-container { 
             z-index: 5; 
             width: 100%; 
-            max-width: 1200px; /* Evita que en TV 4K se estire demasiado */
+            max-width: 1300px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -67,12 +67,11 @@
             text-transform: uppercase; 
             margin-bottom: 8px;
             font-weight: bold;
-            opacity: 0.9;
         }
 
         #prioBadge {
             display: inline-block;
-            padding: 6px 18px;
+            padding: 6px 16px;
             border-radius: 4px;
             font-weight: 800;
             text-transform: uppercase;
@@ -87,17 +86,19 @@
             line-height: 1.1; 
             margin-bottom: 20px; 
             width: 100%;
+            word-wrap: break-word;
         }
 
         #messageDisplay { 
             font-weight: 300; 
             color: #cedddd; 
-            line-height: 1.4; 
+            line-height: 1.3; 
             max-width: 85%; 
             margin: 0 auto;
+            word-wrap: break-word;
         }
 
-        /* CABECERA */
+        /* CABECERA PC */
         .main-header {
             position: absolute; top: 0; width: 100%; height: 60px;
             display: flex; justify-content: space-between; align-items: center;
@@ -112,26 +113,24 @@
             color: #fff; padding: 6px 12px; border-radius: 4px;
             font-weight: bold; cursor: pointer; margin-right: 5px;
             font-size: 0.65rem;
-            transition: 0.2s;
         }
-        .actions button:hover { background: #00d4d8; color: #000; }
 
-        #clockDisplay { font-family: 'Courier New', monospace; font-size: 1.3rem; color: #00d4d8; font-weight: bold; }
+        #clockDisplay { font-family: monospace; font-size: 1.3rem; color: #00d4d8; font-weight: bold; }
 
-        /* MODO TV (FULLSCREEN) */
+        /* MODO TV (FULLSCREEN) - RELOJ DISCRETO A LA DERECHA */
         #cio-app:fullscreen .actions { display: none !important; }
         #cio-app:fullscreen .main-header { 
             background: transparent; border: none; 
             justify-content: flex-end; 
-            padding-top: 25px;
+            padding-top: 20px;
         }
         #cio-app:fullscreen #clockDisplay { 
-            font-size: 2.5rem; 
+            font-size: 2.8rem; 
             margin-right: 30px;
-            opacity: 0.8;
+            text-shadow: 0 0 15px rgba(0, 212, 216, 0.5);
         }
 
-        /* PANELES LATERALES (PC / TV) */
+        /* PANELES LATERALES ADAPTATIVOS */
         #overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.7);
             display: none; z-index: 1000; cursor: pointer;
@@ -140,9 +139,7 @@
 
         .side-panel {
             position: fixed; right: 0; top: 0; 
-            width: 25%; /* Ancho reducido para que no se vea gigante */
-            min-width: 350px;
-            height: 100%;
+            width: 25%; min-width: 350px; height: 100%;
             background: #091718; border-left: 2px solid #00d4d8;
             padding: 25px; transform: translateX(100%);
             transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1100; overflow-y: auto;
@@ -150,11 +147,9 @@
         .side-panel.active { transform: translateX(0); }
 
         .side-panel h2 { color: #00d4d8; font-size: 1.2rem; margin-bottom: 20px; }
-        
-        /* INPUTS MÁS ESTILIZADOS */
         .side-panel input, .side-panel textarea, .side-panel select {
             width: 100%; padding: 10px; margin-bottom: 12px;
-            background: rgba(0,0,0,0.5); color: #fff; border: 1px solid #004d4e; border-radius: 4px;
+            background: #000; color: #fff; border: 1px solid #004d4e; border-radius: 4px;
             font-size: 0.9rem;
         }
 
@@ -168,20 +163,17 @@
                 display: flex; position: fixed; bottom: 0; width: 100%; height: 65px;
                 background: #061112; border-top: 1px solid #00d4d8;
                 justify-content: space-around; align-items: center; z-index: 500;
-                padding-bottom: env(safe-area-inset-bottom);
             }
             .nav-mobile button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.7rem; }
             
             .side-panel { 
-                width: 100%; min-width: 100%; 
-                height: 75vh; /* Altura parcial en móvil para mejor ergonomía */
+                width: 100%; min-width: 100%; height: 75vh; 
                 top: auto; bottom: 0; 
                 transform: translateY(100%); 
                 border-radius: 15px 15px 0 0; border-left: none; border-top: 3px solid #00d4d8; 
             }
             .side-panel.active { transform: translateY(0); transform: translateX(0); }
-            
-            #display-board { padding-bottom: 100px; }
+            #display-board { padding-bottom: 80px; }
             #clockDisplay { font-size: 1.1rem; }
         }
 
@@ -217,35 +209,33 @@
     </nav>
 
     <aside id="panelForm" class="side-panel">
-        <h2>Configurar Novedad</h2>
+        <h2>Nueva Novedad</h2>
         <form onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
-            <label style="color:#00d4d8; font-size:0.7rem;">ORIGEN</label>
             <select id="f-area">
                 <option value="Freschat">Freschat</option>
                 <option value="Monitoreo">Monitoreo</option>
                 <option value="Atención al Cliente">Atención al Cliente</option>
                 <option value="Interno">Interno</option>
             </select>
-            <label style="color:#00d4d8; font-size:0.7rem;">URGENCIA</label>
             <select id="f-prio">
                 <option value="Baja">Baja</option>
                 <option value="Media">Media</option>
                 <option value="Alta">Alta</option>
                 <option value="Crítica">Crítica</option>
             </select>
-            <input type="text" id="f-title" placeholder="Título corto" required>
-            <textarea id="f-msg" rows="5" placeholder="Descripción detallada..." required></textarea>
-            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:12px; border:none; font-weight:bold; cursor:pointer; border-radius:4px; font-size:0.9rem;">ACTUALIZAR</button>
-            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:10px; cursor:pointer; font-weight:bold; font-size:0.8rem;">CANCELAR</button>
+            <input type="text" id="f-title" placeholder="Título" required>
+            <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
+            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:12px; border:none; font-weight:bold; cursor:pointer; border-radius:4px;">ACTUALIZAR</button>
+            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:10px; cursor:pointer; font-weight:bold;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2>Novedades Activas</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:10px; font-weight:bold; margin-bottom:15px; cursor:pointer; border-radius:4px; font-size:0.8rem;">PDF REPORTE</button>
+        <h2>Historial Activo</h2>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:10px; font-weight:bold; margin-bottom:15px; cursor:pointer; border-radius:4px;">REPORTE PDF</button>
         <div id="listItems"></div>
-        <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:20px; cursor:pointer; font-weight:bold; font-size:0.8rem;">CERRAR</button>
+        <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:20px; cursor:pointer; font-weight:bold;">CERRAR</button>
     </aside>
 
     <div id="progressLine"></div>
@@ -349,12 +339,12 @@
         const list = document.getElementById("listItems");
         list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
             <div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:8px; border:1px solid #00d4d8; border-radius:4px;">
-                <small style="color:#00d4d8; font-size:0.6rem;">${item.priority}</small><br>
-                <strong style="display:block; margin:3px 0; font-size:0.85rem;">${item.title}</strong>
-                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; font-size:9px; padding:3px 6px; cursor:pointer; font-weight:bold; border-radius:2px;">EDITAR</button>
-                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:#fff; border:none; font-size:9px; padding:3px 6px; margin-left:4px; cursor:pointer; font-weight:bold; border-radius:2px;">BORRAR</button>
+                <small style="color:#00d4d8; font-size:0.65rem;">${item.priority}</small><br>
+                <strong style="display:block; margin:4px 0; font-size:0.85rem;">${item.title}</strong>
+                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; font-size:10px; padding:4px 8px; cursor:pointer; font-weight:bold;">EDITAR</button>
+                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:#fff; border:none; font-size:10px; padding:4px 8px; margin-left:5px; cursor:pointer; font-weight:bold;">BORRAR</button>
             </div>
-        `).join('') : "<p style='font-size:0.8rem; color:#666;'>Sin datos.</p>";
+        `).join('') : "<p style='font-size:0.8rem; color:#666;'>No hay datos.</p>";
         document.getElementById("panelHistory").classList.add("active"); 
         document.getElementById("overlay").classList.add("active"); 
     }
@@ -380,7 +370,7 @@
 
     function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.text("REPORTE CIO", 20, 20);
+        doc.text("REPORTE CIO OPERATIVO", 20, 20);
         dataStore.forEach((r, i) => doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 35 + (i*10)));
         doc.save("Reporte_CIO.pdf");
     }
