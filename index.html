@@ -13,7 +13,6 @@
             --dark-bg: #050d0e;
             --critico-pulso: #4d0000;
             --ticker-bg: #0a1a1b;
-            /* URL DE TU IMAGEN PROPORCIONADA */
             --bg-url: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbGAjSfOe9RPyUXZOnQ-B-3srjTq63dK5RLw&s');
             
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -23,15 +22,16 @@
             overflow: hidden; margin: 0; padding: 0; z-index: 9999;
         }
 
-        /* CAPA DE IMAGEN DE FONDO PERSONALIZADA */
+        /* CAPA DE IMAGEN CENTRADA SIN ESTIRAR */
         #cio-app::before {
             content: "";
             position: absolute; inset: 0;
             background-image: var(--bg-url);
-            background-size: cover;
-            background-position: center center;
-            opacity: 0.18; /* Un poquito más de visibilidad para que se note el logo */
-            filter: blur(1px); /* Desenfoque sutil para que no moleste al texto */
+            background-size: contain; /* Mantiene la proporción original */
+            background-position: center; /* La clava en el medio */
+            background-repeat: no-repeat; /* Evita que se duplique */
+            opacity: 0.25; /* Subí un pelín la opacidad para que luzca el logo */
+            filter: blur(0px); /* Le quité el blur para que el logo se vea nítido */
             z-index: -1;
         }
 
@@ -54,8 +54,8 @@
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
-            /* El degradado ayuda a que el texto siempre sea legible sin importar el fondo */
-            background: radial-gradient(circle at center, transparent 0%, rgba(5, 13, 14, 0.8) 100%);
+            /* El degradado ahora es más suave para que la imagen central brille */
+            background: radial-gradient(circle at center, transparent 0%, rgba(5, 13, 14, 0.6) 100%);
         }
 
         @keyframes pulso-cio {
@@ -65,13 +65,13 @@
         }
         #cio-app.es-critico #display-board { animation: pulso-cio 2s infinite ease-in-out; }
 
-        #cio-app .info-container { width: 100%; max-width: 1100px; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        #cio-app .info-container { width: 100%; max-width: 1100px; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
         #cio-app #areaLabel { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--primary); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
-        #cio-app #prioBadge { display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 800; border: 1px solid var(--primary); font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 20px; backdrop-filter: blur(5px); }
-        #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin: 0 0 20px 0; color: #fff; text-shadow: 0 2px 15px rgba(0,0,0,0.9); }
-        #cio-app #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
+        #cio-app #prioBadge { display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 800; border: 1px solid var(--primary); font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 20px; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); }
+        #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin: 0 0 20px 0; color: #fff; text-shadow: 0 2px 15px rgba(0,0,0,1); }
+        #cio-app #messageDisplay { font-weight: 400; color: #ffffff; line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; text-shadow: 0 2px 8px rgba(0,0,0,1); }
 
         /* TICKER INFERIOR */
         #cio-app #ticker-bar { height: 40px; background: rgba(10, 26, 27, 0.95); border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; backdrop-filter: blur(10px); }
@@ -101,29 +101,26 @@
         #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; z-index: 1050; }
         #cio-app #overlay-cio.active { display: block; }
 
-        /* FORMULARIOS Y BOTONES ESTÉTICOS */
+        /* BOTONES REDONDEADOS */
         #cio-app h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
-        #cio-app label { display: block; font-size: 11px; color: var(--primary); margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--accent);
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid var(--accent);
             border-radius: 15px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
         }
-        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 18px; cursor: pointer; transition: 0.2s; }
-        #cio-app .btn-save:active { transform: scale(0.96); }
-        #cio-app .btn-cancel { width: 100%; padding: 12px; background: rgba(255, 77, 77, 0.1); color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 18px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 20px; cursor: pointer; }
+        #cio-app .btn-cancel { width: 100%; padding: 12px; background: rgba(255, 77, 77, 0.1); color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 20px; margin-top: 10px; cursor: pointer; font-weight: bold; }
 
-        /* LISTA HISTORIAL */
-        #cio-app .history-item { background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary); border-radius: 15px; backdrop-filter: blur(5px); }
+        #cio-app .history-item { background: rgba(255,255,255,0.08); padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary); border-radius: 15px; }
         #cio-app .history-item button { border-radius: 12px; cursor: pointer; border: none; padding: 8px 15px; font-weight: bold; }
 
-        /* RESPONSIVE MOBILE */
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
             #cio-app .nav-mobile { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-left: none; border-top: 3px solid var(--primary); border-radius: 30px 30px 0 0; }
+            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 30px 30px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
             #cio-app #display-board { padding-bottom: 140px; }
             #cio-app #clockDisplay { font-size: 1.2rem; }
+            #cio-app::before { background-size: 80%; } /* Un poco más pequeña en móvil para que no la tapen los textos */
         }
 
         #cio-app #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; z-index: 999; }
@@ -220,12 +217,7 @@
             const d = await r.json();
             const now = Date.now();
             const raw = d || [];
-            
-            dataStore = raw.filter(item => {
-                if(item.type === 'diaria' && (now - item.timestamp > 86400000)) return false;
-                return true;
-            });
-
+            dataStore = raw.filter(item => (item.type === 'diaria' && (now - item.timestamp > 86400000)) ? false : true);
             if(dataStore.length > 0) {
                 const last = dataStore[dataStore.length - 1];
                 document.getElementById("ticker-content").textContent = `[ÚLTIMO] ${last.area}: ${last.title} ——— `;
@@ -241,28 +233,18 @@
         if(!dataStore.length) return;
         const cont = document.getElementById("infoCont");
         cont.classList.add("oculto");
-
         setTimeout(() => {
             const item = dataStore[currentIndex % dataStore.length];
             const app = document.getElementById("cio-app");
             const badge = document.getElementById("prioBadge");
-
-            if(item.priority === "Crítica") {
-                app.classList.add("es-critico");
-                badge.style.background = "#ff0000"; badge.style.color = "#fff";
-            } else {
-                app.classList.remove("es-critico");
-                badge.style.background = "transparent"; badge.style.color = "var(--primary)";
-            }
-
+            if(item.priority === "Crítica") { app.classList.add("es-critico"); badge.style.background = "#ff0000"; badge.style.color = "#fff"; }
+            else { app.classList.remove("es-critico"); badge.style.background = "rgba(0,0,0,0.4)"; badge.style.color = "var(--primary)"; }
             badge.textContent = `PRIORIDAD ${item.priority}`;
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
-            
             const colors = {"Baja":"#00d4d8", "Media":"#00ccff", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
             document.getElementById("progressLine").style.background = colors[item.priority];
-            
             adjustText();
             cont.classList.remove("oculto");
         }, 600); 
@@ -298,9 +280,7 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE CIO OPERATIVO", 20, 25);
-        doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 20, 33);
-
+        doc.setTextColor(255); doc.text("REPORTE CIO OPERATIVO", 20, 25);
         let y = 55;
         dataStore.forEach((item, i) => {
             if(y > 270) { doc.addPage(); y = 20; }
@@ -385,4 +365,3 @@
 </script>
 </body>
 </html>
-
