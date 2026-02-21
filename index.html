@@ -26,6 +26,39 @@
             border-radius: 5px;
             color: white;
         }
+
+        /* ================= AJUSTES PARA CELULAR (NUEVO) ================= */
+        @media (max-width: 768px) {
+            /* Ajustamos los textos de la pantalla principal para móvil */
+            .fullscreen-title { 
+                font-size: 2.2rem !important; 
+                margin-bottom: 15px !important;
+            }
+            .fullscreen-message { 
+                font-size: 2.5rem !important; 
+                line-height: 1.2 !important;
+            }
+            .area { 
+                font-size: 0.8rem !important; 
+                letter-spacing: 2px !important; 
+            }
+            
+            /* Relojes más discretos en el móvil */
+            .live-clock { font-size: 1.1rem !important; }
+            #ghostClock { font-size: 3.5rem !important; opacity: 0.15; }
+
+            /* El panel lateral ahora ocupa casi toda la pantalla en el móvil */
+            .drawer {
+                width: 90% !important;
+                right: -95%;
+            }
+            .drawer.active {
+                right: 0;
+            }
+
+            /* Reducimos un poco el padding del display para ganar espacio */
+            #display { padding: 20px !important; }
+        }
     </style>
 </head>
 <body>
@@ -92,15 +125,13 @@
 
 <script>
     /* ================= CONFIGURACIÓN DE FIREBASE ================= */
-    // AQUÍ DEBAJO PEGA TU LINK (Debe terminar en /eventos.json)
     const DATABASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
 
     let registros = [];
     let currentIndex = 0;
     let startTime = null;
-    const DURATION = 15; // Segundos que dura cada mensaje en pantalla
+    const DURATION = 15;
 
-    /* ================= ELEMENTOS DEL DOM ================= */
     const progressBar = document.getElementById("progressBar");
     const clock = document.getElementById("clock");
     const ghostClock = document.getElementById("ghostClock");
@@ -109,9 +140,6 @@
     const titleDisplay = document.getElementById("titleDisplay");
     const messageDisplay = document.getElementById("messageDisplay");
 
-    /* ================= FUNCIONES DE NUBE (EL PUENTE) ================= */
-
-    // Envía los datos a Firebase
     async function pushData() {
         await fetch(DATABASE_URL, {
             method: 'PUT',
@@ -119,13 +147,11 @@
         });
     }
 
-    // Trae los datos de Firebase
     async function pullData() {
         try {
             const res = await fetch(DATABASE_URL);
             const data = await res.json();
             if (data) {
-                // Solo actualizamos si lo que hay en la nube es diferente a lo que tenemos
                 if (JSON.stringify(data) !== JSON.stringify(registros)) {
                     registros = data;
                     render(currentIndex);
@@ -139,10 +165,7 @@
         }
     }
 
-    // Revisar cambios automáticamente cada 3 segundos
     setInterval(pullData, 3000);
-
-    /* ================= LÓGICA DE VISUALIZACIÓN ================= */
 
     function updateClock(){
         const now = new Date();
@@ -196,8 +219,6 @@
     }
     requestAnimationFrame(animate);
 
-    /* ================= BOTONES Y FORMULARIOS ================= */
-
     const overlay = document.getElementById("drawerOverlay");
     const dForm = document.getElementById("drawerForm");
     const dHistory = document.getElementById("drawerHistory");
@@ -223,9 +244,9 @@
         if(nuevo.priority === "critical") registros.unshift(nuevo);
         else registros.push(nuevo);
         
-        await pushData(); // Guardar en la nube
+        await pushData();
         e.target.reset();
-        overlay.onclick(); // Cerrar menú
+        overlay.onclick();
     };
 
     function renderHistory() {
@@ -242,7 +263,7 @@
 
     window.eliminar = async (i) => {
         registros.splice(i, 1);
-        await pushData(); // Actualizar nube
+        await pushData();
         renderHistory();
     };
 
@@ -259,7 +280,6 @@
         if(!document.fullscreenElement) document.body.classList.remove("fullscreen");
     });
 
-    // Carga inicial al abrir el archivo
     pullData();
 </script>
 
