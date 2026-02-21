@@ -6,20 +6,21 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS INTEGRADO - DISEÑO RESPONSIVO Y ENCAPSULADO */
+        /* CSS INTEGRADO - MANTENIENDO TU BASE Y AÑADIENDO MEJORAS */
         :root {
             --primary: #00d4d8;
             --accent: #006465;
             --dark-bg: #050d0e;
             --critico-fondo: #1a0000;
             --critico-pulso: #4d0000;
+            --ticker-bg: #0a1a1b;
         }
 
         html, body {
             margin: 0; padding: 0; width: 100%; height: 100%;
             background: var(--dark-bg); color: #ffffff;
             font-family: 'Segoe UI', system-ui, sans-serif;
-            overflow: hidden; /* EVITA CUALQUIER BARRA DE DESPLAZAMIENTO */
+            overflow: hidden;
         }
 
         #cio-app {
@@ -38,7 +39,6 @@
             overflow: hidden;
         }
 
-        /* EFECTO CRÍTICO RESALTADO EN ROJO OSCURO */
         @keyframes pulso-critico {
             0% { background-color: var(--dark-bg); }
             50% { background-color: var(--critico-pulso); }
@@ -49,46 +49,24 @@
             background: var(--critico-fondo);
         }
 
-        /* MODIFICACIÓN PARA EFECTO: CONTENEDOR CON TRANSICIÓN */
         .info-container { 
-            width: 100%; 
-            max-width: 1200px; 
-            z-index: 5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            width: 100%; max-width: 1200px; z-index: 5;
+            display: flex; flex-direction: column; align-items: center;
             transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
         }
 
-        /* CLASES DE TRANSICIÓN */
         .oculto { opacity: 0; transform: translateY(-30px); filter: blur(10px); }
         .pre-entrada { opacity: 0; transform: translateY(30px); filter: blur(10px); }
         
-        #areaLabel { 
-            font-size: clamp(0.8rem, 2vh, 1.2rem); color: var(--primary); 
-            letter-spacing: 5px; text-transform: uppercase; margin-bottom: 1vh;
-        }
-
-        #prioBadge {
-            display: inline-block; padding: 5px 20px; border-radius: 4px;
-            font-weight: 800; border: 1px solid rgba(255,255,255,0.2);
-            font-size: clamp(0.7rem, 1.5vh, 1rem); margin-bottom: 2vh;
-            text-transform: uppercase;
-        }
-
-        #titleDisplay { 
-            font-weight: 800; text-transform: uppercase; line-height: 1.1; 
-            margin-bottom: 2vh; width: 100%;
-        }
+        #areaLabel { font-size: clamp(0.8rem, 2vh, 1.2rem); color: var(--primary); letter-spacing: 5px; text-transform: uppercase; margin-bottom: 1vh; }
+        #prioBadge { display: inline-block; padding: 5px 20px; border-radius: 4px; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); font-size: clamp(0.7rem, 1.5vh, 1rem); margin-bottom: 2vh; text-transform: uppercase; }
+        #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 2vh; width: 100%; }
+        #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.4; width: 100%; max-width: 90%; margin: 0 auto; white-space: pre-wrap; word-wrap: break-word; }
         
-        #messageDisplay { 
-            font-weight: 300; color: #cedddd; line-height: 1.4; 
-            width: 100%; max-width: 90%; margin: 0 auto;
-            white-space: pre-wrap; /* CARGA HACIA ABAJO Y RESPETA ENTERS */
-            word-wrap: break-word;
-        }
+        /* ALERTA ANTIGUEDAD */
+        #timeWarning { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; margin-top: 15px; display: none; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
-        /* HEADER Y RELOJ */
+        /* HEADER */
         .main-header {
             position: absolute; top: 0; width: 100%; height: 60px;
             display: flex; justify-content: space-between; align-items: center;
@@ -97,14 +75,7 @@
             box-sizing: border-box;
         }
 
-        /* FULLSCREEN: SOLO QUEDA EL RELOJ */
         #cio-app:fullscreen .main-header { display: none !important; }
-        #cio-app:fullscreen .actions { display: none !important; }
-        #cio-app:fullscreen #clockDisplay { 
-            font-size: clamp(2rem, 5vh, 4rem); 
-            margin-top: 40px;
-            text-shadow: 0 0 20px rgba(0,212,216,0.6);
-        }
 
         .actions { display: flex; gap: 10px; }
         .actions button {
@@ -115,7 +86,15 @@
 
         #clockDisplay { font-family: monospace; font-size: 1.4rem; color: var(--primary); font-weight: bold; }
 
-        /* PANELES LATERALES */
+        /* TICKER BAR */
+        #ticker-bar {
+            height: 35px; background: var(--ticker-bg); border-top: 1px solid var(--primary);
+            display: flex; align-items: center; overflow: hidden; white-space: nowrap; z-index: 10;
+        }
+        #ticker-content { display: inline-block; padding-left: 100%; animation: ticker-scroll 25s linear infinite; color: var(--primary); font-weight: bold; font-size: 0.85rem; }
+        @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+        /* PANELES */
         .side-panel {
             position: fixed; right: 0; top: 0; width: 30vw; min-width: 350px; height: 100%;
             background: #091718; border-left: 3px solid var(--primary);
@@ -128,10 +107,7 @@
         #overlay.active { display: block; }
 
         label { font-size: 0.7rem; color: var(--primary); display: block; margin-bottom: 5px; margin-top: 10px; }
-        input, textarea, select {
-            width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent);
-            border-radius: 4px; font-size: 1rem; box-sizing: border-box;
-        }
+        input, textarea, select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
 
         /* NAVEGACIÓN MÓVIL */
         .nav-mobile { display: none; }
@@ -140,24 +116,17 @@
             .actions { display: none; }
             .main-header { justify-content: flex-end; background: none; }
             .nav-mobile {
-                display: flex; position: fixed; bottom: 0; width: 100%; height: 75px;
+                display: flex; position: fixed; bottom: 35px; width: 100%; height: 70px;
                 background: #061112; border-top: 2px solid var(--primary);
                 justify-content: space-around; align-items: center; z-index: 500;
             }
-            .nav-mobile button { 
-                background: none; border: none; color: var(--primary); 
-                font-size: 0.8rem; font-weight: bold; cursor: pointer;
-                display: flex; flex-direction: column; align-items: center;
-            }
-            .side-panel { 
-                width: 100%; height: 85%; top: auto; bottom: 0; transform: translateY(100%);
-                border-left: none; border-top: 4px solid var(--primary); border-radius: 20px 20px 0 0;
-            }
+            .nav-mobile button { background: none; border: none; color: var(--primary); font-size: 0.7rem; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+            .side-panel { width: 100%; height: 85%; top: auto; bottom: 0; transform: translateY(100%); border-left: none; border-top: 4px solid var(--primary); border-radius: 20px 20px 0 0; }
             .side-panel.active { transform: translateY(0); }
-            #display-board { padding-bottom: 90px; }
+            #display-board { padding-bottom: 110px; }
         }
 
-        #progressLine { position: fixed; bottom: 0; height: 4px; width: 0%; z-index: 999; }
+        #progressLine { position: fixed; bottom: 35px; height: 4px; width: 0%; z-index: 999; }
     </style>
 </head>
 <body>
@@ -169,6 +138,7 @@
         <div class="actions">
             <button onclick="openForm()">＋ NUEVO</button>
             <button onclick="openHistory()">📋 LISTA</button>
+            <button onclick="handleCerrarTurno()" style="background: #4d0000; border-color: #ff4d4d;">🔒 CERRAR TURNO</button>
             <button onclick="toggleFS()" style="border-color:#ffcc00; color:#ffcc00;">⛶ MODO TV</button>
         </div>
         <div id="clockDisplay">00:00:00</div>
@@ -180,18 +150,29 @@
             <div id="prioBadge">Sincronizando</div>
             <h1 id="titleDisplay">Monitor Operativo</h1>
             <p id="messageDisplay">Cargando novedades...</p>
+            <div id="timeWarning">⚠️ ESTA NOVEDAD TIENE MÁS DE 4 HORAS</div>
         </div>
     </main>
+
+    <div id="ticker-bar">
+        <div id="ticker-content">CARGANDO ÚLTIMA ACTUALIZACIÓN...</div>
+    </div>
 
     <nav class="nav-mobile">
         <button onclick="openForm()"><span>➕</span>NUEVO</button>
         <button onclick="openHistory()"><span>📋</span>LISTA</button>
+        <button onclick="handleCerrarTurno()"><span>🔒</span>TURNO</button>
     </nav>
 
     <aside id="panelForm" class="side-panel">
         <h2>Nueva Novedad</h2>
         <form onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
+            <label>TIPO DE PERMANENCIA</label>
+            <select id="f-type">
+                <option value="turno">De Turno (Se borra al cerrar turno)</option>
+                <option value="diaria">Diaria (Dura 24 horas)</option>
+            </select>
             <label>ÁREA</label>
             <select id="f-area">
                 <option value="Freschat">Freschat</option>
@@ -209,9 +190,9 @@
             <label>TÍTULO</label>
             <input type="text" id="f-title" placeholder="Resumen corto" required>
             <label>DESCRIPCIÓN</label>
-            <textarea id="f-msg" rows="8" placeholder="Escriba el detalle aquí..." required></textarea>
+            <textarea id="f-msg" rows="6" placeholder="Escriba el detalle aquí..." required></textarea>
             <button type="submit" style="width:100%; padding:15px; background:var(--primary); color:black; font-weight:bold; border:none; border-radius:4px; margin-top:15px; cursor:pointer;">ACTUALIZAR MONITOR</button>
-            <button type="button" onclick="closeAll()" style="width:100%; margin-top:10px; background:none; color:#ff4d4d; border:none; cursor:pointer; font-weight:bold;">CANCELAR</button>
+            <button type="button" onclick="closeAll()" style="width:100%; margin-top:10px; background:none; color:#ff4d4d; border:none; cursor:pointer;">CANCELAR</button>
         </form>
     </aside>
 
@@ -232,55 +213,51 @@
     let timerStart = null;
     const DISPLAY_TIME = 15;
 
-    function adjustText() {
-        const t = document.getElementById('titleDisplay');
-        const m = document.getElementById('messageDisplay');
-        const container = document.getElementById('display-board');
-        let sizeT = window.innerWidth <= 768 ? 26 : 75; 
-        let sizeM = window.innerWidth <= 768 ? 16 : 42;
-        t.style.fontSize = sizeT + "px";
-        m.style.fontSize = sizeM + "px";
-        let limit = 0;
-        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.75) && limit < 50) {
-            sizeT -= 1;
-            sizeM -= 0.8;
-            t.style.fontSize = sizeT + "px";
-            m.style.fontSize = sizeM + "px";
-            limit++;
-        }
-    }
-
     async function syncData() {
         try {
             const r = await fetch(API_URL);
             const d = await r.json();
-            dataStore = d || [];
-            if(dataStore.length > 0 && !timerStart) refreshView(currentIndex);
+            const rawData = d || [];
+            const now = Date.now();
+
+            // Filtrar las diarias que tengan más de 24hs
+            dataStore = rawData.filter(item => {
+                if(item.type === 'diaria' && (now - item.timestamp > 86400000)) return false;
+                return true;
+            });
+
+            if(dataStore.length > 0) {
+                const ultima = dataStore[dataStore.length - 1];
+                document.getElementById("ticker-content").textContent = `[RECIENTE] ${ultima.area}: ${ultima.title} ——— `;
+                if(!timerStart) refreshView(currentIndex);
+            }
         } catch(e) { console.error("Sync Error"); }
     }
 
     function refreshView(idx) {
         if(!dataStore.length) return;
         const cont = document.getElementById("infoCont");
-        
         cont.classList.add("oculto");
 
         setTimeout(() => {
             const item = dataStore[idx % dataStore.length];
             const app = document.getElementById("cio-app");
             const badge = document.getElementById("prioBadge");
+            const warning = document.getElementById("timeWarning");
+
+            // Lógica de +4 horas
+            const diffHoras = (Date.now() - item.timestamp) / 3600000;
+            warning.style.display = diffHoras > 4 ? "block" : "none";
 
             if(item.priority === "Crítica") {
                 app.classList.add("es-critico");
-                badge.style.backgroundColor = "#ff0000";
-                badge.style.color = "#fff";
+                badge.style.backgroundColor = "#ff0000"; badge.style.color = "#fff";
             } else {
                 app.classList.remove("es-critico");
-                badge.style.backgroundColor = "transparent";
-                badge.style.color = "var(--primary)";
+                badge.style.backgroundColor = "transparent"; badge.style.color = "var(--primary)";
             }
 
-            badge.textContent = "Prioridad " + item.priority;
+            badge.textContent = `Prioridad ${item.priority} | ${item.type.toUpperCase()}`;
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
@@ -289,12 +266,9 @@
             document.getElementById("progressLine").style.background = colors[item.priority] || "#00d4d8";
             
             adjustText();
-
             cont.classList.remove("oculto");
             cont.classList.add("pre-entrada");
-
             void cont.offsetWidth;
-
             cont.classList.remove("pre-entrada");
         }, 600); 
     }
@@ -306,64 +280,82 @@
             area: document.getElementById("f-area").value,
             priority: document.getElementById("f-prio").value,
             title: document.getElementById("f-title").value,
-            message: document.getElementById("f-msg").value
+            message: document.getElementById("f-msg").value,
+            type: document.getElementById("f-type").value,
+            timestamp: Date.now()
         };
         if(id === -1) dataStore.push(entry); else dataStore[id] = entry;
         await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore) });
         closeAll(); syncData();
     }
 
-    // FUNCIÓN PDF CON LÓGICA DE TURNOS AUTOMÁTICA
+    async function handleCerrarTurno() {
+        if(!confirm("Se descargará el PDF y se ELIMINARÁN todas las novedades 'De Turno'. ¿Desea continuar?")) return;
+        generatePDF();
+        // Mantener solo las que son diarias
+        const soloDiarias = dataStore.filter(item => item.type === 'diaria');
+        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(soloDiarias.length ? soloDiarias : null) });
+        syncData();
+        alert("Turno cerrado con éxito.");
+    }
+
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // LÓGICA DE TURNOS SEGÚN HORA ACTUAL
         const hora = new Date().getHours();
-        let tituloTurno = "NOVEDADES OPERATIVAS";
-        let responsable = "N/A";
+        let config = { t: "NOCTURNO", r: "Caroline Riaño" };
+        
+        if (hora >= 6 && hora < 14) config = { t: "MATUTINO", r: "Alfonso Carballo" };
+        else if (hora >= 14 && hora < 22) config = { t: "VESPERTINO", r: "Manuel Méndez" };
 
-        if (hora >= 6 && hora < 14) {
-            tituloTurno = "NOVEDADES OPERATIVAS - TURNO MATUTINO";
-            responsable = "Alfonso Carballo";
-        } else if (hora >= 14 && hora < 22) {
-            tituloTurno = "NOVEDADES OPERATIVAS - TURNO VESPERTINO";
-            responsable = "Manuel Méndez";
-        } else {
-            tituloTurno = "NOVEDADES OPERATIVAS - TURNO NOCTURNO";
-            responsable = "Caroline Riaño";
-        }
-
-        // ENCABEZADO PDF
         doc.setFillColor(0, 100, 101);
         doc.rect(0, 0, 210, 45, 'F');
         doc.setTextColor(255);
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'bold');
-        doc.text(tituloTurno, 20, 20);
-        
-        doc.setFontSize(11);
-        doc.setFont(undefined, 'normal');
-        doc.text(`Responsable: ${responsable}`, 20, 30);
+        doc.setFontSize(16); doc.setFont(undefined, 'bold');
+        doc.text(`NOVEDADES OPERATIVAS - TURNO ${config.t}`, 20, 20);
+        doc.setFontSize(11); doc.setFont(undefined, 'normal');
+        doc.text(`Responsable: ${config.r}`, 20, 30);
         doc.text(`Fecha/Hora de emisión: ${new Date().toLocaleString()}`, 20, 37);
 
-        // CONTENIDO
-        doc.setTextColor(0);
-        doc.setFontSize(10);
         let y = 60;
-        
+        let stats = { Crítica: 0, Alta: 0, Media: 0, Baja: 0 };
+
         dataStore.forEach((item, i) => {
+            stats[item.priority]++;
             if(y > 270) { doc.addPage(); y = 20; }
             doc.setFont(undefined, 'bold');
-            doc.text(`${i+1}. [${item.priority}] ÁREA: ${item.area}`, 20, y);
+            doc.text(`${i+1}. [${item.priority}] [${item.type.toUpperCase()}] AREA: ${item.area}`, 20, y);
             y += 7;
             doc.setFont(undefined, 'normal');
             const lines = doc.splitTextToSize(item.title + ": " + item.message, 170);
             doc.text(lines, 25, y);
             y += (lines.length * 7) + 10;
         });
-        
-        doc.save(`Reporte_CIO_${responsable.replace(" ", "_")}.pdf`);
+
+        // ESTADÍSTICAS AL FINAL
+        if(y > 240) { doc.addPage(); y = 20; }
+        doc.setDrawColor(0, 100, 101); doc.line(20, y, 190, y); y += 10;
+        doc.setFont(undefined, 'bold'); doc.text("RESUMEN ESTADÍSTICO DEL TURNO:", 20, y); y += 10;
+        doc.setFont(undefined, 'normal');
+        doc.text(`Novedades Totales: ${dataStore.length}`, 25, y); y += 7;
+        doc.text(`Prioridades: Críticas (${stats.Crítica}), Altas (${stats.Alta}), Medias (${stats.Media}), Bajas (${stats.Baja})`, 25, y);
+
+        doc.save(`Reporte_CIO_${config.r.replace(" ", "_")}.pdf`);
+    }
+
+    function adjustText() {
+        const t = document.getElementById('titleDisplay');
+        const m = document.getElementById('messageDisplay');
+        const container = document.getElementById('display-board');
+        let sizeT = window.innerWidth <= 768 ? 26 : 75; 
+        let sizeM = window.innerWidth <= 768 ? 16 : 42;
+        t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
+        let limit = 0;
+        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.70) && limit < 50) {
+            sizeT -= 1; sizeM -= 0.8;
+            t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
+            limit++;
+        }
     }
 
     function openForm() { 
@@ -376,7 +368,7 @@
         const list = document.getElementById("listItems");
         list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
             <div style="background:rgba(255,255,255,0.05); padding:12px; margin-bottom:10px; border:1px solid var(--primary); border-radius:4px;">
-                <small style="color:var(--primary)">${item.area} | ${item.priority}</small>
+                <small style="color:var(--primary)">${item.type.toUpperCase()} | ${item.area} | ${item.priority}</small>
                 <div style="font-weight:bold; margin:5px 0;">${item.title}</div>
                 <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; padding:4px 8px; font-size:10px; font-weight:bold; cursor:pointer;">EDITAR</button>
                 <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white; border:none; padding:4px 8px; font-size:10px; margin-left:5px; font-weight:bold; cursor:pointer;">BORRAR</button>
@@ -393,6 +385,7 @@
         document.getElementById("f-prio").value = item.priority;
         document.getElementById("f-title").value = item.title;
         document.getElementById("f-msg").value = item.message;
+        document.getElementById("f-type").value = item.type;
         document.getElementById("panelHistory").classList.remove("active");
         document.getElementById("panelForm").classList.add("active");
     };
@@ -424,4 +417,3 @@
 </script>
 </body>
 </html>
-
