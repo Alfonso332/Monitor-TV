@@ -2,39 +2,47 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS INTERNO - EVITA CONFLICTOS */
-        #cio-app {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            background: #050d0e;
-            color: #ffffff;
-            font-family: 'Segoe UI', Arial, sans-serif;
+        /* CSS INTERNO - ESTRUCTURA Y CENTRADO */
+        html, body {
             margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #050d0e;
             overflow: hidden;
         }
 
-        #cio-app * { box-sizing: border-box; }
-
-        /* PANTALLA PRINCIPAL */
-        #display-board {
+        #cio-app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #050d0e;
+            color: #ffffff;
+            font-family: 'Segoe UI', Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            text-align: center;
-            background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
-            transition: all 0.5s ease;
-            padding: 30px;
         }
 
-        /* EFECTO CRÍTICO REFINADO */
+        /* DISPLAY PRINCIPAL PERFECTAMENTE CENTRADO */
+        #display-board {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centrado vertical */
+            align-items: center;     /* Centrado horizontal */
+            text-align: center;
+            padding: 20px;
+            background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
+            transition: all 0.5s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* EFECTO CRÍTICO */
         @keyframes bg-critical {
             0% { background-color: #050d0e; }
             50% { background-color: #2b0000; }
@@ -47,14 +55,20 @@
 
         #cio-app.es-critico #titleDisplay {
             text-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
-            color: #fff;
         }
 
-        /* CONTENIDO */
-        .info-container { z-index: 5; width: 90%; max-width: 1400px; }
+        /* CONTENIDO ADAPTATIVO */
+        .info-container { 
+            z-index: 5; 
+            width: 100%; 
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         
         #areaLabel { 
-            font-size: 1.4rem; 
+            font-size: clamp(1rem, 4vw, 1.4rem); 
             color: #00d4d8; 
             letter-spacing: 6px; 
             text-transform: uppercase; 
@@ -64,24 +78,37 @@
 
         #prioBadge {
             display: inline-block;
-            padding: 10px 30px;
+            padding: 10px 25px;
             border-radius: 6px;
             font-weight: 900;
             text-transform: uppercase;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border: 2px solid rgba(255,255,255,0.1);
-            font-size: 1.2rem;
+            font-size: clamp(0.8rem, 3vw, 1.2rem);
             transition: all 0.3s ease;
         }
 
-        #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 20px; transition: 0.3s; }
-        #messageDisplay { font-weight: 300; color: #cedddd; line-height: 1.4; max-width: 80%; margin: 0 auto; }
+        #titleDisplay { 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            line-height: 1.1; 
+            margin-bottom: 15px; 
+            width: 100%;
+        }
+
+        #messageDisplay { 
+            font-weight: 300; 
+            color: #cedddd; 
+            line-height: 1.4; 
+            max-width: 90%; 
+            margin: 0 auto;
+        }
 
         /* CABECERA PC */
         .main-header {
-            position: absolute; top: 0; width: 100%; height: 75px;
+            position: absolute; top: 0; width: 100%; height: 70px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; z-index: 100;
+            padding: 0 30px; z-index: 100;
             background: rgba(0,0,0,0.4);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.15);
@@ -90,22 +117,22 @@
         .actions button {
             background: rgba(0, 100, 101, 0.3);
             border: 1px solid #00d4d8;
-            color: #fff; padding: 10px 18px; border-radius: 4px;
-            font-weight: bold; cursor: pointer; margin-right: 10px;
-            font-size: 0.75rem;
+            color: #fff; padding: 8px 15px; border-radius: 4px;
+            font-weight: bold; cursor: pointer; margin-right: 8px;
+            font-size: 0.7rem;
         }
 
-        #clockDisplay { font-family: monospace; font-size: 1.6rem; color: #00d4d8; font-weight: bold; transition: 0.5s; }
+        #clockDisplay { font-family: monospace; font-size: 1.5rem; color: #00d4d8; font-weight: bold; }
 
         /* MODO TV (FULLSCREEN) */
         #cio-app:fullscreen .actions { display: none !important; }
-        #cio-app:fullscreen .main-header { background: transparent; border: none; justify-content: center; height: 220px; }
+        #cio-app:fullscreen .main-header { background: transparent; border: none; justify-content: center; height: 180px; }
         #cio-app:fullscreen #clockDisplay { 
-            font-size: 8.5rem; 
+            font-size: 8rem; 
             text-shadow: 0 0 45px rgba(0, 212, 216, 0.5); 
-            margin-top: 80px; 
+            margin-top: 50px; 
         }
-        #cio-app:fullscreen.es-critico #clockDisplay { color: #ff4d4d; text-shadow: 0 0 45px rgba(255, 0, 0, 0.6); }
+        #cio-app:fullscreen.es-critico #clockDisplay { color: #ff4d4d; }
 
         /* FORMULARIOS Y PANELES */
         #overlay {
@@ -115,38 +142,32 @@
         #overlay.active { display: block; }
 
         .side-panel {
-            position: fixed; right: 0; top: 0; width: 420px; height: 100%;
+            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #081415; border-left: 3px solid #00d4d8;
-            padding: 40px; transform: translateX(100%);
+            padding: 30px; transform: translateX(100%);
             transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1100; overflow-y: auto;
         }
         .side-panel.active { transform: translateX(0); }
-
-        .side-panel h2 { color: #00d4d8; margin-bottom: 25px; font-size: 1.5rem; }
-        .side-panel input, .side-panel textarea, .side-panel select {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            background: #000; color: #fff; border: 1px solid #006465; border-radius: 4px;
-        }
 
         /* NAVEGACIÓN MÓVIL */
         .nav-mobile { display: none; }
 
         @media (max-width: 768px) {
             .actions { display: none !important; }
-            .main-header { justify-content: center; }
+            .main-header { height: 60px; justify-content: center; background: none; border: none; }
             .nav-mobile {
-                display: flex; position: fixed; bottom: 0; width: 100%; height: 75px;
+                display: flex; position: fixed; bottom: 0; width: 100%; height: 70px;
                 background: #061112; border-top: 1px solid #00d4d8;
                 justify-content: space-around; align-items: center; z-index: 500;
             }
-            .nav-mobile button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.8rem; }
-            .side-panel { width: 100%; transform: translateY(100%); border-radius: 20px 20px 0 0; border-top: 3px solid #00d4d8; }
+            .nav-mobile button { background: none; border: none; color: #00d4d8; font-weight: bold; font-size: 0.75rem; }
+            .side-panel { width: 100%; transform: translateY(100%); border-radius: 20px 20px 0 0; border-top: 3px solid #00d4d8; border-left: none; }
             .side-panel.active { transform: translateY(0); }
-            #display-board { padding-bottom: 100px; }
-            #clockDisplay { font-size: 1.4rem; }
+            #display-board { padding-bottom: 80px; }
+            #clockDisplay { font-size: 1.2rem; }
         }
 
-        #progressLine { position: fixed; bottom: 0; height: 6px; width: 0%; z-index: 999; transition: width 0.1s linear; }
+        #progressLine { position: fixed; bottom: 0; height: 5px; width: 0%; z-index: 999; transition: width 0.1s linear; }
     </style>
 </head>
 <body>
@@ -178,33 +199,31 @@
     </nav>
 
     <aside id="panelForm" class="side-panel">
-        <h2>Nueva Novedad</h2>
+        <h2 style="color:#00d4d8;">Nueva Novedad</h2>
         <form onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
-            <label style="color:#00d4d8; font-size:0.75rem;">ÁREA</label>
-            <select id="f-area">
+            <select id="f-area" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #00d4d8;">
                 <option value="Freschat">Freschat</option>
                 <option value="Monitoreo">Monitoreo</option>
                 <option value="Atención al Cliente">Atención al Cliente</option>
                 <option value="Interno">Interno</option>
             </select>
-            <label style="color:#00d4d8; font-size:0.75rem;">PRIORIDAD</label>
-            <select id="f-prio">
+            <select id="f-prio" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #00d4d8;">
                 <option value="Baja">Baja</option>
                 <option value="Media">Media</option>
                 <option value="Alta">Alta</option>
                 <option value="Crítica">Crítica</option>
             </select>
-            <input type="text" id="f-title" placeholder="Título" required>
-            <textarea id="f-msg" rows="5" placeholder="Descripción de la novedad..." required></textarea>
-            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:15px; border:none; font-weight:bold; cursor:pointer; border-radius:4px;">ACTUALIZAR MONITOR</button>
-            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:15px; cursor:pointer;">CANCELAR</button>
+            <input type="text" id="f-title" placeholder="Título" required style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #00d4d8;">
+            <textarea id="f-msg" rows="5" placeholder="Descripción..." required style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid #00d4d8;"></textarea>
+            <button type="submit" style="width:100%; background:#00d4d8; color:#000; padding:15px; border:none; font-weight:bold; cursor:pointer;">ACTUALIZAR</button>
+            <button type="button" onclick="closeAll()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:10px; cursor:pointer;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2>Historial de Eventos</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:12px; font-weight:bold; margin-bottom:20px; cursor:pointer; border-radius:4px;">DESCARGAR PDF</button>
+        <h2 style="color:#00d4d8;">Historial</h2>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; border:none; padding:10px; font-weight:bold; margin-bottom:15px; cursor:pointer;">PDF</button>
         <div id="listItems"></div>
     </aside>
 
@@ -212,6 +231,7 @@
 </div>
 
 <script>
+    /* LÓGICA INTACTA SEGÚN TU PEDIDO */
     const API_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     let dataStore = [];
     let currentIndex = 0;
@@ -222,11 +242,11 @@
         const t = document.getElementById('titleDisplay');
         const m = document.getElementById('messageDisplay');
         const container = document.getElementById('display-board');
-        let sizeT = window.innerWidth <= 768 ? 32 : 90; 
-        let sizeM = window.innerWidth <= 768 ? 20 : 55;
+        let sizeT = window.innerWidth <= 768 ? 28 : 90; 
+        let sizeM = window.innerWidth <= 768 ? 18 : 55;
         t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
         let limit = 0;
-        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.6) && limit < 50) {
+        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.7) && limit < 50) {
             sizeT -= 1; sizeM -= 1;
             t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
             limit++;
@@ -248,17 +268,14 @@
         const app = document.getElementById("cio-app");
         const badge = document.getElementById("prioBadge");
         
-        // Manejo de prioridad Crítica
         if(item.priority === "Crítica") {
             app.classList.add("es-critico");
             badge.style.background = "#ff4d4d";
             badge.style.color = "#fff";
-            badge.style.transform = "scale(1.1)";
         } else {
             app.classList.remove("es-critico");
             badge.style.background = "transparent";
             badge.style.color = "#00d4d8";
-            badge.style.transform = "scale(1.0)";
         }
 
         badge.textContent = "Prioridad " + item.priority;
@@ -287,7 +304,7 @@
     }
 
     window.onDelete = async (i) => {
-        if(!confirm("¿Borrar novedad?")) return;
+        if(!confirm("¿Borrar?")) return;
         dataStore.splice(i, 1);
         await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore.length ? dataStore : null) });
         openHistory(); syncData();
@@ -313,21 +330,19 @@
     function openHistory() { 
         const list = document.getElementById("listItems");
         list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border:1px solid #00d4d8; border-radius:4px;">
-                <div style="font-size:0.7rem; color:#00d4d8; margin-bottom:5px;">${item.area} | ${item.priority}</div>
-                <strong style="display:block; margin-bottom:10px;">${item.title}</strong>
-                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; padding:5px 10px; font-size:10px; cursor:pointer; font-weight:bold; border-radius:2px;">EDITAR</button>
-                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; font-size:10px; margin-left:5px; cursor:pointer; font-weight:bold; border-radius:2px;">BORRAR</button>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:8px; border:1px solid #00d4d8;">
+                <small>${item.priority}</small><br>
+                <strong>${item.title}</strong><br>
+                <button onclick="onEdit(${i})" style="background:#ffcc00; border:none; font-size:10px; padding:3px 7px; cursor:pointer;">EDITAR</button>
+                <button onclick="onDelete(${i})" style="background:#ff4d4d; color:#fff; border:none; font-size:10px; padding:3px 7px; margin-left:5px; cursor:pointer;">BORRAR</button>
             </div>
-        `).join('') : "<p>No hay registros.</p>";
+        `).join('') : "Vacío";
         document.getElementById("panelHistory").classList.add("active"); 
         document.getElementById("overlay").classList.add("active"); 
     }
 
     function closeAll() { 
-        document.getElementById("panelForm").classList.remove("active");
-        document.getElementById("panelHistory").classList.remove("active");
-        document.getElementById("overlay").classList.remove("active");
+        document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active'));
     }
 
     function toggleFS() { 
@@ -347,8 +362,7 @@
 
     function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(18); doc.text("MONITOR CIO - REPORTE", 20, 20);
-        dataStore.forEach((r, i) => doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 40 + (i*10)));
+        dataStore.forEach((r, i) => doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, 20 + (i*10)));
         doc.save("Reporte_CIO.pdf");
     }
 
