@@ -1,539 +1,420 @@
-*{
-
-margin:0;
-
-padding:0;
-
-box-sizing:border-box;
-
-font-family:"Segoe UI",sans-serif;
-
-}
-
-
-
-body{
-
-background:
-
-radial-gradient(circle at 20% 20%, #003c3f 0%, transparent 40%),
-
-radial-gradient(circle at 80% 80%, #002224 0%, transparent 40%),
-
-#050d0e;
-
-color:#ffffff;
-
-height:100vh;
-
-overflow:hidden;
-
-display:flex;
-
-flex-direction:column;
-
-}
-
-
-
-/* ================= HEADER ================= */
-
-
-
-.control-header{
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-padding:18px 35px;
-
-background:rgba(0,0,0,0.45);
-
-backdrop-filter:blur(14px);
-
-border-bottom:1px solid #006465;
-
-z-index:1000;
-
-border-bottom-left-radius:20px;
-
-border-bottom-right-radius:20px;
-
-}
-
-
-
-.control-header button{
-
-background:rgba(0,100,101,0.25);
-
-border:1px solid #006465;
-
-color:#00d4d8;
-
-padding:12px 24px;
-
-margin-right:12px;
-
-cursor:pointer;
-
-border-radius:40px;
-
-transition:0.3s;
-
-font-weight:500;
-
-}
-
-
-
-.control-header button:hover{
-
-background:#006465;
-
-color:white;
-
-box-shadow:0 0 25px #006465;
-
-transform:scale(1.05);
-
-}
-
-
-
-.live-clock{
-
-font-size:1.5rem;
-
-letter-spacing:3px;
-
-color:#00d4d8;
-
-}
-
-
-
-/* ================= MAIN ================= */
-
-
-
-#display{
-
-flex:1;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-text-align:center;
-
-position:relative;
-
-transition:all 0.8s ease;
-
-padding:40px;
-
-}
-
-
-
-.info-block{
-
-z-index:5;
-
-max-width:85%;
-
-}
-
-
-
-/* Área */
-
-
-
-.area{
-
-letter-spacing:6px;
-
-opacity:0.6;
-
-margin-bottom:20px;
-
-font-size:1.2rem;
-
-}
-
-
-
-/* Servicio */
-
-
-
-#titleDisplay{
-
-font-size:4rem;
-
-margin-bottom:35px;
-
-text-shadow:0 0 25px rgba(0,100,101,0.6);
-
-transition:0.8s;
-
-word-wrap:break-word;
-
-overflow-wrap:break-word;
-
-white-space:normal;
-
-line-height:1.1;
-
-}
-
-
-
-/* Novedad */
-
-
-
-#messageDisplay{
-
-font-size:8rem;
-
-opacity:2;
-
-line-height:1.6;
-
-max-width:90%;
-
-margin:auto;
-
-word-wrap:break-word;
-
-overflow-wrap:break-word;
-
-white-space:pre-wrap;
-
-}
-
-
-
-/* ================= FOOTER ================= */
-
-
-
-.footer-bar{
-
-height:6px;
-
-background:#111;
-
-border-top:1px solid #006465;
-
-}
-
-
-
-#progressBar{
-
-height:100%;
-
-width:0%;
-
-background:#006465;
-
-transition:width 0.1s linear;
-
-}
-
-
-
-/* ================= DRAWER OVERLAY ================= */
-
-
-
-#drawerOverlay{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-background:rgba(0,0,0,0.5);
-
-opacity:0;
-
-pointer-events:none;
-
-transition:0.3s;
-
-z-index:1200;
-
-}
-
-
-
-#drawerOverlay.active{
-
-opacity:1;
-
-pointer-events:auto;
-
-}
-
-
-
-/* ================= DRAWERS ================= */
-
-
-
-.drawer{
-
-position:fixed;
-
-top:0;
-
-right:-420px;
-
-width:400px;
-
-height:100%;
-
-background:#0a1a1c;
-
-padding:35px;
-
-transition:0.4s;
-
-overflow-y:auto;
-
-border-left:1px solid #006465;
-
-z-index:1500;
-
-border-top-left-radius:35px;
-
-border-bottom-left-radius:35px;
-
-box-shadow:-10px 0 40px rgba(0,0,0,0.6);
-
-}
-
-
-
-.drawer.active{
-
-right:0;
-
-}
-
-
-
-.drawer h2{
-
-margin-bottom:25px;
-
-letter-spacing:2px;
-
-}
-
-
-
-.drawer input,
-
-.drawer textarea,
-
-.drawer select{
-
-width:100%;
-
-padding:14px;
-
-margin-bottom:18px;
-
-background:#081314;
-
-border:1px solid #006465;
-
-color:white;
-
-border-radius:18px;
-
-transition:0.3s;
-
-}
-
-
-
-.drawer input:focus,
-
-.drawer textarea:focus,
-
-.drawer select:focus{
-
-outline:none;
-
-box-shadow:0 0 12px #006465;
-
-}
-
-
-
-.drawer button{
-
-background:#006465;
-
-border:none;
-
-padding:14px;
-
-color:white;
-
-cursor:pointer;
-
-border-radius:40px;
-
-transition:0.3s;
-
-font-weight:600;
-
-}
-
-
-
-.drawer button:hover{
-
-box-shadow:0 0 20px #006465;
-
-transform:scale(1.05);
-
-}
-
-
-
-/* ================= CRITICAL MODE ================= */
-
-
-
-#criticalPulse{
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-pointer-events:none;
-
-opacity:0;
-
-background:radial-gradient(circle, rgba(255,0,0,0.3) 0%, transparent 70%);
-
-z-index:900;
-
-}
-
-
-
-.pulse{
-
-animation:pulseRed 1.5s infinite;
-
-}
-
-
-
-@keyframes pulseRed{
-
-0%{opacity:0;}
-
-50%{opacity:0.9;}
-
-100%{opacity:0;}
-
-}
-
-
-
-/* ================= FULLSCREEN ================= */
-
-
-
-#ghostClock{
-
-position:fixed;
-
-top:25px;
-
-right:40px;
-
-font-size:6rem;
-
-opacity:10;
-
-pointer-events:none;
-
-color:#00d4d8;
-
-letter-spacing:5px;
-
-}
-
-
-
-body.fullscreen #ghostClock{
-
-opacity:2;
-
-}
-
-
-
-body.fullscreen .control-header{
-
-display:none;
-
-}
-
-
-
-body.fullscreen #display{
-
-padding:80px;
-
-}
-
-
-
-body.fullscreen #titleDisplay{
-
-font-size:6rem;
-
-line-height:1.05;
-
-}
-
-
-
-body.fullscreen #messageDisplay{
-
-font-size:8rem;
-
-max-width:85%;
-
-line-height:1.4;
-
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CIO - Monitor Operativo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        /* ============================================================
+           CSS UNIFICADO Y PROTEGIDO (#cio-app-root)
+           ============================================================ */
+        
+        #cio-app-root {
+            all: initial; /* Resetea estilos externos */
+            display: block;
+            background: #050d0e;
+            color: #ffffff;
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #cio-app-root * { box-sizing: border-box; font-family: inherit; }
+
+        /* --- PANTALLA PRINCIPAL --- */
+        #display-main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            text-align: center;
+            padding: 40px;
+            background: radial-gradient(circle at center, #0c1c1d 0%, #050d0e 100%);
+            transition: all 0.5s ease;
+        }
+
+        .content-wrap { width: 95%; max-width: 1600px; z-index: 10; }
+
+        #areaText {
+            font-size: 1.4rem;
+            color: #00d4d8;
+            letter-spacing: 7px;
+            margin-bottom: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        #priorityTag {
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.3);
+        }
+
+        #titleDisplay { 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            margin-bottom: 20px; 
+            line-height: 1; 
+            color: #fff;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        #messageDisplay { 
+            font-weight: 300; 
+            color: #d1dbdb; 
+            line-height: 1.3; 
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        /* --- CABECERA SUPERIOR --- */
+        .top-bar {
+            position: fixed; top: 0; width: 100%; height: 70px;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; z-index: 1000; border-bottom: 1px solid #004d4e;
+        }
+
+        .nav-actions button {
+            background: rgba(0, 100, 101, 0.25); border: 1px solid #006465;
+            color: #00d4d8; padding: 10px 20px; border-radius: 5px;
+            font-weight: bold; cursor: pointer; margin-right: 10px; font-size: 0.75rem;
+            transition: 0.3s;
+        }
+
+        .nav-actions button:hover { background: #006465; color: white; }
+
+        #liveClock { 
+            font-family: 'Courier New', monospace; 
+            font-size: 1.6rem; 
+            font-weight: bold; 
+            color: #00d4d8; 
+        }
+
+        /* --- MODO TV (FULLSCREEN) --- */
+        #cio-app-root:fullscreen .top-bar {
+            height: 180px; background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent);
+            border: none; flex-direction: column; padding-top: 30px;
+        }
+        #cio-app-root:fullscreen #liveClock { font-size: 7rem; text-shadow: 0 0 40px rgba(0, 212, 216, 0.6); }
+
+        /* --- ALERTA CRÍTICA --- */
+        @keyframes pulse-critical {
+            0% { box-shadow: inset 0 0 0px #ff0000; background-color: #050d0e; }
+            50% { box-shadow: inset 0 0 100px #610000; background-color: #260000; }
+            100% { box-shadow: inset 0 0 0px #ff0000; background-color: #050d0e; }
+        }
+        .mode-critical #display-main { animation: pulse-critical 1.5s infinite; }
+
+        /* --- DRAWERS Y OVERLAY --- */
+        #ui-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; z-index: 4000; cursor: pointer;
+        }
+        #ui-overlay.active { display: block; }
+
+        .side-panel {
+            position: fixed; right: 0; top: 0; width: 420px; height: 100vh;
+            background: #091718; border-left: 2px solid #006465;
+            padding: 35px; transform: translateX(100%);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5000; overflow-y: auto;
+        }
+        .side-panel.active { transform: translateX(0); }
+
+        .side-panel h2 { color: #00d4d8; margin-bottom: 25px; letter-spacing: 1px; }
+
+        .side-panel input, .side-panel textarea, .side-panel select {
+            width: 100%; padding: 14px; margin-bottom: 18px;
+            background: #000; border: 1px solid #006465; color: white; border-radius: 4px;
+        }
+
+        /* --- RESPONSIVE MÓVIL --- */
+        .bottom-nav { display: none; }
+
+        @media (max-width: 768px) {
+            .nav-actions { display: none; }
+            .top-bar { justify-content: center; background: none; border: none; }
+            .bottom-nav {
+                display: flex; position: fixed; bottom: 0; width: 100%; height: 75px;
+                background: #071314; border-top: 1px solid #006465;
+                justify-content: space-around; align-items: center; z-index: 2000;
+                padding-bottom: 10px;
+            }
+            .bottom-nav button { background: none; border: none; color: #00d4d8; font-size: 0.75rem; font-weight: bold; }
+            .side-panel { width: 100%; top: auto; bottom: 0; height: 85vh; transform: translateY(100%); border-radius: 25px 25px 0 0; border-left: none; border-top: 2px solid #006465; }
+            .side-panel.active { transform: translateY(0); }
+            #display-main { padding-bottom: 120px; }
+            #liveClock { font-size: 1.3rem; }
+        }
+
+        #progress-line { height: 6px; position: fixed; bottom: 0; width: 0%; z-index: 2001; transition: width 0.1s linear; }
+    </style>
+</head>
+<body>
+
+<div id="cio-app-root">
+    <div id="ui-overlay" onclick="closePanels()"></div>
+
+    <header class="top-bar">
+        <div class="nav-actions">
+            <button onclick="openForm()">＋ NUEVO</button>
+            <button onclick="openHistory()">📋 HISTORIAL</button>
+            <button onclick="toggleFS()">⛶ TV FULL</button>
+        </div>
+        <div id="liveClock">00:00:00</div>
+    </header>
+
+    <main id="display-main">
+        <div class="content-wrap">
+            <div id="areaText">SISTEMA CIO</div>
+            <div id="priorityTag">NORMAL</div>
+            <h1 id="titleDisplay">INICIALIZANDO...</h1>
+            <p id="messageDisplay">Cargando base de datos y preferencias visuales</p>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <button onclick="openForm()">➕<br>NUEVO</button>
+        <button onclick="openHistory()">📋<br>HISTORIAL</button>
+    </nav>
+
+    <aside id="panelForm" class="side-panel">
+        <h2>Nueva Novedad</h2>
+        <form onsubmit="handleSave(event)">
+            <input type="hidden" id="editKey" value="-1">
+            <label style="font-size: 0.7rem; color: #00d4d8;">ÁREA</label>
+            <select id="fieldArea">
+                <option value="Freschat">Freschat</option>
+                <option value="Monitoreo">Monitoreo</option>
+                <option value="Atención al Cliente">Atención al Cliente</option>
+                <option value="Interno">Interno</option>
+            </select>
+            <label style="font-size: 0.7rem; color: #00d4d8;">PRIORIDAD</label>
+            <select id="fieldPrio">
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+                <option value="Crítica">Crítica</option>
+            </select>
+            <input type="text" id="fieldTitle" placeholder="Título del evento" required>
+            <textarea id="fieldMsg" rows="6" placeholder="Detalles de la novedad..." required></textarea>
+            <button type="submit" style="width:100%; background:#006465; color:white; padding:16px; border:none; font-weight:bold; cursor:pointer; border-radius:4px;">ACTUALIZAR PANEL</button>
+            <button type="button" onclick="closePanels()" style="width:100%; background:none; color:#ff4d4d; border:none; margin-top:15px; cursor:pointer;">DESCARTAR</button>
+        </form>
+    </aside>
+
+    <aside id="panelHistory" class="side-panel">
+        <h2>Historial Activo</h2>
+        <button onclick="downloadPDF()" style="width:100%; background:#00d4d8; color:black; border:none; padding:14px; font-weight:bold; margin-bottom:25px; cursor:pointer; border-radius:4px;">📥 EXPORTAR PDF</button>
+        <div id="historyStorage"></div>
+    </aside>
+
+    <div id="progress-line"></div>
+</div>
+
+<script>
+    const FIREBASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    let events = [];
+    let cycleIdx = 0;
+    let timeRef = null;
+    const LAPSE = 15; // Segundos por cada novedad
+
+    // AJUSTE DINÁMICO DE TEXTO
+    function responsiveText() {
+        const t = document.getElementById('titleDisplay');
+        const m = document.getElementById('messageDisplay');
+        const d = document.getElementById('display-main');
+        
+        let sizeT = window.innerWidth <= 768 ? 34 : 95; 
+        let sizeM = window.innerWidth <= 768 ? 22 : 62;
+        
+        t.style.fontSize = sizeT + "px";
+        m.style.fontSize = sizeM + "px";
+
+        let limit = 0;
+        while ((t.offsetHeight + m.offsetHeight > d.offsetHeight * 0.62) && limit < 50) {
+            sizeT -= 1; sizeM -= 1;
+            t.style.fontSize = sizeT + "px"; 
+            m.style.fontSize = sizeM + "px";
+            limit++;
+        }
+    }
+
+    // SINCRONIZACIÓN CON FIREBASE
+    async function fetchData() {
+        try {
+            const response = await fetch(FIREBASE_URL);
+            const data = await response.json();
+            events = data || [];
+            updateUI(cycleIdx);
+        } catch(e) { console.error("Error sync:", e); }
+    }
+
+    // ACTUALIZAR VISTA
+    function updateUI(index) {
+        if(!events.length) {
+            document.getElementById("cio-app-root").classList.remove("mode-critical");
+            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
+            document.getElementById("messageDisplay").textContent = "Panel en espera de nuevos registros operativos.";
+            return;
+        }
+        
+        const item = events[index % events.length];
+        const root = document.getElementById("cio-app-root");
+        const tag = document.getElementById("priorityTag");
+        
+        // Alerta Crítica
+        if(item.priority === "Crítica") {
+            root.classList.add("mode-critical");
+            tag.style.background = "#ff4d4d";
+            tag.style.color = "white";
+            tag.style.borderColor = "#ff4d4d";
+        } else {
+            root.classList.remove("mode-critical");
+            tag.style.background = "rgba(0,0,0,0.3)";
+            tag.style.color = "#00d4d8";
+            tag.style.borderColor = "rgba(255,255,255,0.15)";
+        }
+
+        tag.textContent = "Prioridad: " + item.priority;
+        document.getElementById("areaText").textContent = item.area;
+        document.getElementById("titleDisplay").textContent = item.title;
+        document.getElementById("messageDisplay").textContent = item.message;
+        
+        const barColors = {"Baja":"#00d4d8", "Media":"#00ccff", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
+        document.getElementById("progress-line").style.background = barColors[item.priority] || "#006465";
+        
+        setTimeout(responsiveText, 50);
+    }
+
+    // GUARDAR / EDITAR
+    async function handleSave(e) {
+        e.preventDefault();
+        const idx = parseInt(document.getElementById("editKey").value);
+        const newEntry = {
+            area: document.getElementById("fieldArea").value, 
+            priority: document.getElementById("fieldPrio").value,
+            title: document.getElementById("fieldTitle").value, 
+            message: document.getElementById("fieldMsg").value,
+            timestamp: new Date().toLocaleString()
+        };
+        
+        if(idx === -1) events.push(newEntry); else events[idx] = newEntry;
+        
+        await fetch(FIREBASE_URL, { method: 'PUT', body: JSON.stringify(events) });
+        closePanels(); 
+        fetchData();
+    }
+
+    // HISTORIAL ACCIONES
+    window.removeItem = async (i) => {
+        if(!confirm("¿Eliminar este registro permanentemente?")) return;
+        events.splice(i, 1);
+        await fetch(FIREBASE_URL, { method: 'PUT', body: JSON.stringify(events.length ? events : null) });
+        openHistory(); 
+        fetchData();
+    };
+
+    window.editItem = (i) => {
+        const item = events[i];
+        document.getElementById("editKey").value = i;
+        document.getElementById("fieldArea").value = item.area;
+        document.getElementById("fieldPrio").value = item.priority;
+        document.getElementById("fieldTitle").value = item.title;
+        document.getElementById("fieldMsg").value = item.message;
+        document.getElementById("panelHistory").classList.remove("active");
+        document.getElementById("panelForm").classList.add("active");
+    };
+
+    // UI CONTROL
+    function openForm() { 
+        document.getElementById("editKey").value = "-1";
+        document.querySelector("#panelForm form").reset();
+        document.getElementById("panelForm").classList.add("active"); 
+        document.getElementById("ui-overlay").classList.add("active"); 
+    }
+    
+    function openHistory() { 
+        const container = document.getElementById("historyStorage");
+        container.innerHTML = events.map((item, i) => `
+            <div style="background:rgba(255,255,255,0.03); padding:15px; margin-bottom:10px; border:1px solid #1a3a3d; border-radius:5px;">
+                <div style="font-size:0.65rem; color:#00d4d8; margin-bottom:4px;">${item.area} | ${item.priority}</div>
+                <strong style="color:#fff; font-size:0.9rem;">${item.title}</strong><br>
+                <div style="margin-top:10px;">
+                    <button onclick="editItem(${i})" style="background:#ffcc00; border:none; padding:5px 10px; font-size:10px; cursor:pointer; border-radius:3px; font-weight:bold;">EDITAR</button>
+                    <button onclick="removeItem(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; font-size:10px; margin-left:6px; cursor:pointer; border-radius:3px;">BORRAR</button>
+                </div>
+            </div>
+        `).join('');
+        document.getElementById("panelHistory").classList.add("active"); 
+        document.getElementById("ui-overlay").classList.add("active"); 
+    }
+
+    function closePanels() { 
+        document.querySelectorAll('.side-panel, #ui-overlay').forEach(el => el.classList.remove('active')); 
+    }
+
+    function toggleFS() { 
+        if (!document.fullscreenElement) document.getElementById('cio-app-root').requestFullscreen();
+        else document.exitFullscreen();
+    }
+
+    // BUCLE DE ANIMACIÓN
+    function startLoop(ts) {
+        if(!events.length) { requestAnimationFrame(startLoop); return; }
+        if(!timeRef) timeRef = ts;
+        const elapsed = (ts - timeRef) / 1000;
+        document.getElementById("progress-line").style.width = Math.min((elapsed / LAPSE) * 100, 100) + "%";
+        
+        if(elapsed >= LAPSE){ 
+            cycleIdx++; 
+            updateUI(cycleIdx); 
+            timeRef = ts; 
+        }
+        requestAnimationFrame(startLoop);
+    }
+
+    // REPORTE PDF
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF();
+        doc.setFontSize(20); doc.text("REPORTE OPERATIVO CIO", 20, 20);
+        doc.setFontSize(10); doc.text("Generado: " + new Date().toLocaleString(), 20, 28);
+        
+        let y = 45;
+        events.forEach((r, i) => {
+            doc.setFont(undefined, 'bold');
+            doc.text(`${i+1}. [${r.priority}] ${r.area}: ${r.title}`, 20, y);
+            doc.setFont(undefined, 'normal');
+            const splitMsg = doc.splitTextToSize(r.message, 170);
+            doc.text(splitMsg, 20, y + 6);
+            y += (splitMsg.length * 6) + 12;
+        });
+        doc.save("Reporte_CIO.pdf");
+    }
+
+    // INIT
+    setInterval(() => {
+        document.getElementById("liveClock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
+    }, 1000);
+
+    setInterval(fetchData, 8000); // Sincroniza cada 8s
+    window.addEventListener('resize', responsiveText);
+    
+    fetchData();
+    requestAnimationFrame(startLoop);
+</script>
+</body>
+</html>
