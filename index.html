@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CIO - Monitor Corporativo</title>
+    <title>CIO - Monitor Operativo de Novedades</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
-        /* --- VARIABLES DE DISEÑO --- */
+        /* CSS INTEGRADO - ESTILO INDUSTRIAL TECH 
+        */
         :root {
-            --bg-deep: #0d1117;
-            --panel-bg: #161b22;
-            --border-color: #30363d;
-            --text-main: #f0f6fc;
-            --text-dim: #8b949e;
-            --accent-blue: #58a6ff;
-            --accent-green: #3fb950;
-            --accent-red: #f85149;
-            --accent-orange: #d29922;
+            --bg-principal: #0b0e14;
+            --bg-panel: #1a1f26;
+            --borde-tech: #2d333b;
+            --texto-vibrante: #ffffff;
+            --texto-secundario: #9aa4b1;
+            --azul-cio: #3498db;
+            --rojo-alerta: #e74c3c;
+            --verde-ok: #2ecc71;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-principal);
+            color: var(--texto-vibrante);
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
             overflow: hidden;
             height: 100vh;
         }
 
-        /* --- PANTALLA PRINCIPAL --- */
+        /* --- CONTENEDOR DE PANTALLA PRINCIPAL --- */
         #display {
             height: 100vh;
             width: 100vw;
@@ -37,227 +38,217 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 5%;
-            background: radial-gradient(circle at center, #1c2128 0%, #0d1117 100%);
-            transition: background 0.5s ease;
+            padding: 50px;
+            background: radial-gradient(circle at center, #161b22 0%, #0b0e14 100%);
+            text-align: center;
         }
 
         #areaLabel {
-            font-size: 1.2rem;
-            color: var(--accent-blue);
+            font-size: 1.4rem;
+            color: var(--azul-cio);
             text-transform: uppercase;
-            letter-spacing: 8px;
-            margin-bottom: 20px;
-            font-weight: 600;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
 
-        /* CONTENEDOR DE DATOS (ETIQUETAS) */
+        /* CAPSULAS DE DATOS (PRIORIDAD, TURNO, HORA) */
         #metaContainer {
             display: flex;
-            gap: 12px;
-            margin-bottom: 35px;
+            gap: 10px;
+            margin-bottom: 30px;
         }
 
-        .data-tag {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        .tag-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--borde-tech);
+            padding: 6px 15px;
+            border-radius: 2px;
+            font-family: 'Consolas', monospace;
             font-size: 0.9rem;
-            color: var(--text-dim);
+            color: var(--texto-secundario);
             text-transform: uppercase;
         }
 
         #titleDisplay {
             font-weight: 800;
-            line-height: 1.2;
+            line-height: 1.1;
             margin: 0;
-            color: var(--text-main);
+            color: var(--texto-vibrante);
         }
 
         #messageDisplay {
             margin-top: 25px;
             font-weight: 300;
-            color: var(--text-dim);
-            max-width: 1200px;
-            line-height: 1.4;
+            color: var(--texto-secundario);
+            max-width: 85%;
+            line-height: 1.5;
         }
 
-        /* --- CABECERA PC --- */
+        /* --- HEADER PC --- */
         .control-header {
             position: fixed; top: 0; width: 100%; height: 70px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 30px; z-index: 1000;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(13, 17, 23, 0.8);
-            backdrop-filter: blur(10px);
+            padding: 0 40px; z-index: 1000;
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--borde-tech);
         }
 
         #clock {
-            font-family: monospace;
-            font-size: 1.8rem;
-            color: var(--text-main);
-            font-weight: 500;
+            font-family: 'Consolas', monospace;
+            font-size: 2rem;
+            color: var(--texto-vibrante);
+            font-weight: bold;
         }
 
-        /* --- BOTONES ESTILO TECH --- */
         .btn-tech {
-            background: var(--panel-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 10px 18px;
-            border-radius: 6px;
+            background: var(--bg-panel);
+            color: var(--texto-vibrante);
+            border: 1px solid var(--borde-tech);
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: 0.2s;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.2s;
         }
-        .btn-tech:hover { background: var(--border-color); border-color: var(--text-dim); }
+        .btn-tech:hover { background: var(--azul-cio); border-color: white; }
 
-        /* --- PANTALLA COMPLETA TV --- */
-        :fullscreen .left-zone, :fullscreen .mobile-nav { display: none !important; }
-        :fullscreen .control-header { border: none; background: transparent; justify-content: center !important; }
-        :fullscreen #clock { font-size: 10rem !important; opacity: 0.2; position: absolute; top: 5%; }
-        :fullscreen .info-block { margin-top: 10vh; }
+        /* --- FULLSCREEN TV --- */
+        :fullscreen .control-header, :fullscreen .mobile-nav { display: none !important; }
+        :fullscreen #display { padding: 80px; }
+        :fullscreen #clock-tv { display: block !important; position: absolute; top: 5%; font-size: 8rem; opacity: 0.1; font-weight: 900; width: 100%; text-align: center; }
 
-        /* --- ALERTA CRÍTICA (DISCRETA) --- */
-        @keyframes pulse-crit { 0% { background: #0d1117; } 50% { background: #2d1313; } 100% { background: #0d1117; } }
-        .critico-total { animation: pulse-crit 1.5s infinite !important; }
-        .critico-total #areaLabel { color: var(--accent-red); }
+        /* --- ANIMACIÓN CRÍTICA --- */
+        @keyframes pulse-critical { 0% { background: #0b0e14; } 50% { background: #401010; } 100% { background: #0b0e14; } }
+        .critico-total { animation: pulse-critical 1s infinite !important; }
+        .critico-total .tag-info { border-color: var(--rojo-alerta); color: var(--rojo-alerta); }
 
-        /* --- BARRA DE NAVEGACIÓN MÓVIL (TIPO BARRA DE TAREAS) --- */
-        .mobile-nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; height: 75px; 
-            background: var(--panel-bg); 
-            border-top: 1px solid var(--border-color);
-            display: none; justify-content: space-around; align-items: center; 
+        /* --- BARRA DE TAREAS MÓVIL --- */
+        .mobile-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 70px;
+            background: var(--bg-panel);
+            border-top: 2px solid var(--borde-tech);
+            display: none; justify-content: space-around; align-items: center;
             z-index: 2000;
             padding-bottom: env(safe-area-inset-bottom);
         }
-        .nav-item {
-            background: none; border: none; color: var(--text-dim);
-            font-size: 0.75rem; font-weight: 600; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        .nav-btn {
+            background: none; border: none; color: var(--texto-secundario);
+            display: flex; flex-direction: column; align-items: center;
+            font-size: 0.7rem; font-weight: bold; gap: 5px;
         }
-        .nav-item.active { color: var(--accent-blue); }
-        .nav-icon { font-size: 1.4rem; }
+        .nav-btn:active { color: var(--azul-cio); }
 
-        /* --- DRAWERS --- */
+        /* --- DRAWERS (LATERALES) --- */
         .drawer {
             position: fixed; right: 0; top: 0; width: 400px; height: 100vh;
-            background: var(--panel-bg); border-left: 1px solid var(--border-color);
+            background: var(--bg-panel); border-left: 2px solid var(--azul-cio);
             padding: 30px; transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5000;
-            overflow-y: auto;
+            transition: transform 0.4s ease; z-index: 5000; overflow-y: auto;
         }
         .drawer.active { transform: translateX(0); }
-        #drawerOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 4500; }
-        #drawerOverlay.active { display: block; }
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 4000; }
+        #overlay.active { display: block; }
 
         input, select, textarea {
-            width: 100%; padding: 12px; background: var(--bg-deep); border: 1px solid var(--border-color);
-            color: white; border-radius: 6px; margin-top: 5px;
+            width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 4px;
+            background: #000; color: white; border: 1px solid var(--borde-tech);
         }
 
-        /* --- BARRA PROGRESO --- */
-        .progress-wrap { position: fixed; bottom: 0; width: 100%; height: 4px; z-index: 3000; }
-        #progressBar { height: 100%; width: 0%; background: var(--accent-blue); transition: width 0.1s linear; }
+        /* BARRA DE PROGRESO */
+        .progress-container { position: fixed; bottom: 0; width: 100%; height: 5px; background: rgba(0,0,0,0.3); z-index: 1500; }
+        #progressBar { height: 100%; width: 0%; background: var(--azul-cio); }
 
+        /* --- RESPONSIVE CELULAR --- */
         @media (max-width: 768px) {
-            .mobile-nav { display: flex !important; }
-            .left-zone { display: none; }
-            .drawer { width: 100%; bottom: 0; height: 80vh; top: auto; border-radius: 20px 20px 0 0; }
-            #display { padding: 30px; padding-bottom: 100px; }
+            .mobile-nav { display: flex; }
+            .left-zone, .control-header #clock { display: none; }
+            .control-header { justify-content: center; height: 60px; }
+            .drawer { width: 100%; top: auto; bottom: 0; height: 85vh; border-radius: 20px 20px 0 0; }
+            #display { padding: 25px; padding-bottom: 100px; }
+            #areaLabel { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
 
-<div id="drawerOverlay"></div>
+<div id="overlay"></div>
 
 <header class="control-header">
     <div class="left-zone">
-        <button class="btn-tech" onclick="openNew()">＋ NUEVO REGISTRO</button>
-        <button class="btn-tech" onclick="openHistory()" style="margin-left:8px;">☰ HISTORIAL</button>
-        <button class="btn-tech" onclick="document.documentElement.requestFullscreen()" style="margin-left:8px; color: var(--accent-blue);">⛶ TV MODE</button>
+        <button class="btn-tech" onclick="openNew()">＋ NUEVO</button>
+        <button class="btn-tech" onclick="openHistory()" style="margin-left:10px;">☰ HISTORIAL</button>
+        <button class="btn-tech" onclick="document.documentElement.requestFullscreen()" style="margin-left:10px; color: var(--azul-cio);">⛶ MODO TV</button>
     </div>
     <div id="clock">00:00:00</div>
 </header>
 
 <main id="display">
-    <div class="info-block" style="text-align: center;">
-        <div id="areaLabel">SISTEMA CIO</div>
+    <div id="clock-tv" style="display:none;">00:00:00</div>
+    <div class="info-block">
+        <div id="areaLabel">CENTRO DE INTELIGENCIA</div>
         <div id="metaContainer">
-            <div id="tagPriority" class="data-tag">---</div>
-            <div id="tagTurno" class="data-tag">TURNO</div>
-            <div id="tagHora" class="data-tag">--:--</div>
+            <div id="tagPrio" class="tag-info">PRIORIDAD</div>
+            <div id="tagTurno" class="tag-info">TURNO</div>
+            <div id="tagHora" class="tag-info">--:--</div>
         </div>
-        <h1 id="titleDisplay">MONITOR INACTIVO</h1>
-        <p id="messageDisplay">No hay novedades registradas en el ciclo actual.</p>
+        <h1 id="titleDisplay">MONITOR CIO</h1>
+        <p id="messageDisplay">Cargando base de datos operativa...</p>
     </div>
 </main>
 
 <nav class="mobile-nav">
-    <button class="nav-item" onclick="openNew()">
-        <span class="nav-icon">＋</span>
-        <span>NUEVO</span>
-    </button>
-    <button class="nav-item" onclick="openHistory()">
-        <span class="nav-icon">📋</span>
-        <span>LISTA</span>
-    </button>
-    <button class="nav-item" onclick="document.documentElement.requestFullscreen()">
-        <span class="nav-icon">⛶</span>
-        <span>TV</span>
-    </button>
+    <button class="nav-btn" onclick="openNew()"><span>➕</span><span>NUEVO</span></button>
+    <button class="nav-btn" onclick="openHistory()"><span>📋</span><span>LISTA</span></button>
+    <button class="nav-btn" onclick="document.documentElement.requestFullscreen()"><span>⛶</span><span>TV</span></button>
 </nav>
 
 <aside id="drawerForm" class="drawer">
-    <h3 style="margin-bottom:20px;">Nueva Novedad</h3>
-    <form id="formRegistro" style="display:flex; flex-direction:column; gap:15px;">
+    <h2 style="margin-bottom:20px; color: var(--azul-cio);">REGISTRO</h2>
+    <form id="formNovedad">
         <input type="hidden" id="editIndex" value="-1">
-        <div>
-            <label style="font-size:0.8rem; color:var(--text-dim)">Área</label>
-            <select id="inputArea">
-                <option value="Freschat">Freschat</option>
-                <option value="Monitoreo">Monitoreo</option>
-                <option value="Atención al Cliente">Atención al Cliente</option>
-                <option value="Interno">Interno</option>
-            </select>
-        </div>
-        <div>
-            <label style="font-size:0.8rem; color:var(--text-dim)">Prioridad</label>
-            <select id="inputPriority">
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-                <option value="Crítica">Crítica</option>
-            </select>
-        </div>
-        <input type="text" id="inputTitle" placeholder="Título corto" required>
-        <textarea id="inputMessage" rows="5" placeholder="Descripción de la novedad..." required></textarea>
-        <button type="submit" class="btn-tech" style="background:var(--accent-blue); color:black; font-weight:600; padding:15px;">PUBLICAR EN MONITOR</button>
-        <button type="button" onclick="closeAllDrawers()" style="background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top:10px;">Cancelar</button>
+        <label>ÁREA</label>
+        <select id="inputArea">
+            <option value="Freschat">Freschat</option>
+            <option value="Monitoreo">Monitoreo</option>
+            <option value="Atención al Cliente">Atención al Cliente</option>
+            <option value="Interno">Interno</option>
+        </select>
+        <label>PRIORIDAD</label>
+        <select id="inputPriority">
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+            <option value="Crítica">Crítica</option>
+        </select>
+        <label>TÍTULO</label>
+        <input type="text" id="inputTitle" placeholder="Ej: Falla de Servidor" required>
+        <label>MENSAJE</label>
+        <textarea id="inputMessage" rows="6" placeholder="Descripción detallada..." required></textarea>
+        <button type="submit" class="btn-tech" style="width:100%; padding:15px; background: var(--azul-cio);">ACTUALIZAR MONITOR</button>
+        <button type="button" onclick="closeAll()" style="width:100%; background:none; border:none; color:var(--rojo-alerta); margin-top:15px; cursor:pointer;">Cerrar</button>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <h3 style="margin-bottom:15px;">Historial del Día</h3>
-    <button onclick="generatePDF()" style="background:var(--accent-green); color:black; width:100%; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">📥 GENERAR PDF (Novedades Operativas)</button>
+    <h2 style="margin-bottom:20px; color: var(--azul-cio);">HISTORIAL</h2>
+    <button onclick="descargarPDF()" style="background:var(--verde-ok); color:black; width:100%; padding:12px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-bottom:20px;">📥 GENERAR REPORTE (PDF)</button>
     <div id="historyList"></div>
 </aside>
 
-<div class="progress-wrap"><div id="progressBar"></div></div>
+<div class="progress-container"><div id="progressBar"></div></div>
 
 <script>
-    const DATABASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     let registros = [];
     let currentIndex = 0;
     let startTime = null;
     const DURATION = 15;
 
-    function getTurno(h) {
+    function getTurnoNombre() {
+        const h = new Date().getHours();
         if (h >= 6 && h < 14) return "Mañana";
         if (h >= 14 && h < 22) return "Tarde";
         return "Noche";
@@ -267,60 +258,59 @@
         const title = document.getElementById('titleDisplay');
         const message = document.getElementById('messageDisplay');
         const display = document.getElementById('display');
-        const esMovil = window.innerWidth <= 768;
+        const esM = window.innerWidth <= 768;
         
-        let sizeT = esMovil ? 45 : 110; 
-        let sizeM = esMovil ? 20 : 45;
+        let sT = esM ? 40 : 100; 
+        let sM = esM ? 22 : 45;
 
-        title.style.fontSize = sizeT + "px";
-        message.style.fontSize = sizeM + "px";
+        title.style.fontSize = sT + "px";
+        message.style.fontSize = sM + "px";
 
-        let safety = 0;
-        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.6) && safety < 100) {
-            sizeT -= 1; sizeM -= 0.5;
-            title.style.fontSize = sizeT + "px";
-            message.style.fontSize = sizeM + "px";
-            safety++;
+        let limit = 0;
+        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.65) && limit < 100) {
+            sT -= 1; sM -= 0.5;
+            title.style.fontSize = sT + "px";
+            message.style.fontSize = sM + "px";
+            limit++;
         }
     }
 
-    async function pullData() {
+    async function pull() {
         try {
-            const res = await fetch(DATABASE_URL);
-            const data = await res.json();
-            registros = data || [];
+            const r = await fetch(DB_URL);
+            const d = await r.json();
+            registros = d || [];
             render(currentIndex);
         } catch (e) {}
     }
 
-    function render(index){
-        const display = document.getElementById("display");
+    function render(idx){
+        const container = document.getElementById("display");
         if(!registros.length) {
-            display.classList.remove("critico-total");
-            document.getElementById("tagPriority").textContent = "INFO";
-            document.getElementById("tagTurno").textContent = "---";
-            document.getElementById("tagHora").textContent = "--:--";
+            container.classList.remove("critico-total");
+            document.getElementById("tagPrio").textContent = "IDLE";
+            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
+            document.getElementById("messageDisplay").textContent = "Esperando reportes del turno.";
             return;
         }
         
-        const reg = registros[index % registros.length];
-        display.className = (reg.priority === "Crítica") ? "critico-total" : "";
+        const r = registros[idx % registros.length];
+        container.className = (r.priority === "Crítica") ? "critico-total" : "";
         
-        document.getElementById("areaLabel").textContent = reg.area;
-        document.getElementById("tagPriority").textContent = reg.priority;
-        document.getElementById("tagTurno").textContent = "TURNO: " + reg.turno;
-        document.getElementById("tagHora").textContent = reg.hora;
+        document.getElementById("areaLabel").textContent = r.area;
+        document.getElementById("tagPrio").textContent = r.priority;
+        document.getElementById("tagTurno").textContent = "TURNO: " + r.turno;
+        document.getElementById("tagHora").textContent = r.hora;
+        document.getElementById("titleDisplay").textContent = r.title;
+        document.getElementById("messageDisplay").textContent = r.message;
         
-        document.getElementById("titleDisplay").textContent = reg.title;
-        document.getElementById("messageDisplay").textContent = reg.message;
-        
-        const colors = {Baja:"#58a6ff", Media:"#3fb950", Alta:"#d29922", Crítica:"#f85149"};
-        document.getElementById("progressBar").style.background = colors[reg.priority];
+        const colorBar = {Baja:"#3498db", Media:"#2ecc71", Alta:"#f1c40f", Crítica:"#ffffff"};
+        document.getElementById("progressBar").style.background = colorBar[r.priority];
         
         setTimeout(fitText, 50);
     }
 
-    document.getElementById("formRegistro").onsubmit = async (e) => {
+    document.getElementById("formNovedad").onsubmit = async (e) => {
         e.preventDefault();
         const now = new Date();
         const nuevo = {
@@ -329,86 +319,90 @@
             title: document.getElementById("inputTitle").value,
             message: document.getElementById("inputMessage").value,
             hora: now.toLocaleTimeString("es-UY", {hour:'2-digit', minute:'2-digit'}),
-            turno: getTurno(now.getHours())
+            turno: getTurnoNombre()
         };
         const idx = parseInt(document.getElementById("editIndex").value);
         if(idx === -1) registros.push(nuevo); else registros[idx] = nuevo;
-        await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros) });
-        closeAllDrawers(); pullData();
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(registros) });
+        closeAll(); pull();
     };
 
-    function generatePDF() {
+    function descargarPDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        const now = new Date(); const turno = getTurno(now.getHours());
+        const now = new Date(); const t = getTurnoNombre();
         
-        doc.setFillColor(13, 17, 23); doc.rect(0,0,210,40,'F');
+        doc.setFillColor(11, 14, 20); doc.rect(0,0,210,40,'F');
         doc.setTextColor(255,255,255); doc.setFontSize(22); doc.text("NOVEDADES OPERATIVAS", 20, 25);
-        doc.setFontSize(11); doc.text(`Turno: ${turno} | Generado: ${now.toLocaleString()}`, 20, 35);
+        doc.setFontSize(11); doc.text(`Turno: ${t} | Fecha: ${now.toLocaleDateString()}`, 20, 35);
         
         let y = 55; doc.setTextColor(0,0,0);
         registros.forEach(r => {
             doc.setFont(undefined, 'bold'); doc.text(`[${r.priority}] ${r.area}: ${r.title}`, 20, y);
             doc.setFont(undefined, 'normal'); 
-            doc.setFontSize(9); doc.text(`Hora: ${r.hora} | Turno: ${r.turno}`, 20, y + 5);
             doc.setFontSize(10); const lines = doc.splitTextToSize(r.message, 170);
-            doc.text(lines, 20, y + 12); y += (lines.length * 7) + 20;
+            doc.text(lines, 20, y + 7); y += (lines.length * 7) + 15;
             if(y > 270) { doc.addPage(); y = 20; }
         });
-        doc.save(`Novedades_operativas_${turno}_${now.getHours()}hs.pdf`);
+        doc.save(`Novedades_operativas_${t}_${now.getHours()}hs.pdf`);
     }
 
     function renderHistory() {
-        const container = document.getElementById("historyList");
-        container.innerHTML = registros.map((reg, i) => `
-            <div style="background:var(--bg-deep); padding:15px; margin-bottom:10px; border:1px solid var(--border-color); border-radius:8px;">
-                <strong style="color:var(--accent-blue)">${reg.title}</strong><br>
-                <small style="color:var(--text-dim)">${reg.area} | ${reg.hora} | Turno ${reg.turno}</small><br>
+        const div = document.getElementById("historyList");
+        div.innerHTML = registros.map((r, i) => `
+            <div style="background:#000; padding:15px; margin-bottom:10px; border:1px solid var(--borde-tech);">
+                <strong style="color:var(--azul-cio)">${r.title}</strong><br>
+                <small>${r.area} | ${r.hora} | ${r.priority}</small><br>
                 <div style="margin-top:10px;">
-                    <button onclick="editarEvento(${i})" style="color:var(--accent-orange); background:none; border:none; cursor:pointer; font-weight:bold;">Editar</button>
-                    <button onclick="eliminarEvento(${i})" style="color:var(--accent-red); background:none; border:none; cursor:pointer; font-weight:bold; margin-left:15px;">Borrar</button>
+                    <button onclick="editar(${i})" style="color:var(--verde-ok); background:none; border:none; cursor:pointer; font-weight:bold;">EDITAR</button>
+                    <button onclick="borrar(${i})" style="color:var(--rojo-alerta); background:none; border:none; cursor:pointer; font-weight:bold; margin-left:15px;">BORRAR</button>
                 </div>
             </div>
         `).join('');
     }
 
-    window.editarEvento = (i) => {
-        const reg = registros[i];
+    window.editar = (i) => {
+        const r = registros[i];
         document.getElementById("editIndex").value = i;
-        document.getElementById("inputArea").value = reg.area;
-        document.getElementById("inputPriority").value = reg.priority;
-        document.getElementById("inputTitle").value = reg.title;
-        document.getElementById("inputMessage").value = reg.message;
+        document.getElementById("inputArea").value = r.area;
+        document.getElementById("inputPriority").value = r.priority;
+        document.getElementById("inputTitle").value = r.title;
+        document.getElementById("inputMessage").value = r.message;
         document.getElementById("drawerHistory").classList.remove("active");
         document.getElementById("drawerForm").classList.add("active");
     };
 
-    window.eliminarEvento = async (i) => {
-        if(confirm("¿Eliminar registro operativo?")) {
+    window.borrar = async (i) => {
+        if(confirm("¿Eliminar registro?")) {
             registros.splice(i,1);
-            await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros.length ? registros : null) });
-            renderHistory(); pullData();
+            await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(registros.length ? registros : null) });
+            renderHistory(); pull();
         }
     };
 
-    function closeAllDrawers() { document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active')); }
-    function openNew() { document.getElementById("formRegistro").reset(); document.getElementById("editIndex").value="-1"; document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
-    function openHistory() { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
+    function closeAll() { document.querySelectorAll('.drawer, #overlay').forEach(el => el.classList.remove('active')); }
+    function openNew() { document.getElementById("formNovedad").reset(); document.getElementById("editIndex").value="-1"; document.getElementById("drawerForm").classList.add("active"); document.getElementById("overlay").classList.add("active"); }
+    function openHistory() { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("overlay").classList.add("active"); }
 
-    document.getElementById("drawerOverlay").onclick = closeAllDrawers;
+    document.getElementById("overlay").onclick = closeAll;
 
-    function animate(timestamp){
+    function animate(ts){
         if(!registros.length) { requestAnimationFrame(animate); return; }
-        if(!startTime) startTime = timestamp;
-        const progress = (timestamp - startTime) / 1000;
+        if(!startTime) startTime = ts;
+        const progress = (ts - startTime) / 1000;
         document.getElementById("progressBar").style.width = Math.min((progress / DURATION) * 100, 100) + "%";
-        if(progress >= DURATION){ currentIndex = (currentIndex + 1) % registros.length; render(currentIndex); startTime = timestamp; }
+        if(progress >= DURATION){ currentIndex = (currentIndex + 1) % registros.length; render(currentIndex); startTime = ts; }
         requestAnimationFrame(animate);
     }
 
-    setInterval(() => document.getElementById("clock").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}), 1000);
-    setInterval(pullData, 5000);
+    setInterval(() => {
+        const time = new Date().toLocaleTimeString("es-UY",{hour12:false});
+        document.getElementById("clock").textContent = time;
+        document.getElementById("clock-tv").textContent = time;
+    }, 1000);
+    
+    setInterval(pull, 5000);
     requestAnimationFrame(animate);
-    pullData();
+    pull();
 </script>
 </body>
 </html>
