@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CIO - Monitor Operativo</title>
+    <title>CIO - Monitor de Novedades Operativas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        /* --- ESTRUCTURA TV / PC --- */
         #display {
             display: flex !important; flex-direction: column !important; justify-content: center !important;
             align-items: center !important; height: 100vh !important; width: 100vw !important;
@@ -13,29 +14,44 @@
             position: fixed !important; top: 0; left: 0; background: #0a1a1b; z-index: 1;
         }
 
-        .info-block { width: 95% !important; max-width: 1800px; text-align: center; }
+        .info-block { width: 95% !important; max-width: 1900px; text-align: center; }
 
-        #titleDisplay { margin: 0 0 10px 0 !important; font-weight: 800; text-transform: uppercase; width: 100%; }
-        #messageDisplay { margin: 0 !important; white-space: normal !important; word-wrap: break-word !important; width: 100%; display: inline-block; }
+        #titleDisplay { margin: 10px 0 !important; font-weight: 800; text-transform: uppercase; width: 100%; color: white; }
+        #messageDisplay { margin: 10px 0 !important; white-space: normal !important; word-wrap: break-word !important; width: 100%; color: #e0e0e0; }
+
+        /* BARRA DE DATOS (Prioridad, Turno, Hora) */
+        #metaDisplay {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 10px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            color: #00ff88;
+            border: 1px solid #00ff88;
+            margin-bottom: 20px;
+        }
 
         /* HEADER Y RELOJ */
         .control-header {
             position: fixed; top: 0; width: 100%; height: 70px; z-index: 1000;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 30px; box-sizing: border-box; background: rgba(10, 26, 27, 0.8);
+            padding: 0 30px; box-sizing: border-box; background: rgba(10, 26, 27, 0.9);
         }
-        #clock { font-weight: bold; font-family: 'Courier New', monospace; color: white; font-size: 1.8rem; }
+        #clock { font-weight: bold; font-family: 'Courier New', monospace; color: white; font-size: 2rem; }
 
-        /* FULLSCREEN TV */
+        /* FULLSCREEN TV MODO CINE */
         :fullscreen .left-zone, :fullscreen .mobile-nav { display: none !important; }
-        :fullscreen .control-header { justify-content: center !important; height: 200px !important; background: transparent !important; }
-        :fullscreen #clock { font-size: 14rem !important; color: #00ff88 !important; text-shadow: 0 0 50px rgba(0, 255, 136, 0.8); position: absolute; top: 30px; }
+        :fullscreen .control-header { justify-content: center !important; height: 250px !important; background: transparent !important; border: none; }
+        :fullscreen #clock { font-size: 12rem !important; color: #00ff88 !important; text-shadow: 0 0 60px rgba(0, 255, 136, 0.9); position: absolute; top: 20px; }
+        :fullscreen .info-block { margin-top: 150px; }
 
-        /* CRITICO */
-        @keyframes pulse-red { 0% { background-color: #0a1a1b; } 50% { background-color: #5a0000; } 100% { background-color: #0a1a1b; } }
-        .critico-total { animation: pulse-red 1.2s infinite !important; }
+        /* ALERTA CRÍTICA */
+        @keyframes pulse-red { 0% { background-color: #0a1a1b; } 50% { background-color: #600; } 100% { background-color: #0a1a1b; } }
+        .critico-total { animation: pulse-red 1s infinite !important; }
+        .critico-total #metaDisplay { background: #ff4d4d; color: white; border-color: white; }
 
-        /* INTERFAZ DRAWERS */
+        /* DRAWERS */
         #drawerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 4000; }
         #drawerOverlay.active { display: block; }
         .drawer {
@@ -45,10 +61,12 @@
         }
         .drawer.active { transform: translateX(0); }
 
-        /* MÓVIL */
+        /* RESPONSIVE CELULAR (Mantenido) */
         @media (max-width: 768px) {
+            #metaDisplay { font-size: 1rem; padding: 5px 15px; }
             .drawer { width: 100% !important; height: 85vh !important; top: auto !important; bottom: -100vh; border-radius: 25px 25px 0 0; transform: none; }
             .drawer.active { bottom: 0 !important; }
+            .left-zone { display: none; }
             .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; background: #0a1a1b; z-index: 2000; justify-content: space-around; align-items: center; border-top: 1px solid #006465; }
         }
     </style>
@@ -61,17 +79,17 @@
     <div class="left-zone">
         <button id="btnNew" style="background:#00ff88; border:none; padding:12px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">＋ NUEVO</button>
         <button id="btnManage" style="background:#006465; color:white; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; margin-left:10px;">☰ HISTORIAL</button>
-        <button id="btnFullscreen" style="background:transparent; border:1px solid #00ff88; color:#00ff88; padding:12px 20px; border-radius:8px; cursor:pointer; margin-left:10px;">⛶ TV FULL</button>
+        <button id="btnFullscreen" style="background:transparent; border:1px solid #00ff88; color:#00ff88; padding:12px 20px; border-radius:8px; cursor:pointer; margin-left:10px;">⛶ TV FULLSCREEN</button>
     </div>
     <div id="clock">00:00:00</div>
 </header>
 
 <main id="display">
     <div class="info-block">
-        <div id="areaLabel" style="font-size: 1.8rem; color: #00ff88; font-weight: bold; letter-spacing: 5px;">SISTEMA</div>
-        <div id="metaDisplay" style="color: #00ccff; font-size: 1.2rem; margin-bottom: 15px; font-family: monospace;">CARGANDO INFO...</div>
+        <div id="areaLabel" style="font-size: 2.5rem; color: #00ff88; font-weight: bold; letter-spacing: 8px; text-shadow: 0 0 20px rgba(0,255,136,0.5);">AREA</div>
+        <div id="metaDisplay">PRIORIDAD | TURNO | HORA</div>
         <h1 id="titleDisplay">...</h1>
-        <p id="messageDisplay">Sincronizando...</p>
+        <p id="messageDisplay">Sincronizando con base de datos...</p>
     </div>
 </main>
 
@@ -81,35 +99,37 @@
 </nav>
 
 <aside id="drawerForm" class="drawer">
-    <h2 style="color:#00ff88;">Configurar Novedad</h2>
+    <h2 style="color:#00ff88;">Registrar Novedad</h2>
     <form id="formRegistro" style="display:flex; flex-direction:column; gap:20px;">
         <input type="hidden" id="editIndex" value="-1">
+        <label style="color:white">Área Responsable</label>
         <select id="inputArea" style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
             <option value="Freschat">Freschat</option>
             <option value="Monitoreo">Monitoreo</option>
             <option value="Atención al Cliente">Atención al Cliente</option>
             <option value="Interno">Interno</option>
         </select>
+        <label style="color:white">Nivel de Prioridad</label>
         <select id="inputPriority" style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
-            <option value="Baja">Prioridad Baja</option>
-            <option value="Media">Prioridad Media</option>
-            <option value="Alta">Prioridad Alta</option>
-            <option value="Crítica">Prioridad Crítica</option>
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+            <option value="Crítica">Crítica</option>
         </select>
-        <input type="text" id="inputTitle" placeholder="Título" required style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
-        <textarea id="inputMessage" rows="6" placeholder="Descripción..." required style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;"></textarea>
-        <button type="submit" style="background:#00ff88; color:black; padding:18px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">ACTUALIZAR MONITOR</button>
+        <input type="text" id="inputTitle" placeholder="Título de la novedad" required style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;">
+        <textarea id="inputMessage" rows="6" placeholder="Descripción detallada..." required style="padding:12px; background:#1a3a3d; color:white; border:1px solid #006465; border-radius:8px;"></textarea>
+        <button type="submit" style="background:#00ff88; color:black; padding:18px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;">GUARDAR EN MONITOR</button>
         <button type="button" onclick="closeAllDrawers()" style="background:none; color:#ff4d4d; border:none; cursor:pointer;">CANCELAR</button>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <h2 style="color:#00ff88;">Novedades Activas</h2>
-    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:15px; border:none; border-radius:8px; margin-bottom:25px; cursor:pointer;">📥 DESCARGAR PDF</button>
+    <h2 style="color:#00ff88;">Panel de Control</h2>
+    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:15px; border:none; border-radius:8px; margin-bottom:25px; cursor:pointer; font-weight:bold;">📥 GENERAR REPORTE PDF</button>
     <div id="historyList"></div>
 </aside>
 
-<footer class="footer-bar" style="position:fixed; bottom:0; width:100%; height:10px; z-index:1001;"><div id="progressBar" style="height:100%; width:0%;"></div></footer>
+<footer class="footer-bar" style="position:fixed; bottom:0; width:100%; height:12px; z-index:1001;"><div id="progressBar" style="height:100%; width:0%; background:#00ff88; transition: width 0.1s linear;"></div></footer>
 
 <script>
     const DATABASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
@@ -118,9 +138,10 @@
     let startTime = null;
     const DURATION = 15;
 
-    function getTurno(hora) {
-        if (hora >= 6 && hora < 14) return "Mañana";
-        if (hora >= 14 && hora < 22) return "Tarde";
+    function getTurnoInfo() {
+        const h = new Date().getHours();
+        if (h >= 6 && h < 14) return "Mañana";
+        if (h >= 14 && h < 22) return "Tarde";
         return "Noche";
     }
 
@@ -129,12 +150,16 @@
         const message = document.getElementById('messageDisplay');
         const display = document.getElementById('display');
         const esMovil = window.innerWidth <= 768;
-        let sizeT = esMovil ? 35 : 100; 
-        let sizeM = esMovil ? 40 : 130;
+        
+        let sizeT = esMovil ? 35 : 110; 
+        let sizeM = esMovil ? 40 : 140;
+
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
+
         let safety = 0;
-        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.65) && safety < 100) {
+        // Ajuste dinámico para que use todo el ancho pero no se pase del alto
+        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.6) && safety < 100) {
             sizeT -= 1; sizeM -= 1.5;
             title.style.fontSize = sizeT + "px";
             message.style.fontSize = sizeM + "px";
@@ -155,22 +180,25 @@
         const display = document.getElementById("display");
         if(!registros.length) {
             display.classList.remove("critico-total");
-            document.getElementById("areaLabel").textContent = "SISTEMA";
-            document.getElementById("metaDisplay").textContent = "MODO ESPERA";
-            document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
-            document.getElementById("messageDisplay").textContent = "A la espera de reportes.";
+            document.getElementById("areaLabel").textContent = "CIO";
+            document.getElementById("metaDisplay").style.display = "none";
+            document.getElementById("titleDisplay").textContent = "MONITOR ACTIVO";
+            document.getElementById("messageDisplay").textContent = "Sin novedades reportadas en este turno.";
             return;
         }
+        
         const reg = registros[index % registros.length];
+        document.getElementById("metaDisplay").style.display = "inline-block";
+        
         if(reg.priority === "Crítica") display.classList.add("critico-total");
         else display.classList.remove("critico-total");
 
         document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
-        document.getElementById("metaDisplay").textContent = `PRIORIDAD: ${reg.priority} | TURNO: ${reg.turno} | REGISTRO: ${reg.hora}`;
+        document.getElementById("metaDisplay").textContent = `PRIORIDAD: ${reg.priority.toUpperCase()} | TURNO: ${reg.turno.toUpperCase()} | HORA: ${reg.hora}`;
         document.getElementById("titleDisplay").textContent = reg.title;
         document.getElementById("messageDisplay").textContent = reg.message;
         
-        const colors = {Baja:"#00ff88", Media:"#00ccff", Alta:"#ffcc00", Crítica:"#ff4d4d"};
+        const colors = {Baja:"#00ff88", Media:"#00ccff", Alta:"#ffcc00", Crítica:"#ffffff"};
         document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
         setTimeout(fitText, 50);
     }
@@ -179,7 +207,7 @@
         e.preventDefault();
         const now = new Date();
         const horaStr = now.toLocaleTimeString("es-UY", {hour:'2-digit', minute:'2-digit'});
-        const turnoActual = getTurno(now.getHours());
+        const turnoStr = getTurnoInfo();
         
         const nuevo = {
             area: document.getElementById("inputArea").value,
@@ -187,7 +215,7 @@
             title: document.getElementById("inputTitle").value,
             message: document.getElementById("inputMessage").value,
             hora: horaStr,
-            turno: turnoActual
+            turno: turnoStr
         };
         
         const idx = parseInt(document.getElementById("editIndex").value);
@@ -198,14 +226,41 @@
         pullData();
     };
 
+    function generatePDF() {
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF();
+        const now = new Date();
+        const turno = getTurnoInfo();
+        
+        // Título solicitado: Novedades operativas
+        doc.setFillColor(10, 26, 28); doc.rect(0,0,210,40,'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(22); doc.text("NOVEDADES OPERATIVAS", 20, 25);
+        doc.setFontSize(11); doc.text(`Turno: ${turno} | Fecha: ${now.toLocaleDateString()} | Generado: ${now.toLocaleTimeString()}`, 20, 35);
+        
+        let y = 55; doc.setTextColor(0,0,0);
+        registros.forEach(r => {
+            doc.setFont(undefined, 'bold'); 
+            doc.text(`[${r.priority}] ${r.area}: ${r.title}`, 20, y);
+            doc.setFont(undefined, 'normal'); 
+            doc.setFontSize(10);
+            doc.text(`Hora: ${r.hora} | Turno: ${r.turno}`, 20, y + 5);
+            const lines = doc.splitTextToSize(r.message, 170);
+            doc.text(lines, 20, y + 12); 
+            y += (lines.length * 6) + 20;
+            if (y > 270) { doc.addPage(); y = 20; }
+        });
+        // Nombre del archivo según Turno y Hora
+        doc.save(`Novedades_Operativas_${turno}_${now.getHours()}hs.pdf`);
+    }
+
     function renderHistory() {
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
             <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #006465;">
                 <strong style="color:#00ff88">${reg.title}</strong><br>
-                <small>${reg.hora} - Turno ${reg.turno}</small><br>
-                <button onclick="editarEvento(${i})" style="background:#ffcc00; border:none; padding:5px; border-radius:4px; margin-top:8px;">EDITAR</button>
-                <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px; border-radius:4px; margin-left:5px;">BORRAR</button>
+                <small style="color:#00ccff">${reg.area} | ${reg.priority} | ${reg.hora}</small><br>
+                <button onclick="editarEvento(${i})" style="background:#ffcc00; border:none; padding:8px 12px; border-radius:5px; margin-top:10px; cursor:pointer; font-weight:bold;">EDITAR</button>
+                <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:8px 12px; border-radius:5px; margin-left:5px; cursor:pointer; font-weight:bold;">BORRAR</button>
             </div>
         `).join('');
     }
@@ -222,33 +277,14 @@
     };
 
     window.eliminarEvento = async (i) => {
-        if(confirm("¿Eliminar?")) {
+        if(confirm("¿Eliminar novedad?")) {
             registros.splice(i,1);
             await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros.length ? registros : null) });
             renderHistory(); pullData();
         }
     };
 
-    function generatePDF() {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        const now = new Date();
-        const turno = getTurno(now.getHours());
-        
-        doc.setFillColor(10, 26, 28); doc.rect(0,0,210,40,'F');
-        doc.setTextColor(255,255,255); doc.setFontSize(22); doc.text("NOVEDADES OPERATIVAS", 20, 25);
-        doc.setFontSize(12); doc.text(`Turno: ${turno} | Fecha: ${now.toLocaleDateString()}`, 20, 35);
-        
-        let y = 55; doc.setTextColor(0,0,0);
-        registros.forEach(r => {
-            doc.setFont(undefined, 'bold'); doc.text(`${r.area} (${r.priority}) - ${r.hora}`, 20, y);
-            doc.setFont(undefined, 'normal'); const lines = doc.splitTextToSize(r.message, 170);
-            doc.text(lines, 20, y + 7); y += (lines.length * 7) + 15;
-            if (y > 270) { doc.addPage(); y = 20; }
-        });
-        doc.save(`Novedades_${turno}_${now.toLocaleDateString()}.pdf`);
-    }
-
-    function closeAllDrawers() { document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active')); document.getElementById("editIndex").value="-1"; }
+    function closeAllDrawers() { document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active')); }
     function openNew() { document.getElementById("formRegistro").reset(); document.getElementById("editIndex").value="-1"; document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
     function openHistory() { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
 
