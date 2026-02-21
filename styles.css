@@ -1,367 +1,539 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CIO - Monitor Operativo</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <style>
-        /* CSS MEJORADO Y ENCAPSULADO - ESTILO CIO ORIGINAL */
-        #cio-master-container {
-            all: initial; /* Evita que el CSS externo del host afecte */
-            display: flex;
-            flex-direction: column;
-            background: 
-                radial-gradient(circle at 20% 20%, #003c3f 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, #002224 0%, transparent 40%),
-                #050d0e;
-            color: #ffffff;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            position: relative;
-        }
+*{
 
-        #cio-master-container * {
-            box-sizing: border-box;
-            font-family: inherit;
-        }
+margin:0;
 
-        /* ================= HEADER ================= */
-        .control-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 35px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(14px);
-            border-bottom: 1px solid #006465;
-            z-index: 1000;
-            position: absolute;
-            top: 0; width: 100%;
-        }
+padding:0;
 
-        .header-btns {
-            display: flex;
-            gap: 12px;
-        }
+box-sizing:border-box;
 
-        .control-header button {
-            background: rgba(0, 100, 101, 0.2);
-            border: 1px solid #006465;
-            color: #00d4d8;
-            padding: 10px 22px;
-            cursor: pointer;
-            border-radius: 4px; /* Volviendo a la estética original menos redondeada */
-            transition: all 0.3s;
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
+font-family:"Segoe UI",sans-serif;
 
-        .control-header button:hover {
-            background: #006465;
-            color: white;
-            box-shadow: 0 0 15px rgba(0, 100, 101, 0.5);
-        }
+}
 
-        .live-clock {
-            font-size: 1.6rem;
-            letter-spacing: 2px;
-            color: #ffffff;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
 
-        /* ================= MAIN DISPLAY CENTRADO ================= */
-        #display {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            width: 100%;
-            height: 100%;
-        }
 
-        .info-block {
-            z-index: 5;
-            width: 90%;
-            max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+body{
 
-        .area {
-            letter-spacing: 8px;
-            color: #00d4d8;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+background:
 
-        .meta-tags {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
+radial-gradient(circle at 20% 20%, #003c3f 0%, transparent 40%),
 
-        .tag-pill {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 100, 101, 0.5);
-            padding: 4px 12px;
-            font-size: 0.8rem;
-            color: #a0acac;
-            text-transform: uppercase;
-        }
+radial-gradient(circle at 80% 80%, #002224 0%, transparent 40%),
 
-        #titleDisplay {
-            font-size: 5rem; /* Ajustado de 4rem para impacto */
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.1;
-            text-transform: uppercase;
-        }
+#050d0e;
 
-        #messageDisplay {
-            font-size: 2.8rem; /* Ajustado de 8rem (era demasiado grande) */
-            font-weight: 300;
-            color: #b0c4c4;
-            max-width: 85%;
-            line-height: 1.3;
-            margin: 0 auto;
-        }
+color:#ffffff;
 
-        /* ================= FOOTER PROGRESO ================= */
-        .footer-bar {
-            height: 4px;
-            background: rgba(0, 0, 0, 0.3);
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-        }
+height:100vh;
 
-        #progressBar {
-            height: 100%;
-            width: 0%;
-            background: #006465;
-            transition: width 0.1s linear;
-        }
+overflow:hidden;
 
-        /* ================= DRAWERS Y OVERLAY ================= */
-        #drawerOverlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
-            opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1200;
-        }
-        #drawerOverlay.active { opacity: 1; pointer-events: auto; }
+display:flex;
 
-        .drawer {
-            position: fixed; top: 0; right: -420px; width: 400px; height: 100%;
-            background: #0a1a1c; padding: 40px; transition: 0.4s ease;
-            z-index: 1500; border-left: 2px solid #006465;
-        }
-        .drawer.active { right: 0; }
+flex-direction:column;
 
-        .drawer input, .drawer textarea, .drawer select {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            background: #000; border: 1px solid #006465; color: white;
-        }
+}
 
-        /* ================= MOBILE NAVIGATION ================= */
-        .mobile-nav {
-            display: none;
-            position: absolute; bottom: 0; width: 100%; height: 70px;
-            background: #0a1414; border-top: 1px solid #006465;
-            justify-content: space-around; align-items: center;
-            padding-bottom: env(safe-area-inset-bottom);
-            z-index: 1100;
-        }
 
-        .mobile-btn {
-            background: none; border: none; color: #a0acac;
-            display: flex; flex-direction: column; align-items: center;
-            font-size: 0.7rem; font-weight: bold; cursor: pointer;
-        }
 
-        /* ================= MODOS ESPECIALES ================= */
-        @keyframes pulse-red { 0%{opacity:0;} 50%{opacity:0.6;} 100%{opacity:0;} }
-        .critical-bg { position: fixed; inset:0; background: red; opacity:0; pointer-events:none; z-index: 1; }
-        .is-critical .critical-bg { animation: pulse-red 1.5s infinite; }
+/* ================= HEADER ================= */
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .mobile-nav { display: flex; }
-            .control-header { justify-content: center; height: 60px; }
-            .header-btns, .live-clock { display: none; }
-            #display { padding-bottom: 100px; }
-            #titleDisplay { font-size: 2.8rem; }
-            #messageDisplay { font-size: 1.5rem; }
-            .drawer { width: 100%; right: -100%; border-left: none; border-top: 2px solid #006465; top: auto; bottom: 0; height: 80%; }
-        }
-    </style>
-</head>
-<body>
 
-<div id="cio-master-container">
-    <div class="critical-bg"></div>
-    <div id="drawerOverlay" onclick="closeDrawers()"></div>
 
-    <header class="control-header">
-        <div class="header-btns">
-            <button onclick="openDrawer('form')">Nuevo</button>
-            <button onclick="openDrawer('history')">Historial</button>
-            <button onclick="document.documentElement.requestFullscreen()">TV</button>
-        </div>
-        <div id="clockDisplay" class="live-clock">00:00:00</div>
-    </header>
+.control-header{
 
-    <main id="display">
-        <div class="info-block">
-            <div id="areaDisplay" class="area">CARGANDO CIO...</div>
-            <div class="meta-tags">
-                <div id="prioTag" class="tag-pill">---</div>
-                <div id="turnoTag" class="tag-pill">TURNO</div>
-                <div id="horaTag" class="tag-pill">--:--</div>
-            </div>
-            <h1 id="titleDisplay">MONITOR OPERATIVO</h1>
-            <p id="messageDisplay">Sincronizando información en tiempo real...</p>
-        </div>
-    </main>
+display:flex;
 
-    <nav class="mobile-nav">
-        <button class="mobile-btn" onclick="openDrawer('form')"><span>➕</span>NUEVO</button>
-        <button class="mobile-btn" onclick="openDrawer('history')"><span>📋</span>LISTA</button>
-    </nav>
+justify-content:space-between;
 
-    <aside id="drawerForm" class="drawer">
-        <h2 style="color:#006465; margin-bottom:20px;">REGISTRO</h2>
-        <form id="mainForm" onsubmit="saveEntry(event)">
-            <input type="hidden" id="editIdx" value="-1">
-            <select id="inArea"><option value="Freschat">Freschat</option><option value="Monitoreo">Monitoreo</option><option value="Atención al Cliente">Atención al Cliente</option><option value="Interno">Interno</option></select>
-            <select id="inPrio"><option value="Baja">Baja</option><option value="Media">Media</option><option value="Alta">Alta</option><option value="Crítica">Crítica</option></select>
-            <input type="text" id="inTitle" placeholder="TÍTULO" required>
-            <textarea id="inMsg" rows="6" placeholder="MENSAJE..." required></textarea>
-            <button type="submit" style="width:100%; background:#006465; color:white; border:none; padding:15px; font-weight:bold; cursor:pointer;">ACTUALIZAR</button>
-            <button type="button" onclick="closeDrawers()" style="width:100%; background:none; color:red; border:none; margin-top:10px; cursor:pointer;">Cerrar</button>
-        </form>
-    </aside>
+align-items:center;
 
-    <aside id="drawerHistory" class="drawer">
-        <h2 style="color:#006465; margin-bottom:20px;">HISTORIAL</h2>
-        <button onclick="exportPDF()" style="width:100%; background:#2ecc71; color:black; border:none; padding:12px; font-weight:bold; cursor:pointer; margin-bottom:20px;">REPORTE PDF</button>
-        <div id="listItems"></div>
-    </aside>
+padding:18px 35px;
 
-    <footer class="footer-bar">
-        <div id="progressBar"></div>
-    </footer>
-</div>
+background:rgba(0,0,0,0.45);
 
-<script>
-    const API = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
-    let store = [];
-    let cur = 0;
-    let start = null;
-    const LAPSE = 15;
+backdrop-filter:blur(14px);
 
-    async function sync() {
-        try {
-            const r = await fetch(API);
-            const d = await r.json();
-            store = d || [];
-            render(cur);
-        } catch(e) {}
-    }
+border-bottom:1px solid #006465;
 
-    function render(i) {
-        if(!store.length) return;
-        const item = store[i % store.length];
-        const root = document.getElementById('cio-master-container');
-        
-        root.className = item.priority === "Crítica" ? "is-critical" : "";
-        document.getElementById('areaDisplay').textContent = item.area;
-        document.getElementById('prioTag').textContent = item.priority;
-        document.getElementById('turnoTag').textContent = "TURNO: " + item.turno;
-        document.getElementById('horaTag').textContent = item.hora;
-        document.getElementById('titleDisplay').textContent = item.title;
-        document.getElementById('messageDisplay').textContent = item.message;
-    }
+z-index:1000;
 
-    async function saveEntry(e) {
-        e.preventDefault();
-        const now = new Date();
-        const h = now.getHours();
-        const t = (h >= 6 && h < 14) ? "MAÑANA" : (h >= 14 && h < 22) ? "TARDE" : "NOCHE";
-        const obj = {
-            area: document.getElementById('inArea').value,
-            priority: document.getElementById('inPrio').value,
-            title: document.getElementById('inTitle').value,
-            message: document.getElementById('inMsg').value,
-            hora: now.toLocaleTimeString("es-UY", {hour:'2-digit', minute:'2-digit'}),
-            turno: t
-        };
-        const idx = parseInt(document.getElementById('editIdx').value);
-        if(idx === -1) store.push(obj); else store[idx] = obj;
-        await fetch(API, { method: 'PUT', body: JSON.stringify(store) });
-        closeDrawers(); sync();
-    }
+border-bottom-left-radius:20px;
 
-    function exportPDF() {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFillColor(0, 100, 101); doc.rect(0,0,210,30,'F');
-        doc.setTextColor(255,255,255); doc.text("REPORTE CIO", 20, 20);
-        let y = 50; doc.setTextColor(0,0,0);
-        store.forEach(r => {
-            doc.setFont(undefined, 'bold'); doc.text(`[${r.priority}] ${r.area}: ${r.title}`, 20, y);
-            doc.setFont(undefined, 'normal'); doc.text(r.message, 20, y + 7, {maxWidth: 170});
-            y += 25;
-        });
-        doc.save("Reporte_CIO.pdf");
-    }
+border-bottom-right-radius:20px;
 
-    function openDrawer(id) {
-        document.getElementById('drawerOverlay').classList.add('active');
-        if(id === 'form') {
-            document.getElementById('mainForm').reset();
-            document.getElementById('editIdx').value = "-1";
-            document.getElementById('drawerForm').classList.add('active');
-        } else {
-            const cont = document.getElementById('listItems');
-            cont.innerHTML = store.map((r, i) => `<div style="padding:10px; border-bottom:1px solid #1a2a2a">${r.title} <button onclick="del(${i})" style="color:red; background:none; border:none; float:right">X</button></div>`).join('');
-            document.getElementById('drawerHistory').classList.add('active');
-        }
-    }
+}
 
-    window.del = async (i) => {
-        store.splice(i, 1);
-        await fetch(API, { method: 'PUT', body: JSON.stringify(store.length ? store : null) });
-        openDrawer('history'); sync();
-    };
 
-    function closeDrawers() {
-        document.querySelectorAll('.drawer, #drawerOverlay').forEach(el => el.classList.remove('active'));
-    }
 
-    function loop(ts) {
-        if(!store.length) { requestAnimationFrame(loop); return; }
-        if(!start) start = ts;
-        const delta = (ts - start) / 1000;
-        document.getElementById('progressBar').style.width = (delta/LAPSE)*100 + "%";
-        if(delta >= LAPSE) { cur++; render(cur); start = ts; }
-        requestAnimationFrame(loop);
-    }
+.control-header button{
 
-    setInterval(() => {
-        document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString("es-UY",{hour12:false});
-    }, 1000);
+background:rgba(0,100,101,0.25);
 
-    sync();
-    requestAnimationFrame(loop);
-</script>
-</body>
-</html>
+border:1px solid #006465;
+
+color:#00d4d8;
+
+padding:12px 24px;
+
+margin-right:12px;
+
+cursor:pointer;
+
+border-radius:40px;
+
+transition:0.3s;
+
+font-weight:500;
+
+}
+
+
+
+.control-header button:hover{
+
+background:#006465;
+
+color:white;
+
+box-shadow:0 0 25px #006465;
+
+transform:scale(1.05);
+
+}
+
+
+
+.live-clock{
+
+font-size:1.5rem;
+
+letter-spacing:3px;
+
+color:#00d4d8;
+
+}
+
+
+
+/* ================= MAIN ================= */
+
+
+
+#display{
+
+flex:1;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+text-align:center;
+
+position:relative;
+
+transition:all 0.8s ease;
+
+padding:40px;
+
+}
+
+
+
+.info-block{
+
+z-index:5;
+
+max-width:85%;
+
+}
+
+
+
+/* Área */
+
+
+
+.area{
+
+letter-spacing:6px;
+
+opacity:0.6;
+
+margin-bottom:20px;
+
+font-size:1.2rem;
+
+}
+
+
+
+/* Servicio */
+
+
+
+#titleDisplay{
+
+font-size:4rem;
+
+margin-bottom:35px;
+
+text-shadow:0 0 25px rgba(0,100,101,0.6);
+
+transition:0.8s;
+
+word-wrap:break-word;
+
+overflow-wrap:break-word;
+
+white-space:normal;
+
+line-height:1.1;
+
+}
+
+
+
+/* Novedad */
+
+
+
+#messageDisplay{
+
+font-size:8rem;
+
+opacity:2;
+
+line-height:1.6;
+
+max-width:90%;
+
+margin:auto;
+
+word-wrap:break-word;
+
+overflow-wrap:break-word;
+
+white-space:pre-wrap;
+
+}
+
+
+
+/* ================= FOOTER ================= */
+
+
+
+.footer-bar{
+
+height:6px;
+
+background:#111;
+
+border-top:1px solid #006465;
+
+}
+
+
+
+#progressBar{
+
+height:100%;
+
+width:0%;
+
+background:#006465;
+
+transition:width 0.1s linear;
+
+}
+
+
+
+/* ================= DRAWER OVERLAY ================= */
+
+
+
+#drawerOverlay{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,0.5);
+
+opacity:0;
+
+pointer-events:none;
+
+transition:0.3s;
+
+z-index:1200;
+
+}
+
+
+
+#drawerOverlay.active{
+
+opacity:1;
+
+pointer-events:auto;
+
+}
+
+
+
+/* ================= DRAWERS ================= */
+
+
+
+.drawer{
+
+position:fixed;
+
+top:0;
+
+right:-420px;
+
+width:400px;
+
+height:100%;
+
+background:#0a1a1c;
+
+padding:35px;
+
+transition:0.4s;
+
+overflow-y:auto;
+
+border-left:1px solid #006465;
+
+z-index:1500;
+
+border-top-left-radius:35px;
+
+border-bottom-left-radius:35px;
+
+box-shadow:-10px 0 40px rgba(0,0,0,0.6);
+
+}
+
+
+
+.drawer.active{
+
+right:0;
+
+}
+
+
+
+.drawer h2{
+
+margin-bottom:25px;
+
+letter-spacing:2px;
+
+}
+
+
+
+.drawer input,
+
+.drawer textarea,
+
+.drawer select{
+
+width:100%;
+
+padding:14px;
+
+margin-bottom:18px;
+
+background:#081314;
+
+border:1px solid #006465;
+
+color:white;
+
+border-radius:18px;
+
+transition:0.3s;
+
+}
+
+
+
+.drawer input:focus,
+
+.drawer textarea:focus,
+
+.drawer select:focus{
+
+outline:none;
+
+box-shadow:0 0 12px #006465;
+
+}
+
+
+
+.drawer button{
+
+background:#006465;
+
+border:none;
+
+padding:14px;
+
+color:white;
+
+cursor:pointer;
+
+border-radius:40px;
+
+transition:0.3s;
+
+font-weight:600;
+
+}
+
+
+
+.drawer button:hover{
+
+box-shadow:0 0 20px #006465;
+
+transform:scale(1.05);
+
+}
+
+
+
+/* ================= CRITICAL MODE ================= */
+
+
+
+#criticalPulse{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+pointer-events:none;
+
+opacity:0;
+
+background:radial-gradient(circle, rgba(255,0,0,0.3) 0%, transparent 70%);
+
+z-index:900;
+
+}
+
+
+
+.pulse{
+
+animation:pulseRed 1.5s infinite;
+
+}
+
+
+
+@keyframes pulseRed{
+
+0%{opacity:0;}
+
+50%{opacity:0.9;}
+
+100%{opacity:0;}
+
+}
+
+
+
+/* ================= FULLSCREEN ================= */
+
+
+
+#ghostClock{
+
+position:fixed;
+
+top:25px;
+
+right:40px;
+
+font-size:6rem;
+
+opacity:10;
+
+pointer-events:none;
+
+color:#00d4d8;
+
+letter-spacing:5px;
+
+}
+
+
+
+body.fullscreen #ghostClock{
+
+opacity:2;
+
+}
+
+
+
+body.fullscreen .control-header{
+
+display:none;
+
+}
+
+
+
+body.fullscreen #display{
+
+padding:80px;
+
+}
+
+
+
+body.fullscreen #titleDisplay{
+
+font-size:6rem;
+
+line-height:1.05;
+
+}
+
+
+
+body.fullscreen #messageDisplay{
+
+font-size:8rem;
+
+max-width:85%;
+
+line-height:1.4;
+
+}
