@@ -14,8 +14,8 @@
             display: flex; flex-direction: column; gap: 10px;
         }
         .history-actions { display: flex; gap: 8px; justify-content: flex-end; }
-        .btn-edit { background: #ffcc00 !important; color: black !important; padding: 5px 10px; border-radius: 5px; border:none; cursor:pointer; font-size: 0.8rem; font-weight: bold;}
-        .btn-delete { background: #ff4d4d !important; color: white !important; padding: 5px 10px; border-radius: 5px; border:none; cursor:pointer; font-size: 0.8rem; }
+        .btn-edit { background: #ffcc00 !important; color: black !important; padding: 6px 12px; border-radius: 5px; border:none; cursor:pointer; font-weight: bold;}
+        .btn-delete { background: #ff4d4d !important; color: white !important; padding: 6px 12px; border-radius: 5px; border:none; cursor:pointer; }
         .btn-pdf { background: #006465 !important; color: white !important; width: 100%; padding: 12px; border-radius: 8px; border: none; margin-bottom: 15px; font-weight: bold; cursor: pointer; }
 
         .form-actions { display: flex; gap: 10px; margin-top: 20px; }
@@ -29,26 +29,9 @@
             #display { height: 80vh; padding: 20px; display: flex; align-items: center; }
             .fullscreen-title { font-size: 1.8rem !important; }
             .fullscreen-message { font-size: 2rem !important; }
-
-            .mobile-nav {
-                display: flex !important;
-                position: fixed;
-                bottom: 0; left: 0; right: 0;
-                height: 75px;
-                background: #0a1a1b;
-                border-top: 1px solid #006465;
-                justify-content: space-around;
-                align-items: center;
-                z-index: 9999;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
+            .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: #0a1a1b; border-top: 1px solid #006465; justify-content: space-around; align-items: center; z-index: 9999; padding-bottom: env(safe-area-inset-bottom); }
             .nav-item { color: #00ff88; text-decoration: none; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; background: none; border: none; }
-            .drawer {
-                width: 100% !important; height: 92vh !important; bottom: -100vh;
-                right: 0 !important; top: auto !important; left: 0 !important;
-                border-radius: 25px 25px 0 0; transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                overflow-y: auto; padding-bottom: 120px;
-            }
+            .drawer { width: 100% !important; height: 92vh !important; bottom: -100vh; right: 0 !important; top: auto !important; left: 0 !important; border-radius: 25px 25px 0 0; transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding-bottom: 120px; }
             .drawer.active { bottom: 0 !important; }
             .footer-bar { bottom: 75px; height: 4px; }
             input, select, textarea { font-size: 16px !important; background: rgba(255,255,255,0.05) !important; color: white !important; border: 1px solid #006465 !important; margin-bottom: 15px !important; }
@@ -91,6 +74,7 @@
     <h2 id="formTitle">Nuevo Evento</h2>
     <form id="formRegistro">
         <input type="hidden" id="editIndex" value="-1">
+        
         <label>Área</label>
         <select id="inputArea" required>
             <option value="Freschat">Freschat</option>
@@ -112,7 +96,7 @@
         
         <div class="form-actions">
             <button type="button" class="btn-cancel" onclick="closeAllDrawers()">CANCELAR</button>
-            <button type="submit" class="btn-publish" id="btnSubmit">PUBLICAR</button>
+            <button type="submit" class="btn-publish">GUARDAR</button>
         </div>
     </form>
 </aside>
@@ -120,7 +104,7 @@
 <aside id="drawerHistory" class="drawer">
     <div style="width: 50px; height: 6px; background: #333; margin: 0 auto 20px; border-radius: 10px;"></div>
     <button class="btn-pdf" onclick="generatePDF()">📥 DESCARGAR REPORTE DE TURNO</button>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h2>Eventos Activos</h2>
         <button onclick="closeAllDrawers()" style="background:none; border:none; color:#ff4d4d; font-weight:bold;">CERRAR</button>
     </div>
@@ -135,21 +119,26 @@
     const DURATION = 15;
 
     async function pushData() { await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros) }); }
+    
     async function pullData() {
         try {
             const res = await fetch(DATABASE_URL);
             const data = await res.json();
-            if (data) { if (JSON.stringify(data) !== JSON.stringify(registros)) { registros = data; render(currentIndex); } } 
-            else { registros = []; render(0); }
+            if (data) { 
+                if (JSON.stringify(data) !== JSON.stringify(registros)) { 
+                    registros = data; 
+                    render(currentIndex); 
+                    if(document.getElementById("drawerHistory").classList.contains("active")) renderHistory();
+                } 
+            } else { registros = []; render(0); }
         } catch (e) { console.error("Error nube"); }
     }
     setInterval(pullData, 3000);
 
     function updateClock(){
         const now = new Date();
-        const time = now.toLocaleTimeString("es-UY",{hour12:false});
-        document.getElementById("clock").textContent = time;
-        if(document.getElementById("ghostClock")) document.getElementById("ghostClock").textContent = time;
+        document.getElementById("clock").textContent = now.toLocaleTimeString("es-UY",{hour12:false});
+        if(document.getElementById("ghostClock")) document.getElementById("ghostClock").textContent = now.toLocaleTimeString("es-UY",{hour12:false});
     }
     setInterval(updateClock, 1000);
 
@@ -166,7 +155,7 @@
         document.getElementById("titleDisplay").textContent = reg.title;
         document.getElementById("messageDisplay").textContent = reg.message;
         const colors = {low:"#00ff88", medium:"#00ccff", high:"#ffcc00", critical:"#ff4d4d"};
-        document.getElementById("progressBar").style.background = colors[reg.priority];
+        document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
     }
 
     function animate(timestamp){
@@ -203,17 +192,16 @@
     document.getElementById("formRegistro").onsubmit = async (e) => {
         e.preventDefault();
         const index = parseInt(document.getElementById("editIndex").value);
+        
         const nuevo = {
             area: document.getElementById("inputArea").value,
             priority: document.getElementById("inputPriority").value,
             title: document.getElementById("inputTitle").value,
-            message: document.getElementById("inputMessage").value,
-            time: new Date().toLocaleTimeString("es-UY", {hour: '2-digit', minute: '2-digit'}),
-            fullDate: new Date().toISOString()
+            message: document.getElementById("inputMessage").value
         };
         
-        if(index === -1) registros.push(nuevo);
-        else registros[index] = nuevo;
+        if(index === -1) { registros.push(nuevo); } 
+        else { registros[index] = nuevo; }
         
         await pushData();
         closeAllDrawers();
@@ -226,16 +214,19 @@
             const div = document.createElement("div");
             div.className = "history-item";
             div.innerHTML = `
-                <div><strong>[${reg.time}] ${reg.title}</strong><br><small>${reg.area} - ${reg.priority}</small></div>
+                <div>
+                    <strong>${reg.title}</strong><br>
+                    <small>${reg.area.toUpperCase()} - Prioridad: ${reg.priority}</small>
+                </div>
                 <div class="history-actions">
-                    <button class="btn-edit" onclick="editar(${i})">EDITAR</button>
-                    <button class="btn-delete" onclick="eliminar(${i})">BORRAR</button>
+                    <button class="btn-edit" onclick="editarEvento(${i})">EDITAR</button>
+                    <button class="btn-delete" onclick="eliminarEvento(${i})">BORRAR</button>
                 </div>`;
             container.appendChild(div);
         });
     }
 
-    window.editar = (i) => {
+    window.editarEvento = (i) => {
         const reg = registros[i];
         document.getElementById("editIndex").value = i;
         document.getElementById("inputArea").value = reg.area;
@@ -243,48 +234,51 @@
         document.getElementById("inputTitle").value = reg.title;
         document.getElementById("inputMessage").value = reg.message;
         document.getElementById("formTitle").textContent = "Editar Evento";
+        dHistory.classList.remove("active");
         openForm();
     };
 
-    window.eliminar = async (i) => { registros.splice(i, 1); await pushData(); renderHistory(); };
+    window.eliminarEvento = async (i) => {
+        if(confirm("¿Seguro que quieres borrar este evento?")) {
+            registros.splice(i, 1);
+            await pushData();
+            renderHistory();
+        }
+    };
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const now = new Date();
         const hour = now.getHours();
-        let turno = "";
-        
-        if(hour >= 6 && hour < 14) turno = "MAÑANA (06:00 - 14:00)";
-        else if(hour >= 14 && hour < 22) turno = "TARDE (14:00 - 22:00)";
-        else turno = "NOCHE (22:00 - 06:00)";
+        let turno = (hour >= 6 && hour < 14) ? "MAÑANA" : (hour >= 14 && hour < 22) ? "TARDE" : "NOCHE";
 
-        doc.setFontSize(18);
+        doc.setFillColor(0, 100, 101);
+        doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.setFont(undefined, 'bold');
         doc.text("REPORTE OPERATIVO CIO", 105, 20, {align: 'center'});
-        doc.setFontSize(12);
-        doc.text(`Turno: ${turno}`, 20, 35);
-        doc.text(`Fecha: ${now.toLocaleDateString()}`, 20, 42);
-        doc.line(20, 45, 190, 45);
+        doc.setFontSize(10);
+        doc.text(`TURNO: ${turno}  |  FECHA: ${now.toLocaleDateString()}`, 105, 30, {align: 'center'});
 
+        doc.setTextColor(0, 0, 0);
         let y = 55;
-        registros.forEach(reg => {
+        registros.forEach((reg) => {
             if(y > 270) { doc.addPage(); y = 20; }
-            const color = {low:[0, 255, 136], medium:[0, 204, 255], high:[255, 204, 0], critical:[255, 77, 77]};
-            const c = color[reg.priority];
-            doc.setDrawColor(c[0], c[1], c[2]);
-            doc.setLineWidth(1);
-            doc.rect(20, y, 170, 25);
             doc.setFont(undefined, 'bold');
-            doc.text(`${reg.time} - ${reg.title} (${reg.area})`, 25, y + 10);
+            doc.setFontSize(11);
+            doc.text(`${reg.title.toUpperCase()} (${reg.area})`, 25, y);
             doc.setFont(undefined, 'normal');
-            doc.text(reg.message.substring(0, 80), 25, y + 18);
-            y += 32;
+            doc.setFontSize(10);
+            const msgLines = doc.splitTextToSize(reg.message, 160);
+            doc.text(msgLines, 25, y + 7);
+            y += (msgLines.length * 5) + 15;
         });
-
-        doc.save(`Reporte_CIO_${now.toLocaleDateString().replace(/\//g,'-')}.pdf`);
+        doc.save(`Reporte_CIO_${now.toLocaleDateString()}.pdf`);
     }
 
-    document.getElementById("btnFullscreen").onclick = () => { document.documentElement.requestFullscreen(); document.body.classList.add("fullscreen"); };
+    document.getElementById("btnFullscreen").onclick = () => { document.documentElement.requestFullscreen(); };
     pullData();
 </script>
 </body>
