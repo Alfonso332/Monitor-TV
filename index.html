@@ -3,63 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CIO - Centro de Inteligencia Operativa</title>
+    <title>CIO - Intelligence Hub</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* --- TU ESTÉTICA ORIGINAL --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;800&family=JetBrains+Mono:wght@700&display=swap');
+
+        :root {
+            --bg: #050a0a;
+            --panel: #0a1617;
+            --accent: #00ffcc;
+            --danger: #ff3366;
+            --warning: #ffcc00;
+            --info: #00ccff;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* --- DISPLAY PRINCIPAL --- */
         #display {
-            display: flex !important; flex-direction: column !important; justify-content: center !important;
-            align-items: center !important; height: 100vh !important; width: 100vw !important;
-            padding: 40px !important; box-sizing: border-box !important; overflow: hidden !important;
-            position: fixed !important; top: 0; left: 0; background: #0a1a1b; z-index: 1;
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 50px; box-sizing: border-box;
+            transition: background 0.5s ease;
         }
 
-        .info-block { width: 95% !important; text-align: center; }
+        .info-block { width: 90%; max-width: 1600px; text-align: center; position: relative; }
 
-        #titleDisplay { margin: 0; font-weight: bold; color: white; }
-        #messageDisplay { margin-top: 20px; color: white; white-space: normal; word-wrap: break-word; }
+        #areaLabel {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem; color: var(--accent);
+            letter-spacing: 10px; text-transform: uppercase;
+            margin-bottom: 10px; opacity: 0.8;
+        }
 
-        /* HEADER */
+        /* BARRA DE DATOS ESTILIZADA */
+        #metaDisplay {
+            display: inline-flex; gap: 15px; margin-bottom: 30px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+        }
+        .tag {
+            padding: 5px 15px; border-radius: 4px;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            background: rgba(0, 255, 204, 0.05); color: var(--accent);
+        }
+
+        #titleDisplay {
+            font-weight: 800; line-height: 1.1; margin: 0;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #messageDisplay {
+            font-weight: 300; opacity: 0.9; margin-top: 20px;
+            max-width: 1200px; margin-left: auto; margin-right: auto;
+        }
+
+        /* --- HEADER --- */
         .control-header {
-            position: fixed; top: 0; width: 100%; height: 60px; z-index: 1000;
+            position: fixed; top: 0; width: 100%; height: 80px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 25px; box-sizing: border-box; transition: all 0.5s ease;
+            padding: 0 40px; box-sizing: border-box; z-index: 1000;
+            background: linear-gradient(to bottom, rgba(5,10,10,1), rgba(5,10,10,0));
         }
-        #clock { font-weight: bold; font-family: 'Courier New', monospace; color: white; font-size: 1.4rem; transition: all 0.5s ease; }
 
-        /* MODO FULLSCREEN (LO QUE PEDISTE) */
+        #clock {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem; color: white;
+        }
+
+        /* --- FULLSCREEN TV --- */
         :fullscreen .left-zone, :fullscreen .mobile-nav { display: none !important; }
-        :fullscreen .control-header { justify-content: center !important; height: 150px !important; }
+        :fullscreen .control-header { justify-content: center !important; height: 200px !important; }
         :fullscreen #clock {
-            font-size: 8rem !important;
-            color: #00ff88 !important;
-            text-shadow: 0 0 40px rgba(0, 255, 136, 0.7);
-            margin: 0 !important;
+            font-size: 12rem !important; color: var(--accent);
+            text-shadow: 0 0 40px rgba(0, 255, 204, 0.4);
         }
 
-        /* EFECTO CRÍTICO */
-        @keyframes pulse-red { 0% { background-color: #0a1a1b; } 50% { background-color: #5a0000; } 100% { background-color: #0a1a1b; } }
-        .critico-total { animation: pulse-red 1.2s infinite !important; }
+        /* --- ESTADO CRÍTICO --- */
+        @keyframes alert-glow {
+            0% { box-shadow: inset 0 0 100px rgba(255, 51, 102, 0.2); background: #050a0a; }
+            50% { box-shadow: inset 0 0 200px rgba(255, 51, 102, 0.4); background: #1a0505; }
+            100% { box-shadow: inset 0 0 100px rgba(255, 51, 102, 0.2); background: #050a0a; }
+        }
+        .critico-total { animation: alert-glow 1.5s infinite !important; }
+        .critico-total #areaLabel { color: var(--danger); }
+        .critico-total .tag { border-color: var(--danger); color: var(--danger); }
 
-        /* DRAWERS Y OVERLAY (FIX DE EDICIÓN) */
-        #drawerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 5000; }
+        /* --- INTERFAZ --- */
+        .btn-cio {
+            background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-cio:hover { background: var(--accent); color: black; border-color: var(--accent); }
+
+        #drawerOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: none; z-index: 5000; }
         #drawerOverlay.active { display: block; }
 
         .drawer {
-            position: fixed; right: 0; top: 0; width: 400px; height: 100vh;
-            background: #0f2426; border-left: 2px solid #006465;
-            padding: 25px; box-sizing: border-box; transform: translateX(100%);
-            transition: transform 0.4s ease; z-index: 6000; overflow-y: auto;
+            position: fixed; right: 0; top: 0; width: 450px; height: 100vh;
+            background: var(--panel); border-left: 1px solid rgba(0,255,204,0.2);
+            padding: 40px; box-sizing: border-box; transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 6000;
         }
         .drawer.active { transform: translateX(0); }
 
-        /* AJUSTES MÓVIL MANTENIDOS */
+        /* --- MOBILE --- */
         @media (max-width: 768px) {
-            .drawer { width: 100% !important; height: 85vh !important; top: auto !important; bottom: -100vh; border-radius: 25px 25px 0 0; transform: none; }
-            .drawer.active { bottom: 0 !important; }
-            .left-zone { display: none !important; }
-            .mobile-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #0a1a1b; border-top: 1px solid #006465; justify-content: space-around; align-items: center; z-index: 2000; }
+            .drawer { width: 100%; border-radius: 30px 30px 0 0; top: auto; bottom: -100vh; transform: none; height: 90vh; }
+            .drawer.active { bottom: 0; }
+            .mobile-nav { 
+                position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
+                background: var(--panel); display: flex !important; justify-content: space-around;
+                align-items: center; border-top: 1px solid rgba(0,255,204,0.1); z-index: 2000;
+            }
         }
+
+        .footer-bar { position: fixed; bottom: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.05); }
+        #progressBar { height: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent); width: 0%; }
     </style>
 </head>
 <body>
@@ -68,57 +135,63 @@
 
 <header class="control-header">
     <div class="left-zone">
-        <button id="btnNew" style="background:#006465; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer;">＋ NUEVO</button>
-        <button id="btnManage" style="background:#006465; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; margin-left:10px;">☰ HISTORIAL</button>
-        <button id="btnFullscreen" style="background:none; border:1px solid #006465; color:#00ff88; padding:10px; border-radius:8px; cursor:pointer; margin-left:10px;">⛶ FULL</button>
+        <button class="btn-cio" onclick="openNew()">＋ NUEVO</button>
+        <button class="btn-cio" onclick="openHistory()" style="margin-left:10px;">☰ PANEL</button>
+        <button class="btn-cio" onclick="document.documentElement.requestFullscreen()" style="margin-left:10px; border-color: var(--accent);">⛶ TV MODE</button>
     </div>
     <div id="clock">00:00:00</div>
 </header>
 
 <main id="display">
     <div class="info-block">
-        <div id="areaLabel" style="font-size: 1.4rem; color: #00ff88; margin-bottom: 5px; font-weight: bold; letter-spacing: 3px;">SISTEMA</div>
-        <div id="metaDisplay" style="color: #00ccff; font-size: 1rem; margin-bottom: 15px; font-family: monospace; opacity: 0.8;"></div>
-        <h1 id="titleDisplay">CARGANDO...</h1>
-        <p id="messageDisplay">Sincronizando registros...</p>
+        <div id="areaLabel">CIO CENTER</div>
+        <div id="metaDisplay"></div>
+        <h1 id="titleDisplay">MONITOR OPERATIVO</h1>
+        <p id="messageDisplay">Iniciando sistema de vigilancia...</p>
     </div>
 </main>
 
 <nav class="mobile-nav" style="display:none;">
-    <button onclick="openNew()" style="background:none; border:none; color:#00ff88;">➕<br><b>NUEVO</b></button>
-    <button onclick="openHistory()" style="background:none; border:none; color:#00ff88;">📋<br><b>LISTA</b></button>
+    <button onclick="openNew()" style="background:none; border:none; color:var(--accent); font-size: 0.8rem;">➕<br>NUEVO</button>
+    <button onclick="openHistory()" style="background:none; border:none; color:var(--accent); font-size: 0.8rem;">📋<br>LISTA</button>
 </nav>
 
-<footer class="footer-bar" style="position:fixed; bottom:0; width:100%; height:8px; z-index:1500;"><div id="progressBar" style="height:100%; width:0%;"></div></footer>
-
 <aside id="drawerForm" class="drawer">
-    <h2 style="color:#00ff88; margin-top:0;">Evento</h2>
-    <form id="formRegistro" style="display:flex; flex-direction:column; gap:15px;">
+    <h2 style="color:var(--accent); font-weight: 800;">REGISTRO</h2>
+    <form id="formRegistro" style="display:flex; flex-direction:column; gap:20px;">
         <input type="hidden" id="editIndex" value="-1">
-        <select id="inputArea" style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;">
-            <option value="Freschat">Freschat</option>
-            <option value="Monitoreo">Monitoreo</option>
-            <option value="Atención al Cliente">Atención al Cliente</option>
-            <option value="Interno">Interno</option>
-        </select>
-        <select id="inputPriority" style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;">
-            <option value="Baja">Baja</option>
-            <option value="Media">Media</option>
-            <option value="Alta">Alta</option>
-            <option value="Crítica">Crítica</option>
-        </select>
-        <input type="text" id="inputTitle" placeholder="Título" required style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;">
-        <textarea id="inputMessage" rows="5" placeholder="Descripción..." required style="padding:10px; border-radius:5px; background:#1a3a3d; color:white; border:1px solid #006465;"></textarea>
-        <button type="submit" style="background:#00ff88; color:black; padding:15px; border-radius:8px; border:none; font-weight:bold; cursor:pointer;">ACTUALIZAR TV</button>
-        <button type="button" onclick="closeAllDrawers()" style="background:none; color:#ff4d4d; border:none; cursor:pointer;">CANCELAR</button>
+        <div style="display:grid; gap:5px;">
+            <label style="font-size: 0.7rem; color: var(--accent); font-family: 'JetBrains Mono';">ÁREA RESPONSABLE</label>
+            <select id="inputArea" style="padding:15px; background:#111; color:white; border:1px solid #222; border-radius:8px;">
+                <option value="Freschat">Freschat</option>
+                <option value="Monitoreo">Monitoreo</option>
+                <option value="Atención al Cliente">Atención al Cliente</option>
+                <option value="Interno">Interno</option>
+            </select>
+        </div>
+        <div style="display:grid; gap:5px;">
+            <label style="font-size: 0.7rem; color: var(--accent); font-family: 'JetBrains Mono';">PRIORIDAD</label>
+            <select id="inputPriority" style="padding:15px; background:#111; color:white; border:1px solid #222; border-radius:8px;">
+                <option value="Baja">Baja</option>
+                <option value="Media">Media</option>
+                <option value="Alta">Alta</option>
+                <option value="Crítica">Crítica</option>
+            </select>
+        </div>
+        <input type="text" id="inputTitle" placeholder="TÍTULO DEL EVENTO" required style="padding:15px; background:#111; color:white; border:1px solid #222; border-radius:8px;">
+        <textarea id="inputMessage" rows="5" placeholder="DETALLES DE LA NOVEDAD..." required style="padding:15px; background:#111; color:white; border:1px solid #222; border-radius:8px;"></textarea>
+        <button type="submit" style="background:var(--accent); color:black; padding:20px; border-radius:8px; border:none; font-weight:800; cursor:pointer;">ENVIAR A MONITOR</button>
+        <button type="button" onclick="closeAllDrawers()" style="background:none; color:#666; border:none; cursor:pointer;">CERRAR</button>
     </form>
 </aside>
 
 <aside id="drawerHistory" class="drawer">
-    <h2 style="color:#00ff88; margin-top:0;">Historial</h2>
-    <button onclick="generatePDF()" style="background:#006465; color:white; width:100%; padding:12px; border:none; border-radius:8px; margin-bottom:20px; cursor:pointer;">📥 NOVEDADES OPERATIVAS (PDF)</button>
+    <h2 style="color:var(--accent); font-weight: 800;">HUB DE CONTROL</h2>
+    <button onclick="generatePDF()" style="background:rgba(0,255,204,0.1); color:var(--accent); width:100%; padding:15px; border:1px solid var(--accent); border-radius:8px; margin-bottom:20px; cursor:pointer; font-weight:bold;">📥 NOVEDADES OPERATIVAS (PDF)</button>
     <div id="historyList"></div>
 </aside>
+
+<footer class="footer-bar"><div id="progressBar"></div></footer>
 
 <script>
     const DATABASE_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
@@ -138,13 +211,16 @@
         const message = document.getElementById('messageDisplay');
         const display = document.getElementById('display');
         const esMovil = window.innerWidth <= 768;
-        let sizeT = esMovil ? 35 : 100; 
-        let sizeM = esMovil ? 40 : 130;
+        
+        let sizeT = esMovil ? 40 : 120; 
+        let sizeM = esMovil ? 20 : 45;
+
         title.style.fontSize = sizeT + "px";
         message.style.fontSize = sizeM + "px";
+
         let safety = 0;
-        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.7) && safety < 100) {
-            sizeT -= 1; sizeM -= 1.5;
+        while ((title.offsetHeight + message.offsetHeight > display.offsetHeight * 0.6) && safety < 100) {
+            sizeT -= 1; sizeM -= 0.5;
             title.style.fontSize = sizeT + "px";
             message.style.fontSize = sizeM + "px";
             safety++;
@@ -162,24 +238,32 @@
 
     function render(index){
         const display = document.getElementById("display");
+        const meta = document.getElementById("metaDisplay");
         if(!registros.length) {
             display.classList.remove("critico-total");
             document.getElementById("areaLabel").textContent = "SISTEMA";
-            document.getElementById("metaDisplay").textContent = "";
+            meta.innerHTML = "";
             document.getElementById("titleDisplay").textContent = "SIN NOVEDADES";
-            document.getElementById("messageDisplay").textContent = "En espera...";
+            document.getElementById("messageDisplay").textContent = "OPERACIÓN NORMAL";
             return;
         }
+        
         const reg = registros[index % registros.length];
         display.className = (reg.priority === "Crítica") ? "critico-total" : "";
         
-        document.getElementById("areaLabel").textContent = reg.area.toUpperCase();
-        document.getElementById("metaDisplay").textContent = `PRIORIDAD: ${reg.priority} | TURNO: ${reg.turno} | HORA: ${reg.hora}`;
+        document.getElementById("areaLabel").textContent = reg.area;
+        meta.innerHTML = `
+            <div class="tag">${reg.priority.toUpperCase()}</div>
+            <div class="tag">TURNO: ${reg.turno.toUpperCase()}</div>
+            <div class="tag">${reg.hora}</div>
+        `;
         document.getElementById("titleDisplay").textContent = reg.title;
         document.getElementById("messageDisplay").textContent = reg.message;
         
-        const colors = {Baja:"#00ff88", Media:"#00ccff", Alta:"#ffcc00", Crítica:"#ff4d4d"};
+        const colors = {Baja:"#00ffcc", Media:"#00ccff", Alta:"#ffcc00", Crítica:"#ff3366"};
         document.getElementById("progressBar").style.background = colors[reg.priority] || "#006465";
+        document.getElementById("progressBar").style.boxShadow = `0 0 15px ${colors[reg.priority]}`;
+        
         setTimeout(fitText, 50);
     }
 
@@ -203,9 +287,9 @@
     function generatePDF() {
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
         const now = new Date(); const turno = getTurno(now.getHours());
-        doc.setFillColor(10, 26, 28); doc.rect(0,0,210,40,'F');
-        doc.setTextColor(255,255,255); doc.setFontSize(22); doc.text("NOVEDADES OPERATIVAS", 20, 25);
-        doc.setFontSize(11); doc.text(`Turno: ${turno} | Fecha: ${now.toLocaleDateString()}`, 20, 35);
+        doc.setFillColor(5, 10, 10); doc.rect(0,0,210,40,'F');
+        doc.setTextColor(0, 255, 204); doc.setFontSize(22); doc.text("NOVEDADES OPERATIVAS", 20, 25);
+        doc.setTextColor(255,255,255); doc.setFontSize(11); doc.text(`TURNO: ${turno.toUpperCase()} | ${now.toLocaleDateString()}`, 20, 35);
         let y = 55; doc.setTextColor(0,0,0);
         registros.forEach(r => {
             doc.setFont(undefined, 'bold'); doc.text(`[${r.priority}] ${r.area}: ${r.title}`, 20, y);
@@ -218,11 +302,13 @@
     function renderHistory() {
         const container = document.getElementById("historyList");
         container.innerHTML = registros.map((reg, i) => `
-            <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #006465;">
-                <strong style="color:#00ff88">${reg.title}</strong><br>
-                <small style="color:#aaa">${reg.hora} - Turno ${reg.turno}</small><br>
-                <button onclick="editarEvento(${i})" style="background:#ffcc00; border:none; padding:5px 10px; border-radius:4px; margin-top:8px; cursor:pointer;">EDITAR</button>
-                <button onclick="eliminarEvento(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; border-radius:4px; margin-left:5px; cursor:pointer;">BORRAR</button>
+            <div style="background:rgba(255,255,255,0.03); padding:20px; margin-bottom:12px; border-radius:12px; border:1px solid rgba(0,255,204,0.1);">
+                <div style="color:var(--accent); font-size: 0.7rem; font-family: 'JetBrains Mono'; margin-bottom: 5px;">${reg.area} | ${reg.hora}</div>
+                <strong style="font-size: 1.1rem;">${reg.title}</strong><br>
+                <div style="margin-top:10px; display:flex; gap:10px;">
+                    <button onclick="editarEvento(${i})" style="background:none; border:1px solid var(--info); color:var(--info); padding:5px 10px; border-radius:4px; cursor:pointer;">EDITAR</button>
+                    <button onclick="eliminarEvento(${i})" style="background:none; border:1px solid var(--danger); color:var(--danger); padding:5px 10px; border-radius:4px; cursor:pointer;">BORRAR</button>
+                </div>
             </div>
         `).join('');
     }
@@ -239,7 +325,7 @@
     };
 
     window.eliminarEvento = async (i) => {
-        if(confirm("¿Eliminar?")) {
+        if(confirm("¿Eliminar registro?")) {
             registros.splice(i,1);
             await fetch(DATABASE_URL, { method: 'PUT', body: JSON.stringify(registros.length ? registros : null) });
             renderHistory(); pullData();
@@ -250,10 +336,7 @@
     function openNew() { document.getElementById("formRegistro").reset(); document.getElementById("editIndex").value="-1"; document.getElementById("drawerForm").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
     function openHistory() { renderHistory(); document.getElementById("drawerHistory").classList.add("active"); document.getElementById("drawerOverlay").classList.add("active"); }
 
-    document.getElementById("btnNew").onclick = openNew;
-    document.getElementById("btnManage").onclick = openHistory;
     document.getElementById("drawerOverlay").onclick = closeAllDrawers;
-    document.getElementById("btnFullscreen").onclick = () => document.documentElement.requestFullscreen();
 
     function animate(timestamp){
         if(!registros.length) { requestAnimationFrame(animate); return; }
