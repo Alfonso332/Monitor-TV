@@ -41,11 +41,21 @@
         }
 
         #cio-app:fullscreen .main-header,
-        #cio-app:-webkit-full-screen .main-header {
-            display: none !important;
-        }
+        #cio-app:-webkit-full-screen .main-header { display: none !important; }
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: #fff; font-weight: bold; }
+
+        /* DASHBOARD INTERNO EN PANEL */
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05); padding: 15px 5px; border-radius: 12px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-card span { display: block; font-size: 0.7rem; color: gray; text-transform: uppercase; margin-top: 5px; }
+        .stat-card b { font-size: 1.4rem; color: var(--accent); }
+        .stat-card.alert b { color: var(--critico); }
 
         /* BOTÓN FLOTANTE MÓVIL */
         #cio-app #menu-toggle-float {
@@ -82,7 +92,6 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* EDITOR DENTRO DEL HISTORIAL */
         #cio-app .edit-box {
             background: #000; border: 1px solid var(--accent); padding: 15px;
             border-radius: 10px; margin-top: 15px; display: none;
@@ -103,7 +112,7 @@
             font-weight: bold; cursor: pointer;
         }
 
-        /* TICKER BAR - MEJORADO */
+        /* TICKER BAR */
         #cio-app #ticker-bar {
             height: 50px; background: #050c0c; border-top: 1px solid var(--accent);
             display: flex; align-items: center; overflow: hidden; position: relative;
@@ -117,19 +126,13 @@
         }
 
         #cio-app .offline-tag {
-            background: rgba(255, 77, 77, 0.15);
-            color: #ff4d4d;
-            padding: 4px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 77, 77, 0.3);
-            margin: 0 15px;
+            background: rgba(255, 77, 77, 0.15); color: #ff4d4d;
+            padding: 4px 15px; border-radius: 20px;
+            border: 1px solid rgba(255, 77, 77, 0.3); margin: 0 15px;
             display: inline-block;
         }
 
-        @keyframes scrollText {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes scrollText { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
@@ -190,7 +193,14 @@
     </div>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--primary); text-align:center;">Historial</h2>
+        <h2 style="color:var(--primary); text-align:center;">Dashboard & Historial</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card" id="card-off"><b>0</b><span>Servicios Off</span></div>
+            <div class="stat-card" id="card-crit"><b>0</b><span>Críticos</span></div>
+            <div class="stat-card"><b>0</b><span id="card-total">Novedades</span></div>
+        </div>
+
         <div id="historyList"></div>
         <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none !important; border:1px solid #333 !important; color:gray !important;">CERRAR</button>
     </aside>
@@ -202,7 +212,7 @@
             <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
             <input type="text" id="f-title" placeholder="Título" required>
             <textarea id="f-msg" rows="4" placeholder="Mensaje" required></textarea>
-            <button type="submit" class="btn-main" style="width:100%; padding:15px;">PUBLICAR</button>
+            <button type="submit" class="btn-main" style="width:100%; padding:15px;">PUBLICA EN TV</button>
         </form>
     </aside>
 
@@ -239,17 +249,19 @@
                 });
             }
 
+            const cardOff = document.getElementById("card-off");
+            cardOff.querySelector('b').textContent = caidos.length;
             if(caidos.length > 0) {
-                // Ticker con separadores visuales
+                cardOff.classList.add('alert');
                 ticker.innerHTML = `⚠️ OFFLINE: ` + caidos.map(n => `<span class="offline-tag">${n}</span>`).join('');
                 ticker.style.color = "#ff4d4d";
-                // Lista para el panel lateral (móvil/PC)
                 offlineList.innerHTML = caidos.map(n => `
                     <div style="background:rgba(255,77,77,0.1); border:1px solid var(--critico); padding:15px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold; color:#ff4d4d;">
                         ⚠️ ${n}
                     </div>
                 `).join('');
             } else {
+                cardOff.classList.remove('alert');
                 ticker.innerHTML = `✔ Red estable en todos los servicios - Masterson Seguridad — `;
                 ticker.style.color = "#fff";
                 offlineList.innerHTML = `<p style="text-align:center; color:gray; margin-top:20px;">Todos los servicios operativos.</p>`;
@@ -262,8 +274,18 @@
         try {
             const resp = await fetch(DB_URL);
             logs = await resp.json() || [];
+            updateDashboardCounters();
             if(logs.length > 0 && !startTime) renderSlide();
         } catch(e) {}
+    }
+
+    function updateDashboardCounters() {
+        const criticos = logs.filter(l => l.priority === "Crítica").length;
+        const cardCrit = document.getElementById("card-crit");
+        cardCrit.querySelector('b').textContent = criticos;
+        if(criticos > 0) cardCrit.classList.add('alert'); else cardCrit.classList.remove('alert');
+        
+        document.getElementById("card-total").previousElementSibling.textContent = logs.length;
     }
 
     function renderSlide() {
@@ -346,7 +368,7 @@
             message: document.getElementById("e-msg").value
         };
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
-        hideEdit(); renderHistoryList(); renderSlide();
+        hideEdit(); renderHistoryList(); renderSlide(); updateDashboardCounters();
     }
 
     async function saveNew(e) {
