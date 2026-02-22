@@ -28,28 +28,41 @@
             opacity: 0.03; filter: grayscale(1); z-index: -1;
         }
 
-        /* HEADER */
+        /* HEADER & FULLSCREEN LOGIC */
         #cio-app .main-header {
             height: 80px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        /* Ocultar cabecera en Fullscreen */
+        #cio-app:fullscreen .main-header,
+        #cio-app:-webkit-full-screen .main-header {
+            display: none !important;
         }
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: var(--primary); font-weight: bold; }
 
-        /* MENU HAMBURGUESA MÓVIL */
-        #cio-app #menu-toggle {
-            display: none; background: none; border: 1px solid var(--primary);
-            color: var(--primary); font-size: 24px; padding: 5px 12px; border-radius: 8px; cursor: pointer;
+        /* BOTÓN FLOTANTE MÓVIL (TIPO HAMBURGUESA) */
+        #cio-app #menu-toggle-float {
+            display: none; position: fixed; bottom: 30px; right: 20px;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--primary); color: #000; border: none;
+            font-size: 24px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 212, 216, 0.4); z-index: 10015;
+            align-items: center; justify-content: center;
         }
 
         #cio-app #mobile-menu {
-            position: fixed; top: 80px; left: 0; width: 100%; background: rgba(0,0,0,0.95);
-            display: none; flex-direction: column; padding: 20px; gap: 15px; border-bottom: 2px solid var(--primary);
-            z-index: 10010; backdrop-filter: blur(10px); box-sizing: border-box;
+            position: fixed; bottom: 100px; right: 20px; width: 200px;
+            background: rgba(10, 26, 27, 0.95); display: none; flex-direction: column;
+            padding: 15px; gap: 10px; border: 1px solid var(--primary);
+            border-radius: 15px; z-index: 10010; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* ZONA EQUIPOS OFFLINE (VISTA TV) */
+        /* ZONA EQUIPOS OFFLINE */
         #cio-app #critical-alert-zone {
             background: rgba(255, 0, 0, 0.05);
             padding: 10px; display: flex; flex-direction: column; align-items: center;
@@ -68,17 +81,6 @@
             50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(255, 77, 77, 0.4); }
         }
 
-        /* EFECTO CRÍTICO (GLOW RADIAL) */
-        @keyframes critical-glow {
-            0% { box-shadow: inset 0 0 50px rgba(255, 77, 77, 0); }
-            50% { box-shadow: inset 0 0 150px rgba(255, 77, 77, 0.25); }
-            100% { box-shadow: inset 0 0 50px rgba(255, 77, 77, 0); }
-        }
-        .critical-active {
-            animation: critical-glow 2s infinite ease-in-out !important;
-            background: radial-gradient(circle, rgba(255, 77, 77, 0.08) 0%, rgba(0,0,0,0) 70%) !important;
-        }
-
         /* DISPLAY PRINCIPAL */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
@@ -87,7 +89,6 @@
 
         #cio-app .info-container { width: 100%; transition: all 0.6s ease-in-out; }
         #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-        #cio-app #titleDisplay { font-weight: 800; line-height: 1.1; text-transform: uppercase; margin: 10px 0; }
 
         /* PANELES */
         #cio-app .side-panel {
@@ -110,51 +111,44 @@
             font-size: 15px; text-align: center; box-sizing: border-box;
         }
 
-        #cio-app label { 
-            display: block; color: var(--primary); margin-bottom: 5px; 
-            font-size: 11px; font-weight: bold; text-transform: uppercase; 
-            text-align: center; letter-spacing: 1px;
-        }
-
         #cio-app .header-actions button, #cio-app #mobile-menu button {
             background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
             color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
+            width: 100%; margin-bottom: 5px;
         }
 
-        #cio-app #btn-caidos-mob { border-color: var(--critico); color: var(--critico); }
+        #cio-app .header-actions { display: flex; gap: 10px; }
+        #cio-app .header-actions button { width: auto; }
 
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
-            #cio-app #menu-toggle { display: block; }
-            #cio-app #critical-alert-zone, #cio-app #btn-fs-tv { display: none !important; }
+            #cio-app #menu-toggle-float { display: flex; }
+            #cio-app #critical-alert-zone { display: none !important; }
             #cio-app .side-panel { width: 100%; height: 95%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
         }
     </style>
 </head>
-<body>
+<body id="body-cio">
 
 <div id="cio-app">
     <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
 
     <header class="main-header">
-        <button id="menu-toggle" onclick="toggleMobileMenu()">☰</button>
-        
         <div class="header-actions">
             <button onclick="openForm()">＋ NUEVA</button>
             <button onclick="openHistory()">📋 HISTORIAL</button>
-            <button id="btn-fs-tv" onclick="toggleFS()">⛶ FS</button>
+            <button onclick="toggleFS()">⛶ PANTALLA COMPLETA</button>
         </div>
-
         <div id="clockDisplay">00:00:00</div>
         <div><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);"></div>
     </header>
 
+    <button id="menu-toggle-float" onclick="toggleMobileMenu()">☰</button>
     <div id="mobile-menu">
-        <button onclick="openForm(); toggleMobileMenu();">＋ NUEVA NOVEDAD</button>
+        <button onclick="openForm(); toggleMobileMenu();">＋ NUEVA</button>
         <button onclick="openHistory(); toggleMobileMenu();">📋 HISTORIAL</button>
-        <button id="btn-caidos-mob" onclick="openOfflinePanel(); toggleMobileMenu();">⚠️ EQUIPOS CAÍDOS (<span id="count-offline-mob">0</span>)</button>
-        <button onclick="toggleMobileMenu()" style="border:none; color:gray; font-size:12px; margin-top:10px;">CERRAR MENÚ</button>
+        <button onclick="openOfflinePanel(); toggleMobileMenu();" style="color:var(--critico); border-color:var(--critico);">⚠️ CAÍDOS (<span id="count-offline-mob">0</span>)</button>
     </div>
 
     <div id="critical-alert-zone">
@@ -167,12 +161,12 @@
             <div id="areaLabel">CIO MONITOR</div>
             <div id="prioBadge" style="display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--primary); margin: 15px 0; background: rgba(0, 212, 216, 0.1); font-size: 0.8rem;">SISTEMA ACTIVO</div>
             <h1 id="titleDisplay">...</h1>
-            <p id="messageDisplay">Conectando...</p>
+            <p id="messageDisplay">Cargando datos...</p>
         </div>
     </main>
 
     <div id="ticker-bar" style="height:40px; background:#050c0c; border-top:1px solid var(--primary); display:flex; align-items:center; overflow:hidden;">
-        <div id="ticker-content" style="white-space:nowrap; animation:scrollText 35s linear infinite; color:var(--primary); font-weight:bold; font-size:0.85rem;">SISTEMA OPERATIVO - MONITOREO EN TIEMPO REAL - CIO URUGUAY</div>
+        <div id="ticker-content" style="white-space:nowrap; animation:scrollText 35s linear infinite; color:var(--primary); font-weight:bold; font-size:0.85rem;">SISTEMA OPERATIVO - CIO URUGUAY - MONITOREO 24/7</div>
     </div>
     <div id="progressLine" style="position: fixed; bottom: 40px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
 
@@ -232,7 +226,11 @@
 
     function toggleMobileMenu() {
         const menu = document.getElementById("mobile-menu");
-        menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+        const overlay = document.getElementById("overlay");
+        const isVisible = menu.style.display === "flex";
+        
+        menu.style.display = isVisible ? "none" : "flex";
+        overlay.style.display = isVisible ? "none" : "block";
     }
 
     async function updateNetwork() {
@@ -256,7 +254,7 @@
             }
             container.innerHTML = htmlTV;
             if(countMob) countMob.textContent = caidos;
-            offList.innerHTML = htmlMob || "<p style='text-align:center;color:gray'>No hay equipos caídos.</p>";
+            offList.innerHTML = htmlMob || "<p style='text-align:center;color:gray'>Sin equipos caídos.</p>";
             document.getElementById("alert-msg").textContent = caidos > 0 ? "⚠️ EQUIPOS OFFLINE" : "✔ RED ESTABLE";
         } catch(e) {}
     }
@@ -321,8 +319,8 @@
                         <small style="color:gray">${it.area} - ${it.priority}</small>
                     </div>
                     <div style="display:flex; gap:5px;">
-                        <button onclick="showQuickEdit(${i})" style="background:var(--primary); border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer">EDITAR</button>
-                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:6px 10px; border-radius:6px; font-size:10px; cursor:pointer">ELIMINAR</button>
+                        <button onclick="showQuickEdit(${i})" style="background:var(--primary); border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer; color:#000;">EDITAR</button>
+                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:6px 10px; border-radius:6px; font-size:10px; cursor:pointer">BORRAR</button>
                     </div>
                 </div>
                 <div id="edit-anchor-${i}"></div>
@@ -384,7 +382,7 @@
     }
 
     async function deleteEntry(idx) {
-        if(!confirm("¿Eliminar novedad?")) return;
+        if(!confirm("¿Desea borrar esta novedad?")) return;
         logs.splice(idx, 1);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
         renderHistoryList(); syncEvents();
@@ -398,8 +396,13 @@
     }
     
     function toggleFS() { 
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-        else document.exitFullscreen();
+        const app = document.getElementById("cio-app");
+        if (!document.fullscreenElement) {
+            if (app.requestFullscreen) app.requestFullscreen();
+            else if (app.webkitRequestFullscreen) app.webkitRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
     }
 
     function mainLoop(ts) {
