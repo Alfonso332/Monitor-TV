@@ -12,7 +12,7 @@
 
     <style>
         #cio-app {
-            --primary: #006465;
+            --primary: #006465; /* Sustituido 00d4d8 por 006465 */
             --accent: #006465;
             --dark-bg: #000000;
             --critico: #ff4d4d;
@@ -45,7 +45,7 @@
             display: none !important;
         }
 
-        #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: var(--primary); font-weight: bold; }
+        #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: #fff; font-weight: bold; }
 
         /* BOTONES FLOTANTES */
         #cio-app #menu-toggle-float {
@@ -82,20 +82,16 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* MODAL DE EDICIÓN - AHORA CENTRADO Y GRANDE */
-        #cio-app #modalEdit {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
-            width: 90%; max-width: 500px; background: #0a1a1b; 
-            border: 2px solid var(--accent); border-radius: 20px; padding: 30px;
-            z-index: 10100; display: none; opacity: 0; transition: 0.3s;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        /* EDITOR DENTRO DEL HISTORIAL */
+        #cio-app .edit-box {
+            background: #000; border: 1px solid var(--accent); padding: 15px;
+            border-radius: 10px; margin-top: 15px; display: none;
         }
-        #cio-app #modalEdit.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 14px; background: #111; color: #fff; 
-            border: 1px solid #333; border-radius: 10px; margin-bottom: 15px; 
-            text-align: center; box-sizing: border-box; font-size: 16px;
+            width: 100%; padding: 10px; background: #111; color: #fff; 
+            border: 1px solid #333; border-radius: 8px; margin-bottom: 10px; 
+            text-align: center; box-sizing: border-box; font-size: 14px;
         }
 
         #cio-app .header-actions button, 
@@ -169,16 +165,15 @@
     
     <div id="progressLine" style="position: fixed; bottom: 50px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
 
-    <div id="modalEdit">
-        <h2 style="color:var(--primary); text-align:center; margin-top:0;">Editar Novedad</h2>
+    <div id="quickEdit" class="edit-box">
         <input type="hidden" id="e-index">
-        <label style="font-size:12px; color:gray;">TÍTULO</label>
-        <input type="text" id="e-title">
-        <label style="font-size:12px; color:gray;">MENSAJE</label>
-        <textarea id="e-msg" rows="6"></textarea>
+        <select id="e-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Tecnología</option></select>
+        <select id="e-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+        <input type="text" id="e-title" placeholder="Título">
+        <textarea id="e-msg" rows="4" placeholder="Mensaje"></textarea>
         <div style="display:flex; gap:10px;">
-            <button onclick="saveQuickEdit()" class="btn-main" style="flex:2;">GUARDAR CAMBIOS</button>
-            <button onclick="hideEdit()" style="flex:1; background:#222 !important; border:none; color:white; border-radius:8px;">CANCELAR</button>
+            <button onclick="saveQuickEdit()" class="btn-main" style="flex:1;">GUARDAR</button>
+            <button onclick="hideEdit()" style="flex:1; background:#222 !important; border:none; color:white;">CANCELAR</button>
         </div>
     </div>
 
@@ -230,8 +225,8 @@
                 ticker.innerHTML = `⚠️ OFFLINE: ${caidos.join(' • ')} — REVISAR ESTADO — `;
                 ticker.style.color = "#ff4d4d";
             } else {
-                ticker.innerHTML = `✔ Red estable en todos los servicios - Masterson Seguridad `;
-                ticker.style.color = "#006465";
+                ticker.innerHTML = `✔ Red estable en todos los servicios - Masterson Seguridad — `;
+                ticker.style.color = "#fff";
             }
             document.getElementById("count-offline-mob").textContent = caidos.length;
         } catch(e) {}
@@ -255,7 +250,7 @@
             document.getElementById("prioBadge").textContent = `PRIORIDAD ${item.priority}`;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
-            const colors = {"Baja":"#00d4d8", "Media":"#00ccff", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
+            const colors = {"Baja":"#006465", "Media":"#004d4e", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
             const color = colors[item.priority] || "#fff";
             document.getElementById("prioBadge").style.borderColor = color;
             document.getElementById("prioBadge").style.color = color;
@@ -276,9 +271,10 @@
     function openOfflinePanel() { document.getElementById("panelOffline").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     
     function closePanels() { 
-        document.querySelectorAll('.side-panel, #modalEdit').forEach(el => el.classList.remove('active')); 
+        document.querySelectorAll('.side-panel').forEach(el => el.classList.remove('active')); 
         document.getElementById("overlay").style.display = "none";
         document.getElementById("mobile-menu").style.display = "none";
+        hideEdit();
     }
 
     function renderHistoryList() {
@@ -292,28 +288,37 @@
                         <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:8px 12px; border-radius:6px; font-size:11px;">BORRAR</button>
                     </div>
                 </div>
+                <div id="edit-anchor-${i}"></div>
             </div>
         `).join('');
     }
 
     function showQuickEdit(idx) {
         const item = logs[idx];
+        const editBox = document.getElementById("quickEdit");
         document.getElementById("e-index").value = idx;
+        document.getElementById("e-area").value = item.area;
+        document.getElementById("e-prio").value = item.priority;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-        document.getElementById("modalEdit").classList.add("active");
-        document.getElementById("overlay").style.zIndex = "10050"; // Overlay sobre el historial
+        document.getElementById(`edit-anchor-${idx}`).appendChild(editBox);
+        editBox.style.display = "block";
     }
 
     function hideEdit() { 
-        document.getElementById("modalEdit").classList.remove("active"); 
-        document.getElementById("overlay").style.zIndex = "10002"; 
+        const editBox = document.getElementById("quickEdit");
+        editBox.style.display = "none"; 
+        document.body.appendChild(editBox);
     }
 
     async function saveQuickEdit() {
         const idx = document.getElementById("e-index").value;
-        logs[idx].title = document.getElementById("e-title").value;
-        logs[idx].message = document.getElementById("e-msg").value;
+        logs[idx] = {
+            area: document.getElementById("e-area").value,
+            priority: document.getElementById("e-prio").value,
+            title: document.getElementById("e-title").value,
+            message: document.getElementById("e-msg").value
+        };
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
         hideEdit(); renderHistoryList(); renderSlide();
     }
