@@ -33,17 +33,31 @@
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            /* Bajamos la opacidad y añadimos filtro de brillo para oscurecer */
             opacity: 0.15; 
             filter: brightness(0.5); 
             z-index: -1;
         }
 
         #cio-app .main-header {
-            height: 60px; display: flex; justify-content: space-between; align-items: center;
+            height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.2); z-index: 100;
         }
+
+        /* NUEVO: CONTENEDOR DE ESTATUS DE RED */
+        #network-status {
+            display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+        }
+        .status-dot-item {
+            display: flex; align-items: center; gap: 8px; font-size: 10px; 
+            font-weight: bold; letter-spacing: 1px; color: #aaa;
+        }
+        .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            transition: 0.5s;
+        }
+        .dot.online { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        .dot.offline { background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
 
         #cio-app .header-actions button {
             background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
@@ -56,7 +70,6 @@
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
-            /* Oscurecemos el gradiente radial para mayor contraste */
             background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
         }
 
@@ -118,7 +131,7 @@
             #cio-app .side-panel.active { transform: translateY(0); }
             #cio-app #display-board { padding-bottom: 140px; }
             #cio-app #clockDisplay { font-size: 1.2rem; }
-            #cio-app::before { background-size: 80%; opacity: 0.1; }
+            #cio-app #network-status { align-items: center; width: 100%; margin-top: 5px; }
         }
 
         #cio-app #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; z-index: 999; }
@@ -137,7 +150,13 @@
             <button onclick="handleCerrarTurno()" style="border-color: #ff4d4d; color: #ff4d4d;">🔒 CERRAR TURNO</button>
             <button onclick="toggleFS()">⛶ TV</button>
         </div>
-        <div id="clockDisplay">00:00:00</div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div id="clockDisplay">00:00:00</div>
+            <div id="network-status">
+                <div class="status-dot-item">SINCRONIZANDO RED...</div>
+            </div>
+        </div>
     </header>
 
     <main id="display-board">
@@ -204,10 +223,34 @@
 
 <script>
     const API_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
+    
     let dataStore = [];
     let currentIndex = 0;
     let timerStart = null;
     const DISPLAY_TIME = 15;
+
+    // --- FUNCIÓN PARA SINCRONIZAR ESTATUS DE RED ---
+    async function syncNetwork() {
+        try {
+            const r = await fetch(RED_URL);
+            const statusData = await r.json();
+            if(!statusData) return;
+
+            let html = "";
+            for(let key in statusData) {
+                const item = statusData[key];
+                const dotClass = item.estado === "online" ? "online" : "offline";
+                html += `
+                    <div class="status-dot-item">
+                        <div class="dot ${dotClass}"></div>
+                        ${item.nombre}
+                    </div>
+                `;
+            }
+            document.getElementById("network-status").innerHTML = html;
+        } catch(e) { console.error("Error Red Sync"); }
+    }
 
     async function syncData() {
         try {
@@ -382,8 +425,11 @@
 
     setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}); }, 1000);
     setInterval(syncData, 15000);
+    setInterval(syncNetwork, 10000); // Revisa la red cada 10 seg
     window.addEventListener('resize', adjustText);
+    
     syncData();
+    syncNetwork();
     requestAnimationFrame(runLoop);
 </script>
 </body>
