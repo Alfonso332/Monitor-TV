@@ -11,9 +11,10 @@
     <meta name="apple-mobile-web-app-title" content="CIO Monitor">
 
     <style>
+        /* Encapsulamiento total bajo el ID #cio-app */
         #cio-app {
             --primary: #00d4d8;
-            --accent: #006465; 
+            --accent: #006465; /* Tu color corporativo solicitado */
             --dark-bg: #000000;
             --critico: #ff4d4d;
             --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
@@ -23,7 +24,7 @@
             color: #ffffff !important;
             font-family: 'Segoe UI', Roboto, sans-serif !important;
             display: flex; flex-direction: column;
-            overflow: hidden; z-index: 99999; margin: 0; padding: 0;
+            overflow: hidden; z-index: 999999; margin: 0; padding: 0;
         }
 
         #cio-app::before {
@@ -40,31 +41,32 @@
             border-bottom: 1px solid var(--accent);
         }
 
-        #cio-app:fullscreen .main-header, #cio-app:-webkit-full-screen .main-header {
+        /* Ocultar barra superior en Fullscreen */
+        #cio-app:fullscreen .main-header,
+        #cio-app:-webkit-full-screen .main-header {
             display: none !important;
         }
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: var(--primary); font-weight: bold; }
 
-        /* BOTÓN FLOTANTE MÓVIL */
+        /* BOTÓN FLOTANTE MÓVIL (ABAJO A LA DERECHA) */
         #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 60px; right: 20px;
+            display: none; position: fixed; bottom: 70px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
             background: var(--accent); color: #fff; border: none;
             font-size: 24px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 100, 101, 0.4); z-index: 10015;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); z-index: 10015;
             align-items: center; justify-content: center;
         }
 
         #cio-app #mobile-menu {
-            position: fixed; bottom: 130px; right: 20px; width: 220px;
+            position: fixed; bottom: 140px; right: 20px; width: 220px;
             background: rgba(10, 26, 27, 0.98); display: none; flex-direction: column;
             padding: 15px; gap: 10px; border: 1px solid var(--accent);
             border-radius: 15px; z-index: 10010; backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        /* DISPLAY PRINCIPAL */
+        /* DISPLAY PRINCIPAL - CAMPOS CENTRADOS */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
@@ -73,7 +75,7 @@
         #cio-app .info-container { width: 100%; transition: all 0.6s ease-in-out; }
         #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(10px); }
 
-        /* PANELES */
+        /* PANELES LATERALES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a1a1b; border-left: 2px solid var(--accent); padding: 25px;
@@ -90,18 +92,36 @@
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 12px; background: #111; color: #fff; 
             border: 1px solid #333; border-radius: 10px; margin-bottom: 12px; 
-            text-align: center; box-sizing: border-box;
+            text-align: center; box-sizing: border-box; font-size: 16px;
         }
 
-        #cio-app .header-actions button, #cio-app #mobile-menu button, #cio-app .btn-main {
-            background: var(--accent) !important; border: none !important;
+        /* BOTONES UNIFICADOS AL COLOR 006465 */
+        #cio-app .header-actions button, 
+        #cio-app #mobile-menu button,
+        #cio-app .btn-main,
+        #cio-app #panelOffline button {
+            background: var(--accent) !important;
+            border: none !important;
             color: #fff !important; padding: 10px 15px; border-radius: 8px; 
             font-weight: bold; cursor: pointer;
         }
 
-        /* TICKER ANIMATION */
+        #cio-app button:hover { filter: brightness(1.2); }
+
+        /* TICKER INFERIOR */
+        #cio-app #ticker-bar {
+            height: 50px; background: #050c0c; border-top: 1px solid var(--accent);
+            display: flex; align-items: center; overflow: hidden; position: relative;
+        }
+
+        #cio-app #ticker-content {
+            white-space: nowrap; position: absolute;
+            animation: scrollText 25s linear infinite;
+            font-weight: bold; font-size: 1rem;
+        }
+
         @keyframes scrollText {
-            0% { transform: translateX(100%); }
+            0% { transform: translateX(100vw); }
             100% { transform: translateX(-100%); }
         }
 
@@ -132,22 +152,22 @@
     <div id="mobile-menu">
         <button onclick="openForm(); toggleMobileMenu();">＋ NUEVA NOVEDAD</button>
         <button onclick="openHistory(); toggleMobileMenu();">📋 HISTORIAL</button>
-        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:var(--accent) !important;">OFFLINE (<span id="count-offline-mob">0</span>)</button>
+        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob">OFFLINE (<span id="count-offline-mob">0</span>)</button>
         <button onclick="toggleMobileMenu()" style="background:transparent !important; border:1px solid #444 !important; font-size:12px; margin-top:10px;">CERRAR</button>
     </div>
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel">CIO MONITOR</div>
+            <div id="areaLabel" style="letter-spacing: 2px; color: var(--primary);">CIO MONITOR</div>
             <div id="prioBadge" style="display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--accent); margin: 15px 0; background: rgba(0, 100, 101, 0.1); font-size: 0.8rem;">SISTEMA ACTIVO</div>
-            <h1 id="titleDisplay" style="margin:10px 0;">...</h1>
-            <p id="messageDisplay" style="font-size: 1.5rem; opacity: 0.8; max-width: 800px; margin: 0 auto;">Cargando...</p>
+            <h1 id="titleDisplay" style="margin:10px 0; line-height: 1.1;">...</h1>
+            <p id="messageDisplay" style="font-size: 1.6rem; opacity: 0.8; max-width: 850px; margin: 0 auto;">Cargando servicios...</p>
         </div>
     </main>
 
-    <div id="ticker-bar" style="height:50px; background:#050c0c; border-top:1px solid var(--accent); display:flex; align-items:center; overflow:hidden; position: relative;">
-        <div id="ticker-content" style="white-space:nowrap; position: absolute; animation: scrollText 25s linear infinite; color:var(--primary); font-weight:bold; font-size:1rem; width: 100%; text-align: center;">
-            Sincronizando estado de red...
+    <div id="ticker-bar">
+        <div id="ticker-content" style="color: var(--primary);">
+            ✔ RED ESTABLE EN TODOS LOS SERVICIOS — MONITOREO CIO URUGUAY — 
         </div>
     </div>
     
@@ -166,7 +186,7 @@
                 <button onclick="hideEdit()" style="flex:1; background:#222 !important;">CANCELAR</button>
             </div>
         </div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:gray; padding:10px; border-radius:10px;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none !important; border:1px solid #333 !important; color:gray !important;">CERRAR</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
@@ -177,14 +197,14 @@
             <input type="text" id="f-title" placeholder="Título" required>
             <textarea id="f-msg" rows="4" placeholder="Mensaje" required></textarea>
             <button type="submit" class="btn-main" style="width:100%; padding:15px;">PUBLICAR</button>
-            <button type="button" onclick="closePanels()" style="width:100%; margin-top:10px; background:none; border:1px solid #444; color:white; padding:10px;">CANCELAR</button>
+            <button type="button" onclick="closePanels()" style="width:100%; margin-top:10px; background:none !important; border:1px solid #444 !important;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelOffline" class="side-panel">
         <h2 style="color:var(--critico); text-align:center;">Offline</h2>
         <div id="offlineList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:var(--critico) !important; color:white; padding:15px; border-radius:10px; font-weight:bold;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px;">CERRAR</button>
     </aside>
 </div>
 
@@ -211,7 +231,6 @@
             const status = await resp.json();
             const ticker = document.getElementById("ticker-content");
             const countMob = document.getElementById("count-offline-mob");
-            const btnOffMob = document.getElementById("btn-offline-mob");
             const offList = document.getElementById("offlineList");
             
             let caidos = [];
@@ -222,18 +241,16 @@
             }
 
             if(caidos.length > 0) {
-                ticker.innerHTML = `⚠️ OFFLINE: ${caidos.join(' • ')} — REVISAR CONEXIÓN URGENTE — `;
+                ticker.innerHTML = `⚠️ OFFLINE: ${caidos.join(' • ')} — FAVOR VERIFICAR CONEXIÓN — `;
                 ticker.style.color = "#ff4d4d";
-                btnOffMob.style.background = "#ff4d4d !important";
                 offList.innerHTML = caidos.map(n => `<div style="padding:15px; background:rgba(255,77,77,0.1); border:1px solid red; border-radius:10px; margin-bottom:10px; text-align:center;">⚠️ ${n}</div>`).join('');
             } else {
-                ticker.innerHTML = `✔ RED ESTABLE EN TODOS LOS SERVICIOS — CIO URUGUAY — MONITOREO 24/7 — `;
+                ticker.innerHTML = `✔ RED ESTABLE EN TODOS LOS SERVICIOS — CIO URUGUAY — MONITOREO TIEMPO REAL — `;
                 ticker.style.color = "#00d4d8";
-                btnOffMob.style.background = "var(--accent) !important";
                 offList.innerHTML = "<p style='text-align:center;color:gray'>Todos los servicios operativos.</p>";
             }
             if(countMob) countMob.textContent = caidos.length;
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     }
 
     async function syncEvents() {
@@ -271,7 +288,7 @@
 
     function autoSizeText() {
         const t = document.getElementById('titleDisplay');
-        t.style.fontSize = window.innerWidth < 768 ? "32px" : "70px";
+        t.style.fontSize = window.innerWidth < 768 ? "34px" : "70px";
     }
 
     function openHistory() { renderHistoryList(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
@@ -292,7 +309,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div style="text-align:left"><strong style="font-size:14px">${it.title}</strong><br><small style="color:gray">${it.area}</small></div>
                     <div style="display:flex; gap:5px;">
-                        <button onclick="showQuickEdit(${i})" style="background:var(--accent); border:none; padding:6px 10px; border-radius:6px; font-size:10px; color:#fff;">EDITAR</button>
+                        <button onclick="showQuickEdit(${i})" style="padding:6px 10px; border-radius:6px; font-size:10px; background:var(--accent); color:white; border:none;">EDITAR</button>
                         <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:6px 10px; border-radius:6px; font-size:10px;">BORRAR</button>
                     </div>
                 </div>
