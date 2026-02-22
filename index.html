@@ -32,10 +32,8 @@
             transition: background 0.5s ease;
         }
 
-        /* EFECTO MODO EMERGENCIA (Punto 2) */
-        #cio-app.emergency-active {
-            animation: emergencyGlow 2s infinite;
-        }
+        /* MODO EMERGENCIA */
+        #cio-app.emergency-active { animation: emergencyGlow 2s infinite; }
         @keyframes emergencyGlow {
             0% { background-color: #000; }
             50% { background-color: #1a0505; }
@@ -55,29 +53,20 @@
             padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary);
         }
-        #cio-app:fullscreen .main-header,
-        #cio-app:-webkit-full-screen .main-header { display: none !important; }
+        #cio-app:fullscreen .main-header { display: none !important; }
 
-        #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; font-weight: bold; }
-
-        /* DASHBOARD ESTÉTICO (Punto 3) */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        /* DASHBOARD ESTÉTICO */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card {
             background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            padding: 15px 5px; border-radius: 12px;
-            text-align: center; border: 1px solid rgba(0, 209, 209, 0.2);
-            transition: all 0.4s ease;
+            padding: 12px 5px; border-radius: 12px; text-align: center; border: 1px solid rgba(0, 209, 209, 0.2);
         }
-        .stat-card.alert { 
-            border-color: var(--critico); 
-            background: rgba(255, 77, 77, 0.05);
-            box-shadow: 0 0 15px rgba(255, 77, 77, 0.1);
-        }
-        .stat-card b { font-size: 1.6rem; color: var(--accent); }
+        .stat-card.alert { border-color: var(--critico); background: rgba(255, 77, 77, 0.05); box-shadow: 0 0 10px rgba(255, 77, 77, 0.1); }
+        .stat-card b { font-size: 1.4rem; color: var(--accent); }
         .stat-card.alert b { color: var(--critico); }
-        .stat-card span { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; margin-top: 5px; }
+        .stat-card span { display: block; font-size: 0.6rem; color: #888; text-transform: uppercase; margin-top: 4px; }
 
-        /* BOTÓN FLOTANTE MÓVIL */
+        /* BOTÓN FLOTANTE MÓVIL ABAJO DERECHA */
         #cio-app #menu-toggle-float {
             display: none; position: fixed; bottom: 30px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
@@ -107,21 +96,19 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* QUICK EDIT CENTRADO */
-        #cio-app #quickEdit {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 380px; background: #0a1a1b; border: 2px solid var(--accent);
-            padding: 25px; border-radius: 20px; z-index: 10050; display: none;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        /* CAJA DE EDICIÓN DESPLEGABLE (ABAJO DE LA TARJETA) */
+        #cio-app .edit-box {
+            background: #000; border: 1px solid var(--accent); padding: 15px;
+            border-radius: 12px; margin-top: 10px; display: none;
         }
 
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 12px; background: #000; color: #fff; 
-            border: 1px solid #222; border-radius: 8px; margin-bottom: 12px; text-align: center; box-sizing: border-box;
+            width: 100%; padding: 10px; background: #111; color: #fff; 
+            border: 1px solid #333; border-radius: 8px; margin-bottom: 10px; text-align: center; box-sizing: border-box;
         }
 
         #cio-app button.btn-main, #cio-app .header-actions button {
-            background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: bold; cursor: pointer;
+            background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
         /* TICKER BAR */
@@ -132,7 +119,7 @@
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
             #cio-app #menu-toggle-float { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; }
+            #cio-app .side-panel { width: 100%; height: 92%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
         }
     </style>
@@ -140,7 +127,7 @@
 <body onclick="handleGlobalClick(event)">
 
 <div id="cio-app">
-    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10002; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
+    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(4px);" onclick="closePanels()"></div>
 
     <header class="main-header">
         <div class="header-actions">
@@ -148,7 +135,7 @@
             <button onclick="openHistory()" style="background:#222; margin-left:8px;">📋 HISTORIAL</button>
             <button onclick="toggleFS()" style="background:none; border:1px solid #333; margin-left:8px;">⛶ TV</button>
         </div>
-        <div id="clockDisplay">00:00:00</div>
+        <div id="clockDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:bold;">00:00:00</div>
         <div><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);"></div>
     </header>
 
@@ -161,39 +148,40 @@
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 4px; font-weight: 900; font-size: 0.9rem; text-transform: uppercase;">SISTEMA OPERATIVO</div>
+            <div id="areaLabel" style="letter-spacing: 4px; font-weight: 900; font-size: 0.9rem; text-transform: uppercase;">MONITOREO ACTIVO</div>
             <div id="prioBadge" style="display: inline-block; padding: 6px 25px; border-radius: 50px; font-weight: 900; border: 1px solid var(--accent); margin: 20px 0; font-size: 0.8rem; background: rgba(0,0,0,0.5);">ESTADO OK</div>
-            <h1 id="titleDisplay" style="margin:10px 0; line-height: 1.1; font-size: 70px;">...</h1>
-            <p id="messageDisplay" style="font-size: 1.8rem; opacity: 0.8; max-width: 900px; margin: 0 auto;">Iniciando...</p>
+            <h1 id="titleDisplay" style="margin:10px 0; line-height: 1.1; font-size: 70px;">BIENVENIDO</h1>
+            <p id="messageDisplay" style="font-size: 1.8rem; opacity: 0.8; max-width: 900px; margin: 0 auto;">Sincronizando datos...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">Sincronizando con Masterson Seguridad...</div>
+        <div id="ticker-content">CARGANDO SERVICIOS...</div>
     </div>
     
     <div id="progressLine" style="position: fixed; bottom: 45px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
 
-    <div id="quickEdit">
-        <h3 style="margin-top:0; text-align:center; color:var(--accent);">Editar Novedad</h3>
+    <div id="quickEdit" class="edit-box">
         <input type="hidden" id="e-index">
         <select id="e-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
         <select id="e-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
         <input type="text" id="e-title">
-        <textarea id="e-msg" rows="4"></textarea>
-        <button onclick="saveQuickEdit()" class="btn-main" style="width:100%; padding:15px;">ACTUALIZAR</button>
-        <button onclick="hideEdit()" style="width:100%; margin-top:10px; background:none; border:none; color:gray; cursor:pointer;">CANCELAR</button>
+        <textarea id="e-msg" rows="3"></textarea>
+        <div style="display:flex; gap:8px;">
+            <button onclick="saveQuickEdit()" class="btn-main" style="flex:1;">GUARDAR</button>
+            <button onclick="hideEdit()" style="flex:1; background:#222; border:none; color:white; border-radius:8px; cursor:pointer;">CERRAR</button>
+        </div>
     </div>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center;">Estado de Central</h2>
         <div class="stats-grid">
-            <div class="stat-card" id="card-off"><b>0</b><span>Servicios Off</span></div>
+            <div class="stat-card" id="card-off"><b>0</b><span>Off</span></div>
             <div class="stat-card" id="card-crit"><b>0</b><span>Críticos</span></div>
             <div class="stat-card"><b>0</b><span id="card-total">Total</span></div>
         </div>
         <div id="historyList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:white; padding:10px; border-radius:8px;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:white; padding:10px; border-radius:8px;">SALIR</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
@@ -202,13 +190,13 @@
             <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
             <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
             <input type="text" id="f-title" placeholder="Título" required>
-            <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
+            <textarea id="f-msg" rows="4" placeholder="Descripción..." required></textarea>
             <button type="submit" class="btn-main" style="width:100%; padding:15px;">PUBLICAR</button>
         </form>
     </aside>
 
     <aside id="panelOffline" class="side-panel">
-        <h2 style="color:var(--critico); text-align:center;">Alertas de Conexión</h2>
+        <h2 style="color:var(--critico); text-align:center;">Servicios Offline</h2>
         <div id="offlineList"></div>
         <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:white; padding:10px;">CERRAR</button>
     </aside>
@@ -239,25 +227,22 @@
             const resp = await fetch(RED_URL);
             const status = await resp.json();
             const ticker = document.getElementById("ticker-content");
-            const offlineList = document.getElementById("offlineList");
             let caidos = [];
-            
             if(status) {
                 Object.keys(status).forEach(id => { 
                     if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); 
                 });
             }
-
             const cardOff = document.getElementById("card-off");
             cardOff.querySelector('b').textContent = caidos.length;
             if(caidos.length > 0) {
                 cardOff.classList.add('alert');
                 ticker.innerHTML = `⚠️ OFFLINE: ` + caidos.map(n => `<span style="color:#ff4d4d; margin:0 15px;">[${n}]</span>`).join('');
-                offlineList.innerHTML = caidos.map(n => `<div style="background:rgba(255,77,77,0.1); border:1px solid var(--critico); padding:15px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold; color:#ff4d4d;">⚠️ ${n}</div>`).join('');
+                document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="background:rgba(255,77,77,0.1); border:1px solid var(--critico); padding:12px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold; color:#ff4d4d;">⚠️ ${n}</div>`).join('');
             } else {
                 cardOff.classList.remove('alert');
                 ticker.innerHTML = `✔ SERVICIOS OPERATIVOS — MASTERSON SEGURIDAD — `;
-                offlineList.innerHTML = `<p style="text-align:center; color:gray;">No hay servicios caídos.</p>`;
+                document.getElementById("offlineList").innerHTML = `<p style="text-align:center; color:gray;">Red estable.</p>`;
             }
             document.getElementById("count-offline-mob").textContent = caidos.length;
         } catch(e) {}
@@ -289,17 +274,9 @@
 
         setTimeout(() => {
             const item = logs[currentIdx % logs.length];
-            
-            // Lógica de colores por Área y Modo Emergencia
-            const areaColors = {
-                "Monitoreo": "var(--color-monitoreo)",
-                "Atención": "var(--color-atencion)",
-                "Freschat": "var(--color-freschat)",
-                "Novedad Interna": "var(--color-interna)"
-            };
+            const areaColors = { "Monitoreo": "var(--color-monitoreo)", "Atención": "var(--color-atencion)", "Freschat": "var(--color-freschat)", "Novedad Interna": "var(--color-interna)" };
             const currentAreaColor = areaColors[item.area] || "var(--accent)";
 
-            // Modo Emergencia si es Crítica
             if(item.priority === "Crítica") app.classList.add("emergency-active");
             else app.classList.remove("emergency-active");
 
@@ -311,7 +288,6 @@
             
             const prioColors = {"Baja":"#00d1d1", "Media":"#ffcc00", "Alta":"#ff8000", "Crítica":"#ff4d4d"};
             const pColor = prioColors[item.priority] || "#fff";
-            
             document.getElementById("prioBadge").style.borderColor = pColor;
             document.getElementById("prioBadge").style.color = pColor;
             document.getElementById("progressLine").style.background = pColor;
@@ -348,22 +324,30 @@
                         <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:8px 12px; border-radius:6px; font-size:11px;">BORRAR</button>
                     </div>
                 </div>
+                <div id="edit-anchor-${i}"></div>
             </div>
         `).join('');
     }
 
     function showQuickEdit(idx) {
         const item = logs[idx];
+        const editBox = document.getElementById("quickEdit");
         document.getElementById("e-index").value = idx;
         document.getElementById("e-area").value = item.area;
         document.getElementById("e-prio").value = item.priority;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-        document.getElementById("quickEdit").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
+        
+        // MOVEMOS LA CAJA DE EDICIÓN AL ANCLA DE ESTA TARJETA
+        document.getElementById(`edit-anchor-${idx}`).appendChild(editBox);
+        editBox.style.display = "block";
     }
 
-    function hideEdit() { document.getElementById("quickEdit").style.display = "none"; }
+    function hideEdit() { 
+        const eb = document.getElementById("quickEdit");
+        eb.style.display = "none";
+        document.body.appendChild(eb); // Lo sacamos del historial para no romper el render
+    }
 
     async function saveQuickEdit() {
         const idx = document.getElementById("e-index").value;
@@ -374,7 +358,7 @@
             message: document.getElementById("e-msg").value
         };
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
-        hideEdit(); closePanels(); syncEvents();
+        hideEdit(); renderHistoryList(); syncEvents();
     }
 
     async function saveNew(e) {
