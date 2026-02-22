@@ -6,7 +6,7 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS ENCAPSULADO PARA EVITAR CHOQUES */
+        /* CSS ENCAPSULADO */
         #cio-app {
             --primary: #00d4d8;
             --accent: #006465;
@@ -22,7 +22,9 @@
             overflow: hidden; margin: 0; padding: 0; z-index: 9999;
         }
 
-        /* CAPA DE IMAGEN CENTRADA SIN ESTIRAR */
+        /* OCULTAR HEADER EN FULLSCREEN */
+        #cio-app:fullscreen .main-header { display: none; }
+
         #cio-app::before {
             content: "";
             position: absolute; inset: 0;
@@ -31,11 +33,9 @@
             background-position: center;
             background-repeat: no-repeat;
             opacity: 0.25;
-            filter: blur(0px);
             z-index: -1;
         }
 
-        /* HEADER */
         #cio-app .main-header {
             height: 60px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.7); backdrop-filter: blur(15px);
@@ -50,7 +50,6 @@
 
         #cio-app #clockDisplay { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
 
-        /* TABLERO CENTRAL */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
@@ -72,12 +71,10 @@
         #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin: 0 0 20px 0; color: #fff; text-shadow: 0 2px 15px rgba(0,0,0,1); }
         #cio-app #messageDisplay { font-weight: 400; color: #ffffff; line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; text-shadow: 0 2px 8px rgba(0,0,0,1); }
 
-        /* TICKER INFERIOR */
         #cio-app #ticker-bar { height: 40px; background: rgba(10, 26, 27, 0.95); border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; backdrop-filter: blur(10px); }
         #cio-app #ticker-content { white-space: nowrap; animation: ticker-scroll-cio 30s linear infinite; color: var(--primary); font-size: 0.9rem; font-weight: bold; }
         @keyframes ticker-scroll-cio { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* NAVEGACIÓN MOBILE */
         #cio-app .nav-mobile {
             display: none; height: 95px; background: rgba(7, 18, 19, 0.98); border-top: 1px solid var(--primary);
             justify-content: space-around; align-items: flex-start; padding-top: 15px;
@@ -89,7 +86,6 @@
         }
         #cio-app .nav-mobile .icon { font-size: 24px; color: var(--primary); }
 
-        /* PANELES LATERALES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 350px; height: 100%;
             background: #091718; border-left: 2px solid var(--primary); padding: 30px;
@@ -100,7 +96,6 @@
         #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; z-index: 1050; }
         #cio-app #overlay-cio.active { display: block; }
 
-        /* ELEMENTOS FORMULARIO */
         #cio-app h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid var(--accent);
@@ -162,7 +157,7 @@
 
     <aside id="panelForm" class="side-panel">
         <h2>Nueva Entrada</h2>
-        <form onsubmit="handleSave(event)">
+        <form id="mainForm" onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
             <label>Tipo de Evento</label>
             <select id="f-type">
@@ -215,8 +210,7 @@
             const r = await fetch(API_URL);
             const d = await r.json();
             const now = Date.now();
-            const raw = d || [];
-            dataStore = raw.filter(item => (item.type === 'diaria' && (now - item.timestamp > 86400000)) ? false : true);
+            dataStore = (d || []).filter(item => (item.type === 'diaria' && (now - item.timestamp > 86400000)) ? false : true);
             if(dataStore.length > 0) {
                 const last = dataStore[dataStore.length - 1];
                 document.getElementById("ticker-content").textContent = `[ÚLTIMO] ${last.area}: ${last.title} ——— `;
@@ -262,43 +256,43 @@
         };
         if(id === -1) dataStore.push(entry); else dataStore[id] = entry;
         await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore) });
+        document.getElementById("mainForm").reset(); // Reset tras guardar
         closeAll(); syncData();
     }
 
     async function handleCerrarTurno() {
         if(!confirm("¿Cerrar turno? Se descargará el PDF (solo Diarias) y se limpiará el sistema.")) return;
-        
         generatePDF();
-        
         setTimeout(async () => {
             const soloDiarias = dataStore.filter(i => i.type === 'diaria');
             await fetch(API_URL, { method: 'PUT', body: JSON.stringify(soloDiarias.length ? soloDiarias : null) });
-            currentIndex = 0; 
-            syncData();
+            currentIndex = 0; syncData();
         }, 2000);
     }
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // Solo incluimos las DIARIAS en el reporte
         const diariasParaReporte = dataStore.filter(i => i.type === 'diaria');
-
         const responsable = prompt("Nombre del Responsable:");
-        const turno = prompt("Turno (Ej: Mañana, Tarde, Noche):");
+        
+        // LÓGICA DE TURNOS AUTOMÁTICA
+        const hora = new Date().getHours();
+        let turno = "";
+        if (hora >= 6 && hora < 14) turno = "Mañana";
+        else if (hora >= 14 && hora < 22) turno = "Tarde";
+        else turno = "Noche";
 
         doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE CIO OPERATIVO", 20, 20);
-        
         doc.setFontSize(10);
         doc.text(`Responsable: ${responsable || '---'}`, 20, 28);
-        doc.text(`Turno: ${turno || '---'}`, 20, 33);
-        doc.text(`Fecha: ${new Date().toLocaleString()}`, 140, 33);
+        doc.text(`Turno Detectado: ${turno}`, 20, 33);
+        doc.text(`Fecha/Hora: ${new Date().toLocaleString()}`, 130, 33);
 
         let y = 55;
         if(diariasParaReporte.length === 0) {
-            doc.setTextColor(100); doc.text("No se registraron novedades diarias en este turno.", 20, y);
+            doc.setTextColor(100); doc.text("No se registraron novedades diarias importantes en este turno.", 20, y);
         } else {
             diariasParaReporte.forEach((item, i) => {
                 if(y > 270) { doc.addPage(); y = 20; }
@@ -309,7 +303,7 @@
                 doc.text(lines, 25, y); y += (lines.length * 7) + 10;
             });
         }
-        doc.save(`Reporte_CIO_${Date.now()}.pdf`);
+        doc.save(`Reporte_CIO_${turno}_${Date.now()}.pdf`);
     }
 
     function openHistory() {
@@ -363,9 +357,17 @@
         }
     }
 
-    function openForm() { document.getElementById("editId").value = "-1"; document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay-cio").classList.add("active"); }
+    function openForm() { 
+        document.getElementById("editId").value = "-1"; 
+        document.getElementById("mainForm").reset(); // Limpia al abrir nuevo
+        document.getElementById("panelForm").classList.add("active"); 
+        document.getElementById("overlay-cio").classList.add("active"); 
+    }
     function closeAll() { document.querySelectorAll('.side-panel, #overlay-cio').forEach(el => el.classList.remove('active')); }
-    function toggleFS() { if (!document.fullscreenElement) document.getElementById('cio-app').requestFullscreen(); else document.exitFullscreen(); }
+    function toggleFS() { 
+        const app = document.getElementById('cio-app');
+        if (!document.fullscreenElement) app.requestFullscreen(); else document.exitFullscreen(); 
+    }
 
     function runLoop(ts) {
         if(!dataStore.length) { requestAnimationFrame(runLoop); return; }
