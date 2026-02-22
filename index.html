@@ -3,404 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO MONITOR | MASTERSON ELITE</title>
+    <title>SISTEMA DE NOVEDADES | MASTERSON</title>
     
     <link rel="apple-touch-icon" href="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        /* CSS DE ALTA DENSIDAD - ESTRUCTURA MASTERSON 
-           Diseñado para no colisionar con estilos externos mediante el uso del ID raíz #cio-app
+        /* ARQUITECTURA VISUAL MASTERSON v6.0 
+           Diseño centrado, tipografía masiva y sistema de alertas de bajo perfil.
         */
-        
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&family=JetBrains+Mono:wght@300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700;900&family=JetBrains+Mono:wght@300&display=swap');
 
         #cio-app {
-            /* Variables de Diseño Editorial */
-            --p-gold: #C5A059;
-            --p-gold-muted: rgba(197, 160, 89, 0.2);
-            --bg-deep: #050505;
-            --bg-surface: #0f0f0f;
-            --bg-glass: rgba(15, 15, 15, 0.85);
-            --text-h: #ffffff;
-            --text-p: #a0a0a0;
-            --text-dim: #444444;
-            --critico: #ff3b30;
-            --baja: #34c759;
-            --media: #ffcc00;
-            --alta: #ff9500;
+            --p-oro: #C5A059;
+            --p-oro-tenue: rgba(197, 160, 89, 0.1);
+            --fondo-negro: #050505;
+            --fondo-superficie: #0f0f0f;
+            --texto-puro: #ffffff;
+            --texto-gris: #888888;
+            --critico-fondo: #2a0505; /* Rojo muy oscuro solicitado */
+            --critico-texto: #ff4d4d;
+            --baja: #4ade80;
+            --media: #fbbf24;
+            --alta: #fb923c;
             
-            /* Área Colores */
-            --c-mon: #ff453a;
-            --c-atn: #32d74b;
-            --c-fre: #0a84ff;
-            --c-int: #ffffff;
-
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--bg-deep) !important;
-            color: var(--text-h) !important;
+            background: var(--fondo-negro) !important;
+            color: var(--texto-puro) !important;
             font-family: 'Inter', sans-serif !important;
             display: flex; flex-direction: column;
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-            -webkit-font-smoothing: antialiased;
+            transition: background 1s ease;
         }
 
-        /* --- BACKGROUND ENGINE --- */
-        #cio-app #bg-canvas {
-            position: absolute; inset: 0; z-index: 0;
-            pointer-events: none; opacity: 0.4;
+        /* --- FONDO CINEMÁTICO --- */
+        #cio-app canvas#bg-canvas {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.3;
         }
 
-        #cio-app .vignette {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
-            z-index: 1; pointer-events: none;
+        /* --- CABECERA DE ALTA GAMA --- */
+        #cio-app .header-elite {
+            height: 100px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 4%; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+        #cio-app:fullscreen .header-elite { display: none !important; }
+
+        .brand-container { display: flex; align-items: center; gap: 15px; }
+        .brand-container img { height: 45px; filter: grayscale(1) brightness(2.5); }
+        .brand-text { border-left: 1px solid #333; padding-left: 15px; }
+        .brand-text h2 { margin: 0; font-size: 14px; letter-spacing: 3px; font-weight: 900; color: var(--texto-puro); text-transform: uppercase; }
+        .brand-text span { font-size: 9px; color: var(--p-oro); letter-spacing: 2px; font-family: 'JetBrains Mono'; }
+
+        .clock-container { text-align: right; }
+        #reloj { font-size: 1.6rem; font-weight: 200; letter-spacing: -1px; margin: 0; }
+        #fecha { font-size: 9px; text-transform: uppercase; color: var(--texto-gris); letter-spacing: 2px; }
+
+        /* --- CONTENEDOR CENTRAL DE NOVEDADES --- */
+        #cio-app #display-board { 
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 0 5%; z-index: 10; text-align: center; position: relative;
+        }
+        
+        #infoCont { width: 100%; max-width: 1300px; transition: opacity 0.6s ease, transform 0.6s ease; }
+        
+        #areaLabel { font-size: 13px; font-weight: 800; letter-spacing: 6px; text-transform: uppercase; color: var(--p-oro); margin-bottom: 15px; }
+        
+        #titleDisplay { 
+            font-size: 110px; font-weight: 900; line-height: 0.85; letter-spacing: -6px; 
+            margin: 0 auto 30px auto; text-transform: uppercase; max-width: 1100px;
+        }
+        
+        #prioBadge { 
+            display: inline-block; padding: 6px 20px; border: 1px solid var(--p-oro); 
+            font-size: 10px; font-weight: 900; letter-spacing: 3px; border-radius: 2px; margin-bottom: 40px;
         }
 
-        /* --- HEADER ESTRUCTURAL --- */
-        #cio-app .main-header {
-            height: 90px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 50px; background: transparent; z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+        #messageDisplay { 
+            font-size: 1.8rem; line-height: 1.4; color: var(--texto-gris); 
+            max-width: 900px; margin: 0 auto; font-weight: 300;
         }
-        #cio-app:fullscreen .main-header { display: none !important; }
 
-        .brand-section { display: flex; align-items: center; gap: 20px; }
-        .brand-section img { height: 35px; filter: grayscale(1) brightness(2); }
-        .brand-section .divider { width: 1px; height: 30px; background: var(--text-dim); }
-        .brand-status { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--p-gold); letter-spacing: 2px; }
+        /* --- ESTADO CRÍTICO (FONDO ROJO OSCURO) --- */
+        #cio-app.prio-critica { background: var(--critico-fondo) !important; }
+        #cio-app.prio-critica #titleDisplay { color: var(--critico-texto); }
+        #cio-app.prio-critica #prioBadge { border-color: var(--critico-texto); color: var(--critico-texto); }
 
-        .time-section { text-align: center; }
-        #clockDisplay { font-size: 1.8rem; font-weight: 300; letter-spacing: -1px; }
-        #dateDisplay { font-size: 9px; text-transform: uppercase; color: var(--text-dim); letter-spacing: 3px; margin-top: -5px; }
-
-        /* --- SISTEMA DE PANELES --- */
+        /* --- PANELES Y NAVEGACIÓN --- */
         .side-panel {
             position: fixed; right: 0; top: 0; width: 450px; height: 100%;
-            background: var(--bg-surface); border-left: 1px solid rgba(255,255,255,0.05);
-            padding: 50px; transform: translateX(100%); transition: 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 10005; box-sizing: border-box; display: flex; flex-direction: column;
+            background: #0a0a0a; border-left: 1px solid #1a1a1a;
+            padding: 50px; transform: translateX(100%); transition: 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+            z-index: 10005; box-sizing: border-box;
         }
-        .side-panel.active { transform: translateX(0); box-shadow: -50px 0 100px rgba(0,0,0,0.5); }
-        .side-panel h2 { font-weight: 900; font-size: 2.5rem; letter-spacing: -2px; margin-bottom: 30px; }
+        .side-panel.active { transform: translateX(0); box-shadow: -30px 0 60px rgba(0,0,0,0.8); }
 
-        /* --- DISPLAY PRINCIPAL --- */
-        #display-board { flex: 1; display: flex; align-items: center; padding: 0 10%; z-index: 10; position: relative; }
-        
-        .info-container { width: 100%; max-width: 1200px; }
-        #area-box { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
-        #areaLabel { font-weight: 800; font-size: 14px; letter-spacing: 4px; text-transform: uppercase; }
-        .area-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-        #titleDisplay { 
-            font-size: 120px; font-weight: 900; line-height: 0.9; letter-spacing: -7px; 
-            margin: 20px 0; text-transform: uppercase; transition: all 0.5s ease;
-        }
-        #messageDisplay { 
-            font-size: 1.6rem; line-height: 1.5; color: var(--text-p); 
-            max-width: 800px; font-weight: 300; border-left: 2px solid var(--p-gold); 
-            padding-left: 40px; margin-top: 30px;
-        }
-
-        #prioBadge { 
-            display: inline-block; padding: 8px 20px; border-radius: 3px; 
-            font-size: 10px; font-weight: 900; letter-spacing: 2px;
-            background: var(--p-gold-muted); color: var(--p-gold);
-            border: 1px solid var(--p-gold);
-        }
-
-        /* --- COMPONENTES FORMULARIO --- */
-        .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-        
-        #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; background: #000; color: #fff; border: 1px solid #222;
-            padding: 15px; border-radius: 4px; font-family: inherit; font-size: 1rem;
-            box-sizing: border-box; transition: 0.3s;
-        }
-        #cio-app input:focus, #cio-app textarea:focus { border-color: var(--p-gold); outline: none; background: #050505; }
-
-        .btn-main {
-            background: var(--p-gold); color: #000; border: none; padding: 20px;
-            font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-            width: 100%; font-size: 12px; transition: 0.3s;
-        }
-        .btn-main:hover { background: #fff; }
-
-        /* --- HISTORIAL Y CARDS --- */
-        #historyList { flex: 1; overflow-y: auto; padding-right: 10px; }
-        .history-card {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            padding: 20px; border-radius: 8px; margin-bottom: 15px; transition: 0.3s;
-        }
-        .history-card:hover { background: rgba(255,255,255,0.04); }
-        .history-card .card-meta { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 10px; }
-        .history-card h4 { margin: 0; font-size: 1.1rem; letter-spacing: -0.5px; }
-        .card-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .card-actions button { 
-            background: none; border: 1px solid #333; color: #666; padding: 5px 12px; 
-            border-radius: 4px; font-size: 9px; cursor: pointer; text-transform: uppercase;
-        }
-        .card-actions button:hover { border-color: var(--p-gold); color: #fff; }
-
-        /* --- BOTÓN FLOTANTE MÓVIL --- */
+        /* Botón Flotante Optimizado */
         #menu-toggle-float {
-            display: none; position: fixed; bottom: 40px; right: 40px;
-            width: 65px; height: 65px; border-radius: 20px;
-            background: var(--p-gold); color: #000; border: none;
+            position: fixed; bottom: 40px; right: 40px;
+            width: 65px; height: 65px; border-radius: 50%;
+            background: var(--p-oro); color: #000; border: none;
             font-size: 24px; cursor: pointer; z-index: 10015;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); align-items: center; justify-content: center;
+            display: none; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         #mobile-menu {
-            position: fixed; bottom: 120px; right: 40px; width: 260px;
-            background: var(--bg-glass); backdrop-filter: blur(20px);
+            position: fixed; bottom: 115px; right: 40px; width: 240px;
+            background: rgba(15,15,15,0.95); backdrop-filter: blur(15px);
             display: none; flex-direction: column; padding: 15px; gap: 10px;
-            border-radius: 20px; z-index: 10010; border: 1px solid var(--p-gold-muted);
+            border-radius: 20px; z-index: 10010; border: 1px solid rgba(197, 160, 89, 0.2);
         }
 
-        /* --- TICKER Y CONSOLA --- */
-        #ticker-bar {
-            height: 50px; background: #000; display: flex; align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05); z-index: 100;
+        /* --- ELEMENTOS DE FORMULARIO --- */
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+        
+        #cio-app input, #cio-app textarea, #cio-app select {
+            width: 100%; background: #000; color: #fff; border: 1px solid #222;
+            padding: 15px; font-family: inherit; border-radius: 4px; box-sizing: border-box;
         }
-        #ticker-content { font-family: 'JetBrains Mono'; font-size: 11px; text-transform: uppercase; color: var(--text-dim); }
+        #cio-app input:focus { border-color: var(--p-oro); outline: none; }
 
+        .btn-gold {
+            background: var(--p-oro); color: #000; border: none; padding: 18px;
+            font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+            width: 100%; font-size: 11px; transition: 0.3s;
+        }
+
+        /* --- BARRA DE PROGRESO Y TICKER --- */
         #progressLine { 
             position: fixed; top: 0; height: 4px; width: 0%; 
-            background: var(--p-gold); z-index: 100000; transition: width 0.1s linear;
+            background: var(--p-oro); z-index: 100000; transition: width 0.1s linear;
         }
-
-        /* --- MODO CRÍTICO --- */
-        .emergency-active #display-board { animation: emergencyShudder 0.2s infinite; }
-        @keyframes emergencyShudder {
-            0% { transform: translate(0,0); }
-            25% { transform: translate(1px, -1px); }
-            50% { transform: translate(-1px, 1px); }
-            100% { transform: translate(0,0); }
+        #ticker-bar {
+            height: 45px; background: #000; display: flex; align-items: center;
+            border-top: 1px solid #111; z-index: 100;
         }
+        #ticker-content { font-family: 'JetBrains Mono'; font-size: 10px; text-transform: uppercase; color: #444; width: 100%; }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
-            #cio-app .main-header { padding: 0 25px; height: 70px; }
-            #display-board { padding: 0 30px; }
-            #titleDisplay { font-size: 50px; letter-spacing: -2px; margin: 10px 0; }
-            #messageDisplay { font-size: 1.1rem; padding-left: 20px; }
+            #titleDisplay { font-size: 50px; letter-spacing: -2px; }
+            #messageDisplay { font-size: 1.2rem; }
             #menu-toggle-float { display: flex; }
-            .side-panel { width: 100%; border-radius: 30px 30px 0 0; top: auto; bottom: 0; height: 85%; transform: translateY(100%); }
-            .side-panel.active { transform: translateY(0); }
-            .brand-section img { height: 25px; }
-            .header-actions { display: none; }
+            .side-panel { width: 100%; }
+            .header-elite .header-actions { display: none; }
         }
     </style>
 </head>
-<body onclick="handleGlobalClick(event)">
+<body onclick="cerrarMenuAlTocarFuera(event)">
 
 <div id="cio-app">
     <canvas id="bg-canvas"></canvas>
-    <div class="vignette"></div>
     <div id="progressLine"></div>
     <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(10px);" onclick="closePanels()"></div>
 
-    <header class="main-header">
-        <div class="brand-section">
-            <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Logo">
-            <div class="divider"></div>
-            <div class="brand-status">CIO<br>SYSTEM</div>
+    <header class="header-elite">
+        <div class="brand-container">
+            <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Masterson">
+            <div class="brand-text">
+                <h2>Novedades Masterson</h2>
+                <span>CENTRAL DE OPERACIONES</span>
+            </div>
         </div>
 
-        <div class="time-section">
-            <div id="clockDisplay">00:00:00</div>
-            <div id="dateDisplay">Loading...</div>
+        <div class="clock-container">
+            <p id="reloj">00:00:00</p>
+            <p id="fecha">DOMINGO, 22 DE FEBRERO</p>
         </div>
 
         <div class="header-actions">
-            <button onclick="openForm()" class="btn-main" style="padding: 10px 25px; width: auto;">NEW ENTRY</button>
-            <button onclick="openHistory()" style="background:none; border:none; color:var(--text-p); margin-left:25px; cursor:pointer; font-weight:700; font-size:11px; letter-spacing:1px;">RECORDS</button>
-            <button onclick="toggleFS()" style="background:none; border:1px solid #222; color:#333; margin-left:25px; font-size:9px; padding:5px 10px; border-radius:4px; cursor:pointer;">TV MODE</button>
+            <button onclick="openForm()" class="btn-gold" style="padding: 10px 20px; width: auto; font-size: 9px;">NUEVO REGISTRO</button>
+            <button onclick="openHistory()" style="background:none; border:none; color:#444; margin-left:20px; cursor:pointer; font-weight:700; font-size:10px; letter-spacing:2px;">LOGS</button>
+            <button onclick="toggleFS()" style="background:none; border:1px solid #222; color:#222; margin-left:20px; font-size:9px; padding:5px; border-radius:3px;">TV</button>
         </div>
     </header>
 
     <button id="menu-toggle-float" onclick="toggleMobileMenu(event)">☰</button>
     <div id="mobile-menu">
-        <button onclick="openForm(); toggleMobileMenu();" class="btn-main">＋ ADD EVENT</button>
-        <button onclick="openHistory(); toggleMobileMenu();" style="background:transparent; color:#fff; border:1px solid #333; padding:15px; border-radius:12px; font-size:12px;">HISTORY LOG</button>
-        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:rgba(255,59,48,0.1); color:var(--critico); border:none; padding:15px; border-radius:12px; font-weight:bold; font-size:12px;">NET ERRORS (<span id="count-offline-mob">0</span>)</button>
+        <button onclick="openForm(); toggleMobileMenu();" class="btn-gold">＋ NUEVA NOVEDAD</button>
+        <button onclick="openHistory(); toggleMobileMenu();" style="background:transparent; color:#fff; border:1px solid #333; padding:15px; border-radius:10px; font-size:11px;">HISTORIAL</button>
+        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:rgba(255,0,0,0.1); color:#ff4d4d; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:11px;">CAÍDOS (<span id="count-offline-mob">0</span>)</button>
     </div>
 
     <main id="display-board">
-        <div id="infoCont" class="info-container" style="opacity: 0; transition: 0.8s ease;">
-            <div id="area-box">
-                <div class="area-dot" id="areaDot"></div>
-                <div id="areaLabel">Masterson Intelligence</div>
-            </div>
-            <h1 id="titleDisplay">INITIALIZING</h1>
-            <div id="prioBadge">STATUS: SYNCING</div>
-            <p id="messageDisplay">Estableciendo conexión con el centro de datos de seguridad...</p>
+        <div id="infoCont">
+            <div id="areaLabel">INICIALIZANDO SISTEMA</div>
+            <h1 id="titleDisplay">ESPERANDO DATOS</h1>
+            <div id="prioBadge">ESTADO: CONECTANDO</div>
+            <p id="messageDisplay">Sincronizando con la base de datos de Masterson Security...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">CONNECTING TO MASTERSON FIREBASE CLOUD SERVER... STATUS: NOMINAL...</div>
-    </div>
-
-    <div id="quickEdit" style="background:var(--bg-surface); border:1px solid var(--p-gold); padding:25px; border-radius:12px; margin-top:15px; display:none;">
-        <input type="hidden" id="e-index">
-        <div class="form-group">
-            <label>Update Area</label>
-            <select id="e-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
-        </div>
-        <div class="form-group">
-            <label>Priority level</label>
-            <select id="e-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-        </div>
-        <input type="text" id="e-title" placeholder="Event Title" style="margin-bottom:15px;">
-        <textarea id="e-msg" rows="4" placeholder="Detailed Report"></textarea>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="saveQuickEdit()" class="btn-main" style="flex:2;">COMMIT CHANGES</button>
-            <button onclick="hideEdit()" style="flex:1; background:none; border:1px solid #333; color:white; cursor:pointer;">ABORT</button>
-        </div>
+        <div id="ticker-content">CARGANDO FLUJO DE NOVEDADES... MASTERSON CLOUD READY...</div>
     </div>
 
     <aside id="panelHistory" class="side-panel">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <h2>RECORDS</h2>
-            <button onclick="closePanels()" style="background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer;">✕</button>
-        </div>
-        <div id="historyList"></div>
+        <h2 style="font-weight:900; letter-spacing:-1px;">REGISTROS</h2>
+        <div id="historyList" style="margin-top:30px; overflow-y:auto; height:70vh;"></div>
+        <button onclick="closePanels()" style="width:100%; background:none; border:1px solid #222; color:#555; padding:15px; margin-top:20px;">CERRAR</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <h2>REPORT</h2>
-            <button onclick="closePanels()" style="background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer;">✕</button>
-        </div>
+        <h2 style="font-weight:900; letter-spacing:-1px;">REPORTE</h2>
         <form onsubmit="saveNew(event)">
-            <div class="form-group">
-                <label>Target Area</label>
-                <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
+            <div class="input-group">
+                <label>Área de Operación</label>
+                <select id="f-area">
+                    <option>Monitoreo</option>
+                    <option>Freschat</option>
+                    <option>Atención</option>
+                    <option>Novedad Interna</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label>Threat Level</label>
-                <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+            <div class="input-group">
+                <label>Nivel de Prioridad</label>
+                <select id="f-prio">
+                    <option>Baja</option>
+                    <option>Media</option>
+                    <option>Alta</option>
+                    <option>Crítica</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label>Headline</label>
-                <input type="text" id="f-title" placeholder="Summary" required>
+            <div class="input-group">
+                <label>Título de la Novedad</label>
+                <input type="text" id="f-title" placeholder="Ej: Falla de Cámara 04" required>
             </div>
-            <div class="form-group">
-                <label>Intelligence Data</label>
-                <textarea id="f-msg" rows="6" placeholder="Describe the event..." required></textarea>
+            <div class="input-group">
+                <label>Descripción</label>
+                <textarea id="f-msg" rows="5" placeholder="Detalles de la situación..." required></textarea>
             </div>
-            <button type="submit" class="btn-main">PUBLISH EVENT</button>
+            <button type="submit" class="btn-gold">PUBLICAR NOVEDAD</button>
         </form>
     </aside>
 
     <aside id="panelOffline" class="side-panel">
-        <h2 style="color:var(--critico);">NETWORK</h2>
-        <div id="offlineList" style="margin-top:20px;"></div>
-        <button onclick="closePanels()" class="btn-main" style="margin-top:auto; background:none; border:1px solid #333; color:#fff;">CLOSE</button>
+        <h2 style="color:#ff4d4d;">SERVICIOS CAÍDOS</h2>
+        <div id="offlineList" style="margin-top:30px;"></div>
+        <button onclick="closePanels()" class="btn-gold" style="background:none; border:1px solid #333; color:#fff; margin-top:40px;">VOLVER</button>
     </aside>
+
+    <div id="quickEdit" style="background:#0a0a0a; border:1px solid var(--p-oro); padding:20px; border-radius:8px; margin-top:10px; display:none;">
+        <input type="hidden" id="e-index">
+        <input type="text" id="e-title" style="margin-bottom:10px;">
+        <textarea id="e-msg" rows="3" style="margin-bottom:10px;"></textarea>
+        <div style="display:flex; gap:10px;">
+            <button onclick="saveQuickEdit()" class="btn-gold" style="padding:10px;">GUARDAR</button>
+            <button onclick="hideEdit()" style="background:none; border:1px solid #333; color:#fff; padding:10px; flex:1;">CANCELAR</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    /* CORE ENGINE v5.0 - MASTERSON ELITE
-       Manejo de estados, sincronización Firebase y efectos visuales.
-    */
-    
     const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
     let logs = []; 
     let currentIdx = 0; 
     let startTime = null; 
-    const SLIDE_TIME = 15; // Segundos por slide
+    const SLIDE_TIME = 15;
 
-    // -- Background Particles Engine --
+    // --- Motor de Fondo ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
-
     function initCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        particles = [];
-        for(let i=0; i<50; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2,
-                speed: Math.random() * 0.5 + 0.1
-            });
-        }
+        particles = Array.from({length: 40}, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            s: Math.random() * 2,
+            v: Math.random() * 0.3 + 0.1
+        }));
     }
-
-    function drawParticles() {
+    function draw() {
         ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(197, 160, 89, 0.3)";
+        ctx.fillStyle = "rgba(197, 160, 89, 0.2)";
         particles.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-            ctx.fill();
-            p.y -= p.speed;
-            if(p.y < -10) p.y = canvas.height + 10;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
+            p.y -= p.v; if(p.y < -10) p.y = canvas.height + 10;
         });
-        requestAnimationFrame(drawParticles);
+        requestAnimationFrame(draw);
     }
 
-    // -- UI Handlers --
-    function handleGlobalClick(e) {
+    // --- Lógica de Interfaz ---
+    function cerrarMenuAlTocarFuera(e) {
         const menu = document.getElementById("mobile-menu");
         const btn = document.getElementById("menu-toggle-float");
         if (menu.style.display === "flex" && !menu.contains(e.target) && !btn.contains(e.target)) toggleMobileMenu();
     }
 
-    function toggleMobileMenu() {
+    function toggleMobileMenu(e) {
+        if(e) e.stopPropagation();
         const menu = document.getElementById("mobile-menu");
         const isVisible = menu.style.display === "flex";
         menu.style.display = isVisible ? "none" : "flex";
         document.getElementById("overlay").style.display = isVisible ? "none" : "block";
     }
 
-    async function updateNetwork() {
+    async function sync() {
         try {
-            const resp = await fetch(RED_URL);
-            const status = await resp.json();
-            const ticker = document.getElementById("ticker-content");
-            let caidos = [];
+            const [evResp, redResp] = await Promise.all([fetch(DB_URL), fetch(RED_URL)]);
+            const evData = await evResp.json();
+            const redData = await redResp.json();
             
-            if(status) {
-                Object.keys(status).forEach(id => { 
-                    if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); 
-                });
-            }
-
-            if(caidos.length > 0) {
-                ticker.innerHTML = `⚠️ ALERT: SERVICES DOWN [${caidos.join(' | ')}] — `;
-                document.getElementById("offlineList").innerHTML = caidos.map(n => `
-                    <div style="padding:20px; border-bottom:1px solid #222; color:var(--critico); font-weight:700;">
-                        <span style="font-family:monospace">ERR_CONN:</span> ${n}
-                    </div>
-                `).join('');
-            } else {
-                ticker.innerHTML = `✔ ALL SYSTEMS OPERATIONAL — MASTERSON CLOUD SYNC ACTIVE — ${new Date().toLocaleTimeString()} — `;
-                document.getElementById("offlineList").innerHTML = `<p style="color:#333; text-align:center;">Network stable.</p>`;
-            }
-            document.getElementById("count-offline-mob").textContent = caidos.length;
-        } catch(e) {
-            console.error("Network sync failed");
-        }
+            logs = evData ? (Array.isArray(evData) ? evData : Object.values(evData)) : [];
+            updateNetworkUI(redData);
+            if(logs.length > 0 && !startTime) renderSlide();
+        } catch(e) { console.error("Error de sincronización"); }
     }
 
-    async function syncEvents() {
-        try {
-            const resp = await fetch(DB_URL);
-            const data = await resp.json();
-            logs = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-            if(logs.length > 0 && !startTime) renderSlide();
-        } catch(e) {
-            console.error("Event sync failed");
+    function updateNetworkUI(status) {
+        let caidos = [];
+        if(status) {
+            Object.keys(status).forEach(id => { 
+                if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); 
+            });
+        }
+        document.getElementById("count-offline-mob").textContent = caidos.length;
+        const ticker = document.getElementById("ticker-content");
+        if(caidos.length > 0) {
+            ticker.innerHTML = `<span style="color:#ff4d4d">⚠️ ALERTA DE RED: CAÍDOS [ ${caidos.join(' | ')} ] — </span>`;
+            document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="padding:15px; border-bottom:1px solid #222; color:#ff4d4d; font-weight:bold;">● ${n}</div>`).join('');
+        } else {
+            ticker.innerHTML = `✔ TODOS LOS SISTEMAS OPERATIVOS — SINCRONIZACIÓN ACTIVA — MASTERSON SECURITY — `;
+            document.getElementById("offlineList").innerHTML = `<p style="color:#333; text-align:center;">Red Estable</p>`;
         }
     }
 
@@ -410,157 +340,135 @@
         const app = document.getElementById("cio-app");
         
         cont.style.opacity = "0";
-        cont.style.transform = "translateX(-20px)";
+        cont.style.transform = "scale(0.98)";
 
         setTimeout(() => {
             const item = logs[currentIdx % logs.length];
-            const areaColors = { "Monitoreo": "var(--c-mon)", "Atención": "var(--c-atn)", "Freschat": "var(--c-fre)", "Novedad Interna": "var(--c-int)" };
             
-            // UI Updates
             document.getElementById("areaLabel").textContent = item.area;
-            document.getElementById("areaLabel").style.color = areaColors[item.area] || "var(--p-gold)";
-            document.getElementById("areaDot").style.backgroundColor = areaColors[item.area] || "var(--p-gold)";
-            
-            document.getElementById("prioBadge").textContent = `PRIORITY: ${item.priority.toUpperCase()}`;
+            document.getElementById("prioBadge").textContent = `PRIORIDAD: ${item.priority.toUpperCase()}`;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
             
-            const prioColors = {"Baja":"var(--baja)", "Media":"var(--media)", "Alta":"var(--alta)", "Crítica":"var(--critico)"};
+            // Colores por prioridad
+            const prioColors = {"Baja":"#4ade80", "Media":"#fbbf24", "Alta":"#fb923c", "Crítica":"#ff4d4d"};
             const pColor = prioColors[item.priority] || "#fff";
             
-            document.getElementById("prioBadge").style.borderColor = pColor;
             document.getElementById("prioBadge").style.color = pColor;
+            document.getElementById("prioBadge").style.borderColor = pColor;
             document.getElementById("progressLine").style.background = pColor;
-            document.getElementById("titleDisplay").style.color = (item.priority === "Crítica") ? "var(--critico)" : "white";
 
-            if(item.priority === "Crítica") app.classList.add("emergency-active");
-            else app.classList.remove("emergency-active");
+            // Manejo de Estado Crítico (Sin vibración, solo fondo)
+            if(item.priority === "Crítica") app.className = "prio-critica";
+            else app.className = "";
 
             autoSizeText();
             cont.style.opacity = "1";
-            cont.style.transform = "translateX(0)";
-        }, 800);
+            cont.style.transform = "scale(1)";
+        }, 600);
     }
 
     function autoSizeText() {
         const t = document.getElementById('titleDisplay');
-        t.style.fontSize = window.innerWidth < 768 ? "50px" : "120px";
+        if(window.innerWidth < 768) {
+            t.style.fontSize = "45px";
+        } else {
+            t.style.fontSize = logs[currentIdx % logs.length]?.title.length > 20 ? "80px" : "110px";
+        }
     }
 
-    // -- CRUD Functions --
-    function openHistory() { renderHistoryList(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
+    // --- CRUD ---
+    function openHistory() { renderHistory(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     function openForm() { document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     function openOfflinePanel() { document.getElementById("panelOffline").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     
     function closePanels() { 
-        document.querySelectorAll('.side-panel').forEach(el => el.classList.remove('active')); 
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active'));
         document.getElementById("overlay").style.display = "none";
         hideEdit();
     }
 
-    function renderHistoryList() {
+    function renderHistory() {
         const list = document.getElementById("historyList");
         list.innerHTML = logs.map((it, i) => `
-            <div class="history-card">
-                <div class="card-meta">
-                    <span style="color:var(--p-gold)">${it.area}</span>
-                    <span>${it.priority}</span>
+            <div style="background:#111; padding:20px; border-radius:8px; margin-bottom:15px; border-left:4px solid ${it.priority==='Crítica'?'#ff4d4d':'#333'}">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#555; margin-bottom:5px;">
+                    <span>${it.area.toUpperCase()}</span>
+                    <span>${it.priority.toUpperCase()}</span>
                 </div>
-                <h4>${it.title}</h4>
-                <div class="card-actions">
-                    <button onclick="showQuickEdit(${i})">Modify</button>
-                    <button onclick="deleteEntry(${i})">Delete</button>
+                <h4 style="margin:0; font-size:1.1rem;">${it.title}</h4>
+                <div style="margin-top:10px; display:flex; gap:10px;">
+                    <button onclick="showEdit(${i})" style="background:none; border:none; color:var(--p-oro); font-size:10px; cursor:pointer;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#444; font-size:10px; cursor:pointer;">BORRAR</button>
                 </div>
-                <div id="edit-anchor-${i}"></div>
+                <div id="anchor-${i}"></div>
             </div>
         `).join('');
     }
 
-    function showQuickEdit(idx) {
-        const item = logs[idx];
-        const editBox = document.getElementById("quickEdit");
-        document.getElementById("e-index").value = idx;
-        document.getElementById("e-area").value = item.area;
-        document.getElementById("e-prio").value = item.priority;
+    function showEdit(i) {
+        const item = logs[i];
+        const box = document.getElementById("quickEdit");
+        document.getElementById("e-index").value = i;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-        document.getElementById(`edit-anchor-${idx}`).appendChild(editBox);
-        editBox.style.display = "block";
+        document.getElementById(`anchor-${i}`).appendChild(box);
+        box.style.display = "block";
     }
 
-    function hideEdit() { 
-        const eb = document.getElementById("quickEdit");
-        eb.style.display = "none";
-        document.body.appendChild(eb);
-    }
+    function hideEdit() { document.getElementById("quickEdit").style.display = "none"; document.body.appendChild(document.getElementById("quickEdit")); }
 
     async function saveQuickEdit() {
-        const idx = document.getElementById("e-index").value;
-        logs[idx] = { 
-            area: document.getElementById("e-area").value, 
-            priority: document.getElementById("e-prio").value, 
-            title: document.getElementById("e-title").value, 
-            message: document.getElementById("e-msg").value 
-        };
+        const i = document.getElementById("e-index").value;
+        logs[i].title = document.getElementById("e-title").value;
+        logs[i].message = document.getElementById("e-msg").value;
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
-        hideEdit(); renderHistoryList(); syncEvents();
+        hideEdit(); renderHistory(); sync();
     }
 
     async function saveNew(e) {
         e.preventDefault();
-        const entry = { 
-            area: document.getElementById("f-area").value, 
-            priority: document.getElementById("f-prio").value, 
-            title: document.getElementById("f-title").value, 
-            message: document.getElementById("f-msg").value 
-        };
-        logs.push(entry);
+        const n = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value };
+        logs.push(n);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
-        closePanels(); syncEvents();
+        closePanels(); sync();
     }
 
-    async function deleteEntry(idx) {
-        if(!confirm("CONFIRM DELETION?")) return;
-        logs.splice(idx, 1);
+    async function deleteEntry(i) {
+        if(!confirm("¿Eliminar registro?")) return;
+        logs.splice(i, 1);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
-        renderHistoryList(); syncEvents();
+        renderHistory(); sync();
     }
 
-    function toggleFS() { 
+    function toggleFS() {
         const app = document.getElementById("cio-app");
-        if (!document.fullscreenElement) {
-            if (app.requestFullscreen) app.requestFullscreen();
-            else if (app.webkitRequestFullscreen) app.webkitRequestFullscreen();
-        } else { document.exitFullscreen(); }
+        if (!document.fullscreenElement) app.requestFullscreen?.() || app.webkitRequestFullscreen?.();
+        else document.exitFullscreen();
     }
 
-    // -- Loop Principal --
-    function mainLoop(ts) {
-        if(!logs.length) { requestAnimationFrame(mainLoop); return; }
-        if(!startTime) startTime = ts;
-        const progress = (ts - startTime) / (SLIDE_TIME * 1000);
-        document.getElementById("progressLine").style.width = (progress * 100) + "%";
-        if(progress >= 1) { currentIdx++; renderSlide(); startTime = ts; }
-        requestAnimationFrame(mainLoop);
+    // --- Loop Principal ---
+    function loop(ts) {
+        if(logs.length) {
+            if(!startTime) startTime = ts;
+            const progress = (ts - startTime) / (SLIDE_TIME * 1000);
+            document.getElementById("progressLine").style.width = Math.min(progress * 100, 100) + "%";
+            if(progress >= 1) { currentIdx++; renderSlide(); startTime = ts; }
+        }
+        requestAnimationFrame(loop);
     }
 
-    // -- Init --
-    setInterval(() => { 
-        const now = new Date();
-        document.getElementById("clockDisplay").textContent = now.toLocaleTimeString('es-UY', { hour12: false }); 
-        document.getElementById("dateDisplay").textContent = now.toLocaleDateString('es-UY', { weekday: 'long', day: 'numeric', month: 'long' });
+    // --- Init ---
+    setInterval(() => {
+        const n = new Date();
+        document.getElementById("reloj").textContent = n.toLocaleTimeString('es-UY', {hour12:false});
+        document.getElementById("fecha").textContent = n.toLocaleDateString('es-UY', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
     }, 1000);
 
-    initCanvas();
-    drawParticles();
+    initCanvas(); draw();
+    sync(); requestAnimationFrame(loop);
     window.onresize = () => { initCanvas(); autoSizeText(); };
-    
-    updateNetwork(); 
-    syncEvents(); 
-    requestAnimationFrame(mainLoop);
-    
-    setInterval(updateNetwork, 5000);
-    setInterval(syncEvents, 10000);
+    setInterval(sync, 10000);
 </script>
 </body>
 </html>
