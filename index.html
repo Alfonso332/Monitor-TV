@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO Executive Monitor</title>
+    <title>CIO Masterson Edition</title>
     
     <link rel="apple-touch-icon" href="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,211 +11,185 @@
 
     <style>
         #cio-app {
-            /* Paleta Ejecutiva */
-            --primary: #ffffff;
-            --accent: #00d1d1;
-            --dark-bg: #050505;
-            --critico: #ff3b30;
-            --border-soft: rgba(255, 255, 255, 0.1);
+            --primary: #C5A059; /* Oro Champagne */
+            --dark-bg: #0D0D0D;
+            --surface: #161616;
+            --text-main: #F2F2F2;
+            --text-dim: #666666;
+            --critico: #E63946;
             
-            /* Colores de Área (Versión Muted/Elegante) */
-            --color-monitoreo: #ff453a;
-            --color-atencion: #32d74b;
-            --color-freschat: #0a84ff;
-            --color-interna: #ebebf5;
+            --color-monitoreo: #E63946;
+            --color-atencion: #A8DADC;
+            --color-freschat: #457B9D;
+            --color-interna: #F1FAEE;
             
-            --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
-
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: var(--dark-bg) !important;
-            color: #ffffff !important;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif !important;
+            color: var(--text-main) !important;
+            font-family: 'Inter', -apple-system, sans-serif !important;
             display: flex; flex-direction: column;
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-            letter-spacing: -0.02em;
         }
 
-        /* MODO EMERGENCIA SOBRIO */
-        #cio-app.emergency-active { animation: emergencyPulse 3s infinite; }
-        @keyframes emergencyPulse {
-            0% { box-shadow: inset 0 0 100px rgba(0,0,0,1); }
-            50% { box-shadow: inset 0 0 150px rgba(255, 59, 48, 0.15); }
-            100% { box-shadow: inset 0 0 100px rgba(0,0,0,1); }
-        }
-
+        /* FONDO EDITORIAL (GRANO DE PELÍCULA Y LOGO SUTIL) */
         #cio-app::before {
             content: ""; position: absolute; inset: 0;
-            background-image: var(--bg-img); background-size: 30%;
-            background-position: center; background-repeat: no-repeat;
-            opacity: 0.02; filter: grayscale(1); z-index: -1;
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.05; pointer-events: none; z-index: 1;
         }
 
-        /* HEADER REFINADO */
+        /* HEADER ASIMÉTRICO */
         #cio-app .main-header {
-            height: 70px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; background: rgba(0,0,0,0.4); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-soft);
+            height: 100px; display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 0 60px 20px 60px; background: transparent; z-index: 10;
         }
         #cio-app:fullscreen .main-header { display: none !important; }
 
-        /* DASHBOARD */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
-        .stat-card {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px 5px; border-radius: 4px; text-align: center; 
-            border: 1px solid var(--border-soft); transition: 0.3s;
-        }
-        .stat-card b { font-size: 1.6rem; color: #fff; font-weight: 300; }
-        .stat-card span { display: block; font-size: 0.65rem; color: #666; text-transform: uppercase; margin-top: 5px; letter-spacing: 1px; }
-        .stat-card.alert { border-color: var(--critico); }
-        .stat-card.alert b { color: var(--critico); font-weight: 600; }
+        #clockDisplay { font-size: 2.5rem; font-weight: 200; letter-spacing: -2px; color: var(--primary); }
 
-        /* BOTÓN FLOTANTE MÓVIL */
+        /* DASHBOARD - STATS FLOTANTES */
+        .stats-grid { display: flex; gap: 40px; margin-bottom: 20px; }
+        .stat-card { text-align: left; position: relative; }
+        .stat-card b { font-size: 1.2rem; font-weight: 700; display: block; line-height: 1; }
+        .stat-card span { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; }
+        .stat-card.alert b { color: var(--critico); }
+
+        /* BOTÓN FLOTANTE (ESTILO CÁPSULA) */
         #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 30px; right: 25px;
-            width: 55px; height: 55px; border-radius: 18px;
-            background: #fff; color: #000; border: none;
-            font-size: 22px; cursor: pointer; z-index: 10015;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); align-items: center; justify-content: center;
+            display: none; position: fixed; bottom: 40px; right: 40px;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--primary); color: #000; border: none;
+            font-size: 24px; cursor: pointer; z-index: 10015;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
 
         #cio-app #mobile-menu {
-            position: fixed; bottom: 95px; right: 25px; width: 220px;
-            background: rgba(20, 20, 20, 0.95); display: none; flex-direction: column;
-            padding: 12px; gap: 8px; border: 1px solid var(--border-soft);
-            border-radius: 20px; z-index: 10010; backdrop-filter: blur(20px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: fixed; bottom: 110px; right: 40px; width: 240px;
+            background: var(--surface); display: none; flex-direction: column;
+            padding: 20px; gap: 15px; border-radius: 20px; z-index: 10010;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 1px solid rgba(197, 160, 89, 0.2);
         }
 
-        /* PANTALLA CENTRAL */
-        #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; }
-        #cio-app .info-container { width: 100%; transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); }
-        #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+        /* PANTALLA CENTRAL (BRUTALISMO ELEGANTE) */
+        #cio-app #display-board { flex: 1; display: flex; justify-content: flex-start; align-items: center; padding: 0 10%; }
+        
+        #infoCont { text-align: left; max-width: 1100px; }
+        #areaLabel { font-size: 0.7rem; font-weight: 800; letter-spacing: 5px; text-transform: uppercase; color: var(--primary); margin-bottom: 5px; }
+        #prioBadge { display: inline-block; font-size: 0.6rem; font-weight: 900; letter-spacing: 2px; padding: 2px 0; border-bottom: 2px solid var(--primary); margin-bottom: 30px; }
+        #titleDisplay { font-size: 110px; font-weight: 900; line-height: 0.85; letter-spacing: -6px; margin: 0; text-transform: uppercase; transition: color 0.5s ease; }
+        #messageDisplay { font-size: 1.4rem; font-weight: 400; color: #999; margin-top: 40px; line-height: 1.6; max-width: 700px; border-left: 1px solid #333; padding-left: 30px; }
 
-        #areaLabel { letter-spacing: 6px; font-weight: 300; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; opacity: 0.6; }
-        #prioBadge { display: inline-block; padding: 4px 16px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2); margin: 15px 0; font-size: 0.7rem; background: transparent; }
-        #titleDisplay { margin: 10px 0; line-height: 1; font-size: 80px; font-weight: 700; letter-spacing: -3px; }
-        #messageDisplay { font-size: 2rem; font-weight: 300; opacity: 0.5; max-width: 850px; margin: 20px auto 0; line-height: 1.4; }
-
-        /* PANELES LATERALES */
+        /* PANELES (TIPO OVERLAY) */
         #cio-app .side-panel {
-            position: fixed; right: 0; top: 0; width: 420px; height: 100%;
-            background: #0a0a0a; border-left: 1px solid var(--border-soft); padding: 40px;
-            transform: translateX(100%); transition: 0.5s cubic-bezier(1, 0, 0, 1); z-index: 10020;
-            box-sizing: border-box;
+            position: fixed; right: 0; top: 0; width: 500px; height: 100%;
+            background: #000; padding: 60px; transform: translateX(100%); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+            z-index: 10020; box-sizing: border-box;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        
-        /* FORMULARIOS CENTRADOS Y REFINADOS */
-        #cio-app .edit-box {
-            background: #111; border: 1px solid #222; padding: 25px;
-            border-radius: 12px; margin-top: 15px; display: none;
-        }
 
+        /* INPUTS CENTRADOS Y LIMPIOS */
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 14px; background: #151515; color: #fff; 
-            border: 1px solid #222; border-radius: 8px; margin-bottom: 12px; 
-            text-align: center; box-sizing: border-box; font-size: 1rem;
+            width: 100%; padding: 15px 0; background: transparent; color: #fff; 
+            border: none; border-bottom: 1px solid #333; margin-bottom: 20px; 
+            font-size: 1.1rem; transition: 0.3s;
         }
-        #cio-app input:focus { border-color: #444; outline: none; }
+        #cio-app input:focus { border-bottom-color: var(--primary); outline: none; }
 
-        #cio-app button.btn-main, #cio-app .header-actions button {
-            background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        #cio-app button.btn-main {
+            background: var(--primary); color: #000; border: none; padding: 15px 30px; 
+            font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;
         }
-        #cio-app button.btn-main:hover { opacity: 0.8; }
 
-        /* TICKER BAR */
-        #cio-app #ticker-bar { height: 40px; background: #000; border-top: 1px solid var(--border-soft); display: flex; align-items: center; overflow: hidden; }
-        #cio-app #ticker-content { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        /* TICKER (STREET STYLE) */
+        #cio-app #ticker-bar { height: 60px; background: #000; display: flex; align-items: center; border-top: 1px solid #1a1a1a; }
+        #cio-app #ticker-content { font-size: 0.9rem; font-weight: 200; opacity: 0.4; text-transform: uppercase; letter-spacing: 3px; }
 
-        #progressLine { position: fixed; bottom: 40px; height: 2px; width: 0%; transition: width 0.1s linear; opacity: 0.5; }
+        #progressLine { position: fixed; top: 0; height: 4px; width: 0%; transition: width 0.1s linear; background: var(--primary); z-index: 10030; }
 
         @media (max-width: 768px) {
-            #cio-app .main-header { padding: 0 20px; }
-            #cio-app .header-actions { display: none; }
+            #cio-app .main-header { padding: 0 30px 10px 30px; height: 80px; }
             #cio-app #menu-toggle-float { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 30px 30px 0 0; border-left: none; border-top: 1px solid var(--border-soft); }
-            #cio-app .side-panel.active { transform: translateY(0); }
-            #titleDisplay { font-size: 45px; letter-spacing: -1px; }
+            #titleDisplay { font-size: 55px; letter-spacing: -3px; }
+            #cio-app .side-panel { width: 100%; padding: 40px 20px; }
+            #messageDisplay { font-size: 1.1rem; padding-left: 15px; }
         }
     </style>
 </head>
 <body onclick="handleGlobalClick(event)">
 
 <div id="cio-app">
-    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; z-index:10002; backdrop-filter:blur(10px);" onclick="closePanels()"></div>
+    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10002; backdrop-filter:blur(15px);" onclick="closePanels()"></div>
+
+    <div id="progressLine"></div>
 
     <header class="main-header">
+        <div id="clockDisplay">00:00</div>
         <div class="header-actions">
-            <button onclick="openForm()">NUEVA ENTRADA</button>
-            <button onclick="openHistory()" style="background:transparent; color:#fff; border:1px solid #333; margin-left:12px;">REGISTROS</button>
-            <button onclick="toggleFS()" style="background:none; border:none; color:#444; margin-left:12px; font-size:12px;">MODO TV</button>
+            <button onclick="openForm()" class="btn-main">NUEVO REPORTE</button>
+            <button onclick="openHistory()" style="background:none; color:var(--text-dim); border:none; margin-left:20px; cursor:pointer; font-weight:800; font-size:0.7rem; letter-spacing:2px;">LOGS</button>
+            <button onclick="toggleFS()" style="background:none; border:none; color:#333; margin-left:20px; font-size:10px;">Fullscreen</button>
         </div>
-        <div id="clockDisplay" style="font-weight:200; font-size:1.5rem; letter-spacing: 2px;">00:00:00</div>
-        <div><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="28" style="filter: invert(1); opacity:0.8;"></div>
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40" style="filter: grayscale(1) brightness(2); opacity: 0.3;">
     </header>
 
     <button id="menu-toggle-float" onclick="toggleMobileMenu(event)">☰</button>
     <div id="mobile-menu">
-        <button onclick="openForm(); toggleMobileMenu();" class="btn-main" style="width:100%">＋ NUEVA</button>
-        <button onclick="openHistory(); toggleMobileMenu();" style="background:transparent; color:#fff; border:1px solid #333; padding:10px; border-radius:8px;">📋 HISTORIAL</button>
-        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:rgba(255,59,48,0.1); color:var(--critico); border:none; padding:10px; border-radius:8px; font-weight:bold;">OFFLINE (<span id="count-offline-mob">0</span>)</button>
+        <button onclick="openForm(); toggleMobileMenu();" class="btn-main">＋ CREAR</button>
+        <button onclick="openHistory(); toggleMobileMenu();" style="background:transparent; color:#fff; border:1px solid #333; padding:12px; border-radius:10px;">REVISAR LOGS</button>
+        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:rgba(230,57,70,0.1); color:var(--critico); border:none; padding:12px; border-radius:10px; font-weight:bold;">OFFLINE (<span id="count-offline-mob">0</span>)</button>
     </div>
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel">SYSTEM STATUS</div>
-            <h1 id="titleDisplay">STANDBY</h1>
-            <div id="prioBadge">SECURE</div>
-            <p id="messageDisplay">Waiting for system updates...</p>
+            <div id="areaLabel">MASTERSON SYSTEM</div>
+            <div id="prioBadge">STATUS: CALIBRATING</div>
+            <h1 id="titleDisplay">SISTEMA<br>READY</h1>
+            <p id="messageDisplay">Monitoreo de central operativa en espera de datos entrantes...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">CARGANDO REPORTE EJECUTIVO...</div>
+        <div id="ticker-content">CARGANDO FLUJO DE DATOS — MASTERSON SECURITY — CENTRALIZADO</div>
     </div>
-    
-    <div id="progressLine"></div>
 
-    <div id="quickEdit" class="edit-box">
+    <div id="quickEdit" style="background:#111; border:1px solid var(--primary); padding:30px; border-radius:4px; margin-top:20px; display:none;">
         <input type="hidden" id="e-index">
         <select id="e-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
         <select id="e-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
         <input type="text" id="e-title">
-        <textarea id="e-msg" rows="4"></textarea>
-        <div style="display:flex; gap:10px;">
+        <textarea id="e-msg" rows="3"></textarea>
+        <div style="display:flex; gap:15px;">
             <button onclick="saveQuickEdit()" class="btn-main" style="flex:1;">ACTUALIZAR</button>
-            <button onclick="hideEdit()" style="flex:1; background:transparent; border:1px solid #333; color:white; border-radius:8px; cursor:pointer;">CANCELAR</button>
+            <button onclick="hideEdit()" style="flex:1; background:none; border:1px solid #333; color:white; cursor:pointer;">CERRAR</button>
         </div>
     </div>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="font-weight:200; margin-bottom:5px;">Dashboard</h2>
-        <p style="color:#444; font-size:0.8rem; margin-bottom:30px; letter-spacing:1px; text-transform:uppercase;">Resumen de eventos actuales</p>
+        <h2 style="font-size:3rem; font-weight:900; letter-spacing:-2px; margin-bottom:40px;">REGISTROS</h2>
         <div class="stats-grid">
             <div class="stat-card" id="card-off"><b>0</b><span>OFFLINE</span></div>
-            <div class="stat-card" id="card-crit"><b>0</b><span>CRITICAL</span></div>
+            <div class="stat-card" id="card-crit"><b>0</b><span>CRÍTICO</span></div>
             <div class="stat-card"><b>0</b><span id="card-total">TOTAL</span></div>
         </div>
-        <div id="historyList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #222; color:#666; padding:12px; border-radius:8px; cursor:pointer; font-size:0.8rem;">CERRAR VENTANA</button>
+        <div id="historyList" style="margin-top:40px;"></div>
+        <button onclick="closePanels()" style="width:100%; margin-top:40px; background:none; border:1px solid #333; color:#444; padding:15px; cursor:pointer; text-transform:uppercase; font-size:0.7rem;">Cerrar Panel</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="font-weight:200; margin-bottom:30px;">Nueva Novedad</h2>
+        <h2 style="font-size:3rem; font-weight:900; letter-spacing:-2px; margin-bottom:40px;">NUEVO</h2>
         <form onsubmit="saveNew(event)">
             <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
             <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-            <input type="text" id="f-title" placeholder="Título" required>
-            <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required></textarea>
-            <button type="submit" class="btn-main" style="width:100%; padding:18px;">PUBLICAR AHORA</button>
+            <input type="text" id="f-title" placeholder="Título del Evento" required>
+            <textarea id="f-msg" rows="5" placeholder="Descripción detallada..." required></textarea>
+            <button type="submit" class="btn-main" style="width:100%; padding:20px;">Publicar Entrada</button>
         </form>
     </aside>
 
     <aside id="panelOffline" class="side-panel">
-        <h2 style="color:var(--critico); font-weight:200;">Alertas de Red</h2>
-        <div id="offlineList" style="margin-top:20px;"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #222; color:white; padding:10px; border-radius:8px;">VOLVER</button>
+        <h2 style="color:var(--critico); font-size:3rem; font-weight:900; letter-spacing:-2px;">ALERTAS</h2>
+        <div id="offlineList" style="margin-top:40px;"></div>
+        <button onclick="closePanels()" style="width:100%; margin-top:40px; background:none; border:1px solid #333; color:white; padding:15px;">VOLVER</button>
     </aside>
 </div>
 
@@ -252,12 +226,12 @@
             cardOff.querySelector('b').textContent = caidos.length;
             if(caidos.length > 0) {
                 cardOff.classList.add('alert');
-                ticker.innerHTML = `⚠️ RED: ` + caidos.map(n => `<span style="color:var(--critico); font-weight:bold; margin:0 15px;">[${n}]</span>`).join(' • ');
-                document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="background:rgba(255,59,48,0.05); border:1px solid rgba(255,59,48,0.2); padding:15px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:600; color:var(--critico);">● ${n}</div>`).join('');
+                ticker.innerHTML = `⚠️ ATENCIÓN: ` + caidos.map(n => `<span style="color:var(--critico); font-weight:900;">${n}</span>`).join(' — ');
+                document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="padding:20px 0; border-bottom:1px solid #222; font-weight:900; font-size:1.5rem; color:var(--critico);">● ${n}</div>`).join('');
             } else {
                 cardOff.classList.remove('alert');
-                ticker.innerHTML = `✔ SISTEMAS OPERATIVOS — SEGURIDAD MASTERSON — ${new Date().toLocaleDateString()} — `;
-                document.getElementById("offlineList").innerHTML = `<p style="text-align:center; color:#333; font-size:0.8rem;">Sistemas en línea.</p>`;
+                ticker.innerHTML = `SISTEMAS OPERATIVOS — MASTERSON SECURITY — FLOW: STABLE — `;
+                document.getElementById("offlineList").innerHTML = `<p style="color:#333; letter-spacing:2px;">RED ESTABLE</p>`;
             }
             document.getElementById("count-offline-mob").textContent = caidos.length;
         } catch(e) {}
@@ -284,40 +258,35 @@
     function renderSlide() {
         if(!logs.length) return;
         const cont = document.getElementById("infoCont");
-        const app = document.getElementById("cio-app");
-        cont.classList.add("oculto");
+        cont.style.opacity = "0";
+        cont.style.transform = "translateY(10px)";
 
         setTimeout(() => {
             const item = logs[currentIdx % logs.length];
             const areaColors = { "Monitoreo": "var(--color-monitoreo)", "Atención": "var(--color-atencion)", "Freschat": "var(--color-freschat)", "Novedad Interna": "var(--color-interna)" };
-            const currentAreaColor = areaColors[item.area] || "var(--accent)";
-
-            if(item.priority === "Crítica") app.classList.add("emergency-active");
-            else app.classList.remove("emergency-active");
-
-            document.getElementById("areaLabel").textContent = item.area;
-            document.getElementById("areaLabel").style.color = currentAreaColor;
-            document.getElementById("areaLabel").style.opacity = "1";
             
-            document.getElementById("prioBadge").textContent = item.priority.toUpperCase();
+            document.getElementById("areaLabel").textContent = item.area;
+            document.getElementById("prioBadge").textContent = `LEVEL: ${item.priority.toUpperCase()}`;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
             
-            const prioColors = {"Baja":"#0a84ff", "Media":"#ffd60a", "Alta":"#ff9f0a", "Crítica":"#ff3b30"};
+            const prioColors = {"Baja":"#444", "Media":"#ffd60a", "Alta":"#ff9f0a", "Crítica":"var(--critico)"};
             const pColor = prioColors[item.priority] || "#fff";
             document.getElementById("prioBadge").style.borderColor = pColor;
             document.getElementById("prioBadge").style.color = pColor;
+            document.getElementById("titleDisplay").style.color = (item.priority === "Crítica") ? "var(--critico)" : "white";
             document.getElementById("progressLine").style.background = pColor;
-            document.getElementById("titleDisplay").style.color = (item.priority === "Crítica") ? "#ff3b30" : "white";
-            
+
             autoSizeText();
-            cont.classList.remove("oculto");
-        }, 700);
+            cont.style.opacity = "1";
+            cont.style.transform = "translateY(0)";
+            cont.style.transition = "all 0.8s ease";
+        }, 800);
     }
 
     function autoSizeText() {
         const t = document.getElementById('titleDisplay');
-        t.style.fontSize = window.innerWidth < 768 ? "45px" : "80px";
+        t.style.fontSize = window.innerWidth < 768 ? "55px" : "110px";
     }
 
     function openHistory() { renderHistoryList(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
@@ -333,12 +302,12 @@
     function renderHistoryList() {
         const list = document.getElementById("historyList");
         list.innerHTML = logs.map((it, i) => `
-            <div style="background:rgba(255,255,255,0.02); padding:18px; margin-bottom:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.05);">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="text-align:left"><strong style="font-size:15px; font-weight:500;">${it.title}</strong><br><small style="color:#444; text-transform:uppercase; letter-spacing:1px; font-size:9px;">${it.area}</small></div>
-                    <div style="display:flex; gap:8px;">
-                        <button onclick="showQuickEdit(${i})" style="padding:6px 12px; background:transparent; color:#fff; border:1px solid #333; border-radius:4px; font-size:10px;">EDIT</button>
-                        <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#333; font-size:10px;">BORRAR</button>
+            <div style="padding:20px 0; border-bottom:1px solid #1a1a1a;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div style="text-align:left"><strong style="font-size:1.1rem; letter-spacing:-1px;">${it.title}</strong><br><small style="color:#444; text-transform:uppercase; font-size:0.6rem; letter-spacing:1px;">${it.area}</small></div>
+                    <div style="display:flex; gap:15px;">
+                        <button onclick="showQuickEdit(${i})" style="background:none; color:var(--primary); border:none; font-size:0.6rem; font-weight:900; cursor:pointer;">EDIT</button>
+                        <button onclick="deleteEntry(${i})" style="background:none; color:#333; border:none; font-size:0.6rem; cursor:pointer;">DELETE</button>
                     </div>
                 </div>
                 <div id="edit-anchor-${i}"></div>
@@ -366,29 +335,21 @@
 
     async function saveQuickEdit() {
         const idx = document.getElementById("e-index").value;
-        logs[idx] = {
-            area: document.getElementById("e-area").value,
-            priority: document.getElementById("e-prio").value,
-            title: document.getElementById("e-title").value,
-            message: document.getElementById("e-msg").value
-        };
+        logs[idx] = { area: document.getElementById("e-area").value, priority: document.getElementById("e-prio").value, title: document.getElementById("e-title").value, message: document.getElementById("e-msg").value };
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
         hideEdit(); renderHistoryList(); syncEvents();
     }
 
     async function saveNew(e) {
         e.preventDefault();
-        const entry = {
-            area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value,
-            title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value
-        };
+        const entry = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value };
         logs.push(entry);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
         closePanels(); syncEvents();
     }
 
     async function deleteEntry(idx) {
-        if(!confirm("¿Borrar registro?")) return;
+        if(!confirm("DELETE LOG?")) return;
         logs.splice(idx, 1);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
         renderHistoryList(); syncEvents();
@@ -411,7 +372,7 @@
         requestAnimationFrame(mainLoop);
     }
 
-    setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString('es-UY', { hour12: false }); }, 1000);
+    setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString('es-UY', { hour12: false, hour: '2-digit', minute: '2-digit' }); }, 1000);
     setInterval(updateNetwork, 5000);
     setInterval(syncEvents, 10000);
     updateNetwork(); syncEvents(); requestAnimationFrame(mainLoop);
