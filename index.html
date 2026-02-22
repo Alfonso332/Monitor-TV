@@ -6,7 +6,6 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* CSS ENCAPSULADO */
         #cio-app {
             --primary: #00d4d8;
             --accent: #006465;
@@ -14,7 +13,6 @@
             --critico-pulso: #4d0000;
             --ticker-bg: #0a1a1b;
             --bg-url: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
-            
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             display: flex; flex-direction: column;
             background: var(--dark-bg) !important; color: #ffffff !important;
@@ -22,52 +20,37 @@
             overflow: hidden; margin: 0; padding: 0; z-index: 9999;
         }
 
-        /* OCULTAR HEADER EN FULLSCREEN */
         #cio-app:fullscreen .main-header { display: none; }
 
-        /* FONDO OSCURECIDO Y AJUSTADO */
         #cio-app::before {
-            content: "";
-            position: absolute; inset: 0;
-            background-image: var(--bg-url);
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.15; 
-            filter: brightness(0.5); 
-            z-index: -1;
+            content: ""; position: absolute; inset: 0;
+            background-image: var(--bg-url); background-size: contain;
+            background-position: center; background-repeat: no-repeat;
+            opacity: 0.15; filter: brightness(0.5); z-index: -1;
         }
 
-        #cio-app .main-header {
+        .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.2); z-index: 100;
         }
 
-        /* NUEVO: CONTENEDOR DE ESTATUS DE RED */
-        #network-status {
-            display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
-        }
-        .status-dot-item {
-            display: flex; align-items: center; gap: 8px; font-size: 10px; 
-            font-weight: bold; letter-spacing: 1px; color: #aaa;
-        }
-        .dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            transition: 0.5s;
-        }
+        /* ESTILO DE LOS INDICADORES DE RED */
+        #network-status { display: flex; gap: 15px; margin-top: 5px; justify-content: center; }
+        .status-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: #aaa; text-transform: uppercase; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; }
         .dot.online { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
         .dot.offline { background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
 
-        #cio-app .header-actions button {
+        .header-actions button {
             background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
             color: #fff; padding: 8px 16px; border-radius: 15px; font-size: 12px;
             font-weight: bold; cursor: pointer; transition: 0.3s; margin-right: 8px;
         }
 
-        #cio-app #clockDisplay { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
+        #clockDisplay { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
 
-        #cio-app #display-board {
+        #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
             background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
@@ -80,62 +63,47 @@
         }
         #cio-app.es-critico #display-board { animation: pulso-cio 2s infinite ease-in-out; }
 
-        #cio-app .info-container { width: 100%; max-width: 1100px; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; }
-        #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+        .info-container { width: 100%; max-width: 1100px; transition: all 0.6s; z-index: 10; }
+        .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        #cio-app #areaLabel { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--primary); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; font-weight: bold; }
-        #cio-app #prioBadge { display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 800; border: 1px solid var(--primary); font-size: clamp(0.7rem, 2vw, 1rem); margin-bottom: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
-        #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin: 0 0 20px 0; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,1); }
-        #cio-app #messageDisplay { font-weight: 400; color: #ffffff; line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; text-shadow: 0 2px 10px rgba(0,0,0,1); }
+        #areaLabel { font-size: clamp(0.9rem, 2.5vw, 1.4rem); color: var(--primary); letter-spacing: 4px; font-weight: bold; }
+        #prioBadge { display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 800; border: 1px solid var(--primary); margin: 15px 0; background: rgba(0,0,0,0.6); }
+        #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 20px; }
+        #messageDisplay { line-height: 1.5; max-width: 850px; margin: 0 auto; white-space: pre-wrap; }
 
-        #cio-app #ticker-bar { height: 40px; background: rgba(10, 26, 27, 0.95); border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; backdrop-filter: blur(10px); }
-        #cio-app #ticker-content { white-space: nowrap; animation: ticker-scroll-cio 30s linear infinite; color: var(--primary); font-size: 0.9rem; font-weight: bold; }
+        #ticker-bar { height: 40px; background: rgba(10, 26, 27, 0.95); border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; }
+        #ticker-content { white-space: nowrap; animation: ticker-scroll-cio 30s linear infinite; color: var(--primary); font-weight: bold; }
         @keyframes ticker-scroll-cio { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        #cio-app .nav-mobile {
+        .nav-mobile {
             display: none; height: 95px; background: rgba(7, 18, 19, 0.98); border-top: 1px solid var(--primary);
             justify-content: space-around; align-items: flex-start; padding-top: 15px;
-            padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(20px);
         }
-        #cio-app .nav-mobile button {
-            background: none; border: none; color: #fff; display: flex; flex-direction: column;
-            align-items: center; gap: 5px; font-size: 11px; font-weight: bold; cursor: pointer;
-        }
-        #cio-app .nav-mobile .icon { font-size: 24px; color: var(--primary); }
+        .nav-mobile button { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold; }
 
-        #cio-app .side-panel {
+        .side-panel {
             position: fixed; right: 0; top: 0; width: 350px; height: 100%;
             background: #091718; border-left: 2px solid var(--primary); padding: 30px;
-            transform: translateX(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1100;
-            box-sizing: border-box; overflow-y: auto;
+            transform: translateX(100%); transition: 0.4s; z-index: 1100; box-sizing: border-box; overflow-y: auto;
         }
-        #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; z-index: 1050; }
-        #cio-app #overlay-cio.active { display: block; }
+        .side-panel.active { transform: translateX(0); }
+        #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1050; }
+        #overlay-cio.active { display: block; }
 
-        #cio-app h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
-        #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid var(--accent);
-            border-radius: 15px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
-        }
-        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: 800; border: none; border-radius: 20px; cursor: pointer; }
-        #cio-app .btn-cancel { width: 100%; padding: 12px; background: rgba(255, 77, 77, 0.1); color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 20px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 15px; margin-bottom: 15px; }
+        .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: bold; border: none; border-radius: 20px; }
+        .btn-cancel { width: 100%; padding: 12px; background: none; color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 20px; margin-top: 10px; }
 
-        #cio-app .history-item { background: rgba(255,255,255,0.08); padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--primary); border-radius: 15px; }
-        #cio-app .history-item button { border-radius: 12px; cursor: pointer; border: none; padding: 8px 15px; font-weight: bold; }
+        .history-item { background: rgba(255,255,255,0.08); padding: 15px; margin-bottom: 10px; border-radius: 15px; }
 
         @media (max-width: 768px) {
-            #cio-app .header-actions { display: none; }
-            #cio-app .nav-mobile { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 30px 30px 0 0; }
-            #cio-app .side-panel.active { transform: translateY(0); }
-            #cio-app #display-board { padding-bottom: 140px; }
-            #cio-app #clockDisplay { font-size: 1.2rem; }
-            #cio-app #network-status { align-items: center; width: 100%; margin-top: 5px; }
+            .header-actions { display: none; }
+            .nav-mobile { display: flex; }
+            .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 30px 30px 0 0; }
+            .side-panel.active { transform: translateY(0); }
+            #network-status { flex-direction: row; flex-wrap: wrap; gap: 10px; }
         }
-
-        #cio-app #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; z-index: 999; }
-        @media (max-width: 768px) { #cio-app #progressLine { bottom: 135px; } }
+        #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; z-index: 999; }
     </style>
 </head>
 <body>
@@ -151,10 +119,10 @@
             <button onclick="toggleFS()">⛶ TV</button>
         </div>
         
-        <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="text-align: center;">
             <div id="clockDisplay">00:00:00</div>
             <div id="network-status">
-                <div class="status-dot-item">SINCRONIZANDO RED...</div>
+                <span style="font-size: 10px; opacity: 0.5;">CARGANDO RED...</span>
             </div>
         </div>
     </header>
@@ -173,20 +141,17 @@
     </div>
 
     <nav class="nav-mobile">
-        <button onclick="openForm()"><span class="icon">➕</span>NUEVO</button>
-        <button onclick="openHistory()"><span class="icon">📋</span>LISTA</button>
-        <button onclick="handleCerrarTurno()"><span class="icon">🔒</span>TURNO</button>
+        <button onclick="openForm()"><span>➕</span>NUEVO</button>
+        <button onclick="openHistory()"><span>📋</span>LISTA</button>
+        <button onclick="handleCerrarTurno()"><span>🔒</span>TURNO</button>
     </nav>
 
     <aside id="panelForm" class="side-panel">
         <h2>Nueva Entrada</h2>
         <form id="mainForm" onsubmit="handleSave(event)">
             <input type="hidden" id="editId" value="-1">
-            <label>Tipo de Evento</label>
-            <select id="f-type">
-                <option value="turno">De Turno (No aparece en PDF)</option>
-                <option value="diaria">Diaria (Se mantiene 24h)</option>
-            </select>
+            <label>Tipo</label>
+            <select id="f-type"><option value="turno">Turno</option><option value="diaria">Diaria</option></select>
             <label>Área</label>
             <select id="f-area">
                 <option value="Freschat">Freschat</option>
@@ -195,27 +160,18 @@
                 <option value="Interno">Interno</option>
             </select>
             <label>Prioridad</label>
-            <select id="f-prio">
-                <option value="Baja">Baja</option>
-                <option value="Media">Media</option>
-                <option value="Alta">Alta</option>
-                <option value="Crítica">Crítica</option>
-            </select>
-            <label>Título</label>
-            <input type="text" id="f-title" placeholder="Ej: Falla de enlace" required>
-            <label>Descripción</label>
-            <textarea id="f-msg" rows="4" placeholder="Detalle la novedad..." required></textarea>
-            
-            <button type="submit" class="btn-save">ACTUALIZAR MONITOR</button>
-            <button type="button" onclick="closeAll()" class="btn-cancel">✕ CANCELAR</button>
+            <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+            <input type="text" id="f-title" placeholder="Título" required>
+            <textarea id="f-msg" rows="4" placeholder="Mensaje..." required></textarea>
+            <button type="submit" class="btn-save">GUARDAR</button>
+            <button type="button" onclick="closeAll()" class="btn-cancel">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2>Eventos Activos</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:15px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF DIARIO</button>
+        <h2>Historial</h2>
         <div id="listItems"></div>
-        <button type="button" onclick="closeAll()" class="btn-cancel" style="margin-top: 20px;">✕ VOLVER AL MONITOR</button>
+        <button type="button" onclick="closeAll()" class="btn-cancel">CERRAR</button>
     </aside>
 
     <div id="progressLine"></div>
@@ -230,7 +186,7 @@
     let timerStart = null;
     const DISPLAY_TIME = 15;
 
-    // --- FUNCIÓN PARA SINCRONIZAR ESTATUS DE RED ---
+    // --- SINCRONIZACIÓN DE RED ---
     async function syncNetwork() {
         try {
             const r = await fetch(RED_URL);
@@ -238,33 +194,29 @@
             if(!statusData) return;
 
             let html = "";
-            for(let key in statusData) {
+            Object.keys(statusData).forEach(key => {
                 const item = statusData[key];
                 const dotClass = item.estado === "online" ? "online" : "offline";
                 html += `
-                    <div class="status-dot-item">
+                    <div class="status-item">
                         <div class="dot ${dotClass}"></div>
-                        ${item.nombre}
+                        ${key.replace('_', ' ')}
                     </div>
                 `;
-            }
+            });
             document.getElementById("network-status").innerHTML = html;
-        } catch(e) { console.error("Error Red Sync"); }
+        } catch(e) { console.error("Error Red:", e); }
     }
 
     async function syncData() {
         try {
             const r = await fetch(API_URL);
             const d = await r.json();
-            const now = Date.now();
-            dataStore = (d || []).filter(item => (item.type === 'diaria' && (now - item.timestamp > 86400000)) ? false : true);
+            dataStore = d || [];
             if(dataStore.length > 0) {
                 const last = dataStore[dataStore.length - 1];
                 document.getElementById("ticker-content").textContent = `[ÚLTIMO] ${last.area}: ${last.title} ——— `;
                 if(document.getElementById("prioBadge").textContent === "CONECTANDO") refreshView();
-            } else {
-                document.getElementById("prioBadge").textContent = "SISTEMA OK";
-                document.getElementById("ticker-content").textContent = "SIN NOVEDADES ACTIVAS";
             }
         } catch(e) { console.error("Error Sync"); }
     }
@@ -277,14 +229,18 @@
             const item = dataStore[currentIndex % dataStore.length];
             const app = document.getElementById("cio-app");
             const badge = document.getElementById("prioBadge");
-            if(item.priority === "Crítica") { app.classList.add("es-critico"); badge.style.background = "#ff0000"; badge.style.color = "#fff"; }
-            else { app.classList.remove("es-critico"); badge.style.background = "rgba(0,0,0,0.4)"; badge.style.color = "var(--primary)"; }
+            
+            if(item.priority === "Crítica") app.classList.add("es-critico");
+            else app.classList.remove("es-critico");
+            
             badge.textContent = `PRIORIDAD ${item.priority}`;
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
+            
             const colors = {"Baja":"#00d4d8", "Media":"#00ccff", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
-            document.getElementById("progressLine").style.background = colors[item.priority];
+            document.getElementById("progressLine").style.background = colors[item.priority] || "#fff";
+            
             adjustText();
             cont.classList.remove("oculto");
         }, 600); 
@@ -303,116 +259,32 @@
         };
         if(id === -1) dataStore.push(entry); else dataStore[id] = entry;
         await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore) });
-        document.getElementById("mainForm").reset();
         closeAll(); syncData();
     }
-
-    async function handleCerrarTurno() {
-        if(!confirm("¿Cerrar turno? Se descargará el PDF (solo Diarias) y se limpiará el sistema.")) return;
-        generatePDF();
-        setTimeout(async () => {
-            const soloDiarias = dataStore.filter(i => i.type === 'diaria');
-            await fetch(API_URL, { method: 'PUT', body: JSON.stringify(soloDiarias.length ? soloDiarias : null) });
-            currentIndex = 0; syncData();
-        }, 2000);
-    }
-
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const diariasParaReporte = dataStore.filter(i => i.type === 'diaria');
-        const responsable = prompt("Nombre del Responsable:");
-        const hora = new Date().getHours();
-        let turno = "";
-        if (hora >= 6 && hora < 14) turno = "Mañana";
-        else if (hora >= 14 && hora < 22) turno = "Tarde";
-        else turno = "Noche";
-
-        doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE CIO OPERATIVO", 20, 20);
-        doc.setFontSize(10);
-        doc.text(`Responsable: ${responsable || '---'}`, 20, 28);
-        doc.text(`Turno Detectado: ${turno}`, 20, 33);
-        doc.text(`Fecha/Hora: ${new Date().toLocaleString()}`, 130, 33);
-
-        let y = 55;
-        if(diariasParaReporte.length === 0) {
-            doc.setTextColor(100); doc.text("No se registraron novedades diarias importantes en este turno.", 20, y);
-        } else {
-            diariasParaReporte.forEach((item, i) => {
-                if(y > 270) { doc.addPage(); y = 20; }
-                doc.setTextColor(0); doc.setFont(undefined, 'bold');
-                doc.text(`${i+1}. [${item.priority}] AREA: ${item.area}`, 20, y);
-                y += 7; doc.setFont(undefined, 'normal');
-                const lines = doc.splitTextToSize(`${item.title}: ${item.message}`, 170);
-                doc.text(lines, 25, y); y += (lines.length * 7) + 10;
-            });
-        }
-        doc.save(`Reporte_CIO_${turno}_${Date.now()}.pdf`);
-    }
-
-    function openHistory() {
-        const list = document.getElementById("listItems");
-        list.innerHTML = dataStore.length ? dataStore.map((item, i) => `
-            <div class="history-item">
-                <small style="color:var(--primary); font-weight:bold;">${item.type.toUpperCase()}</small>
-                <div style="font-weight:bold; margin:5px 0;">${item.title}</div>
-                <div style="display:flex; gap:10px; margin-top:10px;">
-                    <button onclick="onEdit(${i})" style="background:var(--primary); color:#000;">EDITAR</button>
-                    <button onclick="onDelete(${i})" style="background:#ff4d4d; color:white;">BORRAR</button>
-                </div>
-            </div>
-        `).join('') : "<p style='opacity:0.5; text-align:center;'>No hay novedades activas.</p>";
-        document.getElementById("panelHistory").classList.add("active");
-        document.getElementById("overlay-cio").classList.add("active");
-    }
-
-    window.onEdit = (i) => {
-        const item = dataStore[i];
-        document.getElementById("editId").value = i;
-        document.getElementById("f-area").value = item.area;
-        document.getElementById("f-prio").value = item.priority;
-        document.getElementById("f-title").value = item.title;
-        document.getElementById("f-msg").value = item.message;
-        document.getElementById("f-type").value = item.type;
-        closeAll();
-        document.getElementById("panelForm").classList.add("active");
-        document.getElementById("overlay-cio").classList.add("active");
-    };
-
-    window.onDelete = async (i) => {
-        if(!confirm("¿Eliminar entrada?")) return;
-        dataStore.splice(i, 1);
-        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore.length ? dataStore : null) });
-        openHistory(); syncData();
-    };
 
     function adjustText() {
         const t = document.getElementById('titleDisplay');
         const m = document.getElementById('messageDisplay');
         const container = document.getElementById('display-board');
-        let sizeT = window.innerWidth <= 768 ? 28 : 70; 
-        let sizeM = window.innerWidth <= 768 ? 16 : 38;
+        let sizeT = window.innerWidth <= 768 ? 30 : 70; 
+        let sizeM = window.innerWidth <= 768 ? 18 : 35;
         t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
         let limit = 0;
-        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.70) && limit < 40) {
-            sizeT -= 1; sizeM -= 0.8;
+        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.7) && limit < 30) {
+            sizeT -= 2; sizeM -= 1;
             t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
             limit++;
         }
     }
 
-    function openForm() { 
-        document.getElementById("editId").value = "-1"; 
-        document.getElementById("mainForm").reset();
-        document.getElementById("panelForm").classList.add("active"); 
-        document.getElementById("overlay-cio").classList.add("active"); 
+    function openForm() { document.getElementById("mainForm").reset(); document.getElementById("editId").value="-1"; document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay-cio").classList.add("active"); }
+    function openHistory() { 
+        document.getElementById("listItems").innerHTML = dataStore.map((item, i) => `<div class="history-item"><b>${item.title}</b><br><button onclick="onDelete(${i})">Borrar</button></div>`).join('');
+        document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay-cio").classList.add("active"); 
     }
+    window.onDelete = async (i) => { dataStore.splice(i,1); await fetch(API_URL,{method:'PUT', body:JSON.stringify(dataStore)}); syncData(); openHistory(); };
     function closeAll() { document.querySelectorAll('.side-panel, #overlay-cio').forEach(el => el.classList.remove('active')); }
-    function toggleFS() { 
-        const app = document.getElementById('cio-app');
-        if (!document.fullscreenElement) app.requestFullscreen(); else document.exitFullscreen(); 
-    }
+    function toggleFS() { const app = document.getElementById('cio-app'); if (!document.fullscreenElement) app.requestFullscreen(); else document.exitFullscreen(); }
 
     function runLoop(ts) {
         if(!dataStore.length) { requestAnimationFrame(runLoop); return; }
@@ -424,13 +296,10 @@
     }
 
     setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}); }, 1000);
-    setInterval(syncData, 15000);
-    setInterval(syncNetwork, 10000); // Revisa la red cada 10 seg
+    setInterval(syncData, 10000);
+    setInterval(syncNetwork, 5000); // Actualiza la red cada 5 segundos
     window.addEventListener('resize', adjustText);
-    
-    syncData();
-    syncNetwork();
-    requestAnimationFrame(runLoop);
+    syncData(); syncNetwork(); requestAnimationFrame(runLoop);
 </script>
 </body>
 </html>
