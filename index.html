@@ -16,10 +16,6 @@
             --dark-bg: #000000;
             --critico: #ff4d4d;
             --exito: #2ecc71;
-            --color-monitoreo: #ff4d4d;
-            --color-atencion: #2ecc71;
-            --color-freschat: #3498db;
-            --color-interna: #e0f7fa;
             --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -46,145 +42,134 @@
 
         /* HEADER */
         #cio-app .main-header {
-            height: 80px; display: flex; justify-content: space-between; align-items: center;
+            height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
         #cio-app:fullscreen .main-header { display: none !important; }
 
         /* DASHBOARD CENTRAL */
-        #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
+        #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 15px; position: relative; }
         #cio-app .info-container { width: 100%; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        #cio-app .oculto { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(10px); }
+        #cio-app .oculto { opacity: 0; transform: translateY(15px) scale(0.98); filter: blur(5px); }
+
+        /* TIPOGRAFÍA DINÁMICA */
+        #titleDisplay { margin: 15px 0; line-height: 1.1; font-size: 70px; font-weight: 900; }
+        #messageDisplay { font-size: 1.6rem; opacity: 0.7; max-width: 85%; margin: 0 auto; }
 
         /* BOTÓN FLOTANTE MÓVIL */
         #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 80px; right: 25px;
-            width: 65px; height: 65px; border-radius: 50%;
-            background: var(--primary); color: #fff; border: 2px solid rgba(255,255,255,0.1);
-            font-size: 24px; cursor: pointer; z-index: 10015;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); align-items: center; justify-content: center;
+            display: none; position: fixed; bottom: 85px; right: 20px;
+            width: 55px; height: 55px; border-radius: 50%;
+            background: var(--primary); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            font-size: 20px; cursor: pointer; z-index: 10015;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6); align-items: center; justify-content: center;
         }
 
-        /* TICKER BAR EVOLUCIONADA */
+        /* TICKER BAR */
         #cio-app #ticker-bar { 
-            height: 65px; background: #050505; border-top: 1px solid #111; 
+            height: 55px; background: #050505; border-top: 1px solid #111; 
             display: flex; align-items: center; overflow: hidden; position: relative; 
         }
         #cio-app #ticker-content { 
-            display: flex; align-items: center; gap: 25px;
-            white-space: nowrap; position: absolute; left: 0; padding: 0 50px;
-            transition: transform 0.1s linear;
+            display: flex; align-items: center; gap: 20px;
+            white-space: nowrap; position: absolute; left: 0; padding: 0 40px;
         }
         
-        /* BADGES DE ESTADO */
         .status-badge {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1px; transition: all 0.5s ease;
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 6px; font-size: 0.75rem; font-weight: 800;
+            text-transform: uppercase; transition: all 0.5s ease;
         }
-        
-        .status-badge.offline {
-            background: rgba(255, 77, 77, 0.15); border: 1px solid #ff4d4d; color: #ff4d4d;
-            animation: badgePulse 1.5s infinite;
-        }
-
-        .status-badge.restored {
-            background: rgba(46, 204, 113, 0.2); border: 1px solid var(--exito);
-            color: var(--exito); transform: scale(1.15);
-            box-shadow: 0 0 20px rgba(46, 204, 113, 0.4);
-        }
-
-        .status-badge.hidden-out {
-            opacity: 0; transform: translateY(-20px) scale(0.8);
-        }
-
-        @keyframes badgePulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .status-badge.offline { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; animation: bPulse 1.5s infinite; }
+        .status-badge.restored { background: rgba(46, 204, 113, 0.2); border: 1px solid var(--exito); color: var(--exito); transform: scale(1.1); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3); }
+        .status-badge.hidden-out { opacity: 0; transform: translateY(-10px); }
+        @keyframes bPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
         /* PANELES LATERALES */
         #cio-app .side-panel {
-            position: fixed; right: 0; top: 0; width: 420px; height: 100%;
-            background: #080808; border-left: 1px solid var(--primary); padding: 30px;
-            transform: translateX(100%); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10020;
+            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
+            background: #080808; border-left: 1px solid var(--primary); padding: 25px;
+            transform: translateX(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10020;
             box-sizing: border-box; overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* FORMULARIOS Y BOTONES */
+        /* FORMULARIOS Y BOTONES CENTRADOS */
+        #cio-app .form-wrap { display: flex; flex-direction: column; align-items: center; width: 100%; }
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 14px; background: #111; color: #fff; 
-            border: 1px solid #222; border-radius: 8px; margin-bottom: 12px; box-sizing: border-box;
+            width: 100%; max-width: 340px; padding: 12px; background: #111; color: #fff; 
+            border: 1px solid #222; border-radius: 8px; margin-bottom: 12px; box-sizing: border-box; text-align: center;
         }
-        #cio-app button.btn-main {
-            background: var(--primary); color: white; border: none; padding: 15px; width: 100%;
-            border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase;
-        }
-        #cio-app button.btn-cancel {
-            background: none; border: 1px solid #333; color: #777; padding: 10px; width: 100%;
-            border-radius: 8px; cursor: pointer; margin-top: 10px;
-        }
+        #cio-app button.btn-main { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; max-width: 340px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        #cio-app button.btn-cancel { background: #1a1a1a; border: 1px solid #333; color: #888; padding: 10px; width: 100%; max-width: 340px; border-radius: 8px; cursor: pointer; margin-top: 10px; }
 
-        /* RESPONSIVE */
+        /* RESPONSIVE MÓVIL */
         @media (max-width: 768px) {
             #cio-app #menu-toggle-float { display: flex; }
-            #cio-app .side-panel { width: 100%; }
-            #cio-app .main-header { padding: 0 15px; }
-            #titleDisplay { font-size: 40px !important; }
+            #cio-app .side-panel { width: 100%; border-left: none; }
+            #cio-app .main-header { height: 60px; padding: 0 15px; }
+            #titleDisplay { font-size: 36px !important; margin: 10px 0; }
+            #messageDisplay { font-size: 1.2rem !important; }
+            #clockDisplay { font-size: 1.4rem !important; }
+            .header-actions { display: none; }
         }
     </style>
 </head>
 <body onclick="handleGlobalClick(event)">
 
 <div id="cio-app">
-    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10002; backdrop-filter:blur(10px);" onclick="closePanels()"></div>
+    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10002; backdrop-filter:blur(8px);" onclick="closePanels()"></div>
 
     <header class="main-header">
-        <div class="header-actions" style="display:flex; gap:10px;">
-            <button onclick="openForm()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">＋ NUEVA</button>
-            <button onclick="openHistory()" style="background:#1a1a1a; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">📋 HISTORIAL</button>
-            <button onclick="toggleFS()" style="background:none; border:1px solid #333; color:#555; padding:8px 12px; border-radius:5px; cursor:pointer;">⛶ TV</button>
+        <div class="header-actions" style="display:flex; gap:8px;">
+            <button onclick="openForm()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:5px; font-weight:bold; cursor:pointer;">＋ NUEVA</button>
+            <button onclick="openHistory()" style="background:#1a1a1a; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">📋 HISTORIAL</button>
+            <button onclick="toggleFS()" style="background:none; border:1px solid #333; color:#666; padding:8px 10px; border-radius:5px; cursor:pointer;">⛶ TV</button>
         </div>
-        <div id="clockDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">00:00:00</div>
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35" style="filter: brightness(2);">
+        <div id="clockDisplay" style="font-family:monospace; font-size:1.6rem; font-weight:900; color:var(--primary);">00:00:00</div>
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);">
     </header>
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px;">INICIANDO</div>
-            <div id="prioBadge" style="display: inline-block; padding: 5px 20px; border-radius: 4px; font-weight: 900; border: 1px solid var(--accent); font-size: 0.7rem;">SISTEMA OK</div>
-            <h1 id="titleDisplay" style="margin:20px 0; line-height: 1; font-size: 80px; font-weight: 900;">MASTERSON</h1>
-            <p id="messageDisplay" style="font-size: 1.6rem; opacity: 0.6; max-width: 800px; margin: 0 auto; font-weight: 300;">Cargando novedades...</p>
+            <div id="areaLabel" style="letter-spacing: 4px; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px;">MONITOR</div>
+            <div id="prioBadge" style="display: inline-block; padding: 4px 15px; border-radius: 4px; font-weight: 900; border: 1px solid var(--accent); font-size: 0.65rem;">SISTEMA OK</div>
+            <h1 id="titleDisplay">MASTERSON</h1>
+            <p id="messageDisplay">Cargando información del sistema...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
         <div id="ticker-content">
-            <div class="status-badge" style="color:#444">VERIFICANDO NODOS DE RED...</div>
+            <div class="status-badge" style="color:#444">VERIFICANDO RED...</div>
         </div>
     </div>
     
-    <div id="progressLine" style="position: fixed; bottom: 65px; height: 3px; width: 0%; transition: width 0.1s linear; z-index: 5;"></div>
+    <div id="progressLine" style="position: fixed; bottom: 55px; height: 3px; width: 0%; transition: width 0.1s linear; z-index: 5;"></div>
 
     <button id="menu-toggle-float" onclick="toggleMobileMenu(event)">☰</button>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:var(--primary); margin-bottom:30px;">REGISTRAR NOVEDAD</h2>
-        <form onsubmit="saveNew(event)">
-            <label style="font-size:10px; color:#555;">ÁREA</label>
-            <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
-            <label style="font-size:10px; color:#555;">PRIORIDAD</label>
-            <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-            <input type="text" id="f-title" placeholder="Título corto" required>
-            <textarea id="f-msg" rows="5" placeholder="Descripción detallada..." required></textarea>
-            <button type="submit" class="btn-main">PUBLICAR EN MONITOR</button>
-            <button type="button" onclick="closePanels()" class="btn-cancel">CANCELAR</button>
-        </form>
+        <div class="form-wrap">
+            <h2 style="color:var(--primary); margin-bottom:20px; text-align:center;">NUEVA NOVEDAD</h2>
+            <form onsubmit="saveNew(event)" style="width:100%; display:contents;">
+                <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
+                <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+                <input type="text" id="f-title" placeholder="Título corto" required>
+                <textarea id="f-msg" rows="4" placeholder="Descripción detallada..." required></textarea>
+                <button type="submit" class="btn-main">PUBLICAR</button>
+                <button type="button" onclick="closePanels()" class="btn-cancel">CANCELAR / CERRAR</button>
+            </form>
+        </div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent);">HISTORIAL RECIENTE</h2>
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">HISTORIAL</h2>
         <div id="historyList"></div>
-        <button onclick="closePanels()" class="btn-cancel">CERRAR PANELES</button>
+        <div class="form-wrap">
+            <button onclick="closePanels()" class="btn-cancel">VOLVER AL MONITOR</button>
+        </div>
     </aside>
 </div>
 
@@ -195,10 +180,9 @@
     let logs = []; 
     let currentIdx = 0; 
     let startTime = null; 
-    let lastNetworkStatus = {}; // Para detectar cambios de OFF -> ON
+    let lastNetworkStatus = {};
     const SLIDE_TIME = 15;
 
-    // --- LÓGICA DE RED CON EFECTO RESTABLECER ---
     async function updateNetwork() {
         try {
             const resp = await fetch(RED_URL);
@@ -207,46 +191,27 @@
 
             const ticker = document.getElementById("ticker-content");
             let htmlContent = "";
-            let hasAlerts = false;
 
             Object.keys(status).forEach(id => {
                 const name = id.replace(/_/g, ' ');
                 const isOffline = status[id].estado === "offline";
                 const wasOffline = lastNetworkStatus[id] === "offline";
 
-                // Si estaba caído y ahora está online -> EFECTO VERDE
                 if (!isOffline && wasOffline) {
-                    htmlContent += `<div class="status-badge restored" id="restored-${id}">✔ ${name} RESTABLECIDO</div>`;
-                    // Programar desaparición del mensaje de éxito tras 5 segundos
-                    setTimeout(() => {
-                        const el = document.getElementById(`restored-${id}`);
-                        if(el) el.classList.add('hidden-out');
-                    }, 5000);
+                    htmlContent += `<div class="status-badge restored" id="restored-${id}">✔ ${name} ONLINE</div>`;
+                    setTimeout(() => { document.getElementById(`restored-${id}`)?.classList.add('hidden-out'); }, 5000);
                 } 
-                // Si sigue caído -> EFECTO ROJO
                 else if (isOffline) {
-                    htmlContent += `<div class="status-badge offline">⚠️ OFFLINE: ${name}</div>`;
-                    hasAlerts = true;
+                    htmlContent += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
                 }
-                
                 lastNetworkStatus[id] = status[id].estado;
             });
 
-            if(htmlContent === "") {
-                htmlContent = `<div class="status-badge" style="color:var(--primary); border:1px solid #111;">✔ SISTEMAS OPERATIVOS</div>`;
-            }
-
+            if(htmlContent === "") htmlContent = `<div class="status-badge" style="color:var(--primary)">✔ SISTEMAS OPERATIVOS</div>`;
             ticker.innerHTML = htmlContent;
-            
-            // Animación simple de scroll si hay mucho contenido
-            if(ticker.offsetWidth > window.innerWidth) {
-                ticker.style.animation = "scrollTicker 20s linear infinite";
-            }
-
-        } catch(e) { console.error("Error red:", e); }
+        } catch(e) {}
     }
 
-    // --- GESTIÓN DE NOVEDADES ---
     async function syncEvents() {
         try {
             const resp = await fetch(DB_URL);
@@ -278,23 +243,12 @@
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
             document.getElementById("progressLine").style.background = activeColor;
-            
             cont.classList.remove("oculto");
-        }, 800);
+        }, 700);
     }
 
-    // --- UI HELPERS ---
-    function toggleMobileMenu(e) {
-        e.stopPropagation();
-        openForm(); // Abrir form directo en móvil para rapidez
-    }
-
-    function handleGlobalClick(e) {
-        const panels = document.querySelectorAll('.side-panel');
-        const overlay = document.getElementById("overlay");
-        if(overlay.style.display === "block" && e.target === overlay) closePanels();
-    }
-
+    function toggleMobileMenu(e) { e.stopPropagation(); openForm(); }
+    function handleGlobalClick(e) { if(e.target.id === "overlay") closePanels(); }
     function openForm() { document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     function openHistory() { renderHistory(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("overlay").style.display = "none"; }
@@ -302,22 +256,17 @@
     function renderHistory() {
         const h = document.getElementById("historyList");
         h.innerHTML = logs.map((it, i) => `
-            <div style="background:#111; padding:15px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--primary);">
+            <div style="background:#111; padding:12px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--primary);">
                 <small style="color:var(--primary)">${it.area}</small>
-                <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
-                <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#444; font-size:10px; cursor:pointer;">ELIMINAR</button>
+                <div style="font-weight:bold; margin:3px 0; font-size:0.9rem;">${it.title}</div>
+                <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#ff4d4d; font-size:10px; cursor:pointer; padding:0;">[ ELIMINAR ]</button>
             </div>
         `).join('');
     }
 
     async function saveNew(e) {
         e.preventDefault();
-        const entry = {
-            area: document.getElementById("f-area").value, 
-            priority: document.getElementById("f-prio").value,
-            title: document.getElementById("f-title").value, 
-            message: document.getElementById("f-msg").value
-        };
+        const entry = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value };
         logs.push(entry);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
         closePanels(); syncEvents();
@@ -346,23 +295,10 @@
         requestAnimationFrame(loop);
     }
 
-    // --- INIT ---
-    setInterval(() => { 
-        document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString('es-UY', { hour12: false }); 
-    }, 1000);
-
-    setInterval(updateNetwork, 4000); // Chequeo de red cada 4 seg
+    setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString('es-UY', { hour12: false }); }, 1000);
+    setInterval(updateNetwork, 4000);
     setInterval(syncEvents, 10000);
-    
     updateNetwork(); syncEvents(); requestAnimationFrame(loop);
 </script>
-
-<style>
-    @keyframes scrollTicker {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
-    }
-</style>
-
 </body>
 </html>
