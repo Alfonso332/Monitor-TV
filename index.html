@@ -23,11 +23,12 @@
             overflow: hidden; z-index: 99999; margin: 0; padding: 0;
         }
 
+        /* FONDO MUCHO MÁS OPACO (0.03) */
         #cio-app::before {
             content: ""; position: absolute; inset: 0;
             background-image: var(--bg-img); background-size: contain;
             background-position: center; background-repeat: no-repeat;
-            opacity: 0.1; filter: grayscale(1); z-index: -1;
+            opacity: 0.03; filter: grayscale(1); z-index: -1;
         }
 
         /* HEADER */
@@ -35,6 +36,11 @@
             height: 80px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 25px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.3);
+        }
+
+        /* OCULTAR BOTONES EN PANTALLA COMPLETA */
+        :fullscreen #cio-app .header-actions {
+            display: none !important;
         }
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: var(--primary); font-weight: bold; }
@@ -230,7 +236,7 @@
                 container.innerHTML = "";
                 alertTitle.textContent = "✔ TODOS LOS SERVICIOS ONLINE";
                 alertTitle.style.color = "#00ff00";
-                document.getElementById("critical-alert-zone").style.display = "flex"; // Lo dejamos visible para el mensaje OK
+                document.getElementById("critical-alert-zone").style.display = "flex";
             }
         } catch(e) { console.warn("Error Red"); }
     }
@@ -284,7 +290,14 @@
         document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").classList.add("active");
     }
     function closePanels() { document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active')); }
-    function toggleFS() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+    
+    function toggleFS() { 
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
 
     async function saveEntry(e) {
         e.preventDefault();
