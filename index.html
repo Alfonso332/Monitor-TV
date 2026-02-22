@@ -3,331 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO - Monitor Operativo</title>
+    <title>CIO Monitor - Alerta Crítica</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
-        /* ENCAPSULAMIENTO TOTAL EN #cio-app */
+        /* ENCAPSULAMIENTO PARA NO CHOCAR CON CSS EXTERNO */
         #cio-app {
             --primary: #00d4d8;
             --accent: #006465;
             --dark-bg: #000000;
-            --critico-pulso: #4d0000;
-            --bg-url: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
-            
+            --critico: #ff4d4d;
+            --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
+
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--dark-bg) !important;
+            color: #ffffff !important;
+            font-family: 'Segoe UI', Roboto, sans-serif !important;
             display: flex; flex-direction: column;
-            background: var(--dark-bg) !important; color: #ffffff !important;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-            overflow: hidden; margin: 0; padding: 0; z-index: 9999;
+            overflow: hidden; z-index: 99999; margin: 0; padding: 0;
         }
 
         #cio-app::before {
             content: ""; position: absolute; inset: 0;
-            background-image: var(--bg-url); background-size: contain;
+            background-image: var(--bg-img); background-size: contain;
             background-position: center; background-repeat: no-repeat;
-            opacity: 0.12; filter: brightness(0.4); z-index: -1;
+            opacity: 0.1; filter: grayscale(1); z-index: -1;
         }
 
         /* HEADER */
         #cio-app .main-header {
-            height: 75px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0, 212, 216, 0.2); z-index: 100;
+            height: 90px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 25px; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(0, 212, 216, 0.2);
         }
 
-        /* ESTADO DE RED FILTRADO */
-        #cio-app #network-status { display: flex; gap: 15px; margin-top: 5px; justify-content: center; flex-wrap: wrap; }
-        #cio-app .status-item { 
-            display: flex; align-items: center; gap: 6px; 
-            font-size: 11px; font-weight: 800; color: #ff4d4d; 
-            text-transform: uppercase; animation: fade-in 0.5s ease;
-        }
-        #cio-app .dot { width: 10px; height: 10px; border-radius: 50%; }
-        #cio-app .dot.offline { 
-            background: #ff4d4d; 
-            box-shadow: 0 0 12px #ff4d4d; 
-            animation: pulse-red 1.5s infinite;
-        }
-        @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        #cio-app #clockDisplay { font-family: 'Courier New', monospace; font-size: 2.2rem; color: var(--primary); font-weight: bold; }
 
-        /* BOTONES ACCIÓN */
-        #cio-app .header-actions button {
-            background: rgba(0, 212, 216, 0.05); border: 1px solid var(--primary);
-            color: #fff; padding: 8px 14px; border-radius: 12px; font-size: 11px;
-            font-weight: bold; cursor: pointer; transition: 0.3s; margin-right: 5px;
+        /* SECCIÓN DE ALERTAS GIGANTES (EQUIPOS CAÍDOS) */
+        #cio-app #critical-alert-zone {
+            background: rgba(255, 0, 0, 0.05);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 77, 77, 0.2);
         }
 
-        #cio-app #clockDisplay { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
+        #cio-app .alert-title {
+            color: var(--critico);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
 
-        /* TABLERO DE NOVEDADES */
+        #cio-app #network-status {
+            display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+        }
+
+        /* DISEÑO DE CADA EQUIPO CAÍDO (GRANDE) */
+        #cio-app .status-item-big {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 22px; font-weight: 800; color: #fff;
+            background: rgba(255, 77, 77, 0.2); 
+            padding: 10px 20px; border-radius: 12px;
+            border: 2px solid var(--critico);
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(255, 77, 77, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
+        }
+
+        #cio-app .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--critico); animation: blink 0.8s infinite; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.1; } 100% { opacity: 1; } }
+
+        /* ÁREA CENTRAL DE NOVEDADES */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
         }
 
-        #cio-app.es-critico #display-board { animation: pulso-critico 2s infinite ease-in-out; }
-        @keyframes pulso-critico { 0% { background-color: transparent; } 50% { background-color: var(--critico-pulso); } 100% { background-color: transparent; } }
+        #cio-app .info-container { width: 100%; transition: all 0.6s ease; }
+        #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(5px); }
 
-        #cio-app .info-container { width: 100%; max-width: 1100px; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        #cio-app .oculto { opacity: 0; transform: scale(0.98); filter: blur(10px); }
-
-        #cio-app #areaLabel { font-size: clamp(0.9rem, 2.5vw, 1.3rem); color: var(--primary); letter-spacing: 5px; font-weight: bold; }
-        #cio-app #prioBadge { display: inline-block; padding: 5px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--primary); margin: 15px 0; background: rgba(0,0,0,0.5); }
-        #cio-app #titleDisplay { font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 15px; }
-        #cio-app #messageDisplay { line-height: 1.4; max-width: 850px; margin: 0 auto; white-space: pre-wrap; }
-
-        /* TICKER Y BARRA PROGRESO */
-        #cio-app #ticker-bar { height: 35px; background: #050c0c; border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; }
-        #cio-app #ticker-content { white-space: nowrap; animation: ticker-scroll 30s linear infinite; color: var(--primary); font-size: 0.85rem; font-weight: bold; }
-        @keyframes ticker-scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
-        #cio-app #progressLine { position: fixed; bottom: 35px; height: 3px; width: 0%; z-index: 1000; transition: width 0.1s linear; }
-
-        /* NAVIGATION MOBILE */
-        #cio-app .nav-mobile {
-            display: none; height: 85px; background: #071213; border-top: 1px solid var(--primary);
-            justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom);
+        #cio-app #areaLabel { font-size: 1rem; color: var(--primary); letter-spacing: 5px; font-weight: bold; }
+        #cio-app #prioBadge { 
+            display: inline-block; padding: 5px 20px; border-radius: 50px; 
+            font-weight: 900; border: 1px solid var(--primary); margin: 15px 0;
         }
-        #cio-app .nav-mobile button { background: none; border: none; color: #fff; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: bold; }
+        #cio-app #titleDisplay { font-weight: 800; line-height: 1.1; text-transform: uppercase; }
+        #cio-app #messageDisplay { line-height: 1.4; opacity: 0.9; max-width: 90% !important; margin: 0 auto; }
 
-        /* PANELES LATERALES */
+        /* TICKER INFERIOR */
+        #cio-app #ticker-bar { height: 45px; background: #050c0c; border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; }
+        #cio-app #ticker-content { white-space: nowrap; animation: scrollText 40s linear infinite; color: var(--primary); font-weight: bold; font-size: 1rem; }
+        @keyframes scrollText { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+        #cio-app #progressLine { position: fixed; bottom: 45px; height: 4px; width: 0%; transition: width 0.1s linear; }
+
+        /* CONTROLES Y PANELES */
+        #cio-app .header-actions button {
+            background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
+            color: #fff; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 12px;
+        }
         #cio-app .side-panel {
-            position: fixed; right: 0; top: 0; width: 350px; height: 100%;
-            background: #091718; border-left: 2px solid var(--primary); padding: 25px;
-            transform: translateX(100%); transition: 0.4s; z-index: 2000; box-sizing: border-box; overflow-y: auto;
+            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
+            background: #0a1a1b; border-left: 2px solid var(--primary); padding: 30px;
+            transform: translateX(100%); transition: 0.4s; z-index: 10000; box-sizing: border-box; overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 1500; backdrop-filter: blur(4px); }
-        #cio-app #overlay-cio.active { display: block; }
+        #cio-app #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 9999; backdrop-filter: blur(5px); }
+        #cio-app #overlay.active { display: block; }
 
-        #cio-app input, #cio-app textarea, #cio-app select { width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent); border-radius: 12px; margin-bottom: 12px; font-size: 16px; }
-        #cio-app .btn-save { width: 100%; padding: 15px; background: var(--primary); color: #000; font-weight: bold; border: none; border-radius: 15px; cursor: pointer; }
-        #cio-app .btn-cancel { width: 100%; padding: 12px; background: none; color:#ff4d4d; border: 1px solid #ff4d4d; border-radius: 15px; margin-top: 10px; cursor: pointer; }
-
-        #cio-app .history-item { background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-radius: 12px; border-left: 3px solid var(--primary); }
-
+        /* RESPONSIVE SMARTPHONE */
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
-            #cio-app .nav-mobile { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 85%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 30px 30px 0 0; }
+            #cio-app #clockDisplay { font-size: 1.5rem; }
+            #cio-app .status-item-big { font-size: 16px; padding: 8px 12px; }
+            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 30px 30px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
-            #cio-app #progressLine { bottom: 120px; }
-            #cio-app #display-board { padding-bottom: 120px; }
         }
     </style>
 </head>
 <body>
 
 <div id="cio-app">
-    <div id="overlay-cio" onclick="closeAll()"></div>
+    <div id="overlay" onclick="closePanels()"></div>
 
     <header class="main-header">
         <div class="header-actions">
             <button onclick="openForm()">＋ NOVEDAD</button>
-            <button onclick="openHistory()">📋 LISTA</button>
-            <button onclick="handleCerrarTurno()" style="border-color: #ff4d4d; color: #ff4d4d;">🔒 TURNO</button>
-            <button onclick="toggleFS()">⛶ TV</button>
+            <button onclick="openHistory()">📋 HISTORIAL</button>
         </div>
-        
-        <div style="text-align: center; flex: 1;">
+
+        <div style="text-align: center;">
             <div id="clockDisplay">00:00:00</div>
-            <div id="network-status">
-                <span style="font-size: 10px; opacity: 0.4;">CARGANDO RED...</span>
-            </div>
+        </div>
+
+        <div style="width: 150px; text-align: right;">
+            <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35" style="filter: brightness(2);">
         </div>
     </header>
 
+    <div id="critical-alert-zone">
+        <div class="alert-title" id="alert-msg">Estado de Red: Verificando...</div>
+        <div id="network-status">
+            </div>
+    </div>
+
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel">SISTEMA CIO</div>
-            <div id="prioBadge">CONECTANDO</div>
-            <h1 id="titleDisplay">Monitor Operativo</h1>
-            <p id="messageDisplay">Iniciando protocolo de visualización...</p>
+            <div id="areaLabel">CENTRO DE OPERACIONES</div>
+            <div id="prioBadge">SISTEMA OK</div>
+            <h1 id="titleDisplay">Monitor CIO</h1>
+            <p id="messageDisplay">Sincronizando con base de datos...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">SINCRO DE SEGURIDAD ACTIVA ——— MONITOREO IP EN VIVO ——— </div>
+        <div id="ticker-content">SISTEMA DE MONITOREO EN TIEMPO REAL - TODAS LAS UNIDADES OPERATIVAS - REVISAR NOVEDADES FRECUENTEMENTE</div>
     </div>
 
-    <nav class="nav-mobile">
-        <button onclick="openForm()"><span>➕</span>NUEVO</button>
-        <button onclick="openHistory()"><span>📋</span>LISTA</button>
-        <button onclick="handleCerrarTurno()"><span>🔒</span>TURNO</button>
-    </nav>
+    <div id="progressLine"></div>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:var(--primary)">Entrada Manual</h2>
-        <form id="mainForm" onsubmit="handleSave(event)">
-            <input type="hidden" id="editId" value="-1">
-            <label>Tipo</label>
-            <select id="f-type"><option value="turno">Turno</option><option value="diaria">Diaria</option></select>
-            <label>Área</label>
-            <select id="f-area">
-                <option value="Monitoreo">Monitoreo</option>
-                <option value="Freschat">Freschat</option>
-                <option value="Atención al Cliente">Atención al Cliente</option>
-                <option value="Interno">Interno</option>
+        <h2 style="color:var(--primary)">Nueva Novedad</h2>
+        <form onsubmit="saveEntry(event)">
+            <input type="text" id="f-title" placeholder="Título de la alerta" required style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid var(--accent);">
+            <textarea id="f-msg" rows="5" placeholder="Detalles..." required style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff; border:1px solid var(--accent);"></textarea>
+            <select id="f-area" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff;">
+                <option>Monitoreo</option><option>Tecnología</option><option>Atención</option>
             </select>
-            <label>Prioridad</label>
-            <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-            <input type="text" id="f-title" placeholder="Título" required>
-            <textarea id="f-msg" rows="4" placeholder="Mensaje..." required></textarea>
-            <button type="submit" class="btn-save">PUBLICAR</button>
-            <button type="button" onclick="closeAll()" class="btn-cancel">CANCELAR</button>
+            <select id="f-prio" style="width:100%; padding:10px; margin-bottom:10px; background:#000; color:#fff;">
+                <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
+            </select>
+            <button type="submit" style="width:100%; padding:15px; background:var(--primary); border:none; font-weight:bold;">PUBLICAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--primary)">Historial de Turno</h2>
-        <div id="listItems"></div>
-        <button type="button" onclick="closeAll()" class="btn-cancel">CERRAR</button>
+        <h2 style="color:var(--primary)">Historial</h2>
+        <div id="historyList"></div>
     </aside>
-
-    <div id="progressLine"></div>
 </div>
 
 <script>
-    const API_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
-    let dataStore = [];
-    let currentIndex = 0;
-    let timerStart = null;
-    const DISPLAY_TIME = 15;
+    let logs = [];
+    let currentIdx = 0;
+    let startTime = null;
+    const SLIDE_TIME = 15;
 
-    // --- MONITOREO DE RED (SOLO CAÍDOS) ---
-    async function syncNetwork() {
+    // ACTUALIZACIÓN DE RED (MODO GIGANTE)
+    async function updateNetwork() {
         try {
-            const r = await fetch(RED_URL);
-            const statusData = await r.json();
-            if(!statusData) return;
-
+            const resp = await fetch(RED_URL);
+            const status = await resp.json();
+            const container = document.getElementById("network-status");
+            const alertTitle = document.getElementById("alert-msg");
+            
             let html = "";
-            let caidosCount = 0;
+            let caidos = 0;
 
-            Object.keys(statusData).forEach(key => {
-                const item = statusData[key];
-                if (item.estado === "offline") {
-                    caidosCount++;
-                    html += `
-                        <div class="status-item">
-                            <div class="dot offline"></div>
-                            ${key.replace(/_/g, ' ')}
-                        </div>
-                    `;
-                }
-            });
-
-            if (caidosCount === 0) {
-                html = `<span style="font-size: 10px; color: #00ff00; font-weight: bold; letter-spacing: 1px;">✔ TODOS LOS SERVICIOS ONLINE</span>`;
+            if(status) {
+                Object.keys(status).forEach(name => {
+                    if(status[name].estado === "offline") {
+                        caidos++;
+                        html += `
+                            <div class="status-item-big">
+                                <div class="dot"></div>
+                                ${name.replace(/_/g, ' ')}
+                            </div>`;
+                    }
+                });
             }
 
-            document.getElementById("network-status").innerHTML = html;
-        } catch(e) { console.error("Error Red"); }
-    }
-
-    async function syncData() {
-        try {
-            const r = await fetch(API_URL);
-            const d = await r.json();
-            dataStore = d || [];
-            if(dataStore.length > 0) {
-                const last = dataStore[dataStore.length - 1];
-                document.getElementById("ticker-content").textContent = `[ÚLTIMO] ${last.area}: ${last.title} ——— `;
-                if(document.getElementById("prioBadge").textContent === "CONECTANDO") refreshView();
+            if(caidos > 0) {
+                container.innerHTML = html;
+                alertTitle.textContent = "⚠️ ATENCIÓN: EQUIPOS FUERA DE LÍNEA";
+                alertTitle.style.color = "#ff4d4d";
+                document.getElementById("critical-alert-zone").style.background = "rgba(255, 0, 0, 0.15)";
             } else {
-                document.getElementById("prioBadge").textContent = "SISTEMA OK";
-                document.getElementById("titleDisplay").textContent = "Sin Incidencias";
-                document.getElementById("messageDisplay").textContent = "No hay novedades activas.";
+                container.innerHTML = "";
+                alertTitle.textContent = "✔ SERVICIOS EN LÍNEA";
+                alertTitle.style.color = "#00ff00";
+                document.getElementById("critical-alert-zone").style.background = "transparent";
             }
-        } catch(e) { console.error("Error Sync"); }
+        } catch(e) { console.warn("Error Red"); }
     }
 
-    function refreshView() {
-        if(!dataStore.length) return;
+    // SINCRONIZACIÓN DE EVENTOS
+    async function syncEvents() {
+        try {
+            const resp = await fetch(DB_URL);
+            logs = await resp.json() || [];
+            if(logs.length > 0) renderSlide();
+        } catch(e) { }
+    }
+
+    function renderSlide() {
+        if(!logs.length) return;
         const cont = document.getElementById("infoCont");
         cont.classList.add("oculto");
-        
+
         setTimeout(() => {
-            const item = dataStore[currentIndex % dataStore.length];
-            const app = document.getElementById("cio-app");
-            
-            if(item.priority === "Crítica") app.classList.add("es-critico");
-            else app.classList.remove("es-critico");
-            
-            document.getElementById("prioBadge").textContent = `PRIORIDAD ${item.priority}`;
+            const item = logs[currentIdx % logs.length];
             document.getElementById("areaLabel").textContent = item.area;
+            document.getElementById("prioBadge").textContent = `PRIORIDAD ${item.priority}`;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
-            
+
             const colors = {"Baja":"#00d4d8", "Media":"#00ccff", "Alta":"#ffcc00", "Crítica":"#ff4d4d"};
-            document.getElementById("progressLine").style.background = colors[item.priority] || "#fff";
-            
-            adjustText();
+            const color = colors[item.priority] || "#fff";
+            document.getElementById("prioBadge").style.borderColor = color;
+            document.getElementById("prioBadge").style.color = color;
+            document.getElementById("progressLine").style.background = color;
+
+            autoSizeText();
             cont.classList.remove("oculto");
-        }, 600); 
+        }, 600);
     }
 
-    async function handleSave(e) {
+    function autoSizeText() {
+        const t = document.getElementById('titleDisplay');
+        const m = document.getElementById('messageDisplay');
+        let sizeT = window.innerWidth < 768 ? 30 : 70;
+        let sizeM = window.innerWidth < 768 ? 18 : 35;
+        t.style.fontSize = sizeT + "px";
+        m.style.fontSize = sizeM + "px";
+    }
+
+    // FUNCIONES DE UI
+    function openForm() { document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay").classList.add("active"); }
+    function openHistory() {
+        const list = document.getElementById("historyList");
+        list.innerHTML = logs.map((it, i) => `<div style="padding:10px; border-bottom:1px solid #222;">${it.title} <button onclick="deleteEntry(${i})" style="color:red; background:none; border:none; float:right;">X</button></div>`).join('');
+        document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").classList.add("active");
+    }
+    function closePanels() { document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active')); }
+
+    async function saveEntry(e) {
         e.preventDefault();
-        const entry = {
+        const newEntry = {
             area: document.getElementById("f-area").value,
             priority: document.getElementById("f-prio").value,
             title: document.getElementById("f-title").value,
             message: document.getElementById("f-msg").value,
-            type: document.getElementById("f-type").value,
             timestamp: Date.now()
         };
-        dataStore.push(entry);
-        await fetch(API_URL, { method: 'PUT', body: JSON.stringify(dataStore) });
-        closeAll(); syncData();
+        logs.push(newEntry);
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
+        closePanels();
+        syncEvents();
     }
 
-    function adjustText() {
-        const t = document.getElementById('titleDisplay');
-        const m = document.getElementById('messageDisplay');
-        const container = document.getElementById('display-board');
-        let sizeT = window.innerWidth <= 768 ? 32 : 75; 
-        let sizeM = window.innerWidth <= 768 ? 18 : 35;
-        t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
-        let limit = 0;
-        while ((t.offsetHeight + m.offsetHeight > container.offsetHeight * 0.75) && limit < 30) {
-            sizeT -= 2; sizeM -= 1;
-            t.style.fontSize = sizeT + "px"; m.style.fontSize = sizeM + "px";
-            limit++;
-        }
+    async function deleteEntry(idx) {
+        logs.splice(idx, 1);
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
+        openHistory();
+        syncEvents();
     }
 
-    function openForm() { document.getElementById("mainForm").reset(); document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay-cio").classList.add("active"); }
-    function openHistory() { 
-        document.getElementById("listItems").innerHTML = dataStore.map((item, i) => `
-            <div class="history-item">
-                <b>${item.title}</b><br>
-                <button onclick="onDelete(${i})" style="color:red; background:none; border:none; cursor:pointer;">Borrar</button>
-            </div>`).join('');
-        document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay-cio").classList.add("active"); 
-    }
-    window.onDelete = async (i) => { dataStore.splice(i,1); await fetch(API_URL,{method:'PUT', body:JSON.stringify(dataStore.length ? dataStore : null)}); syncData(); openHistory(); };
-    function closeAll() { document.querySelectorAll('.side-panel, #overlay-cio').forEach(el => el.classList.remove('active')); }
-    function toggleFS() { const app = document.getElementById('cio-app'); if (!document.fullscreenElement) app.requestFullscreen(); else document.exitFullscreen(); }
-
-    function runLoop(ts) {
-        if(!dataStore.length) { requestAnimationFrame(runLoop); return; }
-        if(!timerStart) timerStart = ts;
-        const elapsed = (ts - timerStart) / 1000;
-        document.getElementById("progressLine").style.width = Math.min((elapsed / DISPLAY_TIME) * 100, 100) + "%";
-        if(elapsed >= DISPLAY_TIME){ currentIndex++; refreshView(); timerStart = ts; }
-        requestAnimationFrame(runLoop);
+    // LOOPS
+    function mainLoop(ts) {
+        if(!logs.length) { requestAnimationFrame(mainLoop); return; }
+        if(!startTime) startTime = ts;
+        const progress = (ts - startTime) / (SLIDE_TIME * 1000);
+        document.getElementById("progressLine").style.width = Math.min(progress * 100, 100) + "%";
+        if(progress >= 1) { currentIdx++; renderSlide(); startTime = ts; }
+        requestAnimationFrame(mainLoop);
     }
 
-    setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString("es-UY",{hour12:false}); }, 1000);
-    setInterval(syncData, 10000);
-    setInterval(syncNetwork, 5000);
-    window.addEventListener('resize', adjustText);
-    syncData(); syncNetwork(); requestAnimationFrame(runLoop);
+    setInterval(() => {
+        document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString('es-UY', { hour12: false });
+    }, 1000);
+
+    setInterval(syncEvents, 10000);
+    setInterval(updateNetwork, 5000);
+    
+    syncEvents();
+    updateNetwork();
+    requestAnimationFrame(mainLoop);
+    window.onresize = autoSizeText;
 </script>
 </body>
 </html>
