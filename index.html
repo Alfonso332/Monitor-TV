@@ -3,123 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO Monitor</title>
+    <title>CIO Command Center</title>
     
     <link rel="apple-touch-icon" href="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        #cio-app {
-            --primary: #006465;
-            --accent: #00d1d1;
-            --dark-bg: #000000;
-            --critico: #ff4d4d;
-            /* Colores de Área solicitados */
-            --color-monitoreo: #ff4d4d;
-            --color-atencion: #2ecc71;
-            --color-freschat: #3498db;
-            --color-interna: #e0f7fa;
-            
-            --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
+        :root {
+            --primary: #00d1d1;
+            --danger: #ff4d4d;
+            --success: #2ecc71;
+            --info: #3498db;
+            --neutral: #e0f7fa;
+            --glass: rgba(10, 20, 20, 0.7);
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
 
+        #cio-app {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--dark-bg) !important;
-            color: #ffffff !important;
-            font-family: 'Segoe UI', Roboto, sans-serif !important;
+            background: #000 !important;
+            color: #fff !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             display: flex; flex-direction: column;
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-            transition: background 0.5s ease;
         }
 
-        /* MODO EMERGENCIA */
-        #cio-app.emergency-active { animation: emergencyGlow 2s infinite; }
-        @keyframes emergencyGlow {
-            0% { background-color: #000; }
-            50% { background-color: #1a0505; }
-            100% { background-color: #000; }
-        }
-
+        /* FONDO DINÁMICO */
         #cio-app::before {
             content: ""; position: absolute; inset: 0;
-            background-image: var(--bg-img); background-size: contain;
-            background-position: center; background-repeat: no-repeat;
-            opacity: 0.03; filter: grayscale(1); z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #0a1f1f 0%, #000 100%);
+            z-index: -2;
+        }
+        #cio-app::after {
+            content: ""; position: absolute; inset: 0;
+            background-image: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
+            background-size: 40%; background-position: center; background-repeat: no-repeat;
+            opacity: 0.05; filter: grayscale(1) brightness(0.5); z-index: -1;
         }
 
-        /* HEADER */
+        /* HEADER ESTILO HUD */
         #cio-app .main-header {
-            height: 80px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--primary);
+            height: 70px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 30px; background: var(--glass); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-glass);
         }
         #cio-app:fullscreen .main-header { display: none !important; }
 
-        /* DASHBOARD ESTÉTICO */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            padding: 12px 5px; border-radius: 12px; text-align: center; border: 1px solid rgba(0, 209, 209, 0.2);
-        }
-        .stat-card.alert { border-color: var(--critico); background: rgba(255, 77, 77, 0.05); box-shadow: 0 0 10px rgba(255, 77, 77, 0.1); }
-        .stat-card b { font-size: 1.4rem; color: var(--accent); }
-        .stat-card.alert b { color: var(--critico); }
-        .stat-card span { display: block; font-size: 0.6rem; color: #888; text-transform: uppercase; margin-top: 4px; }
+        #cio-app #clockDisplay { font-family: 'JetBrains Mono', monospace; font-size: 1.5rem; letter-spacing: 2px; color: var(--primary); }
 
-        /* BOTÓN FLOTANTE MÓVIL ABAJO DERECHA */
+        /* DASHBOARD EN PANEL (DISEÑO GRID MODERNO) */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; }
+        .stat-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass);
+            padding: 15px 5px; border-radius: 16px; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-card b { font-size: 1.8rem; display: block; margin-bottom: 2px; }
+        .stat-card span { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        .stat-card.alert { border-color: var(--danger); box-shadow: 0 0 15px rgba(255, 77, 77, 0.2); }
+        .stat-card.alert b { color: var(--danger); }
+
+        /* DISPLAY BOARD (MODERNIZADO) */
+        #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
+        
+        .info-card {
+            background: rgba(255,255,255,0.02);
+            padding: 50px; border-radius: 40px;
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-width: 900px; width: 90%;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .oculto { opacity: 0; transform: translateY(30px) scale(0.98); filter: blur(20px); }
+
+        #areaLabel { font-size: 1rem; font-weight: 800; letter-spacing: 6px; margin-bottom: 10px; }
+        #titleDisplay { font-size: 80px; font-weight: 800; margin: 20px 0; line-height: 1; letter-spacing: -2px; }
+        #messageDisplay { font-size: 2rem; font-weight: 300; color: #ccc; line-height: 1.4; }
+
+        /* BOTÓN FLOTANTE */
         #cio-app #menu-toggle-float {
             display: none; position: fixed; bottom: 30px; right: 20px;
-            width: 60px; height: 60px; border-radius: 50%;
-            background: var(--primary); color: #fff; border: 2px solid rgba(255,255,255,0.2);
-            font-size: 24px; cursor: pointer; z-index: 10015;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6); align-items: center; justify-content: center;
+            width: 65px; height: 65px; border-radius: 20px;
+            background: var(--primary); color: #000; border: none;
+            font-size: 28px; cursor: pointer; z-index: 10015;
+            box-shadow: 0 10px 30px rgba(0, 209, 209, 0.4);
+            align-items: center; justify-content: center; transform: rotate(-5deg);
         }
 
         #cio-app #mobile-menu {
-            position: fixed; bottom: 100px; right: 20px; width: 220px;
-            background: rgba(10, 26, 27, 0.98); display: none; flex-direction: column;
-            padding: 15px; gap: 10px; border: 1px solid var(--primary);
-            border-radius: 15px; z-index: 10010; backdrop-filter: blur(10px);
+            position: fixed; bottom: 110px; right: 20px; width: 240px;
+            background: rgba(10, 20, 20, 0.95); display: none; flex-direction: column;
+            padding: 20px; gap: 12px; border: 1px solid var(--primary);
+            border-radius: 24px; z-index: 10010; backdrop-filter: blur(20px);
         }
-
-        /* PANTALLA CENTRAL */
-        #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        #cio-app .info-container { width: 100%; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
-        #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(15px); }
 
         /* PANELES LATERALES */
         #cio-app .side-panel {
-            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
-            background: #050c0c; border-left: 2px solid var(--primary); padding: 25px;
-            transform: translateX(100%); transition: 0.4s ease; z-index: 10020;
-            box-sizing: border-box; overflow-y: auto;
+            position: fixed; right: 0; top: 0; width: 420px; height: 100%;
+            background: rgba(5, 10, 10, 0.98); backdrop-filter: blur(30px);
+            border-left: 1px solid var(--border-glass); padding: 30px;
+            transform: translateX(100%); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10020;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        
-        /* CAJA DE EDICIÓN DESPLEGABLE (ABAJO DE LA TARJETA) */
-        #cio-app .edit-box {
-            background: #000; border: 1px solid var(--accent); padding: 15px;
-            border-radius: 12px; margin-top: 10px; display: none;
-        }
 
+        /* FORMULARIOS Y EDICIÓN */
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 10px; background: #111; color: #fff; 
-            border: 1px solid #333; border-radius: 8px; margin-bottom: 10px; text-align: center; box-sizing: border-box;
+            width: 100%; padding: 14px; background: rgba(255,255,255,0.05); color: #fff; 
+            border: 1px solid var(--border-glass); border-radius: 12px; margin-bottom: 15px;
+            font-size: 1rem; transition: all 0.3s;
         }
+        #cio-app input:focus { border-color: var(--primary); outline: none; background: rgba(255,255,255,0.1); }
 
-        #cio-app button.btn-main, #cio-app .header-actions button {
-            background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
-        }
+        .btn-main { background: var(--primary) !important; color: #000 !important; border: none; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* TICKER BAR */
-        #cio-app #ticker-bar { height: 45px; background: #000; border-top: 1px solid #111; display: flex; align-items: center; overflow: hidden; position: relative; }
-        #cio-app #ticker-content { white-space: nowrap; position: absolute; animation: scrollText 25s linear infinite; font-weight: bold; }
-        @keyframes scrollText { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+        #cio-app .edit-box { background: rgba(255,255,255,0.02); border: 1px solid var(--primary); padding: 20px; border-radius: 20px; margin-top: 15px; display: none; }
+
+        /* TICKER */
+        #cio-app #ticker-bar { height: 50px; background: #000; border-top: 1px solid var(--border-glass); display: flex; align-items: center; }
+        #cio-app #ticker-content { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; text-transform: uppercase; }
 
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
             #cio-app #menu-toggle-float { display: flex; }
-            #cio-app .side-panel { width: 100%; height: 92%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; }
+            #titleDisplay { font-size: 45px; }
+            .info-card { padding: 30px 20px; border-radius: 30px; }
+            #cio-app .side-panel { width: 100%; border-radius: 30px 30px 0 0; top: 10%; height: 90%; transform: translateY(100%); border-left: none; border-top: 1px solid var(--primary); }
             #cio-app .side-panel.active { transform: translateY(0); }
         }
     </style>
@@ -127,39 +136,39 @@
 <body onclick="handleGlobalClick(event)">
 
 <div id="cio-app">
-    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(4px);" onclick="closePanels()"></div>
+    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; z-index:10002; backdrop-filter:blur(8px);" onclick="closePanels()"></div>
 
     <header class="main-header">
         <div class="header-actions">
-            <button onclick="openForm()">＋ NUEVA</button>
-            <button onclick="openHistory()" style="background:#222; margin-left:8px;">📋 HISTORIAL</button>
-            <button onclick="toggleFS()" style="background:none; border:1px solid #333; margin-left:8px;">⛶ TV</button>
+            <button onclick="openForm()" class="btn-main" style="padding: 8px 20px;">＋ NUEVA</button>
+            <button onclick="openHistory()" style="background:none; color:white; border:1px solid #333; padding: 8px 20px; border-radius:10px; margin-left:10px; cursor:pointer;">📋 REGISTROS</button>
+            <button onclick="toggleFS()" style="background:none; color:#555; border:none; margin-left:10px; cursor:pointer;">⛶ TV</button>
         </div>
-        <div id="clockDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:bold;">00:00:00</div>
-        <div><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);"></div>
+        <div id="clockDisplay">00:00:00</div>
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35" style="filter: drop-shadow(0 0 5px var(--primary));">
     </header>
 
     <button id="menu-toggle-float" onclick="toggleMobileMenu(event)">☰</button>
     <div id="mobile-menu">
-        <button onclick="openForm(); toggleMobileMenu();" class="btn-main">＋ NUEVA NOVEDAD</button>
-        <button onclick="openHistory(); toggleMobileMenu();" class="btn-main">📋 HISTORIAL</button>
-        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" class="btn-main">OFFLINE (<span id="count-offline-mob">0</span>)</button>
+        <button onclick="openForm(); toggleMobileMenu();" class="btn-main">＋ NUEVA</button>
+        <button onclick="openHistory(); toggleMobileMenu();" style="background:rgba(255,255,255,0.05); color:white; border:none; padding:12px; border-radius:12px;">📋 HISTORIAL</button>
+        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:rgba(255,77,77,0.1); color:var(--danger); border:none; padding:12px; border-radius:12px;">⚠️ OFFLINE (<span id="count-offline-mob">0</span>)</button>
     </div>
 
     <main id="display-board">
-        <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 4px; font-weight: 900; font-size: 0.9rem; text-transform: uppercase;">MONITOREO ACTIVO</div>
-            <div id="prioBadge" style="display: inline-block; padding: 6px 25px; border-radius: 50px; font-weight: 900; border: 1px solid var(--accent); margin: 20px 0; font-size: 0.8rem; background: rgba(0,0,0,0.5);">ESTADO OK</div>
-            <h1 id="titleDisplay" style="margin:10px 0; line-height: 1.1; font-size: 70px;">BIENVENIDO</h1>
-            <p id="messageDisplay" style="font-size: 1.8rem; opacity: 0.8; max-width: 900px; margin: 0 auto;">Sincronizando datos...</p>
+        <div id="infoCont" class="info-card">
+            <div id="areaLabel">CENTRAL DE MANDO</div>
+            <div id="prioBadge" style="display:inline-block; font-size:10px; border:1px solid var(--primary); padding:2px 12px; border-radius:4px; margin-bottom:10px;">OPERATIVO</div>
+            <h1 id="titleDisplay">INICIANDO</h1>
+            <p id="messageDisplay">Cargando monitor de eventos...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">CARGANDO SERVICIOS...</div>
+        <div id="ticker-content">CARGANDO...</div>
     </div>
     
-    <div id="progressLine" style="position: fixed; bottom: 45px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
+    <div id="progressLine" style="position:fixed; bottom:50px; height:2px; width:0%; transition:width 0.1s linear;"></div>
 
     <div id="quickEdit" class="edit-box">
         <input type="hidden" id="e-index">
@@ -167,38 +176,38 @@
         <select id="e-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
         <input type="text" id="e-title">
         <textarea id="e-msg" rows="3"></textarea>
-        <div style="display:flex; gap:8px;">
-            <button onclick="saveQuickEdit()" class="btn-main" style="flex:1;">GUARDAR</button>
-            <button onclick="hideEdit()" style="flex:1; background:#222; border:none; color:white; border-radius:8px; cursor:pointer;">CERRAR</button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="saveQuickEdit()" class="btn-main" style="flex:1;">ACTUALIZAR</button>
+            <button onclick="hideEdit()" style="flex:1; background:none; border:none; color:gray; cursor:pointer;">CANCELAR</button>
         </div>
     </div>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center;">Estado de Central</h2>
+        <h2 style="font-weight:200; letter-spacing:2px; text-align:center; margin-bottom:30px;">DASHBOARD <span style="color:var(--primary)">CIO</span></h2>
         <div class="stats-grid">
-            <div class="stat-card" id="card-off"><b>0</b><span>Off</span></div>
-            <div class="stat-card" id="card-crit"><b>0</b><span>Críticos</span></div>
-            <div class="stat-card"><b>0</b><span id="card-total">Total</span></div>
+            <div class="stat-card" id="card-off"><b>0</b><span>OFFLINE</span></div>
+            <div class="stat-card" id="card-crit"><b>0</b><span>CRÍTICOS</span></div>
+            <div class="stat-card"><b>0</b><span id="card-total">EVENTOS</span></div>
         </div>
         <div id="historyList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:white; padding:10px; border-radius:8px;">SALIR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #222; color:gray; padding:12px; border-radius:12px;">CERRAR PANEL</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center;">Registrar Evento</h2>
-        <form onsubmit="saveNew(event)">
+        <h2 style="font-weight:200; letter-spacing:2px; text-align:center;">NUEVA <span style="color:var(--primary)">NOVEDAD</span></h2>
+        <form onsubmit="saveNew(event)" style="margin-top:30px;">
             <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
             <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-            <input type="text" id="f-title" placeholder="Título" required>
-            <textarea id="f-msg" rows="4" placeholder="Descripción..." required></textarea>
-            <button type="submit" class="btn-main" style="width:100%; padding:15px;">PUBLICAR</button>
+            <input type="text" id="f-title" placeholder="TÍTULO DEL EVENTO" required>
+            <textarea id="f-msg" rows="5" placeholder="DETALLE DEL MENSAJE..." required></textarea>
+            <button type="submit" class="btn-main" style="width:100%;">PUBLICAR EN MONITOR</button>
         </form>
     </aside>
 
     <aside id="panelOffline" class="side-panel">
-        <h2 style="color:var(--critico); text-align:center;">Servicios Offline</h2>
-        <div id="offlineList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:white; padding:10px;">CERRAR</button>
+        <h2 style="color:var(--danger); font-weight:200; text-align:center;">ALERTAS <span style="color:#fff">RED</span></h2>
+        <div id="offlineList" style="margin-top:20px;"></div>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #222; color:white; padding:12px;">VOLVER</button>
     </aside>
 </div>
 
@@ -210,9 +219,7 @@
     function handleGlobalClick(e) {
         const menu = document.getElementById("mobile-menu");
         const btn = document.getElementById("menu-toggle-float");
-        if (menu.style.display === "flex" && !menu.contains(e.target) && !btn.contains(e.target)) {
-            toggleMobileMenu();
-        }
+        if (menu.style.display === "flex" && !menu.contains(e.target) && !btn.contains(e.target)) toggleMobileMenu();
     }
 
     function toggleMobileMenu() {
@@ -229,20 +236,18 @@
             const ticker = document.getElementById("ticker-content");
             let caidos = [];
             if(status) {
-                Object.keys(status).forEach(id => { 
-                    if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); 
-                });
+                Object.keys(status).forEach(id => { if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); });
             }
             const cardOff = document.getElementById("card-off");
             cardOff.querySelector('b').textContent = caidos.length;
             if(caidos.length > 0) {
                 cardOff.classList.add('alert');
-                ticker.innerHTML = `⚠️ OFFLINE: ` + caidos.map(n => `<span style="color:#ff4d4d; margin:0 15px;">[${n}]</span>`).join('');
-                document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="background:rgba(255,77,77,0.1); border:1px solid var(--critico); padding:12px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold; color:#ff4d4d;">⚠️ ${n}</div>`).join('');
+                ticker.innerHTML = `⚠️ ALERTA DE CONEXIÓN: ` + caidos.map(n => `<span style="color:var(--danger); margin:0 15px;">[${n}]</span>`).join(' — ');
+                document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="background:rgba(255,77,77,0.05); border:1px solid var(--danger); padding:15px; border-radius:15px; margin-bottom:10px; text-align:center; color:var(--danger); font-family:monospace;">ST-OFF: ${n}</div>`).join('');
             } else {
                 cardOff.classList.remove('alert');
-                ticker.innerHTML = `✔ SERVICIOS OPERATIVOS — MASTERSON SEGURIDAD — `;
-                document.getElementById("offlineList").innerHTML = `<p style="text-align:center; color:gray;">Red estable.</p>`;
+                ticker.innerHTML = `✔ SISTEMAS MASTERSON SEGURIDAD OPERANDO SIN NOVEDAD — `;
+                document.getElementById("offlineList").innerHTML = `<p style="text-align:center; color:#444;">RED ESTABLE</p>`;
             }
             document.getElementById("count-offline-mob").textContent = caidos.length;
         } catch(e) {}
@@ -269,29 +274,27 @@
     function renderSlide() {
         if(!logs.length) return;
         const cont = document.getElementById("infoCont");
-        const app = document.getElementById("cio-app");
         cont.classList.add("oculto");
 
         setTimeout(() => {
             const item = logs[currentIdx % logs.length];
-            const areaColors = { "Monitoreo": "var(--color-monitoreo)", "Atención": "var(--color-atencion)", "Freschat": "var(--color-freschat)", "Novedad Interna": "var(--color-interna)" };
-            const currentAreaColor = areaColors[item.area] || "var(--accent)";
-
-            if(item.priority === "Crítica") app.classList.add("emergency-active");
-            else app.classList.remove("emergency-active");
+            const areaColors = { "Monitoreo": "#ff4d4d", "Atención": "#2ecc71", "Freschat": "#3498db", "Novedad Interna": "#e0f7fa" };
+            const pColors = {"Baja":"#00d1d1", "Media":"#ffcc00", "Alta":"#ff8000", "Crítica":"#ff4d4d"};
+            
+            const areaCol = areaColors[item.area] || "#fff";
+            const prioCol = pColors[item.priority] || "#fff";
 
             document.getElementById("areaLabel").textContent = item.area;
-            document.getElementById("areaLabel").style.color = currentAreaColor;
-            document.getElementById("prioBadge").textContent = `PRIORIDAD ${item.priority.toUpperCase()}`;
+            document.getElementById("areaLabel").style.color = areaCol;
+            document.getElementById("prioBadge").textContent = `LEVEL: ${item.priority.toUpperCase()}`;
+            document.getElementById("prioBadge").style.borderColor = prioCol;
+            document.getElementById("prioBadge").style.color = prioCol;
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
+            document.getElementById("progressLine").style.background = prioCol;
             
-            const prioColors = {"Baja":"#00d1d1", "Media":"#ffcc00", "Alta":"#ff8000", "Crítica":"#ff4d4d"};
-            const pColor = prioColors[item.priority] || "#fff";
-            document.getElementById("prioBadge").style.borderColor = pColor;
-            document.getElementById("prioBadge").style.color = pColor;
-            document.getElementById("progressLine").style.background = pColor;
-            document.getElementById("titleDisplay").style.color = (item.priority === "Crítica") ? "#ff4d4d" : "white";
+            cont.style.boxShadow = `0 30px 60px rgba(0,0,0,0.8), 0 0 20px ${areaCol}10`;
+            cont.style.borderColor = `${areaCol}30`;
             
             autoSizeText();
             cont.classList.remove("oculto");
@@ -300,7 +303,7 @@
 
     function autoSizeText() {
         const t = document.getElementById('titleDisplay');
-        t.style.fontSize = window.innerWidth < 768 ? "38px" : "70px";
+        t.style.fontSize = window.innerWidth < 768 ? "42px" : "80px";
     }
 
     function openHistory() { renderHistoryList(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
@@ -316,12 +319,12 @@
     function renderHistoryList() {
         const list = document.getElementById("historyList");
         list.innerHTML = logs.map((it, i) => `
-            <div style="background:rgba(255,255,255,0.03); padding:15px; margin-bottom:10px; border-radius:12px; border-left:4px solid ${it.priority==='Crítica'?'red':'var(--primary)'}">
+            <div style="background:rgba(255,255,255,0.02); padding:18px; margin-bottom:12px; border-radius:18px; border:1px solid rgba(255,255,255,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="text-align:left"><strong style="font-size:14px">${it.title}</strong><br><small style="color:gray">${it.area}</small></div>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="showQuickEdit(${i})" style="padding:8px 12px; background:var(--primary); color:white; border:none; border-radius:6px; font-size:11px;">EDITAR</button>
-                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:8px 12px; border-radius:6px; font-size:11px;">BORRAR</button>
+                    <div style="text-align:left"><strong style="font-size:15px; color:#eee">${it.title}</strong><br><small style="color:#555; text-transform:uppercase; letter-spacing:1px;">${it.area}</small></div>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="showQuickEdit(${i})" style="padding:8px 12px; background:rgba(0,209,209,0.1); color:var(--primary); border:none; border-radius:8px; font-size:10px; font-weight:bold; cursor:pointer;">EDIT</button>
+                        <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#444; font-size:10px; cursor:pointer;">BORRAR</button>
                     </div>
                 </div>
                 <div id="edit-anchor-${i}"></div>
@@ -337,8 +340,6 @@
         document.getElementById("e-prio").value = item.priority;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-        
-        // MOVEMOS LA CAJA DE EDICIÓN AL ANCLA DE ESTA TARJETA
         document.getElementById(`edit-anchor-${idx}`).appendChild(editBox);
         editBox.style.display = "block";
     }
@@ -346,34 +347,26 @@
     function hideEdit() { 
         const eb = document.getElementById("quickEdit");
         eb.style.display = "none";
-        document.body.appendChild(eb); // Lo sacamos del historial para no romper el render
+        document.body.appendChild(eb);
     }
 
     async function saveQuickEdit() {
         const idx = document.getElementById("e-index").value;
-        logs[idx] = {
-            area: document.getElementById("e-area").value,
-            priority: document.getElementById("e-prio").value,
-            title: document.getElementById("e-title").value,
-            message: document.getElementById("e-msg").value
-        };
+        logs[idx] = { area: document.getElementById("e-area").value, priority: document.getElementById("e-prio").value, title: document.getElementById("e-title").value, message: document.getElementById("e-msg").value };
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
         hideEdit(); renderHistoryList(); syncEvents();
     }
 
     async function saveNew(e) {
         e.preventDefault();
-        const entry = {
-            area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value,
-            title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value
-        };
+        const entry = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value };
         logs.push(entry);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
         closePanels(); syncEvents();
     }
 
     async function deleteEntry(idx) {
-        if(!confirm("¿Eliminar?")) return;
+        if(!confirm("¿CONFIRMAR ELIMINACIÓN?")) return;
         logs.splice(idx, 1);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
         renderHistoryList(); syncEvents();
@@ -400,7 +393,6 @@
     setInterval(updateNetwork, 5000);
     setInterval(syncEvents, 10000);
     updateNetwork(); syncEvents(); requestAnimationFrame(mainLoop);
-    window.onresize = autoSizeText;
 </script>
 </body>
 </html>
