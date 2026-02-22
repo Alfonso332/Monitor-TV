@@ -7,7 +7,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* ENCAPSULAMIENTO TOTAL #cio-app */
         #cio-app {
             --primary: #00d4d8;
             --accent: #006465;
@@ -23,7 +22,6 @@
             overflow: hidden; z-index: 99999; margin: 0; padding: 0;
         }
 
-        /* FONDO MUCHO MÁS OPACO (0.03) */
         #cio-app::before {
             content: ""; position: absolute; inset: 0;
             background-image: var(--bg-img); background-size: contain;
@@ -31,21 +29,19 @@
             opacity: 0.03; filter: grayscale(1); z-index: -1;
         }
 
-        /* HEADER */
+        /* HEADER ADAPTATIVO */
         #cio-app .main-header {
             height: 80px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 25px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(0, 212, 216, 0.3);
         }
 
-        /* OCULTAR BOTONES EN PANTALLA COMPLETA */
-        :fullscreen #cio-app .header-actions {
-            display: none !important;
-        }
+        /* OCULTAR BOTONES EN PANTALLA COMPLETA (TV) */
+        :fullscreen #cio-app .header-actions { display: none !important; }
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: var(--primary); font-weight: bold; }
 
-        /* SECCIÓN DE ALERTAS GIGANTES */
+        /* ALERTAS TV (GIGANTES) */
         #cio-app #critical-alert-zone {
             background: rgba(255, 0, 0, 0.05);
             padding: 10px; display: flex; flex-direction: column; align-items: center;
@@ -71,63 +67,80 @@
             50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(255, 77, 77, 0.4); }
         }
 
-        #cio-app .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--critico); animation: blink 0.8s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+        /* BOTÓN FLOTANTE OFFLINE (SOLO MÓVIL) */
+        #cio-app #btn-offline-mobile {
+            display: none; position: fixed; bottom: 100px; right: 20px;
+            background: var(--critico); color: white; border: none;
+            padding: 15px 20px; border-radius: 50px; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4); z-index: 10001;
+            animation: pulse-border 1.5s infinite;
+        }
 
         /* PANTALLA CENTRAL */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
-            align-items: center; text-align: center; padding: 30px;
+            align-items: center; text-align: center; padding: 20px;
         }
 
         #cio-app .info-container { width: 100%; transition: all 0.6s ease-in-out; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        #cio-app #areaLabel { font-size: 1.2rem; color: var(--primary); letter-spacing: 6px; text-transform: uppercase; font-weight: bold; }
+        #cio-app #areaLabel { font-size: 1.1rem; color: var(--primary); letter-spacing: 4px; text-transform: uppercase; font-weight: bold; }
         #cio-app #prioBadge { 
-            display: inline-block; padding: 6px 25px; border-radius: 50px; 
-            font-weight: 900; border: 1px solid var(--primary); margin: 20px 0;
-            background: rgba(0, 212, 216, 0.1);
+            display: inline-block; padding: 6px 20px; border-radius: 50px; 
+            font-weight: 900; border: 1px solid var(--primary); margin: 15px 0;
+            background: rgba(0, 212, 216, 0.1); font-size: 0.8rem;
         }
-        #cio-app #titleDisplay { font-weight: 800; line-height: 1.1; text-transform: uppercase; margin-bottom: 20px; }
-        #cio-app #messageDisplay { line-height: 1.5; opacity: 0.9; max-width: 900px; margin: 0 auto; white-space: pre-wrap; }
+        #cio-app #titleDisplay { font-weight: 800; line-height: 1.1; text-transform: uppercase; margin-bottom: 15px; }
+        #cio-app #messageDisplay { line-height: 1.4; opacity: 0.9; max-width: 90%; margin: 0 auto; white-space: pre-wrap; }
 
-        /* BARRA INFERIOR */
+        /* TICKER Y PROGRESO */
         #cio-app #ticker-bar { height: 40px; background: #050c0c; border-top: 1px solid var(--primary); display: flex; align-items: center; overflow: hidden; }
-        #cio-app #ticker-content { white-space: nowrap; animation: scrollText 35s linear infinite; color: var(--primary); font-weight: bold; font-size: 0.9rem; }
+        #cio-app #ticker-content { white-space: nowrap; animation: scrollText 35s linear infinite; color: var(--primary); font-weight: bold; font-size: 0.85rem; }
         @keyframes scrollText { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+        #cio-app #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; transition: width 0.1s linear; }
 
-        #cio-app #progressLine { position: fixed; bottom: 40px; height: 4px; width: 0%; transition: width 0.1s linear; }
-
-        /* BOTONES */
+        /* BOTONES HEADER */
         #cio-app .header-actions button {
             background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
-            color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold;
-            cursor: pointer; margin-right: 8px; font-size: 12px; transition: 0.3s;
+            color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: bold;
+            cursor: pointer; font-size: 11px; margin-left: 5px;
         }
-        #cio-app .header-actions button:hover { background: var(--primary); color: #000; }
 
-        /* FORMULARIOS ORIGINALES */
+        /* PANELES LATERALES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 380px; height: 100%;
-            background: #0a1a1b; border-left: 2px solid var(--primary); padding: 30px;
-            transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10000;
+            background: #0a1a1b; border-left: 2px solid var(--primary); padding: 25px;
+            transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10005;
             box-sizing: border-box; overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 9999; backdrop-filter: blur(4px); }
+        #cio-app #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 10002; backdrop-filter: blur(5px); }
         #cio-app #overlay.active { display: block; }
 
-        #cio-app label { display: block; color: var(--primary); margin-bottom: 5px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        /* FORMULARIOS */
+        #cio-app label { display: block; color: var(--primary); margin-bottom: 5px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 12px; background: #000; color: #fff; border: 1px solid var(--accent);
-            border-radius: 10px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box;
+            border-radius: 10px; margin-bottom: 12px; font-size: 16px; box-sizing: border-box;
         }
 
+        /* ESTILOS ESPECÍFICOS PARA CELULAR */
         @media (max-width: 768px) {
-            #cio-app .header-actions { display: none; }
-            #cio-app .side-panel { width: 100%; height: 85%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; }
+            #cio-app #btn-fs-tv { display: none !important; } /* Ocultar pantalla completa en cel */
+            #cio-app #critical-alert-zone { display: none !important; } /* Ocultar zona gigante en cel */
+            
+            #cio-app #btn-offline-mobile.visible { display: block; } /* Mostrar botón circular si hay fallas */
+
+            #cio-app .main-header { height: 70px; padding: 0 10px; }
+            #cio-app #clockDisplay { font-size: 1.2rem; }
+            #cio-app .header-actions button { padding: 6px 8px; font-size: 10px; }
+
+            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; border-left: none; border-top: 2px solid var(--primary); }
             #cio-app .side-panel.active { transform: translateY(0); }
+
+            #cio-app #titleDisplay { font-size: 28px !important; }
+            #cio-app #messageDisplay { font-size: 16px !important; }
         }
     </style>
 </head>
@@ -138,17 +151,15 @@
 
     <header class="main-header">
         <div class="header-actions">
-            <button onclick="openForm()">＋ NUEVA NOVEDAD</button>
-            <button onclick="openHistory()">📋 HISTORIAL</button>
-            <button onclick="toggleFS()">⛶ PANTALLA COMPLETA</button>
+            <button onclick="openForm()">＋ NUEVA</button>
+            <button onclick="openHistory()">📋 LOGS</button>
+            <button id="btn-fs-tv" onclick="toggleFS()">⛶ PANTALLA COMPLETA</button>
         </div>
 
-        <div style="text-align: center;">
-            <div id="clockDisplay">00:00:00</div>
-        </div>
+        <div id="clockDisplay">00:00:00</div>
 
-        <div style="width: 200px; text-align: right;">
-            <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40" style="filter: brightness(2);">
+        <div style="text-align: right;">
+            <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);">
         </div>
     </header>
 
@@ -157,12 +168,14 @@
         <div id="network-status"></div>
     </div>
 
+    <button id="btn-offline-mobile" onclick="openOfflinePanel()">⚠️ CAÍDOS (<span id="count-offline">0</span>)</button>
+
     <main id="display-board">
         <div id="infoCont" class="info-container">
             <div id="areaLabel">CENTRO DE OPERACIONES</div>
             <div id="prioBadge">SISTEMA ACTIVO</div>
-            <h1 id="titleDisplay">Monitor de Servicios</h1>
-            <p id="messageDisplay">Cargando base de datos...</p>
+            <h1 id="titleDisplay">Monitor</h1>
+            <p id="messageDisplay">Sincronizando...</p>
         </div>
     </main>
 
@@ -173,31 +186,34 @@
     <div id="progressLine"></div>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:var(--primary)">Registrar Novedad</h2>
+        <h2 style="color:var(--primary)">Nueva Novedad</h2>
         <form onsubmit="saveEntry(event)">
-            <label>Área Responsable</label>
+            <label>Área</label>
             <select id="f-area">
-                <option>Monitoreo</option><option>Freschat</option>
-                <option>Atención al Cliente</option><option>Tecnología</option>
+                <option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Tecnología</option>
             </select>
             <label>Prioridad</label>
             <select id="f-prio">
                 <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
             </select>
-            <label>Título del Evento</label>
-            <input type="text" id="f-title" placeholder="Ej: Caída de Servidor" required>
-            <label>Mensaje / Detalles</label>
-            <textarea id="f-msg" rows="5" placeholder="Escriba aquí los detalles..." required></textarea>
-            
-            <button type="submit" style="width:100%; padding:15px; background:var(--primary); border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:#000;">PUBLICAR EN TV</button>
-            <button type="button" onclick="closePanels()" style="width:100%; margin-top:10px; background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; padding:10px; border-radius:10px; cursor:pointer;">CANCELAR</button>
+            <label>Título</label>
+            <input type="text" id="f-title" placeholder="Título corto" required>
+            <label>Mensaje</label>
+            <textarea id="f-msg" rows="4" placeholder="Detalles..." required></textarea>
+            <button type="submit" style="width:100%; padding:15px; background:var(--primary); border:none; border-radius:10px; font-weight:bold; color:#000;">PUBLICAR</button>
+            <button type="button" onclick="closePanels()" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444; color:#fff; padding:10px; border-radius:10px;">CERRAR</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--primary)">Historial de Novedades</h2>
+        <h2 style="color:var(--primary)">Historial</h2>
         <div id="historyList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:var(--primary); border:none; padding:10px; border-radius:10px; font-weight:bold; color:#000; width:100%;">CERRAR</button>
+    </aside>
+
+    <aside id="panelOffline" class="side-panel">
+        <h2 style="color:var(--critico)">Equipos Offline</h2>
+        <div id="offlineList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:var(--critico); border:none; padding:15px; border-radius:10px; font-weight:bold; color:#fff;">CERRAR</button>
     </aside>
 </div>
 
@@ -215,30 +231,35 @@
             const resp = await fetch(RED_URL);
             const status = await resp.json();
             const container = document.getElementById("network-status");
-            const alertTitle = document.getElementById("alert-msg");
-            let html = ""; let caidos = 0;
+            const offList = document.getElementById("offlineList");
+            const btnOff = document.getElementById("btn-offline-mobile");
+            const countSpan = document.getElementById("count-offline");
+            
+            let htmlTV = ""; let htmlMob = ""; let caidos = 0;
 
             if(status) {
                 Object.keys(status).forEach(id => {
                     if(status[id].estado === "offline") {
                         caidos++;
-                        html += `<div class="status-item-big"><div class="dot"></div>${id.replace(/_/g, ' ')}</div>`;
+                        const name = id.replace(/_/g, ' ');
+                        htmlTV += `<div class="status-item-big"><div style="width:10px;height:10px;background:red;border-radius:50%"></div>${name}</div>`;
+                        htmlMob += `<div style="padding:15px; background:rgba(255,0,0,0.1); border:1px solid red; border-radius:10px; font-weight:bold;">⚠️ ${name}</div>`;
                     }
                 });
             }
 
-            if(caidos > 0) {
-                container.innerHTML = html;
-                alertTitle.textContent = "⚠️ ATENCIÓN: EQUIPOS FUERA DE LÍNEA";
-                alertTitle.style.color = "var(--critico)";
-                document.getElementById("critical-alert-zone").style.display = "flex";
-            } else {
-                container.innerHTML = "";
-                alertTitle.textContent = "✔ TODOS LOS SERVICIOS ONLINE";
-                alertTitle.style.color = "#00ff00";
-                document.getElementById("critical-alert-zone").style.display = "flex";
-            }
-        } catch(e) { console.warn("Error Red"); }
+            // Actualizar Vista TV
+            container.innerHTML = htmlTV;
+            document.getElementById("alert-msg").textContent = caidos > 0 ? "⚠️ ATENCIÓN: EQUIPOS FUERA DE LÍNEA" : "✔ TODOS LOS SERVICIOS ONLINE";
+            document.getElementById("alert-msg").style.color = caidos > 0 ? "var(--critico)" : "#00ff00";
+
+            // Actualizar Vista Móvil
+            countSpan.textContent = caidos;
+            offList.innerHTML = htmlMob || "<p style='color:gray'>No hay equipos caídos.</p>";
+            if(caidos > 0) btnOff.classList.add("visible");
+            else btnOff.classList.remove("visible");
+
+        } catch(e) { }
     }
 
     async function syncEvents() {
@@ -264,39 +285,34 @@
             document.getElementById("prioBadge").style.borderColor = color;
             document.getElementById("prioBadge").style.color = color;
             document.getElementById("progressLine").style.background = color;
-            autoSizeText();
             cont.classList.remove("oculto");
         }, 600);
     }
 
-    function autoSizeText() {
-        const t = document.getElementById('titleDisplay');
-        const m = document.getElementById('messageDisplay');
-        let sizeT = window.innerWidth < 768 ? 30 : 75;
-        let sizeM = window.innerWidth < 768 ? 18 : 35;
-        t.style.fontSize = sizeT + "px";
-        m.style.fontSize = sizeM + "px";
-    }
-
-    function openForm() { document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay").classList.add("active"); }
+    function openForm() { openPanel("panelForm"); }
     function openHistory() {
         const list = document.getElementById("historyList");
         list.innerHTML = logs.map((it, i) => `
             <div style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:10px; border-left:4px solid var(--primary)">
-                <strong>${it.title}</strong><br><small>${it.area} - ${it.priority}</small>
-                <button onclick="deleteEntry(${i})" style="float:right; background:none; border:none; color:red; cursor:pointer; font-weight:bold;">BORRAR</button>
+                <strong>${it.title}</strong><br><small>${it.area}</small>
+                <button onclick="deleteEntry(${i})" style="float:right; background:none; border:none; color:red; font-weight:bold;">ELIMINAR</button>
             </div>
         `).join('');
-        document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").classList.add("active");
+        openPanel("panelHistory");
     }
+    function openOfflinePanel() { openPanel("panelOffline"); }
+    
+    function openPanel(id) {
+        closePanels();
+        document.getElementById(id).classList.add("active");
+        document.getElementById("overlay").classList.add("active");
+    }
+
     function closePanels() { document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active')); }
     
     function toggleFS() { 
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            document.exitFullscreen();
-        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
     }
 
     async function saveEntry(e) {
@@ -305,8 +321,7 @@
             area: document.getElementById("f-area").value,
             priority: document.getElementById("f-prio").value,
             title: document.getElementById("f-title").value,
-            message: document.getElementById("f-msg").value,
-            timestamp: Date.now()
+            message: document.getElementById("f-msg").value
         };
         logs.push(newEntry);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
@@ -340,7 +355,6 @@
     syncEvents();
     updateNetwork();
     requestAnimationFrame(mainLoop);
-    window.onresize = autoSizeText;
 </script>
 </body>
 </html>
