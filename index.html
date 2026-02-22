@@ -12,7 +12,7 @@
 
     <style>
         #cio-app {
-            --primary: #006465; /* Sustituido 00d4d8 por 006465 */
+            --primary: #006465;
             --accent: #006465;
             --dark-bg: #000000;
             --critico: #ff4d4d;
@@ -47,7 +47,7 @@
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: #fff; font-weight: bold; }
 
-        /* BOTONES FLOTANTES */
+        /* BOTÓN FLOTANTE MÓVIL */
         #cio-app #menu-toggle-float {
             display: none; position: fixed; bottom: 70px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
@@ -103,6 +103,7 @@
             font-weight: bold; cursor: pointer;
         }
 
+        /* TICKER BAR - MEJORADO */
         #cio-app #ticker-bar {
             height: 50px; background: #050c0c; border-top: 1px solid var(--accent);
             display: flex; align-items: center; overflow: hidden; position: relative;
@@ -112,6 +113,17 @@
             white-space: nowrap; position: absolute;
             animation: scrollText 22s linear infinite;
             font-weight: bold; font-size: 1.1rem;
+            display: flex; align-items: center;
+        }
+
+        #cio-app .offline-tag {
+            background: rgba(255, 77, 77, 0.15);
+            color: #ff4d4d;
+            padding: 4px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            margin: 0 15px;
+            display: inline-block;
         }
 
         @keyframes scrollText {
@@ -195,9 +207,9 @@
     </aside>
 
     <aside id="panelOffline" class="side-panel">
-        <h2 style="color:var(--critico); text-align:center;">Offline</h2>
+        <h2 style="color:var(--critico); text-align:center;">Servicios Offline</h2>
         <div id="offlineList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none !important; border:1px solid #333 !important;">CERRAR</button>
     </aside>
 </div>
 
@@ -218,15 +230,29 @@
             const resp = await fetch(RED_URL);
             const status = await resp.json();
             const ticker = document.getElementById("ticker-content");
+            const offlineList = document.getElementById("offlineList");
             let caidos = [];
-            if(status) Object.keys(status).forEach(id => { if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); });
+            
+            if(status) {
+                Object.keys(status).forEach(id => { 
+                    if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); 
+                });
+            }
 
             if(caidos.length > 0) {
-                ticker.innerHTML = `⚠️ OFFLINE: ${caidos.join(' • ')} — REVISAR ESTADO — `;
+                // Ticker con separadores visuales
+                ticker.innerHTML = `⚠️ OFFLINE: ` + caidos.map(n => `<span class="offline-tag">${n}</span>`).join('');
                 ticker.style.color = "#ff4d4d";
+                // Lista para el panel lateral (móvil/PC)
+                offlineList.innerHTML = caidos.map(n => `
+                    <div style="background:rgba(255,77,77,0.1); border:1px solid var(--critico); padding:15px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold; color:#ff4d4d;">
+                        ⚠️ ${n}
+                    </div>
+                `).join('');
             } else {
                 ticker.innerHTML = `✔ Red estable en todos los servicios - Masterson Seguridad — `;
                 ticker.style.color = "#fff";
+                offlineList.innerHTML = `<p style="text-align:center; color:gray; margin-top:20px;">Todos los servicios operativos.</p>`;
             }
             document.getElementById("count-offline-mob").textContent = caidos.length;
         } catch(e) {}
