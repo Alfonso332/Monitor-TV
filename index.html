@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO Monitor</title>
+    <title>CIO Monitor | Masterson</title>
     
     <link rel="apple-touch-icon" href="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,12 +15,10 @@
             --accent: #00d1d1;
             --dark-bg: #000000;
             --critico: #ff4d4d;
-            /* Colores de Área solicitados */
             --color-monitoreo: #ff4d4d;
             --color-atencion: #2ecc71;
             --color-freschat: #3498db;
             --color-interna: #e0f7fa;
-            
             --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -66,9 +64,9 @@
         .stat-card.alert b { color: var(--critico); }
         .stat-card span { display: block; font-size: 0.6rem; color: #888; text-transform: uppercase; margin-top: 4px; }
 
-        /* BOTÓN FLOTANTE MÓVIL ABAJO DERECHA */
+        /* BOTÓN FLOTANTE */
         #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 30px; right: 20px;
+            display: none; position: fixed; bottom: 65px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
             background: var(--primary); color: #fff; border: 2px solid rgba(255,255,255,0.2);
             font-size: 24px; cursor: pointer; z-index: 10015;
@@ -76,7 +74,7 @@
         }
 
         #cio-app #mobile-menu {
-            position: fixed; bottom: 100px; right: 20px; width: 220px;
+            position: fixed; bottom: 135px; right: 20px; width: 220px;
             background: rgba(10, 26, 27, 0.98); display: none; flex-direction: column;
             padding: 15px; gap: 10px; border: 1px solid var(--primary);
             border-radius: 15px; z-index: 10010; backdrop-filter: blur(10px);
@@ -96,7 +94,6 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* CAJA DE EDICIÓN DESPLEGABLE (ABAJO DE LA TARJETA) */
         #cio-app .edit-box {
             background: #000; border: 1px solid var(--accent); padding: 15px;
             border-radius: 12px; margin-top: 10px; display: none;
@@ -111,9 +108,41 @@
             background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
-        /* TICKER BAR */
-        #cio-app #ticker-bar { height: 45px; background: #000; border-top: 1px solid #111; display: flex; align-items: center; overflow: hidden; position: relative; }
-        #cio-app #ticker-content { white-space: nowrap; position: absolute; animation: scrollText 25s linear infinite; font-weight: bold; }
+        /* --- TICKER BAR REDISEÑADA --- */
+        #cio-app #ticker-bar { 
+            height: 55px; background: #000; border-top: 1px solid #111; 
+            display: flex; align-items: center; overflow: hidden; position: relative; 
+        }
+        #cio-app #ticker-content { 
+            display: flex; align-items: center; gap: 20px;
+            white-space: nowrap; position: absolute; animation: scrollText 30s linear infinite; 
+        }
+        
+        .ticker-badge {
+            display: flex; align-items: center; gap: 8px;
+            padding: 5px 15px; border-radius: 6px; font-size: 0.8rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        .ticker-badge.offline {
+            background: rgba(255, 77, 77, 0.15);
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+            animation: pulseAlert 2s infinite;
+        }
+
+        .ticker-badge.online {
+            background: rgba(0, 100, 101, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--accent);
+        }
+
+        @keyframes pulseAlert {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
         @keyframes scrollText { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
         @media (max-width: 768px) {
@@ -156,10 +185,12 @@
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">CARGANDO SERVICIOS...</div>
+        <div id="ticker-content">
+            <div class="ticker-badge online">Sincronizando Sistemas...</div>
+        </div>
     </div>
     
-    <div id="progressLine" style="position: fixed; bottom: 45px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
+    <div id="progressLine" style="position: fixed; bottom: 55px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
 
     <div id="quickEdit" class="edit-box">
         <input type="hidden" id="e-index">
@@ -235,13 +266,20 @@
             }
             const cardOff = document.getElementById("card-off");
             cardOff.querySelector('b').textContent = caidos.length;
+            
             if(caidos.length > 0) {
                 cardOff.classList.add('alert');
-                ticker.innerHTML = `⚠️ OFFLINE: ` + caidos.map(n => `<span style="color:#ff4d4d; margin:0 15px;">[${n}]</span>`).join('');
+                ticker.innerHTML = caidos.map(n => `
+                    <div class="ticker-badge offline">
+                        <span style="font-size:1.2rem; margin-right:5px;">⚠️</span> OFFLINE: ${n}
+                    </div>
+                `).join('') + caidos.map(n => `<div class="ticker-badge offline">⚠️ OFFLINE: ${n}</div>`).join(''); 
+                // Duplicamos el contenido para un scroll infinito más fluido si son pocos
+                
                 document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="background:rgba(255,77,77,0.1); border:1px solid var(--critico); padding:12px; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold; color:#ff4d4d;">⚠️ ${n}</div>`).join('');
             } else {
                 cardOff.classList.remove('alert');
-                ticker.innerHTML = `✔ SERVICIOS OPERATIVOS — MASTERSON SEGURIDAD — `;
+                ticker.innerHTML = `<div class="ticker-badge online">✔ TODOS LOS SERVICIOS OPERATIVOS</div><div class="ticker-badge online">✔ CONEXIÓN SEGURA</div><div class="ticker-badge online">✔ CENTRAL MASTERSON OK</div>`;
                 document.getElementById("offlineList").innerHTML = `<p style="text-align:center; color:gray;">Red estable.</p>`;
             }
             document.getElementById("count-offline-mob").textContent = caidos.length;
@@ -337,8 +375,6 @@
         document.getElementById("e-prio").value = item.priority;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-        
-        // MOVEMOS LA CAJA DE EDICIÓN AL ANCLA DE ESTA TARJETA
         document.getElementById(`edit-anchor-${idx}`).appendChild(editBox);
         editBox.style.display = "block";
     }
@@ -346,7 +382,7 @@
     function hideEdit() { 
         const eb = document.getElementById("quickEdit");
         eb.style.display = "none";
-        document.body.appendChild(eb); // Lo sacamos del historial para no romper el render
+        document.body.appendChild(eb);
     }
 
     async function saveQuickEdit() {
@@ -404,4 +440,3 @@
 </script>
 </body>
 </html>
-
