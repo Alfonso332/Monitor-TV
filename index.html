@@ -11,10 +11,9 @@
     <meta name="apple-mobile-web-app-title" content="CIO Monitor">
 
     <style>
-        /* Encapsulamiento total bajo el ID #cio-app */
         #cio-app {
             --primary: #00d4d8;
-            --accent: #006465; /* Tu color corporativo solicitado */
+            --accent: #006465; /* Color corporativo unificado */
             --dark-bg: #000000;
             --critico: #ff4d4d;
             --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
@@ -41,7 +40,7 @@
             border-bottom: 1px solid var(--accent);
         }
 
-        /* Ocultar barra superior en Fullscreen */
+        /* Ocultar en Fullscreen */
         #cio-app:fullscreen .main-header,
         #cio-app:-webkit-full-screen .main-header {
             display: none !important;
@@ -66,7 +65,7 @@
             border-radius: 15px; z-index: 10010; backdrop-filter: blur(10px);
         }
 
-        /* DISPLAY PRINCIPAL - CAMPOS CENTRADOS */
+        /* PANTALLA CENTRAL */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
@@ -75,7 +74,7 @@
         #cio-app .info-container { width: 100%; transition: all 0.6s ease-in-out; }
         #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(10px); }
 
-        /* PANELES LATERALES */
+        /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a1a1b; border-left: 2px solid var(--accent); padding: 25px;
@@ -95,7 +94,7 @@
             text-align: center; box-sizing: border-box; font-size: 16px;
         }
 
-        /* BOTONES UNIFICADOS AL COLOR 006465 */
+        /* BOTONES UNIFICADOS AL COLOR #006465 */
         #cio-app .header-actions button, 
         #cio-app #mobile-menu button,
         #cio-app .btn-main,
@@ -108,7 +107,7 @@
 
         #cio-app button:hover { filter: brightness(1.2); }
 
-        /* TICKER INFERIOR */
+        /* TICKER BAR */
         #cio-app #ticker-bar {
             height: 50px; background: #050c0c; border-top: 1px solid var(--accent);
             display: flex; align-items: center; overflow: hidden; position: relative;
@@ -116,8 +115,8 @@
 
         #cio-app #ticker-content {
             white-space: nowrap; position: absolute;
-            animation: scrollText 25s linear infinite;
-            font-weight: bold; font-size: 1rem;
+            animation: scrollText 20s linear infinite;
+            font-weight: bold; font-size: 1.1rem;
         }
 
         @keyframes scrollText {
@@ -158,16 +157,16 @@
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 2px; color: var(--primary);">CIO MONITOR</div>
+            <div id="areaLabel" style="letter-spacing: 2px; color: var(--primary); font-weight: bold;">CIO MONITOR</div>
             <div id="prioBadge" style="display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--accent); margin: 15px 0; background: rgba(0, 100, 101, 0.1); font-size: 0.8rem;">SISTEMA ACTIVO</div>
             <h1 id="titleDisplay" style="margin:10px 0; line-height: 1.1;">...</h1>
-            <p id="messageDisplay" style="font-size: 1.6rem; opacity: 0.8; max-width: 850px; margin: 0 auto;">Cargando servicios...</p>
+            <p id="messageDisplay" style="font-size: 1.6rem; opacity: 0.8; max-width: 850px; margin: 0 auto;">Cargando...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content" style="color: var(--primary);">
-            ✔ RED ESTABLE EN TODOS LOS SERVICIOS — MONITOREO CIO URUGUAY — 
+        <div id="ticker-content">
+            Sincronizando con Masterson Seguridad...
         </div>
     </div>
     
@@ -241,11 +240,11 @@
             }
 
             if(caidos.length > 0) {
-                ticker.innerHTML = `⚠️ OFFLINE: ${caidos.join(' • ')} — FAVOR VERIFICAR CONEXIÓN — `;
+                ticker.innerHTML = `⚠️ OFFLINE: ${caidos.join(' • ')} — REVISAR ESTADO — `;
                 ticker.style.color = "#ff4d4d";
                 offList.innerHTML = caidos.map(n => `<div style="padding:15px; background:rgba(255,77,77,0.1); border:1px solid red; border-radius:10px; margin-bottom:10px; text-align:center;">⚠️ ${n}</div>`).join('');
             } else {
-                ticker.innerHTML = `✔ RED ESTABLE EN TODOS LOS SERVICIOS — CIO URUGUAY — MONITOREO TIEMPO REAL — `;
+                ticker.innerHTML = `✔ Red estable en todos los servicios - Masterson Seguridad — `;
                 ticker.style.color = "#00d4d8";
                 offList.innerHTML = "<p style='text-align:center;color:gray'>Todos los servicios operativos.</p>";
             }
