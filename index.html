@@ -8,7 +8,7 @@
     <style>
         #cio-app {
             --primary: #00d4d8;
-            --accent: #006465;
+            --accent: #006465; /* Color principal para botones y resaltes */
             --dark-bg: #000000;
             --critico: #ff4d4d;
             --bg-img: url('https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png');
@@ -32,8 +32,7 @@
         #cio-app .main-header {
             height: 80px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 212, 216, 0.3);
-            transition: transform 0.3s ease;
+            border-bottom: 1px solid var(--accent);
         }
 
         /* Ocultar cabecera en Fullscreen */
@@ -48,18 +47,18 @@
         #cio-app #menu-toggle-float {
             display: none; position: fixed; bottom: 30px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
-            background: var(--primary); color: #000; border: none;
+            background: var(--accent); color: #fff; border: none;
             font-size: 24px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 212, 216, 0.4); z-index: 10015;
+            box-shadow: 0 4px 15px rgba(0, 100, 101, 0.4); z-index: 10015;
             align-items: center; justify-content: center;
         }
 
         #cio-app #mobile-menu {
-            position: fixed; bottom: 100px; right: 20px; width: 200px;
-            background: rgba(10, 26, 27, 0.95); display: none; flex-direction: column;
-            padding: 15px; gap: 10px; border: 1px solid var(--primary);
+            position: fixed; bottom: 100px; right: 20px; width: 220px;
+            background: rgba(10, 26, 27, 0.98); display: none; flex-direction: column;
+            padding: 15px; gap: 10px; border: 1px solid var(--accent);
             border-radius: 15px; z-index: 10010; backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         /* ZONA EQUIPOS OFFLINE */
@@ -93,14 +92,14 @@
         /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
-            background: #0a1a1b; border-left: 2px solid var(--primary); padding: 25px;
+            background: #0a1a1b; border-left: 2px solid var(--accent); padding: 25px;
             transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10005;
             box-sizing: border-box; overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
         #cio-app .edit-box {
-            background: #000; border: 1px solid var(--primary); padding: 20px;
+            background: #000; border: 1px solid var(--accent); padding: 20px;
             border-radius: 15px; margin-top: 15px; display: none;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8); text-align: center;
         }
@@ -111,14 +110,17 @@
             font-size: 15px; text-align: center; box-sizing: border-box;
         }
 
-        #cio-app .header-actions button, #cio-app #mobile-menu button {
-            background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
-            color: #fff; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;
-            width: 100%; margin-bottom: 5px;
+        /* BOTONES GENERALES */
+        #cio-app .header-actions button, 
+        #cio-app #mobile-menu button,
+        #cio-app .btn-main {
+            background: var(--accent) !important;
+            border: none !important;
+            color: #fff !important; padding: 10px 15px; border-radius: 8px; 
+            font-weight: bold; cursor: pointer; transition: opacity 0.2s;
         }
 
-        #cio-app .header-actions { display: flex; gap: 10px; }
-        #cio-app .header-actions button { width: auto; }
+        #cio-app button:hover { opacity: 0.8; }
 
         @media (max-width: 768px) {
             #cio-app .header-actions { display: none; }
@@ -146,9 +148,10 @@
 
     <button id="menu-toggle-float" onclick="toggleMobileMenu()">☰</button>
     <div id="mobile-menu">
-        <button onclick="openForm(); toggleMobileMenu();">＋ NUEVA</button>
+        <button onclick="openForm(); toggleMobileMenu();">＋ NUEVA NOVEDAD</button>
         <button onclick="openHistory(); toggleMobileMenu();">📋 HISTORIAL</button>
-        <button onclick="openOfflinePanel(); toggleMobileMenu();" style="color:var(--critico); border-color:var(--critico);">⚠️ CAÍDOS (<span id="count-offline-mob">0</span>)</button>
+        <button onclick="openOfflinePanel(); toggleMobileMenu();" style="background:var(--critico) !important;">⚠️ OFFLINE (<span id="count-offline-mob">0</span>)</button>
+        <button onclick="toggleMobileMenu()" style="background:transparent !important; border:1px solid #444 !important; font-size:12px; margin-top:10px;">CERRAR</button>
     </div>
 
     <div id="critical-alert-zone">
@@ -159,14 +162,14 @@
     <main id="display-board">
         <div id="infoCont" class="info-container">
             <div id="areaLabel">CIO MONITOR</div>
-            <div id="prioBadge" style="display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--primary); margin: 15px 0; background: rgba(0, 212, 216, 0.1); font-size: 0.8rem;">SISTEMA ACTIVO</div>
+            <div id="prioBadge" style="display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--accent); margin: 15px 0; background: rgba(0, 100, 101, 0.1); font-size: 0.8rem;">SISTEMA ACTIVO</div>
             <h1 id="titleDisplay">...</h1>
-            <p id="messageDisplay">Cargando datos...</p>
+            <p id="messageDisplay">Cargando monitor...</p>
         </div>
     </main>
 
-    <div id="ticker-bar" style="height:40px; background:#050c0c; border-top:1px solid var(--primary); display:flex; align-items:center; overflow:hidden;">
-        <div id="ticker-content" style="white-space:nowrap; animation:scrollText 35s linear infinite; color:var(--primary); font-weight:bold; font-size:0.85rem;">SISTEMA OPERATIVO - CIO URUGUAY - MONITOREO 24/7</div>
+    <div id="ticker-bar" style="height:40px; background:#050c0c; border-top:1px solid var(--accent); display:flex; align-items:center; overflow:hidden;">
+        <div id="ticker-content" style="white-space:nowrap; animation:scrollText 35s linear infinite; color:var(--primary); font-weight:bold; font-size:0.85rem;">SISTEMA OPERATIVO - CIO URUGUAY - MONITOREO EN TIEMPO REAL</div>
     </div>
     <div id="progressLine" style="position: fixed; bottom: 40px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
 
@@ -185,11 +188,11 @@
             <label>Mensaje</label>
             <textarea id="e-msg" rows="3"></textarea>
             <div style="display:flex; gap:10px;">
-                <button onclick="saveQuickEdit()" style="flex:1; background:var(--primary); border:none; padding:12px; border-radius:8px; font-weight:bold; color:#000;">GUARDAR</button>
-                <button onclick="hideEdit()" style="flex:1; background:#222; border:none; color:white; padding:12px; border-radius:8px;">CANCELAR</button>
+                <button onclick="saveQuickEdit()" class="btn-main" style="flex:1;">GUARDAR</button>
+                <button onclick="hideEdit()" style="flex:1; background:#222 !important; border:none; color:white; padding:12px; border-radius:8px; cursor:pointer">CANCELAR</button>
             </div>
         </div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:gray; padding:10px; border-radius:10px;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none !important; border:1px solid #333 !important; color:gray !important; padding:10px; border-radius:10px; cursor:pointer;">CERRAR</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
@@ -203,15 +206,15 @@
             <input type="text" id="f-title" required>
             <label>Mensaje</label>
             <textarea id="f-msg" rows="4" required></textarea>
-            <button type="submit" style="width:100%; padding:15px; background:var(--primary); border:none; border-radius:10px; font-weight:bold; color:#000;">PUBLICAR</button>
-            <button type="button" onclick="closePanels()" style="width:100%; margin-top:10px; background:none; border:1px solid #444; color:white; padding:10px; border-radius:10px;">CANCELAR</button>
+            <button type="submit" class="btn-main" style="width:100%; padding:15px; font-size: 16px;">PUBLICAR</button>
+            <button type="button" onclick="closePanels()" style="width:100%; margin-top:10px; background:none !important; border:1px solid #444 !important; color:white !important; padding:10px; border-radius:10px; cursor:pointer;">CANCELAR</button>
         </form>
     </aside>
 
     <aside id="panelOffline" class="side-panel">
-        <h2 style="color:var(--critico); text-align:center;">Equipos Caídos</h2>
+        <h2 style="color:var(--critico); text-align:center;">Offline</h2>
         <div id="offlineList"></div>
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:var(--critico); border:none; color:white; padding:15px; border-radius:10px; font-weight:bold;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:var(--critico) !important; border:none; color:white; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">CERRAR</button>
     </aside>
 </div>
 
@@ -228,7 +231,6 @@
         const menu = document.getElementById("mobile-menu");
         const overlay = document.getElementById("overlay");
         const isVisible = menu.style.display === "flex";
-        
         menu.style.display = isVisible ? "none" : "flex";
         overlay.style.display = isVisible ? "none" : "block";
     }
@@ -254,8 +256,8 @@
             }
             container.innerHTML = htmlTV;
             if(countMob) countMob.textContent = caidos;
-            offList.innerHTML = htmlMob || "<p style='text-align:center;color:gray'>Sin equipos caídos.</p>";
-            document.getElementById("alert-msg").textContent = caidos > 0 ? "⚠️ EQUIPOS OFFLINE" : "✔ RED ESTABLE";
+            offList.innerHTML = htmlMob || "<p style='text-align:center;color:gray'>Todos los servicios operativos.</p>";
+            document.getElementById("alert-msg").textContent = caidos > 0 ? "⚠️ OFFLINE" : "✔ RED ESTABLE EN TODOS LOS SERVICIOS";
         } catch(e) {}
     }
 
@@ -312,15 +314,15 @@
     function renderHistoryList() {
         const list = document.getElementById("historyList");
         list.innerHTML = logs.map((it, i) => `
-            <div id="item-${i}" style="background:rgba(255,255,255,0.03); padding:15px; margin-bottom:10px; border-radius:12px; border-left:4px solid ${it.priority==='Crítica'?'red':'var(--primary)'}">
+            <div id="item-${i}" style="background:rgba(255,255,255,0.03); padding:15px; margin-bottom:10px; border-radius:12px; border-left:4px solid ${it.priority==='Crítica'?'red':'var(--accent)'}">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div style="text-align:left">
                         <strong style="font-size:14px">${it.title}</strong><br>
                         <small style="color:gray">${it.area} - ${it.priority}</small>
                     </div>
                     <div style="display:flex; gap:5px;">
-                        <button onclick="showQuickEdit(${i})" style="background:var(--primary); border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer; color:#000;">EDITAR</button>
-                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:6px 10px; border-radius:6px; font-size:10px; cursor:pointer">BORRAR</button>
+                        <button onclick="showQuickEdit(${i})" style="background:var(--accent); border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer; color:#fff;">EDITAR</button>
+                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:6px 10px; border-radius:6px; font-size:10px; cursor:pointer">ELIMINAR</button>
                     </div>
                 </div>
                 <div id="edit-anchor-${i}"></div>
@@ -382,7 +384,7 @@
     }
 
     async function deleteEntry(idx) {
-        if(!confirm("¿Desea borrar esta novedad?")) return;
+        if(!confirm("¿Eliminar este registro?")) return;
         logs.splice(idx, 1);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
         renderHistoryList(); syncEvents();
