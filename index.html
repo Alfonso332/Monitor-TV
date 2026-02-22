@@ -10,23 +10,24 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        /* ARQUITECTURA VISUAL MASTERSON v6.0 
-           Diseño centrado, tipografía masiva y sistema de alertas de bajo perfil.
+        /* ARQUITECTURA MASTERSON v7.0 - "DARK OCEAN"
+           Color Primario: #006465
+           Foco: Reloj Central y Servicios Críticos
         */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700;900&family=JetBrains+Mono:wght@300&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;400;700;900&family=JetBrains+Mono:wght@300&display=swap');
 
         #cio-app {
-            --p-oro: #C5A059;
-            --p-oro-tenue: rgba(197, 160, 89, 0.1);
+            --p-brand: #006465;
+            --p-brand-glow: rgba(0, 100, 101, 0.4);
             --fondo-negro: #050505;
-            --fondo-superficie: #0f0f0f;
+            --fondo-superficie: #0c0c0c;
             --texto-puro: #ffffff;
-            --texto-gris: #888888;
-            --critico-fondo: #2a0505; /* Rojo muy oscuro solicitado */
-            --critico-texto: #ff4d4d;
-            --baja: #4ade80;
-            --media: #fbbf24;
-            --alta: #fb923c;
+            --texto-gris: #777777;
+            --critico-fondo: #1a0202;
+            --critico-color: #ff3b30;
+            --baja: #00c853;
+            --media: #ffd600;
+            --alta: #ff9100;
             
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: var(--fondo-negro) !important;
@@ -34,183 +35,201 @@
             font-family: 'Inter', sans-serif !important;
             display: flex; flex-direction: column;
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-            transition: background 1s ease;
+            transition: background 0.8s ease;
         }
 
-        /* --- FONDO CINEMÁTICO --- */
-        #cio-app canvas#bg-canvas {
-            position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.3;
+        /* --- BACKGROUND LAYER --- */
+        #cio-app #canvas-dots {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.2;
         }
 
-        /* --- CABECERA DE ALTA GAMA --- */
-        #cio-app .header-elite {
-            height: 100px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 4%; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        /* --- CABECERA SUPERIOR --- */
+        #cio-app .top-nav {
+            height: 90px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.03);
         }
-        #cio-app:fullscreen .header-elite { display: none !important; }
+        #cio-app:fullscreen .top-nav { display: none !important; }
 
-        .brand-container { display: flex; align-items: center; gap: 15px; }
-        .brand-container img { height: 45px; filter: grayscale(1) brightness(2.5); }
-        .brand-text { border-left: 1px solid #333; padding-left: 15px; }
-        .brand-text h2 { margin: 0; font-size: 14px; letter-spacing: 3px; font-weight: 900; color: var(--texto-puro); text-transform: uppercase; }
-        .brand-text span { font-size: 9px; color: var(--p-oro); letter-spacing: 2px; font-family: 'JetBrains Mono'; }
+        .logo-box { display: flex; align-items: center; gap: 15px; }
+        .logo-box img { height: 42px; filter: grayscale(1) brightness(2); }
+        .logo-text { border-left: 1px solid #222; padding-left: 15px; }
+        .logo-text h1 { margin: 0; font-size: 14px; letter-spacing: 3px; font-weight: 900; text-transform: uppercase; }
+        .logo-text span { font-size: 10px; color: var(--p-brand); font-family: 'JetBrains Mono'; letter-spacing: 1px; }
 
-        .clock-container { text-align: right; }
-        #reloj { font-size: 1.6rem; font-weight: 200; letter-spacing: -1px; margin: 0; }
-        #fecha { font-size: 9px; text-transform: uppercase; color: var(--texto-gris); letter-spacing: 2px; }
-
-        /* --- CONTENEDOR CENTRAL DE NOVEDADES --- */
-        #cio-app #display-board { 
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            padding: 0 5%; z-index: 10; text-align: center; position: relative;
+        .nav-actions { display: flex; gap: 15px; }
+        .btn-nav {
+            background: none; border: 1px solid #222; color: var(--texto-gris);
+            padding: 8px 18px; border-radius: 5px; font-size: 10px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; letter-spacing: 1px;
         }
-        
-        #infoCont { width: 100%; max-width: 1300px; transition: opacity 0.6s ease, transform 0.6s ease; }
-        
-        #areaLabel { font-size: 13px; font-weight: 800; letter-spacing: 6px; text-transform: uppercase; color: var(--p-oro); margin-bottom: 15px; }
-        
-        #titleDisplay { 
-            font-size: 110px; font-weight: 900; line-height: 0.85; letter-spacing: -6px; 
-            margin: 0 auto 30px auto; text-transform: uppercase; max-width: 1100px;
-        }
-        
-        #prioBadge { 
-            display: inline-block; padding: 6px 20px; border: 1px solid var(--p-oro); 
-            font-size: 10px; font-weight: 900; letter-spacing: 3px; border-radius: 2px; margin-bottom: 40px;
+        .btn-nav:hover { border-color: var(--p-brand); color: #fff; }
+        .btn-nav.active { background: var(--p-brand); color: #000; border-color: var(--p-brand); }
+
+        /* --- DASHBOARD CENTRAL --- */
+        #display-board {
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; padding: 0 10%; z-index: 10;
         }
 
-        #messageDisplay { 
-            font-size: 1.8rem; line-height: 1.4; color: var(--texto-gris); 
-            max-width: 900px; margin: 0 auto; font-weight: 300;
+        /* RELOJ GIGANTE CENTRAL */
+        #clock-hero {
+            margin-bottom: 40px; transition: all 0.5s ease;
+        }
+        #main-time {
+            font-size: 8rem; font-weight: 100; letter-spacing: -5px; line-height: 1;
+            margin: 0; color: var(--texto-puro);
+        }
+        #main-date {
+            font-size: 12px; letter-spacing: 8px; text-transform: uppercase;
+            color: var(--p-brand); margin-top: 10px; font-weight: 400;
         }
 
-        /* --- ESTADO CRÍTICO (FONDO ROJO OSCURO) --- */
-        #cio-app.prio-critica { background: var(--critico-fondo) !important; }
-        #cio-app.prio-critica #titleDisplay { color: var(--critico-texto); }
-        #cio-app.prio-critica #prioBadge { border-color: var(--critico-texto); color: var(--critico-texto); }
+        /* NOVEDADES */
+        #info-wrap { width: 100%; max-width: 1200px; }
+        #area-tag { 
+            font-size: 11px; font-weight: 900; letter-spacing: 5px; 
+            color: var(--p-brand); text-transform: uppercase; margin-bottom: 15px;
+        }
+        #title-main {
+            font-size: 90px; font-weight: 900; line-height: 0.9; letter-spacing: -5px;
+            margin: 0 0 25px 0; text-transform: uppercase;
+        }
+        #msg-main {
+            font-size: 1.5rem; color: var(--texto-gris); font-weight: 300;
+            max-width: 850px; margin: 0 auto; line-height: 1.5;
+        }
 
-        /* --- PANELES Y NAVEGACIÓN --- */
+        /* --- OFFLINE BOX (MÁS GRANDE Y ESTÉTICO) --- */
+        #offline-alert-container {
+            position: absolute; bottom: 80px; width: 100%; display: none;
+            justify-content: center; z-index: 20;
+        }
+        .offline-banner {
+            background: rgba(255, 59, 48, 0.1); border: 1px solid var(--critico-color);
+            padding: 20px 40px; border-radius: 12px; backdrop-filter: blur(10px);
+            display: flex; align-items: center; gap: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .offline-banner h3 { color: var(--critico-color); margin: 0; font-size: 12px; letter-spacing: 2px; }
+        .offline-list-mini { display: flex; gap: 15px; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; }
+        .offline-item { color: #fff; background: var(--critico-color); padding: 2px 10px; border-radius: 4px; }
+
+        /* --- SISTEMA DE PANELES --- */
         .side-panel {
-            position: fixed; right: 0; top: 0; width: 450px; height: 100%;
-            background: #0a0a0a; border-left: 1px solid #1a1a1a;
-            padding: 50px; transform: translateX(100%); transition: 0.8s cubic-bezier(0.85, 0, 0.15, 1);
-            z-index: 10005; box-sizing: border-box;
+            position: fixed; right: 0; top: 0; width: 480px; height: 100%;
+            background: var(--fondo-superficie); border-left: 1px solid #1a1a1a;
+            padding: 60px; transform: translateX(100%); transition: 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10005; box-sizing: border-box; overflow-y: auto;
         }
-        .side-panel.active { transform: translateX(0); box-shadow: -30px 0 60px rgba(0,0,0,0.8); }
+        .side-panel.active { transform: translateX(0); }
+        .side-panel h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 40px; letter-spacing: -1px; }
 
-        /* Botón Flotante Optimizado */
-        #menu-toggle-float {
-            position: fixed; bottom: 40px; right: 40px;
-            width: 65px; height: 65px; border-radius: 50%;
-            background: var(--p-oro); color: #000; border: none;
-            font-size: 24px; cursor: pointer; z-index: 10015;
-            display: none; align-items: center; justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        #mobile-menu {
-            position: fixed; bottom: 115px; right: 40px; width: 240px;
-            background: rgba(15,15,15,0.95); backdrop-filter: blur(15px);
-            display: none; flex-direction: column; padding: 15px; gap: 10px;
-            border-radius: 20px; z-index: 10010; border: 1px solid rgba(197, 160, 89, 0.2);
-        }
-
-        /* --- ELEMENTOS DE FORMULARIO --- */
-        .input-group { margin-bottom: 25px; text-align: left; }
-        .input-group label { display: block; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-        
+        /* --- FORMULARIOS --- */
+        .f-group { margin-bottom: 30px; }
+        .f-group label { display: block; font-size: 10px; text-transform: uppercase; color: #555; margin-bottom: 10px; letter-spacing: 2px; }
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; background: #000; color: #fff; border: 1px solid #222;
-            padding: 15px; font-family: inherit; border-radius: 4px; box-sizing: border-box;
+            width: 100%; background: #000; color: #fff; border: 1px solid #222; padding: 18px;
+            border-radius: 6px; font-family: inherit; font-size: 1rem; box-sizing: border-box;
         }
-        #cio-app input:focus { border-color: var(--p-oro); outline: none; }
+        #cio-app input:focus { border-color: var(--p-brand); outline: none; }
 
-        .btn-gold {
-            background: var(--p-oro); color: #000; border: none; padding: 18px;
-            font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
-            width: 100%; font-size: 11px; transition: 0.3s;
+        .btn-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn-prime { background: var(--p-brand); color: #fff; border: none; padding: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; letter-spacing: 2px; }
+        .btn-cancel { background: none; border: 1px solid #333; color: #777; padding: 15px; font-weight: 700; text-transform: uppercase; cursor: pointer; font-size: 11px; }
+
+        /* --- BOTÓN FLOTANTE --- */
+        #float-trigger {
+            position: fixed; bottom: 40px; right: 40px; width: 70px; height: 70px;
+            background: var(--p-brand); border-radius: 50%; border: none; color: #fff;
+            font-size: 28px; cursor: pointer; z-index: 10020; display: none;
+            align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
-        /* --- BARRA DE PROGRESO Y TICKER --- */
-        #progressLine { 
-            position: fixed; top: 0; height: 4px; width: 0%; 
-            background: var(--p-oro); z-index: 100000; transition: width 0.1s linear;
+        #mobile-nav {
+            position: fixed; bottom: 120px; right: 40px; width: 250px;
+            background: #0f0f0f; padding: 20px; border-radius: 15px; border: 1px solid #222;
+            display: none; flex-direction: column; gap: 12px; z-index: 10015;
         }
-        #ticker-bar {
-            height: 45px; background: #000; display: flex; align-items: center;
-            border-top: 1px solid #111; z-index: 100;
-        }
-        #ticker-content { font-family: 'JetBrains Mono'; font-size: 10px; text-transform: uppercase; color: #444; width: 100%; }
+
+        /* --- ESTADOS --- */
+        #progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--p-brand); z-index: 100000; transition: width 0.1s linear; }
+        
+        #cio-app.is-critico { background: var(--critico-fondo) !important; }
+        #cio-app.is-critico #title-main { color: var(--critico-color); }
+        #cio-app.is-critico #progress-bar { background: var(--critico-color); }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
-            #titleDisplay { font-size: 50px; letter-spacing: -2px; }
-            #messageDisplay { font-size: 1.2rem; }
-            #menu-toggle-float { display: flex; }
-            .side-panel { width: 100%; }
-            .header-elite .header-actions { display: none; }
+            #main-time { font-size: 4.5rem; }
+            #title-main { font-size: 42px; letter-spacing: -2px; }
+            #msg-main { font-size: 1.1rem; }
+            #float-trigger { display: flex; }
+            .side-panel { width: 100%; padding: 40px 25px; }
+            .top-nav { padding: 0 20px; }
+            .nav-actions { display: none; }
         }
     </style>
 </head>
-<body onclick="cerrarMenuAlTocarFuera(event)">
+<body onclick="handleAppClick(event)">
 
 <div id="cio-app">
-    <canvas id="bg-canvas"></canvas>
-    <div id="progressLine"></div>
-    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(10px);" onclick="closePanels()"></div>
+    <canvas id="canvas-dots"></canvas>
+    <div id="progress-bar"></div>
+    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(8px);" onclick="closePanels()"></div>
 
-    <header class="header-elite">
-        <div class="brand-container">
+    <header class="top-nav">
+        <div class="logo-box">
             <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Masterson">
-            <div class="brand-text">
-                <h2>Novedades Masterson</h2>
-                <span>CENTRAL DE OPERACIONES</span>
+            <div class="logo-text">
+                <h1>Novedades Masterson</h1>
+                <span>SISTEMA DE CONTROL CENTRALIZADO</span>
             </div>
         </div>
-
-        <div class="clock-container">
-            <p id="reloj">00:00:00</p>
-            <p id="fecha">DOMINGO, 22 DE FEBRERO</p>
-        </div>
-
-        <div class="header-actions">
-            <button onclick="openForm()" class="btn-gold" style="padding: 10px 20px; width: auto; font-size: 9px;">NUEVO REGISTRO</button>
-            <button onclick="openHistory()" style="background:none; border:none; color:#444; margin-left:20px; cursor:pointer; font-weight:700; font-size:10px; letter-spacing:2px;">LOGS</button>
-            <button onclick="toggleFS()" style="background:none; border:1px solid #222; color:#222; margin-left:20px; font-size:9px; padding:5px; border-radius:3px;">TV</button>
+        <div class="nav-actions">
+            <button onclick="openForm()" class="btn-nav active">NUEVO REPORTE</button>
+            <button onclick="openHistory()" class="btn-nav">HISTORIAL</button>
+            <button onclick="toggleFS()" class="btn-nav">PANTALLA COMPLETA</button>
         </div>
     </header>
 
-    <button id="menu-toggle-float" onclick="toggleMobileMenu(event)">☰</button>
-    <div id="mobile-menu">
-        <button onclick="openForm(); toggleMobileMenu();" class="btn-gold">＋ NUEVA NOVEDAD</button>
-        <button onclick="openHistory(); toggleMobileMenu();" style="background:transparent; color:#fff; border:1px solid #333; padding:15px; border-radius:10px; font-size:11px;">HISTORIAL</button>
-        <button onclick="openOfflinePanel(); toggleMobileMenu();" id="btn-offline-mob" style="background:rgba(255,0,0,0.1); color:#ff4d4d; border:none; padding:15px; border-radius:10px; font-weight:bold; font-size:11px;">CAÍDOS (<span id="count-offline-mob">0</span>)</button>
+    <button id="float-trigger" onclick="toggleMobNav(event)">☰</button>
+    <div id="mobile-nav">
+        <button onclick="openForm(); toggleMobNav();" class="btn-prime" style="padding:15px; font-size:10px;">＋ NUEVA ENTRADA</button>
+        <button onclick="openHistory(); toggleMobNav();" class="btn-cancel" style="color:#fff; border-color:#444;">VER REGISTROS</button>
+        <button onclick="openOfflinePanel(); toggleMobNav();" id="mob-off-btn" style="background:rgba(255,0,0,0.2); color:#ff3b30; border:none; padding:12px; border-radius:8px; font-weight:900; font-size:10px;">CAÍDOS: <span id="mob-off-count">0</span></button>
     </div>
 
     <main id="display-board">
-        <div id="infoCont">
-            <div id="areaLabel">INICIALIZANDO SISTEMA</div>
-            <h1 id="titleDisplay">ESPERANDO DATOS</h1>
-            <div id="prioBadge">ESTADO: CONECTANDO</div>
-            <p id="messageDisplay">Sincronizando con la base de datos de Masterson Security...</p>
+        <div id="clock-hero">
+            <h2 id="main-time">00:00:00</h2>
+            <div id="main-date">DOMINGO 22 FEBRERO</div>
+        </div>
+
+        <div id="info-wrap" style="opacity:0; transition: 0.7s ease;">
+            <div id="area-tag">Iniciando Servidores</div>
+            <h3 id="title-main">SINCRONIZANDO</h3>
+            <p id="msg-main">Cargando la última base de datos de eventos y estado de red...</p>
+        </div>
+
+        <div id="offline-alert-container">
+            <div class="offline-banner">
+                <h3>⚠️ SERVICIOS FUERA DE LÍNEA:</h3>
+                <div id="offline-render-list" class="offline-list-mini"></div>
+            </div>
         </div>
     </main>
 
-    <div id="ticker-bar">
-        <div id="ticker-content">CARGANDO FLUJO DE NOVEDADES... MASTERSON CLOUD READY...</div>
-    </div>
-
-    <aside id="panelHistory" class="side-panel">
-        <h2 style="font-weight:900; letter-spacing:-1px;">REGISTROS</h2>
-        <div id="historyList" style="margin-top:30px; overflow-y:auto; height:70vh;"></div>
-        <button onclick="closePanels()" style="width:100%; background:none; border:1px solid #222; color:#555; padding:15px; margin-top:20px;">CERRAR</button>
-    </aside>
+    <footer style="height:40px; background:#000; z-index:100; display:flex; align-items:center; border-top:1px solid #111; padding:0 40px;">
+        <div style="font-family:'JetBrains Mono'; font-size:9px; color:#444; letter-spacing:2px; text-transform:uppercase;">
+            Status: Conectado al Nodo Masterson-UY // <span id="footer-status">En espera</span>
+        </div>
+    </footer>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="font-weight:900; letter-spacing:-1px;">REPORTE</h2>
+        <h2>REPORTE</h2>
         <form onsubmit="saveNew(event)">
-            <div class="input-group">
-                <label>Área de Operación</label>
+            <div class="f-group">
+                <label>Ubicación / Área</label>
                 <select id="f-area">
                     <option>Monitoreo</option>
                     <option>Freschat</option>
@@ -218,8 +237,8 @@
                     <option>Novedad Interna</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label>Nivel de Prioridad</label>
+            <div class="f-group">
+                <label>Severidad</label>
                 <select id="f-prio">
                     <option>Baja</option>
                     <option>Media</option>
@@ -227,181 +246,200 @@
                     <option>Crítica</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label>Título de la Novedad</label>
-                <input type="text" id="f-title" placeholder="Ej: Falla de Cámara 04" required>
+            <div class="f-group">
+                <label>Título del Evento</label>
+                <input type="text" id="f-title" placeholder="¿Qué sucedió?" required>
             </div>
-            <div class="input-group">
-                <label>Descripción</label>
-                <textarea id="f-msg" rows="5" placeholder="Detalles de la situación..." required></textarea>
+            <div class="f-group">
+                <label>Detalles Técnicos</label>
+                <textarea id="f-msg" rows="5" placeholder="Escriba aquí el reporte detallado..." required></textarea>
             </div>
-            <button type="submit" class="btn-gold">PUBLICAR NOVEDAD</button>
+            <div class="btn-stack">
+                <button type="submit" class="btn-prime">PUBLICAR AHORA</button>
+                <button type="button" onclick="closePanels()" class="btn-cancel">CANCELAR</button>
+            </div>
         </form>
     </aside>
 
-    <aside id="panelOffline" class="side-panel">
-        <h2 style="color:#ff4d4d;">SERVICIOS CAÍDOS</h2>
-        <div id="offlineList" style="margin-top:30px;"></div>
-        <button onclick="closePanels()" class="btn-gold" style="background:none; border:1px solid #333; color:#fff; margin-top:40px;">VOLVER</button>
+    <aside id="panelHistory" class="side-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+            <h2 style="margin:0;">LOGS</h2>
+            <button onclick="closePanels()" class="btn-nav">VOLVER</button>
+        </div>
+        <div id="historyRender"></div>
     </aside>
 
-    <div id="quickEdit" style="background:#0a0a0a; border:1px solid var(--p-oro); padding:20px; border-radius:8px; margin-top:10px; display:none;">
+    <aside id="panelOffline" class="side-panel">
+        <h2 style="color:var(--critico-color)">ALERTAS DE RED</h2>
+        <div id="offlineFullList"></div>
+        <button onclick="closePanels()" class="btn-prime" style="margin-top:30px; background:none; border:1px solid #333;">CERRAR</button>
+    </aside>
+
+    <div id="quickEdit" style="background:#0a0a0a; border:1px solid var(--p-brand); padding:25px; border-radius:12px; margin-top:15px; display:none; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
         <input type="hidden" id="e-index">
-        <input type="text" id="e-title" style="margin-bottom:10px;">
-        <textarea id="e-msg" rows="3" style="margin-bottom:10px;"></textarea>
+        <div class="f-group">
+            <input type="text" id="e-title" style="margin-bottom:10px;">
+            <textarea id="e-msg" rows="4"></textarea>
+        </div>
         <div style="display:flex; gap:10px;">
-            <button onclick="saveQuickEdit()" class="btn-gold" style="padding:10px;">GUARDAR</button>
-            <button onclick="hideEdit()" style="background:none; border:1px solid #333; color:#fff; padding:10px; flex:1;">CANCELAR</button>
+            <button onclick="saveQuickEdit()" class="btn-prime" style="flex:1; padding:12px; font-size:10px;">GUARDAR</button>
+            <button onclick="hideEdit()" class="btn-cancel" style="flex:1; padding:12px;">CANCELAR</button>
         </div>
     </div>
 </div>
 
 <script>
-    const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
-    const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
+    /* CORE ENGINE MASTERSON 
+       Gestión de Datos y Renderización Dinámica
+    */
+    
+    const API_EVENTOS = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    const API_RED = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
     let logs = []; 
     let currentIdx = 0; 
     let startTime = null; 
-    const SLIDE_TIME = 15;
+    const TIEMPO_SLIDE = 15;
 
-    // --- Motor de Fondo ---
-    const canvas = document.getElementById('bg-canvas');
+    // --- Partículas de Fondo ---
+    const canvas = document.getElementById('canvas-dots');
     const ctx = canvas.getContext('2d');
-    let particles = [];
-    function initCanvas() {
+    let dots = [];
+    function initDots() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        particles = Array.from({length: 40}, () => ({
+        dots = Array.from({length: 30}, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            s: Math.random() * 2,
-            v: Math.random() * 0.3 + 0.1
+            r: Math.random() * 2,
+            v: Math.random() * 0.2 + 0.1
         }));
     }
-    function draw() {
+    function drawDots() {
         ctx.clearRect(0,0,canvas.width, canvas.height);
-        ctx.fillStyle = "rgba(197, 160, 89, 0.2)";
-        particles.forEach(p => {
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill();
-            p.y -= p.v; if(p.y < -10) p.y = canvas.height + 10;
+        ctx.fillStyle = "#006465";
+        dots.forEach(d => {
+            ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI*2); ctx.fill();
+            d.y -= d.v; if(d.y < -10) d.y = canvas.height + 10;
         });
-        requestAnimationFrame(draw);
+        requestAnimationFrame(drawDots);
     }
 
-    // --- Lógica de Interfaz ---
-    function cerrarMenuAlTocarFuera(e) {
-        const menu = document.getElementById("mobile-menu");
-        const btn = document.getElementById("menu-toggle-float");
-        if (menu.style.display === "flex" && !menu.contains(e.target) && !btn.contains(e.target)) toggleMobileMenu();
+    // --- Manejo de UI ---
+    function handleAppClick(e) {
+        const menu = document.getElementById("mobile-nav");
+        const trigger = document.getElementById("float-trigger");
+        if (menu.style.display === "flex" && !menu.contains(e.target) && !trigger.contains(e.target)) toggleMobNav();
     }
 
-    function toggleMobileMenu(e) {
+    function toggleMobNav(e) {
         if(e) e.stopPropagation();
-        const menu = document.getElementById("mobile-menu");
-        const isVisible = menu.style.display === "flex";
-        menu.style.display = isVisible ? "none" : "flex";
-        document.getElementById("overlay").style.display = isVisible ? "none" : "block";
+        const menu = document.getElementById("mobile-nav");
+        const visible = menu.style.display === "flex";
+        menu.style.display = visible ? "none" : "flex";
+        document.getElementById("overlay").style.display = visible ? "none" : "block";
     }
 
-    async function sync() {
+    async function fetchData() {
         try {
-            const [evResp, redResp] = await Promise.all([fetch(DB_URL), fetch(RED_URL)]);
-            const evData = await evResp.json();
-            const redData = await redResp.json();
+            const [rEv, rRed] = await Promise.all([fetch(API_EVENTOS), fetch(API_RED)]);
+            const dataEv = await rEv.json();
+            const dataRed = await rRed.json();
             
-            logs = evData ? (Array.isArray(evData) ? evData : Object.values(evData)) : [];
-            updateNetworkUI(redData);
+            logs = dataEv ? (Array.isArray(dataEv) ? dataEv : Object.values(dataEv)) : [];
+            updateRedUI(dataRed);
             if(logs.length > 0 && !startTime) renderSlide();
-        } catch(e) { console.error("Error de sincronización"); }
+        } catch(err) { console.error("Error de red"); }
     }
 
-    function updateNetworkUI(status) {
+    function updateRedUI(data) {
         let caidos = [];
-        if(status) {
-            Object.keys(status).forEach(id => { 
-                if(status[id].estado === "offline") caidos.push(id.replace(/_/g, ' ')); 
+        if(data) {
+            Object.keys(data).forEach(k => {
+                if(data[k].estado === "offline") caidos.push(k.replace(/_/g, ' '));
             });
         }
-        document.getElementById("count-offline-mob").textContent = caidos.length;
-        const ticker = document.getElementById("ticker-content");
+        
+        const banner = document.getElementById("offline-alert-container");
+        const list = document.getElementById("offline-render-list");
+        const fullList = document.getElementById("offlineFullList");
+        
+        document.getElementById("mob-off-count").textContent = caidos.length;
+        
         if(caidos.length > 0) {
-            ticker.innerHTML = `<span style="color:#ff4d4d">⚠️ ALERTA DE RED: CAÍDOS [ ${caidos.join(' | ')} ] — </span>`;
-            document.getElementById("offlineList").innerHTML = caidos.map(n => `<div style="padding:15px; border-bottom:1px solid #222; color:#ff4d4d; font-weight:bold;">● ${n}</div>`).join('');
+            banner.style.display = "flex";
+            list.innerHTML = caidos.map(n => `<span class="offline-item">${n}</span>`).join('');
+            fullList.innerHTML = caidos.map(n => `
+                <div style="padding:20px; border-bottom:1px solid #222; color:var(--critico-color); font-weight:900;">
+                    ● ${n.toUpperCase()} <span style="float:right; font-size:10px; opacity:0.5;">SIN RESPUESTA</span>
+                </div>
+            `).join('');
         } else {
-            ticker.innerHTML = `✔ TODOS LOS SISTEMAS OPERATIVOS — SINCRONIZACIÓN ACTIVA — MASTERSON SECURITY — `;
-            document.getElementById("offlineList").innerHTML = `<p style="color:#333; text-align:center;">Red Estable</p>`;
+            banner.style.display = "none";
+            fullList.innerHTML = `<p style="text-align:center; color:#333; margin-top:40px;">TODOS LOS SERVICIOS OPERATIVOS</p>`;
         }
     }
 
     function renderSlide() {
         if(!logs.length) return;
-        const cont = document.getElementById("infoCont");
+        const info = document.getElementById("info-wrap");
         const app = document.getElementById("cio-app");
         
-        cont.style.opacity = "0";
-        cont.style.transform = "scale(0.98)";
+        info.style.opacity = "0";
+        info.style.transform = "translateY(10px)";
 
         setTimeout(() => {
             const item = logs[currentIdx % logs.length];
-            
-            document.getElementById("areaLabel").textContent = item.area;
-            document.getElementById("prioBadge").textContent = `PRIORIDAD: ${item.priority.toUpperCase()}`;
-            document.getElementById("titleDisplay").textContent = item.title;
-            document.getElementById("messageDisplay").textContent = item.message;
-            
-            // Colores por prioridad
-            const prioColors = {"Baja":"#4ade80", "Media":"#fbbf24", "Alta":"#fb923c", "Crítica":"#ff4d4d"};
-            const pColor = prioColors[item.priority] || "#fff";
-            
-            document.getElementById("prioBadge").style.color = pColor;
-            document.getElementById("prioBadge").style.borderColor = pColor;
-            document.getElementById("progressLine").style.background = pColor;
+            const pColors = {"Baja":"var(--baja)", "Media":"var(--media)", "Alta":"var(--alta)", "Crítica":"var(--critico-color)"};
+            const activeColor = pColors[item.priority] || var(--p-brand);
 
-            // Manejo de Estado Crítico (Sin vibración, solo fondo)
-            if(item.priority === "Crítica") app.className = "prio-critica";
-            else app.className = "";
+            document.getElementById("area-tag").textContent = item.area;
+            document.getElementById("area-tag").style.color = activeColor;
+            document.getElementById("title-main").textContent = item.title;
+            document.getElementById("msg-main").textContent = item.message;
+            document.getElementById("progress-bar").style.backgroundColor = activeColor;
+            document.getElementById("footer-status").textContent = `Viendo novedad ${currentIdx % logs.length + 1} de ${logs.length}`;
 
-            autoSizeText();
-            cont.style.opacity = "1";
-            cont.style.transform = "scale(1)";
-        }, 600);
+            if(item.priority === "Crítica") app.classList.add("is-critico");
+            else app.classList.remove("is-critico");
+
+            autoSizeTitle();
+            info.style.opacity = "1";
+            info.style.transform = "translateY(0)";
+        }, 700);
     }
 
-    function autoSizeText() {
-        const t = document.getElementById('titleDisplay');
-        if(window.innerWidth < 768) {
-            t.style.fontSize = "45px";
-        } else {
-            t.style.fontSize = logs[currentIdx % logs.length]?.title.length > 20 ? "80px" : "110px";
-        }
+    function autoSizeTitle() {
+        const t = document.getElementById('title-main');
+        if(window.innerWidth < 768) t.style.fontSize = "40px";
+        else t.style.fontSize = logs[currentIdx % logs.length]?.title.length > 25 ? "65px" : "90px";
     }
 
-    // --- CRUD ---
+    // --- Control de Paneles ---
     function openHistory() { renderHistory(); document.getElementById("panelHistory").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     function openForm() { document.getElementById("panelForm").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     function openOfflinePanel() { document.getElementById("panelOffline").classList.add("active"); document.getElementById("overlay").style.display = "block"; }
     
-    function closePanels() { 
+    function closePanels() {
         document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active'));
         document.getElementById("overlay").style.display = "none";
         hideEdit();
     }
 
     function renderHistory() {
-        const list = document.getElementById("historyList");
-        list.innerHTML = logs.map((it, i) => `
-            <div style="background:#111; padding:20px; border-radius:8px; margin-bottom:15px; border-left:4px solid ${it.priority==='Crítica'?'#ff4d4d':'#333'}">
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:#555; margin-bottom:5px;">
-                    <span>${it.area.toUpperCase()}</span>
-                    <span>${it.priority.toUpperCase()}</span>
+        const h = document.getElementById("historyRender");
+        h.innerHTML = logs.map((it, i) => `
+            <div style="background:#000; border:1px solid #1a1a1a; padding:20px; border-radius:10px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--p-brand); font-weight:900; letter-spacing:1px; margin-bottom:8px;">
+                    <span>${it.area}</span>
+                    <span style="color:${it.priority==='Crítica'?'red':'#555'}">${it.priority}</span>
                 </div>
-                <h4 style="margin:0; font-size:1.1rem;">${it.title}</h4>
-                <div style="margin-top:10px; display:flex; gap:10px;">
-                    <button onclick="showEdit(${i})" style="background:none; border:none; color:var(--p-oro); font-size:10px; cursor:pointer;">EDITAR</button>
-                    <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#444; font-size:10px; cursor:pointer;">BORRAR</button>
+                <h4 style="margin:0; font-size:1.1rem; line-height:1.2;">${it.title}</h4>
+                <div style="margin-top:15px; display:flex; gap:15px;">
+                    <button onclick="showEdit(${i})" style="background:none; border:none; color:#fff; font-size:10px; cursor:pointer; font-weight:700;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#333; font-size:10px; cursor:pointer;">ELIMINAR</button>
                 </div>
-                <div id="anchor-${i}"></div>
+                <div id="edit-pos-${i}"></div>
             </div>
         `).join('');
     }
@@ -412,7 +450,7 @@
         document.getElementById("e-index").value = i;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-        document.getElementById(`anchor-${i}`).appendChild(box);
+        document.getElementById(`edit-pos-${i}`).appendChild(box);
         box.style.display = "block";
     }
 
@@ -422,53 +460,53 @@
         const i = document.getElementById("e-index").value;
         logs[i].title = document.getElementById("e-title").value;
         logs[i].message = document.getElementById("e-msg").value;
-        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
-        hideEdit(); renderHistory(); sync();
+        await fetch(API_EVENTOS, { method: 'PUT', body: JSON.stringify(logs) });
+        hideEdit(); renderHistory(); fetchData();
     }
 
     async function saveNew(e) {
         e.preventDefault();
         const n = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value };
         logs.push(n);
-        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs) });
-        closePanels(); sync();
+        await fetch(API_EVENTOS, { method: 'PUT', body: JSON.stringify(logs) });
+        closePanels(); fetchData();
     }
 
     async function deleteEntry(i) {
-        if(!confirm("¿Eliminar registro?")) return;
+        if(!confirm("¿CONFIRMAR ELIMINACIÓN?")) return;
         logs.splice(i, 1);
-        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
-        renderHistory(); sync();
+        await fetch(API_EVENTOS, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
+        renderHistory(); fetchData();
     }
 
     function toggleFS() {
-        const app = document.getElementById("cio-app");
-        if (!document.fullscreenElement) app.requestFullscreen?.() || app.webkitRequestFullscreen?.();
+        const el = document.getElementById("cio-app");
+        if (!document.fullscreenElement) el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
         else document.exitFullscreen();
     }
 
-    // --- Loop Principal ---
+    // --- Loop ---
     function loop(ts) {
         if(logs.length) {
             if(!startTime) startTime = ts;
-            const progress = (ts - startTime) / (SLIDE_TIME * 1000);
-            document.getElementById("progressLine").style.width = Math.min(progress * 100, 100) + "%";
-            if(progress >= 1) { currentIdx++; renderSlide(); startTime = ts; }
+            const p = (ts - startTime) / (TIEMPO_SLIDE * 1000);
+            document.getElementById("progress-bar").style.width = Math.min(p * 100, 100) + "%";
+            if(p >= 1) { currentIdx++; renderSlide(); startTime = ts; }
         }
         requestAnimationFrame(loop);
     }
 
     // --- Init ---
     setInterval(() => {
-        const n = new Date();
-        document.getElementById("reloj").textContent = n.toLocaleTimeString('es-UY', {hour12:false});
-        document.getElementById("fecha").textContent = n.toLocaleDateString('es-UY', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+        const d = new Date();
+        document.getElementById("main-time").textContent = d.toLocaleTimeString('es-UY', {hour12:false});
+        document.getElementById("main-date").textContent = d.toLocaleDateString('es-UY', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
     }, 1000);
 
-    initCanvas(); draw();
-    sync(); requestAnimationFrame(loop);
-    window.onresize = () => { initCanvas(); autoSizeText(); };
-    setInterval(sync, 10000);
+    initDots(); drawDots();
+    fetchData(); requestAnimationFrame(loop);
+    window.onresize = () => { initDots(); autoSizeTitle(); };
+    setInterval(fetchData, 10000);
 </script>
 </body>
 </html>
