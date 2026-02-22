@@ -39,7 +39,35 @@
 
         #cio-app #clockDisplay { font-family: monospace; font-size: 1.8rem; color: var(--primary); font-weight: bold; }
 
-        /* EFECTO CRÍTICO MEJORADO (PULSO RADIAL) */
+        /* ZONA EQUIPOS OFFLINE (VISTA TV) */
+        #cio-app #critical-alert-zone {
+            background: rgba(255, 0, 0, 0.05);
+            padding: 10px; display: flex; flex-direction: column; align-items: center;
+            border-bottom: 1px solid rgba(255, 77, 77, 0.2);
+        }
+
+        #cio-app .status-item-big {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 20px; font-weight: 800; color: #fff;
+            background: rgba(255, 77, 77, 0.2); padding: 8px 16px; border-radius: 10px;
+            border: 2px solid var(--critico); animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 77, 77, 0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(255, 77, 77, 0.4); }
+        }
+
+        /* BOTÓN FLOTANTE MÓVIL (OFFLINE) */
+        #cio-app #btn-offline-mobile {
+            display: none; position: fixed; bottom: 100px; right: 20px;
+            background: var(--critico); color: white; border: none;
+            padding: 15px 20px; border-radius: 50px; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255,0,0,0.4); z-index: 10001;
+            cursor: pointer;
+        }
+
+        /* EFECTO CRÍTICO (GLOW RADIAL) */
         @keyframes critical-glow {
             0% { box-shadow: inset 0 0 50px rgba(255, 77, 77, 0); }
             50% { box-shadow: inset 0 0 150px rgba(255, 77, 77, 0.25); }
@@ -53,52 +81,51 @@
         /* DISPLAY PRINCIPAL */
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
-            align-items: center; text-align: center; padding: 20px;
-            transition: all 0.5s ease;
+            align-items: center; text-align: center; padding: 20px; transition: all 0.5s ease;
         }
 
         #cio-app .info-container { width: 100%; transition: all 0.6s ease-in-out; }
         #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(10px); }
 
-        #cio-app #areaLabel { font-size: 1.1rem; color: var(--primary); letter-spacing: 4px; text-transform: uppercase; font-weight: bold; }
-        #cio-app #prioBadge { 
-            display: inline-block; padding: 6px 20px; border-radius: 50px; 
-            font-weight: 900; border: 1px solid var(--primary); margin: 15px 0;
-            background: rgba(0, 212, 216, 0.1); font-size: 0.8rem;
-        }
-        #cio-app #titleDisplay { font-weight: 800; line-height: 1.1; text-transform: uppercase; }
+        #cio-app #titleDisplay { font-weight: 800; line-height: 1.1; text-transform: uppercase; margin: 10px 0; }
 
-        /* BOTONES */
-        #cio-app .header-actions button {
-            background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
-            color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 11px;
-        }
-
-        /* PANELES LATERALES */
+        /* PANELES Y FORMULARIOS CENTRADOS */
         #cio-app .side-panel {
-            position: fixed; right: 0; top: 0; width: 380px; height: 100%;
+            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a1a1b; border-left: 2px solid var(--primary); padding: 25px;
             transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10005;
             box-sizing: border-box; overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; z-index: 10002; backdrop-filter: blur(5px); }
-        #cio-app #overlay.active { display: block; }
-
-        /* FORMULARIO DE EDICIÓN RÁPIDA (DENTRO DEL PANEL) */
+        
         #cio-app .edit-box {
-            background: #000; border: 1px solid var(--primary); padding: 15px;
-            border-radius: 10px; margin-top: 10px; display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #000; border: 1px solid var(--primary); padding: 20px;
+            border-radius: 15px; margin-top: 15px; display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            text-align: center; /* Centrar contenido */
         }
 
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; padding: 10px; background: #111; color: #fff; border: 1px solid #333;
-            border-radius: 8px; margin-bottom: 10px; font-size: 14px;
+            width: 100%; padding: 12px; background: #111; color: #fff; 
+            border: 1px solid #333; border-radius: 10px; margin-bottom: 12px; 
+            font-size: 15px; text-align: center; box-sizing: border-box;
+        }
+
+        #cio-app label { 
+            display: block; color: var(--primary); margin-bottom: 5px; 
+            font-size: 11px; font-weight: bold; text-transform: uppercase; 
+            text-align: center; letter-spacing: 1px;
+        }
+
+        #cio-app .header-actions button {
+            background: rgba(0, 212, 216, 0.1); border: 1px solid var(--primary);
+            color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
         @media (max-width: 768px) {
-            #cio-app .side-panel { width: 100%; height: 90%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 20px 20px 0 0; }
+            #cio-app #critical-alert-zone, #cio-app #btn-fs-tv { display: none !important; }
+            #cio-app #btn-offline-mobile.visible { display: block; }
+            #cio-app .side-panel { width: 100%; height: 95%; top: auto; bottom: 0; transform: translateY(100%); border-radius: 25px 25px 0 0; }
             #cio-app .side-panel.active { transform: translateY(0); }
         }
     </style>
@@ -106,7 +133,7 @@
 <body>
 
 <div id="cio-app">
-    <div id="overlay" onclick="closePanels()"></div>
+    <div id="overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10002; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
 
     <header class="main-header">
         <div class="header-actions">
@@ -118,69 +145,107 @@
         <div><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);"></div>
     </header>
 
+    <div id="critical-alert-zone">
+        <div id="alert-msg" style="font-weight: 900; font-size: 11px; letter-spacing: 3px; margin-bottom: 8px;">SINCRONIZANDO...</div>
+        <div id="network-status" style="display: flex; gap: 12px; flex-wrap: wrap;"></div>
+    </div>
+
+    <button id="btn-offline-mobile" onclick="openOfflinePanel()">⚠️ CAÍDOS (<span id="count-offline">0</span>)</button>
+
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel">CENTRO DE OPERACIONES</div>
-            <div id="prioBadge">SISTEMA ACTIVO</div>
-            <h1 id="titleDisplay">Cargando...</h1>
-            <p id="messageDisplay">Por favor espere.</p>
+            <div id="areaLabel">CIO MONITOR</div>
+            <div id="prioBadge" style="display: inline-block; padding: 6px 20px; border-radius: 50px; font-weight: 900; border: 1px solid var(--primary); margin: 15px 0; background: rgba(0, 212, 216, 0.1); font-size: 0.8rem;">SISTEMA ACTIVO</div>
+            <h1 id="titleDisplay">...</h1>
+            <p id="messageDisplay">Conectando con base de datos...</p>
         </div>
     </main>
 
-    <div id="ticker-bar"><div id="ticker-content">SISTEMA DE MONITOREO CIO - NOVEDADES EN TIEMPO REAL</div></div>
+    <div id="ticker-bar" style="height:40px; background:#050c0c; border-top:1px solid var(--primary); display:flex; align-items:center; overflow:hidden;">
+        <div id="ticker-content" style="white-space:nowrap; animation:scrollText 35s linear infinite; color:var(--primary); font-weight:bold; font-size:0.85rem;">SISTEMA OPERATIVO - MONITOREO EN TIEMPO REAL - REVISAR NOVEDADES</div>
+    </div>
     <div id="progressLine" style="position: fixed; bottom: 40px; height: 3px; width: 0%; transition: width 0.1s linear;"></div>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--primary)">Historial de Novedades</h2>
-        
+        <h2 style="color:var(--primary); text-align:center;">Historial</h2>
         <div id="historyList"></div>
-
+        
         <div id="quickEdit" class="edit-box">
-            <h3 style="color:var(--primary); margin-top:0">Editar Entrada</h3>
+            <h3 style="color:var(--primary); margin-top:0">Editar Registro</h3>
             <input type="hidden" id="e-index">
-            <label style="font-size:10px; color:gray">ÁREA</label>
-            <select id="e-area">
-                <option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Tecnología</option>
-            </select>
-            <label style="font-size:10px; color:gray">PRIORIDAD</label>
-            <select id="e-prio">
-                <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
-            </select>
-            <label style="font-size:10px; color:gray">TÍTULO</label>
+            <label>Área</label>
+            <select id="e-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Tecnología</option></select>
+            <label>Prioridad</label>
+            <select id="e-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+            <label>Título</label>
             <input type="text" id="e-title">
-            <label style="font-size:10px; color:gray">MENSAJE</label>
+            <label>Mensaje</label>
             <textarea id="e-msg" rows="3"></textarea>
             <div style="display:flex; gap:10px;">
-                <button onclick="saveQuickEdit()" style="flex:1; background:var(--primary); border:none; padding:10px; border-radius:5px; font-weight:bold; cursor:pointer">GUARDAR</button>
-                <button onclick="hideEdit()" style="flex:1; background:#222; border:none; color:white; padding:10px; border-radius:5px; cursor:pointer">CANCELAR</button>
+                <button onclick="saveQuickEdit()" style="flex:1; background:var(--primary); border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer">ACTUALIZAR</button>
+                <button onclick="hideEdit()" style="flex:1; background:#222; border:none; color:white; padding:12px; border-radius:8px; cursor:pointer">CANCELAR</button>
             </div>
         </div>
-        
-        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:gray; padding:10px; border-radius:10px;">CERRAR</button>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:none; border:1px solid #333; color:gray; padding:10px; border-radius:10px; cursor:pointer;">CERRAR</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:var(--primary)">Nueva Novedad</h2>
+        <h2 style="color:var(--primary); text-align:center;">Nueva Novedad</h2>
         <form onsubmit="saveNew(event)">
             <label>Área</label>
             <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Tecnología</option></select>
             <label>Prioridad</label>
             <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
             <label>Título</label>
-            <input type="text" id="f-title" required>
+            <input type="text" id="f-title" required placeholder="Título">
             <label>Mensaje</label>
-            <textarea id="f-msg" rows="4" required></textarea>
-            <button type="submit" style="width:100%; padding:15px; background:var(--primary); border:none; border-radius:10px; font-weight:bold;">PUBLICAR</button>
+            <textarea id="f-msg" rows="4" required placeholder="Descripción"></textarea>
+            <button type="submit" style="width:100%; padding:15px; background:var(--primary); border:none; border-radius:10px; font-weight:bold; cursor:pointer;">PUBLICAR</button>
         </form>
+    </aside>
+
+    <aside id="panelOffline" class="side-panel">
+        <h2 style="color:var(--critico); text-align:center;">Equipos Caídos</h2>
+        <div id="offlineList"></div>
+        <button onclick="closePanels()" style="width:100%; margin-top:20px; background:var(--critico); border:none; color:white; padding:15px; border-radius:10px; font-weight:bold; cursor:pointer;">CERRAR</button>
     </aside>
 </div>
 
 <script>
     const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
+    
     let logs = [];
     let currentIdx = 0;
     let startTime = null;
     const SLIDE_TIME = 15;
+
+    async function updateNetwork() {
+        try {
+            const resp = await fetch(RED_URL);
+            const status = await resp.json();
+            const container = document.getElementById("network-status");
+            const btnOff = document.getElementById("btn-offline-mobile");
+            const offList = document.getElementById("offlineList");
+            let htmlTV = ""; let htmlMob = ""; let caidos = 0;
+
+            if(status) {
+                Object.keys(status).forEach(id => {
+                    if(status[id].estado === "offline") {
+                        caidos++;
+                        const name = id.replace(/_/g, ' ');
+                        htmlTV += `<div class="status-item-big"><div style="width:10px;height:10px;background:red;border-radius:50%"></div>${name}</div>`;
+                        htmlMob += `<div style="padding:15px; background:rgba(255,77,77,0.1); border:1px solid red; border-radius:10px; margin-bottom:10px; text-align:center; font-weight:bold;">⚠️ ${name}</div>`;
+                    }
+                });
+            }
+            container.innerHTML = htmlTV;
+            document.getElementById("count-offline").textContent = caidos;
+            offList.innerHTML = htmlMob || "<p style='text-align:center;color:gray'>No hay equipos caídos.</p>";
+            if(caidos > 0) btnOff.classList.add("visible"); else btnOff.classList.remove("visible");
+            document.getElementById("alert-msg").textContent = caidos > 0 ? "⚠️ EQUIPOS OFFLINE" : "✔ RED ESTABLE";
+        } catch(e) {}
+    }
 
     async function syncEvents() {
         try {
@@ -209,7 +274,6 @@
             document.getElementById("prioBadge").style.color = color;
             document.getElementById("progressLine").style.background = color;
 
-            // Efecto crítico pulido
             if(item.priority === "Crítica") {
                 board.classList.add("critical-active");
                 document.getElementById("titleDisplay").style.color = "#ff4d4d";
@@ -228,28 +292,28 @@
         t.style.fontSize = window.innerWidth < 768 ? "32px" : "75px";
     }
 
-    // --- FUNCIONES DE HISTORIAL Y EDICIÓN ---
     function openHistory() {
         renderHistoryList();
         document.getElementById("panelHistory").classList.add("active");
-        document.getElementById("overlay").classList.add("active");
+        document.getElementById("overlay").style.display = "block";
     }
 
     function renderHistoryList() {
         const list = document.getElementById("historyList");
         list.innerHTML = logs.map((it, i) => `
-            <div id="item-${i}" style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-radius:10px; border-left:4px solid ${it.priority==='Crítica'?'red':'var(--primary)'}">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <strong>${it.title}</strong><br>
+            <div id="item-${i}" style="background:rgba(255,255,255,0.03); padding:15px; margin-bottom:10px; border-radius:12px; border-left:4px solid ${it.priority==='Crítica'?'red':'var(--primary)'}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="text-align:left">
+                        <strong style="font-size:14px">${it.title}</strong><br>
                         <small style="color:gray">${it.area} - ${it.priority}</small>
                     </div>
                     <div style="display:flex; gap:5px;">
-                        <button onclick="showQuickEdit(${i})" style="background:var(--primary); border:none; padding:5px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer">EDITAR</button>
-                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:5px 8px; border-radius:4px; font-size:10px; cursor:pointer">X</button>
+                        <button onclick="showQuickEdit(${i})" style="background:var(--primary); border:none; padding:6px 10px; border-radius:6px; font-size:10px; font-weight:bold; cursor:pointer">EDITAR</button>
+                        <button onclick="deleteEntry(${i})" style="background:none; border:1px solid #ff4d4d; color:#ff4d4d; padding:6px 10px; border-radius:6px; font-size:10px; cursor:pointer">ELIMINAR</button>
                     </div>
                 </div>
-                <div id="edit-anchor-${i}"></div> </div>
+                <div id="edit-anchor-${i}"></div>
+            </div>
         `).join('');
     }
 
@@ -257,20 +321,18 @@
         const item = logs[idx];
         const editBox = document.getElementById("quickEdit");
         const anchor = document.getElementById(`edit-anchor-${idx}`);
-        
         document.getElementById("e-index").value = idx;
         document.getElementById("e-area").value = item.area;
         document.getElementById("e-prio").value = item.priority;
         document.getElementById("e-title").value = item.title;
         document.getElementById("e-msg").value = item.message;
-
-        anchor.appendChild(editBox); // Mueve el formulario justo debajo del ítem
+        anchor.appendChild(editBox);
         editBox.style.display = "block";
     }
 
     function hideEdit() {
         document.getElementById("quickEdit").style.display = "none";
-        document.body.appendChild(document.getElementById("quickEdit")); // Lo devuelve a su lugar neutro
+        document.body.appendChild(document.getElementById("quickEdit"));
     }
 
     async function saveQuickEdit() {
@@ -287,10 +349,14 @@
         syncEvents();
     }
 
-    // --- NUEVA NOVEDAD ---
     function openForm() { 
         document.getElementById("panelForm").classList.add("active");
-        document.getElementById("overlay").classList.add("active");
+        document.getElementById("overlay").style.display = "block";
+    }
+
+    function openOfflinePanel() {
+        document.getElementById("panelOffline").classList.add("active");
+        document.getElementById("overlay").style.display = "block";
     }
 
     async function saveNew(e) {
@@ -308,7 +374,7 @@
     }
 
     async function deleteEntry(idx) {
-        if(!confirm("¿Borrar novedad?")) return;
+        if(!confirm("¿Eliminar novedad?")) return;
         logs.splice(idx, 1);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(logs.length ? logs : null) });
         renderHistoryList();
@@ -316,7 +382,8 @@
     }
 
     function closePanels() { 
-        document.querySelectorAll('.side-panel, #overlay').forEach(el => el.classList.remove('active')); 
+        document.querySelectorAll('.side-panel').forEach(el => el.classList.remove('active')); 
+        document.getElementById("overlay").style.display = "none";
         hideEdit();
     }
     
@@ -339,7 +406,9 @@
     }, 1000);
 
     setInterval(syncEvents, 10000);
+    setInterval(updateNetwork, 5000);
     syncEvents();
+    updateNetwork();
     requestAnimationFrame(mainLoop);
     window.onresize = autoSizeText;
 </script>
