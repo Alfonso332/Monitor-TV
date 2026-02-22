@@ -6,9 +6,9 @@
     <title>CIO - Monitor Operativo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* RESET & ENCAPSULAMIENTO */
+        /* CSS ENCAPSULADO PARA EVITAR CHOQUES */
         #cio-app {
-           --primary: #00d4d8;
+            --primary: #00d4d8;
             --accent: #006465;
             --dark-bg: #000000;
             --critico-pulso: #4d0000;
@@ -27,11 +27,11 @@
             content: "";
             position: absolute; inset: 0;
             background-image: var(--bg-url);
-            background-size: contain; /* Mantiene la proporción original */
-            background-position: center; /* La clava en el medio */
-            background-repeat: no-repeat; /* Evita que se duplique */
-            opacity: 0.25; /* Subí un pelín la opacidad para que luzca el logo */
-            filter: blur(0px); /* Le quité el blur para que el logo se vea nítido */
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.25;
+            filter: blur(0px);
             z-index: -1;
         }
 
@@ -54,7 +54,6 @@
         #cio-app #display-board {
             flex: 1; display: flex; flex-direction: column; justify-content: center;
             align-items: center; text-align: center; padding: 20px;
-            /* El degradado ahora es más suave para que la imagen central brille */
             background: radial-gradient(circle at center, transparent 0%, rgba(5, 13, 14, 0.6) 100%);
         }
 
@@ -101,7 +100,7 @@
         #cio-app #overlay-cio { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; z-index: 1050; }
         #cio-app #overlay-cio.active { display: block; }
 
-        /* BOTONES REDONDEADOS */
+        /* ELEMENTOS FORMULARIO */
         #cio-app h2 { color: var(--primary); margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid var(--accent); padding-bottom: 10px; }
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 12px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid var(--accent);
@@ -120,7 +119,7 @@
             #cio-app .side-panel.active { transform: translateY(0); }
             #cio-app #display-board { padding-bottom: 140px; }
             #cio-app #clockDisplay { font-size: 1.2rem; }
-            #cio-app::before { background-size: 80%; } /* Un poco más pequeña en móvil para que no la tapen los textos */
+            #cio-app::before { background-size: 80%; }
         }
 
         #cio-app #progressLine { position: fixed; bottom: 40px; height: 3px; width: 0%; z-index: 999; }
@@ -167,8 +166,8 @@
             <input type="hidden" id="editId" value="-1">
             <label>Tipo de Evento</label>
             <select id="f-type">
-                <option value="turno">De Turno (Se borra al cerrar)</option>
-                <option value="diaria">Diaria (Dura 24 horas)</option>
+                <option value="turno">De Turno (No aparece en PDF)</option>
+                <option value="diaria">Diaria (Se mantiene 24h)</option>
             </select>
             <label>Área</label>
             <select id="f-area">
@@ -196,7 +195,7 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2>Eventos Activos</h2>
-        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:15px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF</button>
+        <button onclick="generatePDF()" style="width:100%; background:#fff; color:#000; padding:12px; font-weight:bold; border:none; border-radius:15px; margin-bottom:20px; cursor:pointer;">📥 DESCARGAR PDF DIARIO</button>
         <div id="listItems"></div>
         <button type="button" onclick="closeAll()" class="btn-cancel" style="margin-top: 20px;">✕ VOLVER AL MONITOR</button>
     </aside>
@@ -267,29 +266,49 @@
     }
 
     async function handleCerrarTurno() {
-        if(!confirm("¿Cerrar turno? Se descargará el PDF y se borrarán las novedades de turno.")) return;
+        if(!confirm("¿Cerrar turno? Se descargará el PDF (solo Diarias) y se limpiará el sistema.")) return;
+        
         generatePDF();
+        
         setTimeout(async () => {
-            const diarias = dataStore.filter(i => i.type === 'diaria');
-            await fetch(API_URL, { method: 'PUT', body: JSON.stringify(diarias.length ? diarias : null) });
-            currentIndex = 0; syncData();
-        }, 1500);
+            const soloDiarias = dataStore.filter(i => i.type === 'diaria');
+            await fetch(API_URL, { method: 'PUT', body: JSON.stringify(soloDiarias.length ? soloDiarias : null) });
+            currentIndex = 0; 
+            syncData();
+        }, 2000);
     }
 
     function generatePDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        
+        // Solo incluimos las DIARIAS en el reporte
+        const diariasParaReporte = dataStore.filter(i => i.type === 'diaria');
+
+        const responsable = prompt("Nombre del Responsable:");
+        const turno = prompt("Turno (Ej: Mañana, Tarde, Noche):");
+
         doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255); doc.text("REPORTE CIO OPERATIVO", 20, 25);
+        doc.setTextColor(255); doc.setFontSize(18); doc.text("REPORTE CIO OPERATIVO", 20, 20);
+        
+        doc.setFontSize(10);
+        doc.text(`Responsable: ${responsable || '---'}`, 20, 28);
+        doc.text(`Turno: ${turno || '---'}`, 20, 33);
+        doc.text(`Fecha: ${new Date().toLocaleString()}`, 140, 33);
+
         let y = 55;
-        dataStore.forEach((item, i) => {
-            if(y > 270) { doc.addPage(); y = 20; }
-            doc.setTextColor(0); doc.setFont(undefined, 'bold');
-            doc.text(`${i+1}. [${item.priority}] AREA: ${item.area}`, 20, y);
-            y += 7; doc.setFont(undefined, 'normal');
-            const lines = doc.splitTextToSize(`${item.title}: ${item.message}`, 170);
-            doc.text(lines, 25, y); y += (lines.length * 7) + 10;
-        });
+        if(diariasParaReporte.length === 0) {
+            doc.setTextColor(100); doc.text("No se registraron novedades diarias en este turno.", 20, y);
+        } else {
+            diariasParaReporte.forEach((item, i) => {
+                if(y > 270) { doc.addPage(); y = 20; }
+                doc.setTextColor(0); doc.setFont(undefined, 'bold');
+                doc.text(`${i+1}. [${item.priority}] AREA: ${item.area}`, 20, y);
+                y += 7; doc.setFont(undefined, 'normal');
+                const lines = doc.splitTextToSize(`${item.title}: ${item.message}`, 170);
+                doc.text(lines, 25, y); y += (lines.length * 7) + 10;
+            });
+        }
         doc.save(`Reporte_CIO_${Date.now()}.pdf`);
     }
 
@@ -365,9 +384,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
