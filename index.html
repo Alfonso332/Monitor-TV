@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <style>
-        /* === AISLAMIENTO TOTAL DEL CSS (Anti-Choques Externos) === */
+        /* === AISLAMIENTO TOTAL DEL CSS === */
         #cio-app {
             --primary: #006465;
             --accent: #00d1d1;
@@ -28,10 +28,7 @@
             text-align: left;
         }
 
-        #cio-app * {
-            box-sizing: border-box !important;
-            font-family: inherit;
-        }
+        #cio-app * { box-sizing: border-box !important; font-family: inherit; }
 
         /* FONDO Y EMERGENCIA */
         #cio-app::before {
@@ -49,9 +46,20 @@
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
-        /* REGLA FULLSCREEN: Oculta la barra superior */
+
+        /* REGLA FULLSCREEN: Oculta cabecera y muestra el reloj flotante */
+        #cio-app .fs-clock { display: none; } /* Oculto por defecto */
+
         #cio-app:fullscreen .main-header,
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
+
+        #cio-app:fullscreen .fs-clock,
+        #cio-app:-webkit-full-screen .fs-clock { 
+            display: block; position: absolute; top: 20px; right: 30px; 
+            font-family: monospace; font-size: 2.5rem; font-weight: 900; 
+            color: var(--primary); text-shadow: 0 0 20px rgba(0,100,101,0.5);
+            z-index: 100;
+        }
 
         /* TABLERO CENTRAL */
         #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
@@ -68,7 +76,7 @@
         }
         #cio-app #ticker-content { display: flex; align-items: center; gap: 20px; white-space: nowrap; position: absolute; left: 20px; }
 
-        /* BOTÓN FLOTANTE (SOLO MÓVIL) */
+        /* BOTÓN FLOTANTE MÓVIL */
         #cio-app #menu-toggle-float {
             display: none; position: fixed; bottom: 70px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
@@ -86,22 +94,18 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* FORMULARIOS CENTRADOS */
         #cio-app .form-content { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; max-width: 320px; padding: 12px; background: #151515 !important; color: #fff !important; 
             border: 1px solid #252525 !important; border-radius: 8px; text-align: center; font-size: 1rem;
         }
-        #cio-app input:focus, #cio-app textarea:focus, #cio-app select:focus { outline: 1px solid var(--accent); }
         #cio-app .btn-action { background: var(--primary) !important; color: #fff !important; border: none; padding: 14px; width: 100%; max-width: 320px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         #cio-app .btn-cancel { background: #222 !important; color: #888 !important; border: none; padding: 10px; width: 100%; max-width: 320px; border-radius: 8px; cursor: pointer; }
 
-        /* ESTILOS DE BADGES */
         #cio-app .status-badge { padding: 5px 12px; border-radius: 5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
         #cio-app .status-badge.offline { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; }
         #cio-app .status-badge.restored { background: rgba(46, 204, 113, 0.2); border: 1px solid var(--exito); color: var(--exito); transform: scale(1.1); transition: 0.5s; }
 
-        /* MEDIA QUERIES PARA CELULAR */
         @media (max-width: 768px) {
             #cio-app #menu-toggle-float { display: flex; }
             #cio-app .header-actions { display: none !important; }
@@ -117,6 +121,8 @@
 <body>
 
 <div id="cio-app">
+    <div id="fsClockDisplay" class="fs-clock">00:00:00</div>
+
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
 
     <header class="main-header">
@@ -153,13 +159,10 @@
         <div class="form-content">
             <button onclick="openPanel('panelForm')" class="btn-action">＋ REGISTRAR NOVEDAD</button>
             <button onclick="openPanel('panelHistory')" class="btn-action" style="background:#1a1a1a !important;">📋 VER HISTORIAL</button>
-            
             <div style="width:100%; margin-top:30px; border-top:1px solid #222; padding-top:20px;">
                 <h3 style="font-size:0.8rem; color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO DE SERVICIOS</h3>
-                <div id="mobileServicesList" style="display:flex; flex-direction:column; gap:10px;">
-                    </div>
+                <div id="mobileServicesList" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
-            
             <button onclick="closePanels()" class="btn-cancel" style="margin-top:40px;">CERRAR MENÚ</button>
         </div>
     </aside>
@@ -203,30 +206,24 @@
             const resp = await fetch(cio_RED_URL);
             const status = await resp.json();
             if(!status) return;
-
             const ticker = document.getElementById("ticker-content");
             const mobileList = document.getElementById("mobileServicesList");
-            let tickerHTML = "";
-            let mobileHTML = "";
+            let tickerHTML = ""; let mobileHTML = "";
 
             Object.keys(status).forEach(id => {
                 const name = id.replace(/_/g, ' ');
                 const isOff = status[id].estado === "offline";
                 const wasOff = cio_lastNetworkStatus[id] === "offline";
-
                 if (!isOff && wasOff) {
                     const successHTML = `<div class="status-badge restored" id="res-${id}">✔ ${name} ONLINE</div>`;
-                    tickerHTML += successHTML;
-                    mobileHTML += successHTML;
+                    tickerHTML += successHTML; mobileHTML += successHTML;
                     setTimeout(() => { document.querySelectorAll(`#res-${id}`).forEach(el => el.remove()); }, 5000);
                 } else if (isOff) {
                     const offHTML = `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
-                    tickerHTML += offHTML;
-                    mobileHTML += offHTML;
+                    tickerHTML += offHTML; mobileHTML += offHTML;
                 }
                 cio_lastNetworkStatus[id] = status[id].estado;
             });
-
             ticker.innerHTML = tickerHTML || `<span style="color:var(--primary); font-size:0.7rem;">✔ TODOS LOS NODOS OPERATIVOS</span>`;
             mobileList.innerHTML = mobileHTML || `<div style="text-align:center; color:#444; font-size:0.8rem;">Sistemas sin alertas</div>`;
         } catch(e) {}
@@ -250,7 +247,6 @@
             const item = cio_logs[cio_currentIdx % cio_logs.length];
             const pColors = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"};
             const color = pColors[item.priority] || "#fff";
-
             document.getElementById("cio-app").className = (item.priority === "Crítica") ? "emergency-active" : "";
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("areaLabel").style.color = color;
@@ -264,7 +260,6 @@
         }, 600);
     }
 
-    // --- UI CONTROL ---
     function openPanel(id) {
         closePanels();
         document.getElementById(id).classList.add("active");
@@ -297,7 +292,7 @@
     }
 
     async function deleteEntry(idx) {
-        if(!confirm("¿Seguro que deseas borrar este evento?")) return;
+        if(!confirm("¿Borrar evento?")) return;
         cio_logs.splice(idx, 1);
         await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs.length ? cio_logs : null) });
         renderHistory(); syncEvents();
@@ -306,11 +301,11 @@
     function toggleFS() { 
         const app = document.getElementById("cio-app");
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (app.requestFullscreen) { app.requestFullscreen(); }
-            else if (app.webkitRequestFullscreen) { app.webkitRequestFullscreen(); }
+            if (app.requestFullscreen) app.requestFullscreen();
+            else if (app.webkitRequestFullscreen) app.webkitRequestFullscreen();
         } else {
-            if (document.exitFullscreen) { document.exitFullscreen(); }
-            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
         }
     }
 
@@ -324,7 +319,13 @@
         requestAnimationFrame(loop);
     }
 
-    setInterval(() => { document.getElementById("clockDisplay").textContent = new Date().toLocaleTimeString('es-UY', { hour12: false }); }, 1000);
+    // Actualiza ambos relojes (Header y Fullscreen)
+    setInterval(() => { 
+        const time = new Date().toLocaleTimeString('es-UY', { hour12: false });
+        document.getElementById("clockDisplay").textContent = time; 
+        document.getElementById("fsClockDisplay").textContent = time; 
+    }, 1000);
+
     setInterval(updateNetwork, 4000);
     setInterval(syncEvents, 10000);
     updateNetwork(); syncEvents(); requestAnimationFrame(loop);
