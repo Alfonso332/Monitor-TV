@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         /* === AISLAMIENTO Y VARIABLES === */
@@ -32,7 +33,7 @@
 
         #cio-app * { box-sizing: border-box !important; }
 
-        /* HEADER Y RELOJES */
+        /* HEADER */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
@@ -50,10 +51,9 @@
         #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         #cio-app .info-container { width: 100%; transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; line-height: 1; }
-        #cio-app #messageDisplay { font-size: 1.8rem; opacity: 0.7; max-width: 80%; margin: 0 auto; font-weight: 300; }
+        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; line-height: 1; text-transform: uppercase; }
 
-        /* BARRA INFERIOR (TICKER) */
+        /* TICKER INFERIOR */
         #cio-app #ticker-bar { 
             height: 50px; background: #050505; border-top: 1px solid #111; 
             display: flex; align-items: center; overflow: hidden; position: relative; 
@@ -71,28 +71,29 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* BOTONES ESTÉTICOS (PILL) */
+        /* BOTONES PILL */
         #cio-app .btn-pill {
             background: var(--primary) !important; color: #fff !important;
             border: none; padding: 12px 24px; border-radius: 50px;
             font-weight: 700; cursor: pointer; transition: 0.3s;
             text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
-            text-align: center; width: 100%; max-width: 320px;
+            text-align: center; width: 100%; display: block;
         }
         #cio-app .btn-pill:hover { background: var(--accent) !important; transform: translateY(-2px); }
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
         #cio-app .btn-danger { background: rgba(255, 77, 77, 0.1) !important; border: 1px solid #ff4d4d; color: #ff4d4d !important; }
 
-        /* FORMULARIOS */
+        /* STATS GRID */
+        #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 20px; }
+        #cio-app .stat-box { background: #111; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #222; }
+        #cio-app .stat-box b { display: block; font-size: 1.2rem; }
+        #cio-app .stat-box small { font-size: 0.6rem; opacity: 0.5; text-transform: uppercase; }
+
         #cio-app .form-content { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; max-width: 320px; padding: 14px; background: #151515 !important;
             color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center;
         }
-
-        /* STATS */
-        #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-bottom: 20px; }
-        #cio-app .stat-box { background: #111; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #222; }
 
         #cio-app #menu-toggle-float {
             display: none; position: fixed; bottom: 70px; right: 20px;
@@ -104,7 +105,7 @@
         @media (max-width: 768px) {
             #cio-app #menu-toggle-float { display: flex; align-items: center; justify-content: center; }
             #cio-app .header-actions { display: none !important; }
-            #cio-app .side-panel { width: 90%; }
+            #cio-app .side-panel { width: 90%; padding: 20px; }
             #cio-app #titleDisplay { font-size: 38px !important; }
         }
     </style>
@@ -127,15 +128,15 @@
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase;">MASTERSON ELITE</div>
+            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase;">SISTEMA ACTIVO</div>
             <h1 id="titleDisplay">MASTERSON</h1>
-            <p id="messageDisplay">Sincronizando base de datos...</p>
+            <p id="messageDisplay" style="font-size:1.5rem; opacity:0.6;">Cargando novedades...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
         <div id="ticker-content">
-            <span style="font-size: 0.7rem; color: #444;">VERIFICANDO SERVICIOS...</span>
+            <span style="font-size: 0.7rem; color: #444;">VERIFICANDO NODOS...</span>
         </div>
     </div>
     
@@ -144,10 +145,10 @@
     <button id="menu-toggle-float" onclick="openPanel('panelMobileMenu')">☰</button>
 
     <aside id="panelMobileMenu" class="side-panel">
-        <h2 style="color:var(--primary); text-align:center; margin-bottom:30px;">MENU CIO</h2>
+        <h2 style="color:var(--primary); text-align:center; margin-bottom:30px;">MENU OPERATIVO</h2>
         <div class="form-content">
             <button onclick="openFormPanel()" class="btn-pill">＋ REGISTRAR NOVEDAD</button>
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 VER HISTORIAL</button>
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 VER HISTORIAL / STATUS</button>
             <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; opacity:0.5;">CERRAR</button>
         </div>
     </aside>
@@ -168,12 +169,15 @@
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center;">HISTORIAL</h2>
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO DEL CIO</h2>
+        
         <div class="stats-grid">
-            <div class="stat-box"><span id="stat-total" style="font-size:1.5rem; font-weight:900;">0</span><br><small style="opacity:0.5">Novedades</small></div>
-            <div class="stat-box" style="border-color:var(--critico)"><span id="stat-crit" style="font-size:1.5rem; font-weight:900; color:var(--critico)">0</span><br><small style="opacity:0.5">Críticas</small></div>
+            <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
+            <div class="stat-box"><b id="stat-crit" style="color:var(--critico)">0</b><small>Críticos</small></div>
+            <div class="stat-box"><b id="stat-off" style="color:var(--accent)">0</b><small>Offline</small></div>
         </div>
-        <button onclick="downloadPDF()" class="btn-pill btn-sec" style="width:100%; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR PDF TURNO</button>
+
+        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR REPORTE PDF</button>
         
         <div id="historyList" style="width:100%;"></div>
         
@@ -190,10 +194,10 @@
     let cio_logs = []; 
     let cio_currentIdx = 0; 
     let cio_startTime = null; 
-    let cio_lastNetworkStatus = {};
+    let cio_offCount = 0;
     const cio_SLIDE_TIME = 15;
 
-    // --- LÓGICA RED (TICKER INFERIOR) ---
+    // --- LÓGICA RED ---
     async function updateNetwork() {
         try {
             const resp = await fetch(cio_RED_URL);
@@ -201,14 +205,16 @@
             if(!status) return;
             const ticker = document.getElementById("ticker-content");
             let tickerHTML = "";
+            cio_offCount = 0;
 
             Object.keys(status).forEach(id => {
-                const name = id.replace(/_/g, ' ');
                 if (status[id].estado === "offline") {
-                    tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
+                    tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${id.replace(/_/g, ' ')}</div>`;
+                    cio_offCount++;
                 }
             });
             ticker.innerHTML = tickerHTML || `<span style="color:var(--primary); font-size:0.7rem; font-weight:bold;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
+            document.getElementById("stat-off").textContent = cio_offCount;
         } catch(e) {}
     }
 
@@ -218,12 +224,11 @@
             const resp = await fetch(cio_DB_URL);
             const data = await resp.json();
             const now = Date.now();
-            let rawLogs = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+            let raw = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
             
-            // Borrado automático de > 24 horas
-            cio_logs = rawLogs.filter(it => !it.timestamp || (now - it.timestamp < 86400000));
+            cio_logs = raw.filter(it => !it.timestamp || (now - it.timestamp < 86400000));
             
-            if (rawLogs.length !== cio_logs.length) {
+            if (raw.length !== cio_logs.length) {
                 await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
             }
 
@@ -235,31 +240,49 @@
         } catch(e) {}
     }
 
-    // --- PDF ---
+    // --- PDF REDISEÑADO ---
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const hour = new Date().getHours();
-        let turno = "NOCHE (22-06)";
-        if (hour >= 6 && hour < 14) turno = "MAÑANA (06-14)";
-        else if (hour >= 14 && hour < 22) turno = "TARDE (14-22)";
+        let turno = "NOCHE (22:00 - 06:00)";
+        if (hour >= 6 && hour < 14) turno = "MAÑANA (06:00 - 14:00)";
+        else if (hour >= 14 && hour < 22) turno = "TARDE (14:00 - 22:00)";
 
-        doc.setFontSize(18);
-        doc.text(`Novedad operativa de turno: ${turno}`, 20, 20);
-        doc.setFontSize(10);
-        doc.text(`Generado: ${new Date().toLocaleString()}`, 20, 28);
-        doc.line(20, 32, 190, 32);
+        // Cabecera Estética
+        doc.setFillColor(0, 100, 101); // Color #006465
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(22);
+        doc.setFont(undefined, 'bold');
+        doc.text("NOVEDAD OPERATIVA", 20, 20);
+        
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Turno: ${turno}`, 20, 30);
+        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 150, 30);
 
-        let y = 45;
-        cio_logs.forEach((it, i) => {
-            if (y > 270) { doc.addPage(); y = 20; }
-            doc.setFont(undefined, 'bold');
-            doc.text(`${i+1}. [${it.area.toUpperCase()}] ${it.title}`, 20, y);
-            doc.setFont(undefined, 'normal');
-            doc.text(`${it.message}`, 25, y + 7, { maxWidth: 160 });
-            y += 22;
+        // Tabla de Novedades
+        const tableData = cio_logs.map((it, i) => [
+            i + 1,
+            it.area.toUpperCase(),
+            it.priority.toUpperCase(),
+            it.title,
+            it.message
+        ]);
+
+        doc.autoTable({
+            startY: 50,
+            head: [['#', 'Área', 'Prioridad', 'Título', 'Descripción']],
+            body: tableData,
+            headStyles: { fillColor: [0, 100, 101], textColor: [255, 255, 255] },
+            alternateRowStyles: { fillColor: [240, 240, 240] },
+            margin: { left: 15, right: 15 },
+            styles: { fontSize: 9, cellPadding: 4 }
         });
-        doc.save(`Novedad_${turno}.pdf`);
+
+        doc.save(`CIO_Reporte_${turno.split(' ')[0]}.pdf`);
     }
 
     // --- CRUD ---
@@ -278,12 +301,9 @@
         document.getElementById("f-prio").value = it.priority;
         document.getElementById("f-title").value = it.title;
         document.getElementById("f-msg").value = it.message;
-        
         document.getElementById("formTitle").textContent = "EDITAR NOVEDAD";
         document.getElementById("btnSubmit").textContent = "GUARDAR CAMBIOS";
-        
-        document.getElementById("panelHistory").classList.remove("active");
-        document.getElementById("panelForm").classList.add("active");
+        openPanel('panelForm');
     }
 
     async function saveEntry(e) {
@@ -296,10 +316,8 @@
             message: document.getElementById("f-msg").value,
             timestamp: (id !== "" && cio_logs[id]) ? cio_logs[id].timestamp : Date.now()
         };
-
         if (id !== "") cio_logs[id] = entry;
         else cio_logs.push(entry);
-
         await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
         closePanels(); syncEvents();
     }
@@ -315,7 +333,7 @@
         const h = document.getElementById("historyList");
         h.innerHTML = cio_logs.map((it, i) => `
             <div style="background:#111; padding:15px; border-radius:12px; margin-bottom:12px; border-left:4px solid var(--primary);">
-                <small style="color:var(--accent); font-weight:bold;">${it.area.toUpperCase()}</small>
+                <small style="color:var(--accent); font-weight:bold;">${it.area.toUpperCase()} | ${it.priority}</small>
                 <div style="font-weight:bold; margin:5px 0; font-size:0.9rem;">${it.title}</div>
                 <div style="display:flex; gap:10px; margin-top:10px;">
                     <button onclick="editEntry(${i})" class="btn-pill btn-sec" style="padding:6px 12px; font-size:0.6rem; width:auto;">EDITAR</button>
@@ -325,7 +343,6 @@
         `).join('');
     }
 
-    // --- DISPLAY SLIDER ---
     function renderSlide() {
         if(!cio_logs.length) return;
         const cont = document.getElementById("infoCont");
@@ -344,7 +361,6 @@
         }, 600);
     }
 
-    // --- UI HELPERS ---
     function openPanel(id) {
         closePanels();
         document.getElementById(id).classList.add("active");
@@ -358,8 +374,7 @@
     }
 
     function toggleFS() { 
-        const app = document.getElementById("cio-app");
-        if (!document.fullscreenElement) app.requestFullscreen();
+        if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen();
         else document.exitFullscreen();
     }
 
