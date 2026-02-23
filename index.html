@@ -33,14 +33,14 @@
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
         #cio-app * { box-sizing: border-box !important; }
 
-        /* HEADER ORIGINAL */
+        /* HEADER */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
-        #cio-app .fs-clock { display: none; }
         #cio-app:fullscreen .main-header { display: none !important; }
+        #cio-app .fs-clock { display: none; }
         #cio-app:fullscreen .fs-clock { 
             display: block; position: absolute; top: 20px; right: 30px; 
             font-family: monospace; font-size: 2.5rem; font-weight: 900; 
@@ -53,39 +53,33 @@
         #cio-app .info-container { transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER CORREGIDO Y AGRANDADO */
+        /* TICKER CONFIGURADO */
         #cio-app #ticker-bar { 
-            height: 75px; /* Más alto para carteles grandes */
-            background: #050505; border-top: 1px solid #111; 
+            height: 75px; background: #050505; border-top: 1px solid #111; 
             display: flex; align-items: center; overflow: hidden; position: relative; 
         }
 
         #cio-app #ticker-content { 
             display: flex; align-items: center; gap: 80px; white-space: nowrap; 
-            position: absolute;
-            animation: scroll-ticker 25s linear infinite; 
-            padding-left: 100vw; /* Empieza fuera a la derecha */
+            position: absolute; left: 0;
+            animation: scroll-ticker 15s linear infinite; 
         }
 
         @keyframes scroll-ticker {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); } /* Da la vuelta completa al contenido */
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
         }
 
         #cio-app .status-badge { 
-            padding: 12px 30px; border-radius: 8px; 
-            font-size: 1.6rem; /* MÁS GRANDE */
-            font-weight: 900; text-transform: uppercase; 
-            flex-shrink: 0;
+            padding: 12px 30px; border-radius: 8px; font-size: 1.6rem; 
+            font-weight: 900; text-transform: uppercase; flex-shrink: 0;
         }
         #cio-app .status-badge.offline { 
-            background: rgba(255, 77, 77, 0.15); 
-            border: 3px solid #ff4d4d; 
-            color: #ff4d4d; 
-            box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+            background: rgba(255, 77, 77, 0.15); border: 3px solid #ff4d4d; 
+            color: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
         }
 
-        /* FORMULARIOS Y PANELES (ESTILO ORIGINAL MANTENIDO) */
+        /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
@@ -93,14 +87,28 @@
             overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app .form-content { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+        /* ESTADISTICAS */
+        #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 15px; }
+        #cio-app .stat-box { background: #111; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #222; cursor: pointer; transition: 0.2s; }
+        #cio-app .stat-box b { display: block; font-size: 1.3rem; }
+        #cio-app .stat-box small { font-size: 0.65rem; opacity: 0.6; text-transform: uppercase; }
+
+        /* DETALLES OFFLINE (EL DESPLEGABLE) */
+        #cio-app #offline-details {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out;
+            background: #111; border-radius: 12px; margin-bottom: 20px;
+        }
+        #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 10px; margin-top: -5px; }
+        #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 10px; border-bottom: 1px solid #222; }
+
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 14px; background: #151515 !important;
-            color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center;
+            color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center; margin-bottom: 12px;
         }
         #cio-app .btn-pill {
             background: var(--primary) !important; color: #fff !important; border: none; padding: 12px 24px; border-radius: 50px;
-            font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase;
+            font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px;
         }
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
 
@@ -114,9 +122,8 @@
         @media (max-width: 768px) {
             #cio-app #menu-toggle-float { display: flex; align-items: center; justify-content: center; }
             #cio-app .header-actions { display: none !important; }
-            #cio-app .side-panel { width: 95%; }
+            #cio-app .side-panel { width: 95%; padding: 20px; }
             #cio-app #titleDisplay { font-size: 40px !important; }
-            #cio-app .status-badge { font-size: 1.1rem; padding: 10px 20px; }
         }
     </style>
 </head>
@@ -155,37 +162,41 @@
     <button id="menu-toggle-float" onclick="openPanel('panelMobileMenu')">☰</button>
 
     <aside id="panelMobileMenu" class="side-panel">
-        <h2 style="color:var(--primary); text-align:center; margin-bottom:30px;">MENÚ CIO</h2>
-        <div class="form-content">
-            <button onclick="openFormPanel()" class="btn-pill">＋ NUEVA NOVEDAD</button>
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 HISTORIAL</button>
-            <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
-        </div>
+        <h2 style="color:var(--primary); text-align:center; margin-bottom:20px;">MENÚ CIO</h2>
+        <button onclick="openFormPanel()" class="btn-pill">＋ NUEVA NOVEDAD</button>
+        <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 HISTORIAL</button>
+        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <div class="form-content">
-            <h2 id="formTitle" style="color:var(--primary);">NOVEDAD</h2>
-            <form id="mainForm" onsubmit="saveEntry(event)" style="display:contents;">
-                <input type="hidden" id="f-id" value="">
-                <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
-                <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-                <input type="text" id="f-title" placeholder="Título novedad" required>
-                <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
-                <button type="submit" class="btn-pill">PUBLICAR</button>
-                <button type="button" onclick="closePanels()" class="btn-pill btn-sec">CANCELAR</button>
-            </form>
-        </div>
+        <h2 id="formTitle" style="color:var(--primary); text-align:center;">NOVEDAD</h2>
+        <form id="mainForm" onsubmit="saveEntry(event)">
+            <input type="hidden" id="f-id" value="">
+            <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
+            <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+            <input type="text" id="f-title" placeholder="Título novedad" required>
+            <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
+            <button type="submit" class="btn-pill">PUBLICAR</button>
+            <button type="button" onclick="closePanels()" class="btn-pill btn-sec">CANCELAR</button>
+        </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center;">ESTADO</h2>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <div style="flex:1; background:#111; padding:10px; border-radius:8px; text-align:center;"><b id="stat-total">0</b><br><small>Total</small></div>
-            <div style="flex:1; background:#111; padding:10px; border-radius:8px; text-align:center; color:var(--critico);"><b id="stat-crit">0</b><br><small>Crit</small></div>
-            <div style="flex:1; background:#111; padding:10px; border-radius:8px; text-align:center; color:var(--accent);"><b id="stat-off">0</b><br><small>Off</small></div>
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO OPERATIVO</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
+            <div class="stat-box"><b id="stat-crit" style="color:var(--critico)">0</b><small>Crit</small></div>
+            <div class="stat-box" onclick="toggleOfflineDetails()">
+                <b id="stat-off" style="color:var(--accent)">0</b>
+                <small>Off ▾</small>
+            </div>
         </div>
+
+        <div id="offline-details"></div>
+
         <div id="historyList"></div>
+        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
 </div>
 
@@ -201,25 +212,30 @@
             const resp = await fetch(cio_RED_URL);
             const status = await resp.json();
             const ticker = document.getElementById("ticker-content");
-            let tickerHTML = "";
+            const offDetails = document.getElementById("offline-details");
+            let tickerHTML = "", detailsHTML = "";
             let offCount = 0;
 
             if(status) {
                 Object.keys(status).forEach(id => {
                     if (status[id].estado === "offline") {
-                        tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${id.replace(/_/g, ' ')}</div>`;
+                        const name = id.replace(/_/g, ' ');
+                        tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
+                        detailsHTML += `<div class="off-item">● ${name}</div>`;
                         offCount++;
                     }
                 });
             }
 
             if(offCount > 0) {
-                ticker.innerHTML = tickerHTML + tickerHTML; // Doble para que no haya hueco al terminar
-                ticker.style.animation = `scroll-ticker ${offCount * 10}s linear infinite`;
+                ticker.innerHTML = tickerHTML;
+                ticker.style.animation = `scroll-ticker ${offCount * 8 + 5}s linear infinite`;
+                offDetails.innerHTML = detailsHTML;
             } else {
                 ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
                 ticker.style.animation = "none";
                 ticker.style.left = "0";
+                offDetails.innerHTML = "<div class='off-item' style='color:#666'>No hay servicios offline</div>";
             }
             document.getElementById("stat-off").textContent = offCount;
         } catch(e) {}
@@ -304,6 +320,7 @@
     function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
     function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
     function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
+    function toggleOfflineDetails() { document.getElementById("offline-details").classList.toggle("show"); }
 
     setInterval(() => {
         const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
