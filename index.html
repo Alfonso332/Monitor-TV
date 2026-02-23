@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* === ENCAPSULAMIENTO CIO === */
+        /* === BASE CIO === */
         #cio-app {
             --primary: #006465;
             --accent: #00d1d1;
@@ -54,7 +54,7 @@
         #cio-app .info-container { transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER FLUJO CONTINUO */
+        /* TICKER CONFIGURADO */
         #cio-app #ticker-bar { 
             height: 75px; background: #050505; border-top: 1px solid #111; 
             display: flex; align-items: center; overflow: hidden; position: relative; 
@@ -63,7 +63,7 @@
         #cio-app #ticker-content { 
             display: flex; align-items: center; gap: 80px; white-space: nowrap; 
             position: absolute; left: 0;
-            animation: scroll-ticker 30s linear infinite; 
+            animation: scroll-ticker 25s linear infinite; 
         }
 
         @keyframes scroll-ticker {
@@ -74,10 +74,7 @@
         #cio-app .status-badge { 
             padding: 12px 30px; border-radius: 8px; font-size: 1.6rem; 
             font-weight: 900; text-transform: uppercase; flex-shrink: 0;
-            display: flex; flex-direction: column; align-items: center; line-height: 1;
         }
-        #cio-app .status-badge small { font-size: 0.6rem; opacity: 0.7; margin-top: 4px; letter-spacing: 1px; }
-
         #cio-app .status-badge.offline { 
             background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); 
             color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
@@ -108,13 +105,12 @@
             background: #111; border-radius: 12px; margin-bottom: 20px;
         }
         #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 10px; margin-top: -5px; }
-        #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 10px; border-bottom: 1px solid #222; }
 
-        /* INPUTS Y BOTONES - CENTRADOS */
+        /* INPUTS Y BOTONES */
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 14px; background: #151515 !important;
-            color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; 
-            text-align: center !important; margin-bottom: 12px; font-size: 1rem;
+            color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center; margin-bottom: 12px;
         }
         #cio-app .btn-pill {
             background: var(--primary) !important; color: #fff !important; border: none; padding: 12px 24px; border-radius: 50px;
@@ -128,24 +124,24 @@
             border-left: 4px solid var(--primary);
         }
 
-        /* === CELULAR FAB ABAJO DERECHA === */
+        /* === AJUSTES EXCLUSIVOS CELULAR === */
         #mobile-fab { display: none; }
 
         @media (max-width: 768px) {
             #cio-app { overflow: hidden; position: fixed; height: 100vh; }
             #cio-app .main-header, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
             #cio-app #display-board { padding: 15px; }
-            #cio-app #titleDisplay { font-size: 32px !important; margin: 5px 0; }
-            #cio-app #messageDisplay { font-size: 1.2rem !important; }
+            #cio-app #titleDisplay { font-size: 28px !important; margin: 5px 0; }
+            #cio-app #messageDisplay { font-size: 1.1rem !important; }
             #cio-app .side-panel { width: 100%; border-left: none; }
             
             #mobile-fab {
-                display: flex; position: fixed; bottom: 35px; right: 30px; 
-                width: 70px; height: 70px; background: var(--primary);
+                display: flex; position: fixed; bottom: 30px; right: 25px; 
+                width: 65px; height: 65px; background: var(--primary);
                 border-radius: 50%; z-index: 1000005; align-items: center; justify-content: center;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.6); border: 2px solid var(--accent);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid var(--accent);
             }
-            #mobile-fab span { font-size: 35px; color: white; }
+            #mobile-fab span { font-size: 30px; color: white; }
         }
     </style>
 </head>
@@ -153,7 +149,7 @@
 
 <div id="cio-app">
     <div id="fsClockDisplay" class="fs-clock">00:00:00</div>
-    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter:blur(6px);" onclick="closePanels()"></div>
+    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
 
     <header class="main-header">
         <div class="header-actions" style="display:flex; gap:10px;">
@@ -161,40 +157,38 @@
             <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="padding:8px 20px; width:auto;">📋 HISTORIAL</button>
             <button onclick="toggleFS()" style="background:none; border:1px solid #333; color:#555; padding:8px 12px; border-radius:8px; cursor:pointer;">⛶ TV</button>
         </div>
-        <div id="clockDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:900; color:var(--primary);">00:00:00</div>
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40">
+        <div id="clockDisplay" style="font-family:monospace; font-size:1.6rem; font-weight:900; color:var(--primary);">00:00:00</div>
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35">
     </header>
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 6px; font-weight: 900; font-size: 0.8rem; margin-bottom: 10px; color: var(--accent);">MASTERSON MONITOR</div>
+            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.75rem;">MASTERSON MONITOR</div>
             <h1 id="titleDisplay">SISTEMA CIO</h1>
-            <p id="messageDisplay" style="font-size:1.8rem; opacity:0.6;">Sincronizando...</p>
+            <p id="messageDisplay" style="font-size:1.6rem; opacity:0.6;">Sincronizando...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
         <div id="ticker-content">
-            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">MONITOREO DE RED ACTIVO...</span>
+            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">ESCANEANDO...</span>
         </div>
     </div>
     
-    <div id="progressLine" style="position: fixed; bottom: 75px; height: 5px; width: 0%; background: var(--primary); z-index: 5; transition: width 0.1s linear;"></div>
+    <div id="progressLine" style="position: fixed; bottom: 75px; height: 4px; width: 0%; background: var(--primary); z-index: 5;"></div>
 
     <div id="mobile-fab" onclick="openPanel('panelHistory')">
         <span>☰</span>
     </div>
 
     <aside id="panelForm" class="side-panel">
-        <h2 id="formTitle" style="color:var(--primary); text-align:center; margin-bottom: 20px;">NOVEDAD</h2>
+        <h2 id="formTitle" style="color:var(--primary); text-align:center;">NOVEDAD</h2>
         <form id="mainForm" onsubmit="saveEntry(event)">
             <input type="hidden" id="f-id" value="">
-            <label style="font-size: 0.7rem; opacity: 0.5; margin-left: 5px;">ÁREA</label>
-            <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención al cliente</option><option>Servidores</option><option>Novedad Interna</option></select>
-            <label style="font-size: 0.7rem; opacity: 0.5; margin-left: 5px;">PRIORIDAD</label>
+            <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención al cliente</option><option>Novedad Interna</option></select>
             <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-            <input type="text" id="f-title" placeholder="TÍTULO" required>
-            <textarea id="f-msg" rows="6" placeholder="DESCRIPCIÓN..." required></textarea>
+            <input type="text" id="f-title" placeholder="Título novedad" required>
+            <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
             <button type="submit" class="btn-pill">PUBLICAR</button>
             <button type="button" onclick="closePanels()" class="btn-pill btn-sec">CANCELAR</button>
         </form>
@@ -204,20 +198,20 @@
         <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO OPERATIVO</h2>
         
         <div class="stats-grid">
-            <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Añadir</small></div>
+            <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Nueva</small></div>
             <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
             <div class="stat-box" onclick="toggleOfflineDetails()">
-                <b id="stat-off" style="color:var(--critico)">0</b>
+                <b id="stat-off" style="color:var(--accent)">0</b>
                 <small>Off ▾</small>
             </div>
         </div>
 
         <div id="offline-details"></div>
 
-        <button onclick="downloadPDF()" class="btn-pill" style="background:#111 !important; border: 1px solid #333; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE TURNO</button>
+        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE TURNO ACTUAL</button>
 
         <div id="historyList"></div>
-        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">VOLVER</button>
+        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
 </div>
 
@@ -226,9 +220,19 @@
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
+    let prevStatus = {}; 
     let recentlyRestored = {}; 
-    let offlineTracker = {}; // Control de tiempo para los 100 segundos
     const cio_SLIDE_TIME = 45;
+
+    // Lógica de Deslizamiento (Swipe to close)
+    let touchStartX = 0;
+    document.querySelectorAll('.side-panel').forEach(panel => {
+        panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        panel.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX - touchStartX > 100) closePanels(); 
+        });
+    });
 
     async function updateNetwork() {
         try {
@@ -238,51 +242,39 @@
             const offDetails = document.getElementById("offline-details");
             let tickerHTML = "", detailsHTML = "";
             let offCount = 0;
-            const NOW = Date.now();
 
             if(status) {
                 Object.keys(status).forEach(id => {
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
-                    
+                    if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
+                        recentlyRestored[id] = 2;
+                    }
                     if (currentItem.estado === "offline") {
-                        if (!offlineTracker[id]) offlineTracker[id] = NOW;
-                        const elapsed = (NOW - offlineTracker[id]) / 1000;
-
-                        // Solo mostrar si lleva más de 100 segundos caído
-                        if (elapsed >= 100) {
-                            const hFallo = new Date(offlineTracker[id]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                            tickerHTML += `<div class="status-badge offline">⚠️ CONEXIÓN PERDIDA: ${name} <small>DESDE ${hFallo}</small></div>`;
-                            detailsHTML += `<div class="off-item"><span>● ${name}</span><span>${hFallo}</span></div>`;
-                            offCount++;
-                            delete recentlyRestored[id];
-                        }
-                    } else {
-                        // Si vuelve a estar online y estuvo caído > 100s, mostrar aviso
-                        if (offlineTracker[id] && (NOW - offlineTracker[id]) / 1000 >= 100) {
-                            recentlyRestored[id] = 3; 
-                        }
-                        delete offlineTracker[id];
-                        if (recentlyRestored[id] > 0) {
-                            tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
-                            recentlyRestored[id]--;
-                        }
+                        tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
+                        detailsHTML += `<div class="off-item">● ${name}</div>`;
+                        offCount++;
+                        delete recentlyRestored[id];
+                    } else if (recentlyRestored[id] > 0) {
+                        tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
+                        recentlyRestored[id]--;
                     }
                 });
+                prevStatus = JSON.parse(JSON.stringify(status));
             }
 
             if(tickerHTML !== "") {
                 ticker.innerHTML = tickerHTML;
                 const itemsCount = offCount + Object.keys(recentlyRestored).filter(k => recentlyRestored[k] > 0).length;
-                ticker.style.animation = `scroll-ticker ${itemsCount * 10 + 5}s linear infinite`;
+                ticker.style.animation = `scroll-ticker ${itemsCount * 8 + 5}s linear infinite`;
                 offDetails.innerHTML = detailsHTML;
             } else {
-                ticker.innerHTML = `<span style="color:var(--primary); font-size:1.5rem; font-weight:bold; width:100vw; text-align:center; letter-spacing:2px;">✔ SISTEMAS OPERATIVOS NOMINALES</span>`;
+                ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
                 ticker.style.animation = "none"; ticker.style.left = "0";
-                offDetails.innerHTML = "<div class='off-item' style='color:#444; justify-content:center;'>Sin incidencias de red</div>";
+                offDetails.innerHTML = "<div class='off-item' style='color:#666'>No hay servicios offline</div>";
             }
             document.getElementById("stat-off").textContent = offCount;
-        } catch(e) { console.error("Error Red:", e); }
+        } catch(e) {}
     }
 
     async function syncEvents() {
@@ -290,8 +282,7 @@
             const resp = await fetch(cio_DB_URL);
             const data = await resp.json();
             const now = Date.now();
-            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : [])
-                        .filter(it => !it.timestamp || (now - it.timestamp < 86400000));
+            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (now - it.timestamp < 86400000));
             document.getElementById("stat-total").textContent = cio_logs.length;
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
             renderHistory();
@@ -305,7 +296,7 @@
         setTimeout(() => {
             const item = cio_logs[cio_currentIdx % cio_logs.length];
             const color = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"}[item.priority] || "#fff";
-            app.classList.toggle("pantalla-critica", item.priority === "Crítica");
+            if(item.priority === "Crítica") app.classList.add("pantalla-critica"); else app.classList.remove("pantalla-critica");
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("areaLabel").style.color = color;
             document.getElementById("titleDisplay").textContent = item.title;
@@ -320,23 +311,23 @@
             const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
             return `
             <div class="history-item">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <small style="color:var(--accent); font-weight:bold;">${it.area.toUpperCase()}</small>
+                <div style="display:flex; justify-content:space-between;">
+                    <small style="color:var(--accent); font-weight:bold;">${it.area}</small>
                     <small style="opacity:0.5;">${h}</small>
                 </div>
-                <div style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">${it.title}</div>
-                <div style="font-size:0.85rem; opacity:0.7; margin-bottom:12px; line-height:1.4;">${it.message}</div>
-                <div style="display:flex; gap:15px; border-top:1px solid #222; padding-top:10px;">
-                    <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:bold;">EDITAR</button>
-                    <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:bold;">ELIMINAR</button>
+                <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
+                <div style="font-size:0.8rem; opacity:0.7; margin-bottom:10px;">${it.message}</div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; padding:0; cursor:pointer; font-size:0.7rem; font-weight:bold;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; padding:0; cursor:pointer; font-size:0.7rem; font-weight:bold;">ELIMINAR</button>
                 </div>
             </div>
-        `}).reverse().join('');
+        `}).join('');
     }
 
     async function deleteEntry(idx) {
-        if(confirm("¿Eliminar registro?")) {
-            cio_logs.splice(cio_logs.length - 1 - idx, 1);
+        if(confirm("¿Eliminar?")) {
+            cio_logs.splice(idx, 1);
             await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
             syncEvents();
         }
@@ -356,9 +347,8 @@
     }
 
     function editEntry(idx) {
-        const realIdx = cio_logs.length - 1 - idx;
-        const it = cio_logs[realIdx];
-        document.getElementById("f-id").value = realIdx;
+        const it = cio_logs[idx];
+        document.getElementById("f-id").value = idx;
         document.getElementById("f-area").value = it.area;
         document.getElementById("f-prio").value = it.priority;
         document.getElementById("f-title").value = it.title;
@@ -370,27 +360,58 @@
         const { jsPDF } = window.jspdf;
         const doc = jsPDF();
         const now = new Date();
-        const h = now.getHours();
-        let turno = "Noche (22:00 - 06:00)";
-        if (h >= 6 && h < 14) turno = "Mañana (06:00 - 14:00)";
-        else if (h >= 14 && h < 22) turno = "Tarde (14:00 - 22:00)";
+        const currentH = now.getHours();
+        
+        // Determinar turno actual basado en la hora de descarga
+        let currentTurno = "";
+        if (currentH >= 6 && currentH < 14) currentTurno = "Turno Mañana (06:00 - 14:00)";
+        else if (currentH >= 14 && currentH < 22) currentTurno = "Turno Tarde (14:00 - 22:00)";
+        else currentTurno = "Turno Noche (22:00 - 06:00)";
 
-        doc.setFontSize(18); doc.setTextColor(0, 100, 101);
-        doc.text("MASTERSON | REPORTE CIO", 14, 20);
+        // Encabezado
+        doc.setFontSize(16); doc.setTextColor(0, 100, 101);
+        doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
+        
         doc.setFontSize(10); doc.setTextColor(100);
-        doc.text(`Turno: ${turno} | Generado: ${now.toLocaleString()}`, 14, 28);
+        doc.text(`Turno: ${currentTurno}`, 14, 28);
+        doc.text(`Fecha y Hora de descarga: ${now.toLocaleString()}`, 14, 34);
 
+        // Función de clasificación interna (idéntica para filtrar)
+        const getTurnoDeNovedad = (timestamp) => {
+            const h = new Date(timestamp).getHours();
+            if (h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
+            if (h >= 14 && h < 22) return "Turno Tarde (14:00 - 22:00)";
+            return "Turno Noche (22:00 - 06:00)";
+        };
+
+        // Filtrar novedades solo para el turno en el que estoy descargando
+        const novedadesFiltradas = cio_logs.filter(it => getTurnoDeNovedad(it.timestamp) === currentTurno);
+
+        // Generar Tabla Única
         doc.autoTable({
-            startY: 35,
-            head: [['Hora', 'Área', 'Prio', 'Título', 'Novedad']],
-            body: cio_logs.map(it => [
-                new Date(it.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                it.area, it.priority, it.title, it.message
-            ]),
+            startY: 45,
+            head: [['Hora', 'Área', 'Prioridad', 'Título', 'Novedad']],
+            body: novedadesFiltradas.length > 0 
+                ? novedadesFiltradas.map(it => [
+                    new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    it.area, 
+                    it.priority, 
+                    it.title, 
+                    it.message
+                  ])
+                : [['-', '-', '-', 'No se registraron novedades en este turno', '-']],
+            theme: 'striped',
             headStyles: { fillColor: [0, 100, 101] },
-            styles: { fontSize: 8 }
+            columnStyles: {
+                0: { cellWidth: 20 },
+                1: { cellWidth: 35 },
+                2: { cellWidth: 25 },
+                4: { cellWidth: 'auto' }
+            }
         });
-        doc.save(`CIO_Reporte_${now.toLocaleDateString()}.pdf`);
+
+        const fileName = `Reporte_${currentTurno.split(' ')[1]}_${now.toLocaleDateString().replace(/\//g, '-')}.pdf`;
+        doc.save(fileName);
     }
 
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
