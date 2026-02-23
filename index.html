@@ -208,7 +208,7 @@
 
         <div id="offline-details"></div>
 
-        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE POR TURNOS</button>
+        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE TURNO ACTUAL</button>
 
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
@@ -308,12 +308,12 @@
 
     function renderHistory() {
         document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => {
-            const hora = it.timestamp ? new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+            const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
             return `
             <div class="history-item">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; justify-content:space-between;">
                     <small style="color:var(--accent); font-weight:bold;">${it.area}</small>
-                    <small style="opacity:0.5; font-size:0.7rem;">${hora}</small>
+                    <small style="opacity:0.5;">${h}</small>
                 </div>
                 <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
                 <div style="font-size:0.8rem; opacity:0.7; margin-bottom:10px;">${it.message}</div>
@@ -360,39 +360,58 @@
         const { jsPDF } = window.jspdf;
         const doc = jsPDF();
         const now = new Date();
-        doc.setFontSize(16); doc.text("REPORTE MASTERSON", 14, 20);
+        const currentH = now.getHours();
         
-        const getTurno = (ts) => {
-            const h = new Date(ts).getHours();
-            if(h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
-            if(h >= 14 && h < 22) return "Turno Tarde (14:00 - 22:00)";
+        // Determinar turno actual basado en la hora de descarga
+        let currentTurno = "";
+        if (currentH >= 6 && currentH < 14) currentTurno = "Turno Mañana (06:00 - 14:00)";
+        else if (currentH >= 14 && currentH < 22) currentTurno = "Turno Tarde (14:00 - 22:00)";
+        else currentTurno = "Turno Noche (22:00 - 06:00)";
+
+        // Encabezado
+        doc.setFontSize(16); doc.setTextColor(0, 100, 101);
+        doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
+        
+        doc.setFontSize(10); doc.setTextColor(100);
+        doc.text(`Turno: ${currentTurno}`, 14, 28);
+        doc.text(`Fecha y Hora de descarga: ${now.toLocaleString()}`, 14, 34);
+
+        // Función de clasificación interna (idéntica para filtrar)
+        const getTurnoDeNovedad = (timestamp) => {
+            const h = new Date(timestamp).getHours();
+            if (h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
+            if (h >= 14 && h < 22) return "Turno Tarde (14:00 - 22:00)";
             return "Turno Noche (22:00 - 06:00)";
         };
 
-        const turnos = ["Turno Mañana (06:00 - 14:00)", "Turno Tarde (14:00 - 22:00)", "Turno Noche (22:00 - 06:00)"];
-        let currentY = 35;
+        // Filtrar novedades solo para el turno en el que estoy descargando
+        const novedadesFiltradas = cio_logs.filter(it => getTurnoDeNovedad(it.timestamp) === currentTurno);
 
-        turnos.forEach(turno => {
-            const filtered = cio_logs.filter(it => getTurno(it.timestamp) === turno);
-            doc.setFontSize(12); doc.setTextColor(0, 100, 101); doc.text(turno, 14, currentY);
-            
-            doc.autoTable({
-                startY: currentY + 4, 
-                head: [['Hora', 'Área', 'Prio', 'Título', 'Mensaje']],
-                body: filtered.length ? filtered.map(it => [
-                    it.timestamp ? new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--',
+        // Generar Tabla Única
+        doc.autoTable({
+            startY: 45,
+            head: [['Hora', 'Área', 'Prioridad', 'Título', 'Novedad']],
+            body: novedadesFiltradas.length > 0 
+                ? novedadesFiltradas.map(it => [
+                    new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                     it.area, 
                     it.priority, 
                     it.title, 
                     it.message
-                ]) : [['-', '-', '-', 'Sin novedades', '-']],
-                theme: 'striped', 
-                headStyles: { fillColor: [0, 100, 101] },
-                columnStyles: { 0: { cellWidth: 20 } }
-            });
-            currentY = doc.lastAutoTable.finalY + 15;
+                  ])
+                : [['-', '-', '-', 'No se registraron novedades en este turno', '-']],
+            theme: 'striped',
+            headStyles: { fillColor: [0, 100, 101] },
+            columnStyles: {
+                0: { cellWidth: 20 },
+                1: { cellWidth: 35 },
+                2: { cellWidth: 25 },
+                4: { cellWidth: 'auto' }
+            }
         });
-        doc.save(`Reporte_CIO_${now.toLocaleDateString()}.pdf`);
+
+        const fileName = `Reporte_${currentTurno.split(' ')[1]}_${now.toLocaleDateString().replace(/\//g, '-')}.pdf`;
+        doc.save(fileName);
     }
 
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
