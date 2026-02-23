@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* === AISLAMIENTO TOTAL DEL CSS === */
+        /* === AISLAMIENTO TOTAL === */
         #cio-app {
             --primary: #006465;
             --accent: #00d1d1;
@@ -27,44 +27,30 @@
             font-family: 'Segoe UI', Roboto, sans-serif !important;
             display: flex; flex-direction: column;
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-            text-align: left;
         }
 
-        #cio-app * { box-sizing: border-box !important; font-family: inherit; }
+        #cio-app * { box-sizing: border-box !important; }
 
-        /* FONDO Y EMERGENCIA */
-        #cio-app::before {
-            content: ""; position: absolute; inset: 0;
-            background-image: var(--bg-img); background-size: contain;
-            background-position: center; background-repeat: no-repeat;
-            opacity: 0.04; filter: grayscale(1); z-index: -1;
-        }
-        #cio-app.emergency-active { animation: cioEmergencyPulse 2s infinite; }
-        @keyframes cioEmergencyPulse { 0%, 100% { background-color: #000; } 50% { background-color: #1a0505; } }
-
-        /* HEADER */
+        /* HEADER Y RELOJ */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
-
         #cio-app .fs-clock { display: none; }
-        #cio-app:fullscreen .main-header, #cio-app:-webkit-full-screen .main-header { display: none !important; }
-        #cio-app:fullscreen .fs-clock, #cio-app:-webkit-full-screen .fs-clock { 
+        #cio-app:fullscreen .main-header { display: none !important; }
+        #cio-app:fullscreen .fs-clock { 
             display: block; position: absolute; top: 20px; right: 30px; 
-            font-family: monospace; font-size: 2.5rem; font-weight: 900; 
-            color: var(--primary); text-shadow: 0 0 20px rgba(0,100,101,0.5); z-index: 100;
+            font-family: monospace; font-size: 2.5rem; font-weight: 900; color: var(--primary);
         }
 
-        /* TABLERO */
+        /* TABLERO CENTRAL */
         #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         #cio-app .info-container { width: 100%; transition: all 0.6s ease; }
-        #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; line-height: 1; }
-        #cio-app #messageDisplay { font-size: 1.8rem; opacity: 0.7; max-width: 80%; margin: 0 auto; font-weight: 300; }
+        #cio-app .oculto { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+        #cio-app #titleDisplay { font-size: 70px; font-weight: 900; margin: 10px 0; }
 
-        /* PANELES */
+        /* PANELES LATERALES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
@@ -73,35 +59,45 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        #cio-app .form-content { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-        #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; max-width: 320px; padding: 12px; background: #151515 !important; color: #fff !important; 
-            border: 1px solid #252525 !important; border-radius: 8px; text-align: center; font-size: 1rem;
+        /* BOTONES ESTÉTICOS */
+        #cio-app .btn-pill {
+            background: var(--primary) !important; color: #fff !important;
+            border: none; padding: 12px 20px; border-radius: 50px;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        #cio-app .btn-action { background: var(--primary) !important; color: #fff !important; border: none; padding: 14px; width: 100%; max-width: 320px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        #cio-app .btn-cancel { background: #222 !important; color: #888 !important; border: none; padding: 10px; width: 100%; max-width: 320px; border-radius: 8px; cursor: pointer; }
+        #cio-app .btn-pill:hover { background: var(--accent) !important; transform: scale(1.02); }
+        #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
+        #cio-app .btn-danger { color: #ff4d4d !important; background: rgba(255,77,77,0.1) !important; border: 1px solid #ff4d4d; }
 
-        #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 15px; }
-        #cio-app .stat-card { background: #111; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid #222; }
-        #cio-app .stat-num { display: block; font-size: 1.2rem; font-weight: 900; color: var(--accent); }
-        #cio-app .stat-txt { font-size: 0.5rem; text-transform: uppercase; opacity: 0.6; }
+        /* FORMULARIOS */
+        #cio-app .form-group { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+        #cio-app input, #cio-app textarea, #cio-app select {
+            width: 100%; max-width: 320px; padding: 14px; background: #151515 !important;
+            color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center;
+        }
 
-        #cio-app #ticker-bar { height: 50px; background: #050505; border-top: 1px solid #111; display: flex; align-items: center; overflow: hidden; position: relative; }
-        #cio-app #ticker-content { display: flex; align-items: center; gap: 20px; white-space: nowrap; position: absolute; left: 20px; }
+        /* STATS Y SERVICIOS */
+        #cio-app .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        #cio-app .stat-box { background: #111; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #222; }
+        #cio-app .service-tag { 
+            padding: 8px; background: #151515; border-radius: 8px; margin-bottom: 5px;
+            display: flex; justify-content: space-between; font-size: 0.7rem; align-items: center;
+        }
 
         #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 70px; right: 20px;
+            display: none; position: fixed; bottom: 30px; right: 20px;
             width: 60px; height: 60px; border-radius: 50%;
-            background: var(--primary); color: #fff; border: 2px solid rgba(255,255,255,0.2);
-            font-size: 24px; cursor: pointer; z-index: 10050;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.8); align-items: center; justify-content: center;
+            background: var(--primary); color: #fff; border: none;
+            font-size: 24px; cursor: pointer; z-index: 10050; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         @media (max-width: 768px) {
-            #cio-app #menu-toggle-float { display: flex; }
+            #cio-app #menu-toggle-float { display: flex; align-items: center; justify-content: center; }
             #cio-app .header-actions { display: none !important; }
-            #cio-app #titleDisplay { font-size: 34px !important; }
-            #cio-app .side-panel { width: 85%; }
+            #cio-app .side-panel { width: 90%; }
+            #cio-app #titleDisplay { font-size: 38px !important; }
         }
     </style>
 </head>
@@ -113,67 +109,69 @@
 
     <header class="main-header">
         <div class="header-actions" style="display:flex; gap:10px;">
-            <button onclick="openPanel('panelForm')" class="btn-action" style="padding:8px 15px; font-size:0.7rem; width:auto;">＋ NUEVA</button>
-            <button onclick="openPanel('panelHistory')" class="btn-action" style="padding:8px 15px; font-size:0.7rem; width:auto; background:#111 !important;">📋 HISTORIAL</button>
-            <button onclick="toggleFS()" style="background:none !important; border:1px solid #333; color:#555; padding:8px 10px; border-radius:5px; cursor:pointer;">⛶ TV</button>
+            <button onclick="openFormPanel()" class="btn-pill">＋ NUEVA</button>
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 HISTORIAL</button>
+            <button onclick="toggleFS()" style="background:none; border:1px solid #333; color:#555; padding:8px 12px; border-radius:8px; cursor:pointer;">⛶ TV</button>
         </div>
         <div id="clockDisplay" style="font-family:monospace; font-size:1.6rem; font-weight:900; color:var(--primary);">00:00:00</div>
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="30" style="filter: brightness(2);">
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35" style="filter: brightness(1.5);">
     </header>
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; color: var(--accent);">CONECTANDO...</div>
-            <div id="prioBadge" style="display: inline-block; padding: 3px 12px; border-radius: 4px; font-weight: 900; border: 1px solid var(--accent); font-size: 0.6rem; margin: 10px 0;">SISTEMA ACTIVO</div>
-            <h1 id="titleDisplay">MASTERSON</h1>
-            <p id="messageDisplay">Sincronizando...</p>
+            <div id="areaLabel" style="letter-spacing: 4px; font-weight: 900; font-size: 0.8rem; text-transform: uppercase;">MASTERSON ELITE</div>
+            <h1 id="titleDisplay">Sincronizando...</h1>
+            <p id="messageDisplay" style="font-size:1.5rem; opacity:0.6; font-weight:300;">Cargando base de datos operativa</p>
         </div>
     </main>
 
-    <div id="ticker-bar">
-        <div id="ticker-content">
-            <span style="font-size: 0.7rem; color: #444;">VERIFICANDO SERVICIOS...</span>
-        </div>
-    </div>
-    
-    <div id="progressLine" style="position: fixed; bottom: 50px; height: 2px; width: 0%; background: var(--primary); z-index: 5;"></div>
+    <div id="progressLine" style="position: fixed; bottom: 0; height: 3px; width: 0%; background: var(--primary); transition: width 0.1s linear;"></div>
 
     <button id="menu-toggle-float" onclick="openPanel('panelMobileMenu')">☰</button>
 
     <aside id="panelMobileMenu" class="side-panel">
         <h2 style="color:var(--primary); text-align:center; margin-bottom:30px;">MENU CIO</h2>
-        <div class="form-content">
-            <button onclick="openPanel('panelForm')" class="btn-action">＋ REGISTRAR NOVEDAD</button>
-            <button onclick="openPanel('panelHistory')" class="btn-action" style="background:#1a1a1a !important;">📋 VER HISTORIAL</button>
-            <button onclick="closePanels()" class="btn-cancel" style="margin-top:40px;">CERRAR MENÚ</button>
+        <div class="form-group">
+            <button onclick="openFormPanel()" class="btn-pill" style="width:100%">＋ REGISTRAR NOVEDAD</button>
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:100%">📋 VER HISTORIAL</button>
+            <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; opacity:0.5;">CERRAR</button>
         </div>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <div class="form-content">
-            <h2 id="formTitle" style="color:var(--primary); margin-bottom:20px;">NUEVA NOVEDAD</h2>
+        <div class="form-group">
+            <h2 id="formTitle" style="color:var(--primary); margin-bottom:10px;">NUEVA NOVEDAD</h2>
             <form id="mainForm" onsubmit="saveEntry(event)" style="display:contents;">
                 <input type="hidden" id="f-id" value="">
                 <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
                 <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
-                <input type="text" id="f-title" placeholder="Título corto" required>
-                <textarea id="f-msg" rows="4" placeholder="Descripción detallada..." required></textarea>
-                <button type="submit" id="btnSubmit" class="btn-action">PUBLICAR</button>
-                <button type="button" onclick="closePanels()" class="btn-cancel">CANCELAR</button>
+                <input type="text" id="f-title" placeholder="Título de la novedad" required>
+                <textarea id="f-msg" rows="5" placeholder="Descripción detallada..." required></textarea>
+                <button type="submit" id="btnSubmit" class="btn-pill" style="width:100%">PUBLICAR AHORA</button>
+                <button type="button" onclick="closePanels()" class="btn-pill btn-sec" style="width:100%">CANCELAR</button>
             </form>
         </div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center;">REPORTE</h2>
-        <div class="stats-grid">
-            <div class="stat-card"><span id="stat-total" class="stat-num">0</span><span class="stat-txt">Total</span></div>
-            <div class="stat-card"><span id="stat-crit" class="stat-num" style="color:var(--critico)">0</span><span class="stat-txt">Críticos</span></div>
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">ESTADO OPERATIVO</h2>
+        
+        <div class="stats-container">
+            <div class="stat-box"><span id="stat-total" style="font-size:1.5rem; font-weight:900;">0</span><br><small style="opacity:0.5">Novedades</small></div>
+            <div class="stat-box" style="border-color:var(--critico)"><span id="stat-crit" style="font-size:1.5rem; font-weight:900; color:var(--critico)">0</span><br><small style="opacity:0.5">Críticos</small></div>
         </div>
-        <button onclick="downloadPDF()" class="btn-action" style="background:#222 !important; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR PDF TURNO</button>
-        <div id="historyList" style="width:100%;"></div>
-        <div class="form-content" style="margin-top:20px;">
-            <button onclick="closePanels()" class="btn-cancel">CERRAR</button>
+
+        <div style="background:#111; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #222;">
+            <h3 style="font-size:0.7rem; color:var(--accent); margin-bottom:10px; text-transform:uppercase;">Nodos Offline</h3>
+            <div id="historyServicesList"></div>
+        </div>
+
+        <button onclick="downloadPDF()" class="btn-pill btn-sec" style="width:100%; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR PDF DEL TURNO</button>
+        
+        <div id="historyList"></div>
+
+        <div class="form-group" style="margin-top:20px;">
+            <button onclick="closePanels()" class="btn-pill btn-sec" style="width:100%">CERRAR</button>
         </div>
     </aside>
 </div>
@@ -187,63 +185,115 @@
     let cio_startTime = null; 
     const cio_SLIDE_TIME = 15;
 
-    // --- LÓGICA DE PDF ---
-    function getTurno() {
-        const hour = new Date().getHours();
-        if (hour >= 6 && hour < 14) return "MAÑANA";
-        if (hour >= 14 && hour < 22) return "TARDE";
-        return "NOCHE";
-    }
-
-    async function downloadPDF() {
+    // --- PDF ---
+    function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const turno = getTurno();
-        const fecha = new Date().toLocaleDateString();
+        const hour = new Date().getHours();
+        let turno = "NOCHE";
+        if (hour >= 6 && hour < 14) turno = "MAÑANA";
+        else if (hour >= 14 && hour < 22) turno = "TARDE";
 
-        doc.setFontSize(18);
+        doc.setFontSize(20);
         doc.text(`Novedad operativa de turno: ${turno}`, 20, 20);
-        doc.setFontSize(12);
-        doc.text(`Fecha: ${fecha}`, 20, 30);
-        doc.line(20, 35, 190, 35);
+        doc.setFontSize(10);
+        doc.text(`Reporte generado el ${new Date().toLocaleString()}`, 20, 28);
+        doc.line(20, 32, 190, 32);
 
         let y = 45;
         cio_logs.forEach((it, i) => {
             if (y > 270) { doc.addPage(); y = 20; }
             doc.setFont(undefined, 'bold');
-            doc.text(`${i+1}. [${it.area}] ${it.title} (${it.priority})`, 20, y);
+            doc.text(`${i+1}. [${it.area.toUpperCase()}] - ${it.title}`, 20, y);
             doc.setFont(undefined, 'normal');
             doc.text(`${it.message}`, 25, y + 7, { maxWidth: 160 });
-            y += 20;
+            y += 22;
         });
-
-        doc.save(`Reporte_CIO_${turno}_${fecha}.pdf`);
+        doc.save(`CIO_Reporte_${turno}.pdf`);
     }
 
-    // --- CRUD Y SYNC ---
+    // --- CORE LOGIC ---
     async function syncEvents() {
         try {
             const resp = await fetch(cio_DB_URL);
             const data = await resp.json();
             const now = Date.now();
+            let raw = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
             
-            // Filtrar y auto-borrar registros de > 24hs
-            let rawLogs = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-            const filtered = rawLogs.filter(it => !it.timestamp || (now - it.timestamp < 86400000));
+            // Auto-borrado 24hs
+            cio_logs = raw.filter(it => !it.timestamp || (now - it.timestamp < 86400000));
             
-            if (rawLogs.length !== filtered.length) {
-                await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(filtered) });
+            if (raw.length !== cio_logs.length) {
+                await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
             }
 
-            cio_logs = filtered;
-            updateStats();
+            document.getElementById("stat-total").textContent = cio_logs.length;
+            document.getElementById("stat-crit").textContent = cio_logs.filter(it => it.priority === "Crítica").length;
+            
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
+            renderHistory();
         } catch(e) {}
     }
 
-    function updateStats() {
-        document.getElementById("stat-total").textContent = cio_logs.length;
-        document.getElementById("stat-crit").textContent = cio_logs.filter(it => it.priority === "Crítica").length;
+    async function syncServices() {
+        try {
+            const resp = await fetch(cio_RED_URL);
+            const status = await resp.json();
+            const histList = document.getElementById("historyServicesList");
+            let html = "";
+            
+            if(status) {
+                Object.keys(status).forEach(id => {
+                    if(status[id].estado === "offline") {
+                        html += `<div class="service-tag"><span>⚠️ ${id.replace(/_/g,' ')}</span> <b style="color:var(--critico)">OFFLINE</b></div>`;
+                    }
+                });
+            }
+            histList.innerHTML = html || `<div style="opacity:0.3; font-size:0.7rem; text-align:center;">Todos los servicios OK</div>`;
+        } catch(e) {}
+    }
+
+    function renderSlide() {
+        if(!cio_logs.length) return;
+        const cont = document.getElementById("infoCont");
+        cont.classList.add("oculto");
+        setTimeout(() => {
+            const item = cio_logs[cio_currentIdx % cio_logs.length];
+            const colors = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"};
+            const color = colors[item.priority] || "#fff";
+            
+            document.getElementById("areaLabel").textContent = item.area;
+            document.getElementById("areaLabel").style.color = color;
+            document.getElementById("titleDisplay").textContent = item.title;
+            document.getElementById("messageDisplay").textContent = item.message;
+            document.getElementById("progressLine").style.background = color;
+            cont.classList.remove("oculto");
+        }, 600);
+    }
+
+    // --- FORMULARIO Y EDICION ---
+    function openFormPanel() {
+        document.getElementById("mainForm").reset();
+        document.getElementById("f-id").value = "";
+        document.getElementById("formTitle").textContent = "NUEVA NOVEDAD";
+        document.getElementById("btnSubmit").textContent = "PUBLICAR AHORA";
+        openPanel('panelForm');
+    }
+
+    function editEntry(idx) {
+        const it = cio_logs[idx];
+        document.getElementById("f-id").value = idx;
+        document.getElementById("f-area").value = it.area;
+        document.getElementById("f-prio").value = it.priority;
+        document.getElementById("f-title").value = it.title;
+        document.getElementById("f-msg").value = it.message;
+        
+        document.getElementById("formTitle").textContent = "EDITAR NOVEDAD";
+        document.getElementById("btnSubmit").textContent = "GUARDAR CAMBIOS";
+        
+        // Cerramos historial y abrimos formulario
+        document.getElementById("panelHistory").classList.remove("active");
+        document.getElementById("panelForm").classList.add("active");
     }
 
     async function saveEntry(e) {
@@ -254,91 +304,54 @@
             priority: document.getElementById("f-prio").value,
             title: document.getElementById("f-title").value,
             message: document.getElementById("f-msg").value,
-            timestamp: id ? cio_logs[id].timestamp : Date.now()
+            timestamp: (id !== "" && cio_logs[id]) ? cio_logs[id].timestamp : Date.now()
         };
 
         if (id !== "") cio_logs[id] = entry;
         else cio_logs.push(entry);
 
         await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        document.getElementById("mainForm").reset();
-        document.getElementById("f-id").value = "";
         closePanels(); syncEvents();
     }
 
-    function editEntry(idx) {
-        const it = cio_logs[idx];
-        document.getElementById("f-id").value = idx;
-        document.getElementById("f-area").value = it.area;
-        document.getElementById("f-prio").value = it.priority;
-        document.getElementById("f-title").value = it.title;
-        document.getElementById("f-msg").value = it.message;
-        document.getElementById("formTitle").textContent = "EDITAR NOVEDAD";
-        document.getElementById("btnSubmit").textContent = "ACTUALIZAR";
-        openPanel('panelForm');
-    }
-
     async function deleteEntry(idx) {
-        if(!confirm("¿Borrar evento?")) return;
+        if(!confirm("¿Eliminar definitivamente?")) return;
         cio_logs.splice(idx, 1);
         await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs.length ? cio_logs : null) });
-        renderHistory(); syncEvents();
+        syncEvents();
     }
 
     function renderHistory() {
         const h = document.getElementById("historyList");
         h.innerHTML = cio_logs.map((it, i) => `
-            <div style="background:#111; padding:12px; border-radius:8px; margin-bottom:10px; border-left:4px solid var(--primary);">
-                <small style="color:var(--accent)">${it.area} | ${it.priority}</small>
-                <div style="font-weight:bold; margin:3px 0;">${it.title}</div>
-                <div style="display:flex; gap:15px; margin-top:5px;">
-                    <button onclick="editEntry(${i})" style="background:none; border:none; color:var(--accent); font-size:10px; cursor:pointer; padding:0;">[ EDITAR ]</button>
-                    <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#ff4d4d; font-size:10px; cursor:pointer; padding:0;">[ ELIMINAR ]</button>
+            <div style="background:#111; padding:15px; border-radius:12px; margin-bottom:12px; border-left:4px solid var(--primary);">
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <small style="color:var(--accent); font-weight:bold;">${it.area.toUpperCase()}</small>
+                    <small style="opacity:0.4; font-size:0.6rem;">${new Date(it.timestamp).toLocaleTimeString()}</small>
+                </div>
+                <div style="font-weight:bold; margin:5px 0; font-size:0.9rem;">${it.title}</div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button onclick="editEntry(${i})" class="btn-pill btn-sec" style="padding:5px 12px; font-size:0.6rem;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" class="btn-pill btn-danger" style="padding:5px 12px; font-size:0.6rem;">BORRAR</button>
                 </div>
             </div>
         `).join('');
     }
 
-    // --- FRONT END LOGIC ---
-    function renderSlide() {
-        if(!cio_logs.length) return;
-        const cont = document.getElementById("infoCont");
-        cont.classList.add("oculto");
-        setTimeout(() => {
-            const item = cio_logs[cio_currentIdx % cio_logs.length];
-            const pColors = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"};
-            const color = pColors[item.priority] || "#fff";
-            document.getElementById("cio-app").className = (item.priority === "Crítica") ? "emergency-active" : "";
-            document.getElementById("areaLabel").textContent = item.area;
-            document.getElementById("areaLabel").style.color = color;
-            document.getElementById("prioBadge").textContent = `PRIORIDAD ${item.priority.toUpperCase()}`;
-            document.getElementById("prioBadge").style.borderColor = color;
-            document.getElementById("prioBadge").style.color = color;
-            document.getElementById("titleDisplay").textContent = item.title;
-            document.getElementById("messageDisplay").textContent = item.message;
-            document.getElementById("progressLine").style.background = color;
-            cont.classList.remove("oculto");
-        }, 600);
-    }
-
     function openPanel(id) {
-        if (id === 'panelForm' && document.getElementById("f-id").value === "") {
-            document.getElementById("formTitle").textContent = "NUEVA NOVEDAD";
-            document.getElementById("btnSubmit").textContent = "PUBLICAR";
-        }
+        closePanels();
         document.getElementById(id).classList.add("active");
         document.getElementById("cio-overlay").style.display = "block";
-        if(id === 'panelHistory') renderHistory();
+        if(id === 'panelHistory') syncServices();
     }
 
     function closePanels() {
-        document.querySelectorAll('#cio-app .side-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active'));
         document.getElementById("cio-overlay").style.display = "none";
     }
 
     function toggleFS() { 
-        const app = document.getElementById("cio-app");
-        if (!document.fullscreenElement) app.requestFullscreen();
+        if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen();
         else document.exitFullscreen();
     }
 
@@ -359,7 +372,7 @@
     }, 1000);
 
     setInterval(syncEvents, 10000);
-    syncEvents(); requestAnimationFrame(loop);
+    syncEvents(); syncServices(); requestAnimationFrame(loop);
 </script>
 </body>
 </html>
