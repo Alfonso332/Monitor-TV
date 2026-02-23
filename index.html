@@ -19,6 +19,7 @@
             --accent: #00d1d1;
             --dark-bg: #000000;
             --critico: #ff4d4d;
+            --online: #2ecc71;
             --bg-emergencia: #1a0000; 
 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -75,8 +76,12 @@
             font-weight: 900; text-transform: uppercase; flex-shrink: 0;
         }
         #cio-app .status-badge.offline { 
-            background: rgba(255, 77, 77, 0.15); border: 3px solid #ff4d4d; 
-            color: #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+            background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); 
+            color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+        }
+        #cio-app .status-badge.restored { 
+            background: rgba(46, 204, 113, 0.15); border: 3px solid var(--online); 
+            color: var(--online); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
         }
 
         /* PANELES */
@@ -197,6 +202,8 @@
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
+    let prevStatus = {}; // Para detectar cambios de estado
+    let recentlyRestored = {}; // Para manejar el aviso verde temporal
     const cio_SLIDE_TIME = 15;
 
     async function updateNetwork() {
@@ -210,18 +217,32 @@
 
             if(status) {
                 Object.keys(status).forEach(id => {
-                    if (status[id].estado === "offline") {
-                        const name = id.replace(/_/g, ' ');
+                    const currentItem = status[id];
+                    const name = id.replace(/_/g, ' ');
+
+                    // Lógica para detectar si pasó de offline a online
+                    if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
+                        recentlyRestored[id] = 2; // Durará 2 ciclos de actualización
+                    }
+
+                    if (currentItem.estado === "offline") {
                         tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
                         detailsHTML += `<div class="off-item">● ${name}</div>`;
                         offCount++;
+                        delete recentlyRestored[id]; // Si vuelve a caer, quitamos aviso de restauración
+                    } else if (recentlyRestored[id] > 0) {
+                        // Mostrar badge verde de restablecido
+                        tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
+                        recentlyRestored[id]--; // Descontar un ciclo
                     }
                 });
+                prevStatus = JSON.parse(JSON.stringify(status));
             }
 
-            if(offCount > 0) {
+            if(tickerHTML !== "") {
                 ticker.innerHTML = tickerHTML;
-                ticker.style.animation = `scroll-ticker ${offCount * 8 + 5}s linear infinite`;
+                const itemsCount = offCount + Object.keys(recentlyRestored).filter(k => recentlyRestored[k] > 0).length;
+                ticker.style.animation = `scroll-ticker ${itemsCount * 8 + 5}s linear infinite`;
                 offDetails.innerHTML = detailsHTML;
             } else {
                 ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
@@ -357,6 +378,7 @@
     function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
     function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
     function toggleOfflineDetails() { document.getElementById("offline-details").classList.toggle("show"); }
+    
     function loop(ts) {
         if(cio_logs.length) {
             if(!cio_startTime) cio_startTime = ts;
