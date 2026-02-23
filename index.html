@@ -222,9 +222,10 @@
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
     let prevStatus = {}; 
     let recentlyRestored = {}; 
+    let offlineCounters = {}; // <-- NUEVO: Para contar las 3 verificaciones
     const cio_SLIDE_TIME = 45;
 
-    // Lógica de Deslizamiento (Swipe to close)
+    // Lógica de Deslizamiento
     let touchStartX = 0;
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
@@ -247,15 +248,28 @@
                 Object.keys(status).forEach(id => {
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
-                    if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
-                        recentlyRestored[id] = 2;
-                    }
+
+                    // Lógica de 3 verificaciones
                     if (currentItem.estado === "offline") {
+                        // Incrementar contador si está offline
+                        offlineCounters[id] = (offlineCounters[id] || 0) + 1;
+                    } else {
+                        // Si vuelve a estar online, detectar si antes estaba realmente offline para el mensaje de RESTABLECIDO
+                        if (offlineCounters[id] >= 3) {
+                            recentlyRestored[id] = 2;
+                        }
+                        offlineCounters[id] = 0; // Reiniciar contador
+                    }
+
+                    // SOLO MOSTRAR SI LLEGÓ A 3 VERIFICACIONES
+                    if (offlineCounters[id] >= 3) {
                         tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
                         detailsHTML += `<div class="off-item">● ${name}</div>`;
                         offCount++;
                         delete recentlyRestored[id];
-                    } else if (recentlyRestored[id] > 0) {
+                    } 
+                    // Mostrar mensaje de restablecido si el contador era >= 3 y ahora es 0
+                    else if (recentlyRestored[id] > 0) {
                         tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
                         recentlyRestored[id]--;
                     }
@@ -362,13 +376,11 @@
         const now = new Date();
         const currentH = now.getHours();
         
-        // Determinar turno actual basado en la hora de descarga
         let currentTurno = "";
         if (currentH >= 6 && currentH < 14) currentTurno = "Turno Mañana (06:00 - 14:00)";
         else if (currentH >= 14 && currentH < 22) currentTurno = "Turno Tarde (14:00 - 22:00)";
         else currentTurno = "Turno Noche (22:00 - 06:00)";
 
-        // Encabezado
         doc.setFontSize(16); doc.setTextColor(0, 100, 101);
         doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
         
@@ -376,7 +388,6 @@
         doc.text(`Turno: ${currentTurno}`, 14, 28);
         doc.text(`Fecha y Hora de descarga: ${now.toLocaleString()}`, 14, 34);
 
-        // Función de clasificación interna (idéntica para filtrar)
         const getTurnoDeNovedad = (timestamp) => {
             const h = new Date(timestamp).getHours();
             if (h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
@@ -384,10 +395,8 @@
             return "Turno Noche (22:00 - 06:00)";
         };
 
-        // Filtrar novedades solo para el turno en el que estoy descargando
         const novedadesFiltradas = cio_logs.filter(it => getTurnoDeNovedad(it.timestamp) === currentTurno);
 
-        // Generar Tabla Única
         doc.autoTable({
             startY: 45,
             head: [['Hora', 'Área', 'Prioridad', 'Título', 'Novedad']],
@@ -436,6 +445,7 @@
         document.getElementById("fsClockDisplay").textContent = t;
     }, 1000);
 
+    // Mantenemos los intervalos de 5 y 10 segundos
     setInterval(updateNetwork, 5000); setInterval(syncEvents, 10000);
     updateNetwork(); syncEvents(); requestAnimationFrame(loop);
 </script>
