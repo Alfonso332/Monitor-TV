@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CIO Monitor | Masterson Elite</title>
+    <title>CIO Monitor | Masterson</title>
     
     <link rel="apple-touch-icon" href="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +112,6 @@
             font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center;
         }
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
-        #cio-app .btn-danger { background: rgba(255, 77, 77, 0.1) !important; border: 1px solid #ff4d4d; color: #ff4d4d !important; }
 
         /* HISTORIAL CARDS */
         #cio-app .history-item {
@@ -120,15 +119,7 @@
             border-left: 4px solid var(--primary);
         }
 
-        /* MOBILE */
-        #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 90px; right: 20px;
-            width: 65px; height: 65px; border-radius: 50%;
-            background: var(--primary); color: #fff; border: none; font-size: 24px; z-index: 10050;
-        }
-
         @media (max-width: 768px) {
-            #cio-app #menu-toggle-float { display: flex; align-items: center; justify-content: center; }
             #cio-app .header-actions { display: none !important; }
             #cio-app .side-panel { width: 95%; padding: 20px; }
             #cio-app #titleDisplay { font-size: 40px !important; }
@@ -161,20 +152,11 @@
 
     <div id="ticker-bar">
         <div id="ticker-content">
-            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">ESCANEANDO RED...</span>
+            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">ESCANEANDO...</span>
         </div>
     </div>
     
     <div id="progressLine" style="position: fixed; bottom: 75px; height: 4px; width: 0%; background: var(--primary); z-index: 5;"></div>
-
-    <button id="menu-toggle-float" onclick="openPanel('panelMobileMenu')">☰</button>
-
-    <aside id="panelMobileMenu" class="side-panel">
-        <h2 style="color:var(--primary); text-align:center; margin-bottom:20px;">MENÚ CIO</h2>
-        <button onclick="openFormPanel()" class="btn-pill">＋ NUEVA NOVEDAD</button>
-        <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 HISTORIAL</button>
-        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
-    </aside>
 
     <aside id="panelForm" class="side-panel">
         <h2 id="formTitle" style="color:var(--primary); text-align:center;">NOVEDAD</h2>
@@ -203,7 +185,7 @@
 
         <div id="offline-details"></div>
 
-        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR REPORTE PDF</button>
+        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE POR TURNOS</button>
 
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
@@ -299,7 +281,7 @@
     }
 
     async function deleteEntry(idx) {
-        if(confirm("¿Estás seguro de eliminar esta novedad?")) {
+        if(confirm("¿Eliminar esta novedad?")) {
             cio_logs.splice(idx, 1);
             await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
             syncEvents();
@@ -331,19 +313,50 @@
 
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(18);
-        doc.text("Reporte de Novedades CIO", 14, 20);
+        const doc = jsPDF();
+        const now = new Date();
         
-        const tableData = cio_logs.map(it => [it.area, it.priority, it.title, it.message]);
-        doc.autoTable({
-            startY: 30,
-            head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
-            body: tableData,
+        doc.setFontSize(16);
+        doc.text("REPORTE DIARIO DE NOVEDADES - MASTERSON", 14, 20);
+        doc.setFontSize(10);
+        doc.text(`Fecha: ${now.toLocaleDateString()}`, 14, 28);
+
+        const getTurno = (ts) => {
+            const h = new Date(ts).getHours();
+            if(h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
+            if(h >= 14 && h < 22) return "Turno Tarde (14:00 - 22:00)";
+            return "Turno Noche (22:00 - 06:00)";
+        };
+
+        const turnos = ["Turno Mañana (06:00 - 14:00)", "Turno Tarde (14:00 - 22:00)", "Turno Noche (22:00 - 06:00)"];
+        let currentY = 35;
+
+        turnos.forEach(turno => {
+            const filtered = cio_logs.filter(it => getTurno(it.timestamp) === turno);
+            doc.setFontSize(12);
+            doc.setTextColor(0, 100, 101);
+            doc.text(turno, 14, currentY);
+            doc.setTextColor(0, 0, 0);
+            
+            const rows = filtered.map(it => [it.area, it.priority, it.title, it.message]);
+            doc.autoTable({
+                startY: currentY + 4,
+                head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
+                body: rows.length ? rows : [['-', '-', 'Sin novedades', '-']],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 100, 101] }
+            });
+            currentY = doc.lastAutoTable.finalY + 15;
         });
-        doc.save(`CIO_Reporte_${new Date().toLocaleDateString()}.pdf`);
+
+        doc.save(`Reporte_CIO_Masterson_${now.toLocaleDateString()}.pdf`);
     }
 
+    function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
+    function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
+    function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
+    function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
+    function toggleOfflineDetails() { document.getElementById("offline-details").classList.toggle("show"); }
     function loop(ts) {
         if(cio_logs.length) {
             if(!cio_startTime) cio_startTime = ts;
@@ -353,12 +366,6 @@
         }
         requestAnimationFrame(loop);
     }
-
-    function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
-    function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
-    function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
-    function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
-    function toggleOfflineDetails() { document.getElementById("offline-details").classList.toggle("show"); }
 
     setInterval(() => {
         const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
