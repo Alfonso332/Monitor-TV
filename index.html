@@ -41,9 +41,10 @@
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
         
-        /* Limpieza total en Fullscreen */
+        /* Limpieza total en Fullscreen: No botones de historial ni barras superiores */
         #cio-app:fullscreen .main-header, 
-        #cio-app:fullscreen #mobile-fab { display: none !important; }
+        #cio-app:fullscreen #mobile-fab,
+        #cio-app:fullscreen .header-actions { display: none !important; }
         
         #cio-app .fs-clock { display: none; }
         #cio-app:fullscreen .fs-clock { 
@@ -137,7 +138,6 @@
             #cio-app #messageDisplay { font-size: 1.2rem !important; }
             #cio-app .side-panel { width: 100%; padding-top: 60px; }
             
-            /* Botón Flotante Abajo Derecha */
             #mobile-fab {
                 display: flex; position: fixed; bottom: 30px; right: 25px; 
                 width: 65px; height: 65px; background: var(--primary);
@@ -260,15 +260,20 @@
                 Object.keys(status).forEach(id => {
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
+
+                    // Lógica para detectar si pasó de offline a online
                     if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
-                        recentlyRestored[id] = 2; // Mostrar 2 ciclos
+                        recentlyRestored[id] = 3; // Mantener aviso por 3 ciclos de ticker
                     }
+
+                    // REQUISITO: SOLO LEER Y MOSTRAR LOS OFFLINE
                     if (currentItem.estado === "offline") {
                         tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
                         detailsHTML += `<div class="off-item">● ${name}</div>`;
                         offCount++;
                         delete recentlyRestored[id];
                     } else if (recentlyRestored[id] > 0) {
+                        // Mostrar solo si se acaba de restablecer
                         tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
                         recentlyRestored[id]--;
                     }
@@ -313,9 +318,7 @@
         setTimeout(() => {
             const item = cio_logs[cio_currentIdx % cio_logs.length];
             const color = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"}[item.priority] || "#fff";
-            
             app.classList.toggle("pantalla-critica", item.priority === "Crítica");
-            
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("areaLabel").style.color = color;
             document.getElementById("titleDisplay").textContent = item.title;
@@ -387,7 +390,8 @@
     }
 
     function toggleFS() { 
-        if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); 
+        const app = document.getElementById("cio-app");
+        if (!document.fullscreenElement) app.requestFullscreen(); 
         else document.exitFullscreen(); 
     }
 
@@ -415,25 +419,16 @@
         const now = new Date();
         const h = now.getHours();
         let turno = (h >= 6 && h < 14) ? "Mañana" : (h >= 14 && h < 22) ? "Tarde" : "Noche";
-
         doc.setFontSize(18); doc.setTextColor(0, 100, 101);
         doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
-        doc.setFontSize(10); doc.setTextColor(100);
-        doc.text(`Turno: ${turno} | Fecha: ${now.toLocaleString()}`, 14, 28);
-
-        const rows = cio_logs.map(it => [
-            new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            it.area, it.priority, it.title, it.message
-        ]);
-
         doc.autoTable({
             startY: 35,
             head: [['Hora', 'Área', 'Prioridad', 'Título', 'Descripción']],
-            body: rows,
+            body: cio_logs.map(it => [new Date(it.timestamp).toLocaleTimeString(), it.area, it.priority, it.title, it.message]),
             theme: 'grid',
             headStyles: { fillColor: [0, 100, 101] }
         });
-        doc.save(`Reporte_CIO_${turno}_${now.toLocaleDateString()}.pdf`);
+        doc.save(`Reporte_CIO_${now.toLocaleDateString()}.pdf`);
     }
 
     setInterval(() => {
@@ -442,8 +437,8 @@
         document.getElementById("fsClockDisplay").textContent = t;
     }, 1000);
 
-    // Sincronización con el tiempo del Python (40 segundos)
-    setInterval(updateNetwork, 40000); 
+    // REQUISITO: Sincronización cada 120 segundos (3 ciclos de 40s del Python)
+    setInterval(updateNetwork, 120000); 
     setInterval(syncEvents, 15000);
 
     // Cargas iniciales
