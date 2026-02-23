@@ -128,10 +128,11 @@
         #mobile-fab { display: none; }
 
         @media (max-width: 768px) {
-            #cio-app { overflow-y: auto; position: absolute; height: auto; min-height: 100vh; }
+            #cio-app { overflow: hidden; position: fixed; height: 100vh; }
             #cio-app .main-header, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
-            #cio-app #display-board { min-height: 100vh; padding-bottom: 100px; }
-            #cio-app #titleDisplay { font-size: 42px !important; }
+            #cio-app #display-board { padding: 15px; }
+            #cio-app #titleDisplay { font-size: 28px !important; margin: 5px 0; }
+            #cio-app #messageDisplay { font-size: 1.1rem !important; }
             #cio-app .side-panel { width: 100%; border-left: none; }
             
             #mobile-fab {
@@ -229,7 +230,7 @@
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
         panel.addEventListener('touchend', e => {
             let touchEndX = e.changedTouches[0].screenX;
-            if (touchEndX - touchStartX > 100) closePanels(); // Deslizar derecha > 100px cierra
+            if (touchEndX - touchStartX > 100) closePanels(); 
         });
     });
 
