@@ -41,7 +41,7 @@
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
         
-        /* Limpieza total en Fullscreen: No botones de historial ni barras superiores */
+        /* Limpieza total en Fullscreen según requerimiento */
         #cio-app:fullscreen .main-header, 
         #cio-app:fullscreen #mobile-fab,
         #cio-app:fullscreen .header-actions { display: none !important; }
@@ -84,10 +84,6 @@
             background: rgba(255, 77, 77, 0.1); border: 3px solid var(--critico); 
             color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);
         }
-        #cio-app .status-badge.restored { 
-            background: rgba(46, 204, 113, 0.1); border: 3px solid var(--online); 
-            color: var(--online); box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
-        }
 
         /* PANELES LATERALES */
         #cio-app .side-panel {
@@ -103,7 +99,7 @@
         #cio-app .stat-box { background: #111; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #222; cursor: pointer; }
         #cio-app .stat-box b { display: block; font-size: 1.5rem; }
 
-        /* DETALLES OFFLINE */
+        /* OFFLINE DETAILS */
         #cio-app #offline-details {
             max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
             background: #000; border-radius: 12px; margin-bottom: 20px;
@@ -175,7 +171,7 @@
 
     <div id="ticker-bar">
         <div id="ticker-content">
-            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">SINCRONIZANDO CON NVRs...</span>
+            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">SINCRONIZANDO FILTRO DE RED (120s)...</span>
         </div>
     </div>
     
@@ -189,18 +185,8 @@
         <h2 id="formTitle" style="color:var(--primary); text-align:center; margin-bottom:30px;">REGISTRAR NOVEDAD</h2>
         <form id="mainForm" onsubmit="saveEntry(event)" class="form-container">
             <input type="hidden" id="f-id" value="">
-            <select id="f-area">
-                <option>Monitoreo</option>
-                <option>Freschat</option>
-                <option>Atención al cliente</option>
-                <option>Novedad Interna</option>
-            </select>
-            <select id="f-prio">
-                <option>Baja</option>
-                <option>Media</option>
-                <option>Alta</option>
-                <option>Crítica</option>
-            </select>
+            <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención al cliente</option><option>Novedad Interna</option></select>
+            <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
             <input type="text" id="f-title" placeholder="Título de la novedad" required>
             <textarea id="f-msg" rows="6" placeholder="Detalles de lo ocurrido..." required></textarea>
             <button type="submit" class="btn-pill">PUBLICAR AHORA</button>
@@ -210,20 +196,13 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">ESTADO OPERATIVO</h2>
-        
         <div class="stats-grid">
             <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Novedad</small></div>
             <div class="stat-box"><b id="stat-total">0</b><small>Eventos</small></div>
-            <div class="stat-box" onclick="toggleOfflineDetails()">
-                <b id="stat-off" style="color:var(--critico)">0</b>
-                <small>Offline ▾</small>
-            </div>
+            <div class="stat-box" onclick="toggleOfflineDetails()"><b id="stat-off" style="color:var(--critico)">0</b><small>Offline ▾</small></div>
         </div>
-
         <div id="offline-details"></div>
-
         <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:25px; font-size:0.8rem;">⬇ REPORTE TURNO ACTUAL</button>
-
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR PANEL</button>
     </aside>
@@ -234,11 +213,10 @@
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
-    let prevStatus = {}; 
-    let recentlyRestored = {}; 
+    let offlineConfirmation = {}; // { id: contador }
     const cio_SLIDE_TIME = 45;
 
-    // Lógica de Gesto Swipe para cerrar paneles
+    // Gesto Swipe para cerrar
     let touchStartX = 0;
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
@@ -254,44 +232,38 @@
             const ticker = document.getElementById("ticker-content");
             const offDetails = document.getElementById("offline-details");
             let tickerHTML = "", detailsHTML = "";
-            let offCount = 0;
+            let offConfirmedCount = 0;
 
             if(status) {
                 Object.keys(status).forEach(id => {
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
 
-                    // Lógica para detectar si pasó de offline a online
-                    if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
-                        recentlyRestored[id] = 3; // Mantener aviso por 3 ciclos de ticker
+                    if (currentItem.estado === "offline") {
+                        offlineConfirmation[id] = (offlineConfirmation[id] || 0) + 1;
+                    } else {
+                        offlineConfirmation[id] = 0;
                     }
 
-                    // REQUISITO: SOLO LEER Y MOSTRAR LOS OFFLINE
-                    if (currentItem.estado === "offline") {
+                    // REQUISITO: SOLO OFFLINE Y TRAS 3 CICLOS (120 seg)
+                    if (offlineConfirmation[id] >= 3) {
                         tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
-                        detailsHTML += `<div class="off-item">● ${name}</div>`;
-                        offCount++;
-                        delete recentlyRestored[id];
-                    } else if (recentlyRestored[id] > 0) {
-                        // Mostrar solo si se acaba de restablecer
-                        tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
-                        recentlyRestored[id]--;
+                        detailsHTML += `<div class="off-item">● ${name} (Confirmado)</div>`;
+                        offConfirmedCount++;
                     }
                 });
-                prevStatus = JSON.parse(JSON.stringify(status));
             }
 
             if(tickerHTML !== "") {
                 ticker.innerHTML = tickerHTML;
-                const itemsCount = offCount + Object.keys(recentlyRestored).filter(k => recentlyRestored[k] > 0).length;
-                ticker.style.animation = `scroll-ticker ${itemsCount * 8 + 5}s linear infinite`;
+                ticker.style.animation = `scroll-ticker ${offConfirmedCount * 8 + 5}s linear infinite`;
                 offDetails.innerHTML = detailsHTML;
             } else {
                 ticker.innerHTML = `<span style="color:var(--primary); font-size:1.4rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
                 ticker.style.animation = "none"; ticker.style.left = "0";
                 offDetails.innerHTML = "<div class='off-item' style='color:#444'>Red estable</div>";
             }
-            document.getElementById("stat-off").textContent = offCount;
+            document.getElementById("stat-off").textContent = offConfirmedCount;
         } catch(e) { console.error("Error red:", e); }
     }
 
@@ -299,8 +271,7 @@
         try {
             const resp = await fetch(cio_DB_URL);
             const data = await resp.json();
-            const now = Date.now();
-            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (now - it.timestamp < 86400000));
+            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (Date.now() - it.timestamp < 86400000));
             document.getElementById("stat-total").textContent = cio_logs.length;
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
             renderHistory();
@@ -308,11 +279,7 @@
     }
 
     function renderSlide() {
-        if(!cio_logs.length) {
-            document.getElementById("titleDisplay").textContent = "SISTEMA CIO";
-            document.getElementById("messageDisplay").textContent = "Sin novedades recientes";
-            return;
-        }
+        if(!cio_logs.length) return;
         const cont = document.getElementById("infoCont"), app = document.getElementById("cio-app");
         cont.classList.add("oculto");
         setTimeout(() => {
@@ -333,22 +300,22 @@
             const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
             return `
             <div class="history-item">
-                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                    <small style="color:var(--accent); font-weight:bold; text-transform:uppercase;">${it.area}</small>
+                <div style="display:flex; justify-content:space-between;">
+                    <small style="color:var(--accent); font-weight:bold;">${it.area}</small>
                     <small style="opacity:0.5;">${h}</small>
                 </div>
-                <div style="font-weight:bold; font-size:1.1rem; margin-bottom:5px;">${it.title}</div>
-                <div style="font-size:0.9rem; opacity:0.7; margin-bottom:15px; line-height:1.4;">${it.message}</div>
-                <div style="display:flex; gap:15px; border-top:1px solid #222; pt:10px; padding-top:10px;">
-                    <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:900;">EDITAR</button>
-                    <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:900;">ELIMINAR</button>
+                <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
+                <div style="font-size:0.9rem; opacity:0.7;">${it.message}</div>
+                <div style="display:flex; gap:15px; margin-top:10px; border-top:1px solid #222; padding-top:10px;">
+                    <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; cursor:pointer; font-size:0.7rem; font-weight:900;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; cursor:pointer; font-size:0.7rem; font-weight:900;">ELIMINAR</button>
                 </div>
             </div>`;
         }).reverse().join('');
     }
 
     async function deleteEntry(idx) {
-        if(confirm("¿Eliminar esta novedad?")) {
+        if(confirm("¿Eliminar?")) {
             cio_logs.splice(idx, 1);
             await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
             syncEvents();
@@ -390,8 +357,7 @@
     }
 
     function toggleFS() { 
-        const app = document.getElementById("cio-app");
-        if (!document.fullscreenElement) app.requestFullscreen(); 
+        if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); 
         else document.exitFullscreen(); 
     }
 
@@ -416,19 +382,14 @@
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = jsPDF();
-        const now = new Date();
-        const h = now.getHours();
-        let turno = (h >= 6 && h < 14) ? "Mañana" : (h >= 14 && h < 22) ? "Tarde" : "Noche";
-        doc.setFontSize(18); doc.setTextColor(0, 100, 101);
-        doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
+        doc.text("REPORTE OPERATIVO", 14, 20);
         doc.autoTable({
-            startY: 35,
-            head: [['Hora', 'Área', 'Prioridad', 'Título', 'Descripción']],
-            body: cio_logs.map(it => [new Date(it.timestamp).toLocaleTimeString(), it.area, it.priority, it.title, it.message]),
-            theme: 'grid',
+            startY: 30,
+            head: [['Hora', 'Área', 'Título']],
+            body: cio_logs.map(it => [new Date(it.timestamp).toLocaleTimeString(), it.area, it.title]),
             headStyles: { fillColor: [0, 100, 101] }
         });
-        doc.save(`Reporte_CIO_${now.toLocaleDateString()}.pdf`);
+        doc.save(`Reporte_CIO.pdf`);
     }
 
     setInterval(() => {
@@ -437,11 +398,10 @@
         document.getElementById("fsClockDisplay").textContent = t;
     }, 1000);
 
-    // REQUISITO: Sincronización cada 120 segundos (3 ciclos de 40s del Python)
-    setInterval(updateNetwork, 120000); 
+    // CICLOS: El HTML consulta cada 40s, pero el ticker solo muestra si el contador llega a 3 (120s)
+    setInterval(updateNetwork, 40000); 
     setInterval(syncEvents, 15000);
 
-    // Cargas iniciales
     updateNetwork(); syncEvents(); requestAnimationFrame(loop);
 </script>
 </body>
