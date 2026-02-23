@@ -94,7 +94,7 @@
         #cio-app .stat-box b { display: block; font-size: 1.3rem; }
         #cio-app .stat-box small { font-size: 0.65rem; opacity: 0.6; text-transform: uppercase; }
 
-        /* DETALLES OFFLINE (EL DESPLEGABLE) */
+        /* DETALLES OFFLINE */
         #cio-app #offline-details {
             max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out;
             background: #111; border-radius: 12px; margin-bottom: 20px;
@@ -102,15 +102,23 @@
         #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 10px; margin-top: -5px; }
         #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 10px; border-bottom: 1px solid #222; }
 
+        /* INPUTS Y BOTONES */
         #cio-app input, #cio-app textarea, #cio-app select {
             width: 100%; padding: 14px; background: #151515 !important;
             color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center; margin-bottom: 12px;
         }
         #cio-app .btn-pill {
             background: var(--primary) !important; color: #fff !important; border: none; padding: 12px 24px; border-radius: 50px;
-            font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px;
+            font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center;
         }
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
+        #cio-app .btn-danger { background: rgba(255, 77, 77, 0.1) !important; border: 1px solid #ff4d4d; color: #ff4d4d !important; }
+
+        /* HISTORIAL CARDS */
+        #cio-app .history-item {
+            background: #111; padding: 15px; border-radius: 12px; margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
 
         /* MOBILE */
         #cio-app #menu-toggle-float {
@@ -195,6 +203,8 @@
 
         <div id="offline-details"></div>
 
+        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR REPORTE PDF</button>
+
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
@@ -276,11 +286,24 @@
 
     function renderHistory() {
         document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => `
-            <div style="background:#111; padding:12px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--primary);">
-                <small>${it.area}</small><br><b>${it.title}</b><br>
-                <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; padding:5px 0; cursor:pointer;">Editar</button>
+            <div class="history-item">
+                <small style="color:var(--accent); font-weight:bold;">${it.area}</small>
+                <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
+                <div style="font-size:0.8rem; opacity:0.7; margin-bottom:10px;">${it.message}</div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; padding:0; cursor:pointer; font-size:0.7rem; font-weight:bold;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; padding:0; cursor:pointer; font-size:0.7rem; font-weight:bold;">ELIMINAR</button>
+                </div>
             </div>
         `).join('');
+    }
+
+    async function deleteEntry(idx) {
+        if(confirm("¿Estás seguro de eliminar esta novedad?")) {
+            cio_logs.splice(idx, 1);
+            await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+            syncEvents();
+        }
     }
 
     async function saveEntry(e) {
@@ -289,7 +312,7 @@
         const entry = {
             area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value,
             title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value,
-            timestamp: Date.now()
+            timestamp: id !== "" ? cio_logs[id].timestamp : Date.now()
         };
         if(id !== "") cio_logs[id] = entry; else cio_logs.push(entry);
         await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
@@ -304,6 +327,21 @@
         document.getElementById("f-title").value = it.title;
         document.getElementById("f-msg").value = it.message;
         openPanel('panelForm');
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text("Reporte de Novedades CIO", 14, 20);
+        
+        const tableData = cio_logs.map(it => [it.area, it.priority, it.title, it.message]);
+        doc.autoTable({
+            startY: 30,
+            head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
+            body: tableData,
+        });
+        doc.save(`CIO_Reporte_${new Date().toLocaleDateString()}.pdf`);
     }
 
     function loop(ts) {
