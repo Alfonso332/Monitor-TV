@@ -124,10 +124,22 @@
             border-left: 4px solid var(--primary);
         }
 
+        /* === AJUSTES EXCLUSIVOS CELULAR (NADA AFECTA A TV) === */
+        #mobile-fab { display: none; } /* Oculto por defecto en PC/TV */
+
         @media (max-width: 768px) {
-            #cio-app .header-actions { display: none !important; }
-            #cio-app .side-panel { width: 95%; padding: 20px; }
-            #cio-app #titleDisplay { font-size: 40px !important; }
+            #cio-app .main-header, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
+            #cio-app #titleDisplay { font-size: 42px !important; }
+            #cio-app .side-panel { width: 100%; }
+            
+            /* Botón Hamburguesa Flotante */
+            #mobile-fab {
+                display: flex; position: fixed; bottom: 30px; right: 25px; 
+                width: 65px; height: 65px; background: var(--primary);
+                border-radius: 50%; z-index: 1000005; align-items: center; justify-content: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid var(--accent);
+            }
+            #mobile-fab span { font-size: 30px; color: white; }
         }
     </style>
 </head>
@@ -163,6 +175,10 @@
     
     <div id="progressLine" style="position: fixed; bottom: 75px; height: 4px; width: 0%; background: var(--primary); z-index: 5;"></div>
 
+    <div id="mobile-fab" onclick="openPanel('panelHistory')">
+        <span>☰</span>
+    </div>
+
     <aside id="panelForm" class="side-panel">
         <h2 id="formTitle" style="color:var(--primary); text-align:center;">NOVEDAD</h2>
         <form id="mainForm" onsubmit="saveEntry(event)">
@@ -180,8 +196,8 @@
         <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO OPERATIVO</h2>
         
         <div class="stats-grid">
+            <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Nueva</small></div>
             <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
-            <div class="stat-box"><b id="stat-crit" style="color:var(--critico)">0</b><small>Crit</small></div>
             <div class="stat-box" onclick="toggleOfflineDetails()">
                 <b id="stat-off" style="color:var(--accent)">0</b>
                 <small>Off ▾</small>
@@ -202,8 +218,8 @@
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
-    let prevStatus = {}; // Para detectar cambios de estado
-    let recentlyRestored = {}; // Para manejar el aviso verde temporal
+    let prevStatus = {}; 
+    let recentlyRestored = {}; 
     const cio_SLIDE_TIME = 15;
 
     async function updateNetwork() {
@@ -220,20 +236,18 @@
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
 
-                    // Lógica para detectar si pasó de offline a online
                     if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
-                        recentlyRestored[id] = 2; // Durará 2 ciclos de actualización
+                        recentlyRestored[id] = 2;
                     }
 
                     if (currentItem.estado === "offline") {
                         tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
                         detailsHTML += `<div class="off-item">● ${name}</div>`;
                         offCount++;
-                        delete recentlyRestored[id]; // Si vuelve a caer, quitamos aviso de restauración
+                        delete recentlyRestored[id];
                     } else if (recentlyRestored[id] > 0) {
-                        // Mostrar badge verde de restablecido
                         tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
-                        recentlyRestored[id]--; // Descontar un ciclo
+                        recentlyRestored[id]--;
                     }
                 });
                 prevStatus = JSON.parse(JSON.stringify(status));
@@ -261,7 +275,6 @@
             const now = Date.now();
             cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (now - it.timestamp < 86400000));
             document.getElementById("stat-total").textContent = cio_logs.length;
-            document.getElementById("stat-crit").textContent = cio_logs.filter(it => it.priority === "Crítica").length;
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
             renderHistory();
         } catch(e) {}
@@ -302,7 +315,7 @@
     }
 
     async function deleteEntry(idx) {
-        if(confirm("¿Eliminar esta novedad?")) {
+        if(confirm("¿Eliminar?")) {
             cio_logs.splice(idx, 1);
             await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
             syncEvents();
@@ -336,41 +349,26 @@
         const { jsPDF } = window.jspdf;
         const doc = jsPDF();
         const now = new Date();
-        
-        doc.setFontSize(16);
-        doc.text("REPORTE DIARIO DE NOVEDADES - MASTERSON", 14, 20);
-        doc.setFontSize(10);
-        doc.text(`Fecha: ${now.toLocaleDateString()}`, 14, 28);
-
+        doc.setFontSize(16); doc.text("REPORTE MASTERSON", 14, 20);
         const getTurno = (ts) => {
             const h = new Date(ts).getHours();
             if(h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
             if(h >= 14 && h < 22) return "Turno Tarde (14:00 - 22:00)";
             return "Turno Noche (22:00 - 06:00)";
         };
-
         const turnos = ["Turno Mañana (06:00 - 14:00)", "Turno Tarde (14:00 - 22:00)", "Turno Noche (22:00 - 06:00)"];
         let currentY = 35;
-
         turnos.forEach(turno => {
             const filtered = cio_logs.filter(it => getTurno(it.timestamp) === turno);
-            doc.setFontSize(12);
-            doc.setTextColor(0, 100, 101);
-            doc.text(turno, 14, currentY);
-            doc.setTextColor(0, 0, 0);
-            
-            const rows = filtered.map(it => [it.area, it.priority, it.title, it.message]);
+            doc.setFontSize(12); doc.setTextColor(0, 100, 101); doc.text(turno, 14, currentY);
             doc.autoTable({
-                startY: currentY + 4,
-                head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
-                body: rows.length ? rows : [['-', '-', 'Sin novedades', '-']],
-                theme: 'striped',
-                headStyles: { fillColor: [0, 100, 101] }
+                startY: currentY + 4, head: [['Área', 'Prio', 'Título', 'Mensaje']],
+                body: filtered.length ? filtered.map(it => [it.area, it.priority, it.title, it.message]) : [['-', '-', 'Sin novedades', '-']],
+                theme: 'striped', headStyles: { fillColor: [0, 100, 101] }
             });
             currentY = doc.lastAutoTable.finalY + 15;
         });
-
-        doc.save(`Reporte_CIO_Masterson_${now.toLocaleDateString()}.pdf`);
+        doc.save(`Reporte_CIO_${now.toLocaleDateString()}.pdf`);
     }
 
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
