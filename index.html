@@ -89,7 +89,7 @@
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
             transform: translateX(100%); transition: 0.4s ease; z-index: 10100;
-            overflow-y: auto;
+            overflow-y: auto; touch-action: pan-y;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
 
@@ -124,15 +124,16 @@
             border-left: 4px solid var(--primary);
         }
 
-        /* === AJUSTES EXCLUSIVOS CELULAR (NADA AFECTA A TV) === */
-        #mobile-fab { display: none; } /* Oculto por defecto en PC/TV */
+        /* === AJUSTES EXCLUSIVOS CELULAR === */
+        #mobile-fab { display: none; }
 
         @media (max-width: 768px) {
+            #cio-app { overflow-y: auto; position: absolute; height: auto; min-height: 100vh; }
             #cio-app .main-header, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
+            #cio-app #display-board { min-height: 100vh; padding-bottom: 100px; }
             #cio-app #titleDisplay { font-size: 42px !important; }
-            #cio-app .side-panel { width: 100%; }
+            #cio-app .side-panel { width: 100%; border-left: none; }
             
-            /* Botón Hamburguesa Flotante */
             #mobile-fab {
                 display: flex; position: fixed; bottom: 30px; right: 25px; 
                 width: 65px; height: 65px; background: var(--primary);
@@ -222,6 +223,16 @@
     let recentlyRestored = {}; 
     const cio_SLIDE_TIME = 15;
 
+    // Lógica de Deslizamiento (Swipe to close)
+    let touchStartX = 0;
+    document.querySelectorAll('.side-panel').forEach(panel => {
+        panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
+        panel.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX - touchStartX > 100) closePanels(); // Deslizar derecha > 100px cierra
+        });
+    });
+
     async function updateNetwork() {
         try {
             const resp = await fetch(cio_RED_URL);
@@ -235,11 +246,9 @@
                 Object.keys(status).forEach(id => {
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
-
                     if (prevStatus[id] && prevStatus[id].estado === "offline" && currentItem.estado === "online") {
                         recentlyRestored[id] = 2;
                     }
-
                     if (currentItem.estado === "offline") {
                         tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
                         detailsHTML += `<div class="off-item">● ${name}</div>`;
@@ -260,8 +269,7 @@
                 offDetails.innerHTML = detailsHTML;
             } else {
                 ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
-                ticker.style.animation = "none";
-                ticker.style.left = "0";
+                ticker.style.animation = "none"; ticker.style.left = "0";
                 offDetails.innerHTML = "<div class='off-item' style='color:#666'>No hay servicios offline</div>";
             }
             document.getElementById("stat-off").textContent = offCount;
@@ -287,10 +295,7 @@
         setTimeout(() => {
             const item = cio_logs[cio_currentIdx % cio_logs.length];
             const color = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"}[item.priority] || "#fff";
-            
-            if(item.priority === "Crítica") app.classList.add("pantalla-critica");
-            else app.classList.remove("pantalla-critica");
-
+            if(item.priority === "Crítica") app.classList.add("pantalla-critica"); else app.classList.remove("pantalla-critica");
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("areaLabel").style.color = color;
             document.getElementById("titleDisplay").textContent = item.title;
