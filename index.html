@@ -13,14 +13,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* === ESTILOS BASE RESTAURADOS Y MEJORADOS === */
+        /* === BASE CIO === */
         #cio-app {
             --primary: #006465;
             --accent: #00d1d1;
             --dark-bg: #000000;
             --critico: #ff4d4d;
-            --exito: #2ecc71;
-            --bg-emergencia: #1a0000; /* Fondo rojo oscuro solicitado */
+            --bg-emergencia: #1a0000; 
 
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: var(--dark-bg) !important;
@@ -28,16 +27,13 @@
             font-family: 'Segoe UI', Roboto, sans-serif !important;
             display: flex; flex-direction: column;
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-            text-align: left;
             transition: background 0.8s ease;
         }
 
-        /* Clase activa para prioridad crítica */
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
-
         #cio-app * { box-sizing: border-box !important; }
 
-        /* HEADER */
+        /* HEADER ORIGINAL */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
@@ -48,81 +44,79 @@
         #cio-app:fullscreen .fs-clock { 
             display: block; position: absolute; top: 20px; right: 30px; 
             font-family: monospace; font-size: 2.5rem; font-weight: 900; 
-            color: var(--primary); text-shadow: 0 0 20px rgba(0,100,101,0.5); z-index: 100;
+            color: var(--primary); z-index: 100;
         }
 
-        /* TABLERO CENTRAL */
+        /* DISPLAY CENTRAL */
         #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        #cio-app .info-container { width: 100%; transition: all 0.6s ease; }
+        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; text-transform: uppercase; }
+        #cio-app .info-container { transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; line-height: 1; text-transform: uppercase; }
 
-        /* TICKER INFERIOR (CON MOVIMIENTO) */
+        /* TICKER CORREGIDO Y AGRANDADO */
         #cio-app #ticker-bar { 
-            height: 60px; background: #050505; border-top: 1px solid #111; 
+            height: 75px; /* Más alto para carteles grandes */
+            background: #050505; border-top: 1px solid #111; 
             display: flex; align-items: center; overflow: hidden; position: relative; 
         }
+
         #cio-app #ticker-content { 
-            display: flex; align-items: center; gap: 50px; white-space: nowrap; 
-            position: absolute; left: 100%; animation: scroll-ticker 20s linear infinite;
+            display: flex; align-items: center; gap: 80px; white-space: nowrap; 
+            position: absolute;
+            animation: scroll-ticker 25s linear infinite; 
+            padding-left: 100vw; /* Empieza fuera a la derecha */
         }
 
         @keyframes scroll-ticker {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-200%); }
+            100% { transform: translateX(-100%); } /* Da la vuelta completa al contenido */
         }
 
         #cio-app .status-badge { 
-            padding: 8px 20px; border-radius: 6px; 
-            font-size: 1.2rem; /* Agrandado */
-            font-weight: 800; text-transform: uppercase; 
+            padding: 12px 30px; border-radius: 8px; 
+            font-size: 1.6rem; /* MÁS GRANDE */
+            font-weight: 900; text-transform: uppercase; 
+            flex-shrink: 0;
         }
-        #cio-app .status-badge.offline { background: rgba(255, 77, 77, 0.1); border: 2px solid #ff4d4d; color: #ff4d4d; }
+        #cio-app .status-badge.offline { 
+            background: rgba(255, 77, 77, 0.15); 
+            border: 3px solid #ff4d4d; 
+            color: #ff4d4d; 
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+        }
 
-        /* PANELES Y FORMULARIOS (RECUPERADOS DEL ORIGINAL) */
+        /* FORMULARIOS Y PANELES (ESTILO ORIGINAL MANTENIDO) */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
-            transform: translateX(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10100;
+            transform: translateX(100%); transition: 0.4s ease; z-index: 10100;
             overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        
-        #cio-app .btn-pill {
-            background: var(--primary) !important; color: #fff !important;
-            border: none; padding: 12px 24px; border-radius: 50px;
-            font-weight: 700; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
-            text-align: center; width: 100%; display: block;
-        }
-        #cio-app .btn-pill:hover { background: var(--accent) !important; transform: translateY(-2px); }
-        #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
-        #cio-app .btn-danger { background: rgba(255, 77, 77, 0.1) !important; border: 1px solid #ff4d4d; color: #ff4d4d !important; }
-
-        #cio-app .form-content { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; }
+        #cio-app .form-content { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         #cio-app input, #cio-app textarea, #cio-app select {
-            width: 100%; max-width: 320px; padding: 14px; background: #151515 !important;
+            width: 100%; padding: 14px; background: #151515 !important;
             color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center;
         }
-
-        #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 10px; }
-        #cio-app .stat-box { background: #111; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #222; cursor: pointer; }
-        #cio-app #offline-details { max-height: 0; overflow: hidden; transition: 0.4s; background: #111; border-radius: 12px; }
-        #cio-app #offline-details.show { max-height: 300px; padding: 10px; border: 1px solid #ff4d4d33; margin-bottom: 20px; }
+        #cio-app .btn-pill {
+            background: var(--primary) !important; color: #fff !important; border: none; padding: 12px 24px; border-radius: 50px;
+            font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase;
+        }
+        #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
 
         /* MOBILE */
         #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 80px; right: 20px;
-            width: 60px; height: 60px; border-radius: 50%;
-            background: var(--primary); color: #fff; border: none;
-            font-size: 24px; cursor: pointer; z-index: 10050;
+            display: none; position: fixed; bottom: 90px; right: 20px;
+            width: 65px; height: 65px; border-radius: 50%;
+            background: var(--primary); color: #fff; border: none; font-size: 24px; z-index: 10050;
         }
 
         @media (max-width: 768px) {
             #cio-app #menu-toggle-float { display: flex; align-items: center; justify-content: center; }
             #cio-app .header-actions { display: none !important; }
-            #cio-app .side-panel { width: 95%; padding: 20px; border-radius: 20px 0 0 20px; }
-            #cio-app #titleDisplay { font-size: 38px !important; }
+            #cio-app .side-panel { width: 95%; }
+            #cio-app #titleDisplay { font-size: 40px !important; }
+            #cio-app .status-badge { font-size: 1.1rem; padding: 10px 20px; }
         }
     </style>
 </head>
@@ -139,60 +133,58 @@
             <button onclick="toggleFS()" style="background:none; border:1px solid #333; color:#555; padding:8px 12px; border-radius:8px; cursor:pointer;">⛶ TV</button>
         </div>
         <div id="clockDisplay" style="font-family:monospace; font-size:1.6rem; font-weight:900; color:var(--primary);">00:00:00</div>
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35" style="filter: brightness(2);">
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35">
     </header>
 
     <main id="display-board">
         <div id="infoCont" class="info-container">
-            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase;">MASTERSON MONITOR</div>
+            <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.75rem;">MASTERSON MONITOR</div>
             <h1 id="titleDisplay">SISTEMA CIO</h1>
-            <p id="messageDisplay" style="font-size:1.5rem; opacity:0.6;">Sincronizando...</p>
+            <p id="messageDisplay" style="font-size:1.6rem; opacity:0.6;">Sincronizando...</p>
         </div>
     </main>
 
     <div id="ticker-bar">
         <div id="ticker-content">
-            <span style="font-size: 0.8rem; color: #444;">VERIFICANDO NODOS...</span>
+            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">ESCANEANDO RED...</span>
         </div>
     </div>
     
-    <div id="progressLine" style="position: fixed; bottom: 60px; height: 3px; width: 0%; background: var(--primary); z-index: 5;"></div>
+    <div id="progressLine" style="position: fixed; bottom: 75px; height: 4px; width: 0%; background: var(--primary); z-index: 5;"></div>
 
     <button id="menu-toggle-float" onclick="openPanel('panelMobileMenu')">☰</button>
 
     <aside id="panelMobileMenu" class="side-panel">
-        <h2 style="color:var(--primary); text-align:center; margin-bottom:30px;">MENÚ</h2>
+        <h2 style="color:var(--primary); text-align:center; margin-bottom:30px;">MENÚ CIO</h2>
         <div class="form-content">
             <button onclick="openFormPanel()" class="btn-pill">＋ NUEVA NOVEDAD</button>
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 HISTORIAL Y STATUS</button>
-            <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; opacity:0.5;">CERRAR</button>
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec">📋 HISTORIAL</button>
+            <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
         </div>
     </aside>
 
     <aside id="panelForm" class="side-panel">
         <div class="form-content">
-            <h2 id="formTitle" style="color:var(--primary); margin-bottom:10px;">NUEVA NOVEDAD</h2>
+            <h2 id="formTitle" style="color:var(--primary);">NOVEDAD</h2>
             <form id="mainForm" onsubmit="saveEntry(event)" style="display:contents;">
                 <input type="hidden" id="f-id" value="">
                 <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
                 <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
                 <input type="text" id="f-title" placeholder="Título novedad" required>
                 <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
-                <button type="submit" id="btnSubmit" class="btn-pill">PUBLICAR</button>
+                <button type="submit" class="btn-pill">PUBLICAR</button>
                 <button type="button" onclick="closePanels()" class="btn-pill btn-sec">CANCELAR</button>
             </form>
         </div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO OPERATIVO</h2>
-        <div class="stats-grid">
-            <div class="stat-box"><b id="stat-total">0</b><small>Novedades</small></div>
-            <div class="stat-box"><b id="stat-crit" style="color:var(--critico)">0</b><small>Críticos</small></div>
-            <div class="stat-box" onclick="toggleOfflineDetails()"><b id="stat-off" style="color:var(--accent)">0</b><small>Offline ▾</small></div>
+        <h2 style="color:var(--accent); text-align:center;">ESTADO</h2>
+        <div style="display:flex; gap:5px; margin-bottom:15px;">
+            <div style="flex:1; background:#111; padding:10px; border-radius:8px; text-align:center;"><b id="stat-total">0</b><br><small>Total</small></div>
+            <div style="flex:1; background:#111; padding:10px; border-radius:8px; text-align:center; color:var(--critico);"><b id="stat-crit">0</b><br><small>Crit</small></div>
+            <div style="flex:1; background:#111; padding:10px; border-radius:8px; text-align:center; color:var(--accent);"><b id="stat-off">0</b><br><small>Off</small></div>
         </div>
-        <div id="offline-details"></div>
-        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.7rem;">⬇ REPORTE PDF</button>
         <div id="historyList"></div>
     </aside>
 </div>
@@ -201,36 +193,35 @@
     const cio_DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     
-    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null, cio_offNodes = [];
+    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
     const cio_SLIDE_TIME = 15;
 
     async function updateNetwork() {
         try {
             const resp = await fetch(cio_RED_URL);
             const status = await resp.json();
-            if(!status) return;
             const ticker = document.getElementById("ticker-content");
-            let tickerHTML = "", detailsHTML = "";
-            cio_offNodes = [];
+            let tickerHTML = "";
+            let offCount = 0;
 
-            Object.keys(status).forEach(id => {
-                if (status[id].estado === "offline") {
-                    const name = id.replace(/_/g, ' ');
-                    tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
-                    detailsHTML += `<div style="color:#ff4d4d; padding:5px;">● ${name}</div>`;
-                    cio_offNodes.push(name);
-                }
-            });
-
-            if(cio_offNodes.length > 0) {
-                ticker.innerHTML = tickerHTML;
-                ticker.style.animationDuration = `${cio_offNodes.length * 5}s`;
-            } else {
-                ticker.innerHTML = `<span style="color:var(--primary); font-size:0.9rem; font-weight:bold; width:100vw; text-align:center;">✔ SERVICIOS OPERATIVOS</span>`;
-                ticker.style.animation = "none";
+            if(status) {
+                Object.keys(status).forEach(id => {
+                    if (status[id].estado === "offline") {
+                        tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${id.replace(/_/g, ' ')}</div>`;
+                        offCount++;
+                    }
+                });
             }
-            document.getElementById("offline-details").innerHTML = detailsHTML || "Sin nodos offline";
-            document.getElementById("stat-off").textContent = cio_offNodes.length;
+
+            if(offCount > 0) {
+                ticker.innerHTML = tickerHTML + tickerHTML; // Doble para que no haya hueco al terminar
+                ticker.style.animation = `scroll-ticker ${offCount * 10}s linear infinite`;
+            } else {
+                ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
+                ticker.style.animation = "none";
+                ticker.style.left = "0";
+            }
+            document.getElementById("stat-off").textContent = offCount;
         } catch(e) {}
     }
 
@@ -239,12 +230,9 @@
             const resp = await fetch(cio_DB_URL);
             const data = await resp.json();
             const now = Date.now();
-            let raw = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-            cio_logs = raw.filter(it => !it.timestamp || (now - it.timestamp < 86400000));
-            
+            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (now - it.timestamp < 86400000));
             document.getElementById("stat-total").textContent = cio_logs.length;
             document.getElementById("stat-crit").textContent = cio_logs.filter(it => it.priority === "Crítica").length;
-
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
             renderHistory();
         } catch(e) {}
@@ -252,14 +240,12 @@
 
     function renderSlide() {
         if(!cio_logs.length) return;
-        const cont = document.getElementById("infoCont");
-        const app = document.getElementById("cio-app");
+        const cont = document.getElementById("infoCont"), app = document.getElementById("cio-app");
         cont.classList.add("oculto");
         setTimeout(() => {
             const item = cio_logs[cio_currentIdx % cio_logs.length];
-            const color = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"}[item.priority];
+            const color = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"}[item.priority] || "#fff";
             
-            // Fondo rojo oscuro si es crítica
             if(item.priority === "Crítica") app.classList.add("pantalla-critica");
             else app.classList.remove("pantalla-critica");
 
@@ -274,21 +260,13 @@
 
     function renderHistory() {
         document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => `
-            <div style="background:#111; padding:10px; border-radius:10px; margin-bottom:8px; border-left:4px solid var(--primary);">
-                <small>${it.area}</small><div><b>${it.title}</b></div>
-                <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; cursor:pointer;">Editar</button>
+            <div style="background:#111; padding:12px; border-radius:10px; margin-bottom:10px; border-left:4px solid var(--primary);">
+                <small>${it.area}</small><br><b>${it.title}</b><br>
+                <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; padding:5px 0; cursor:pointer;">Editar</button>
             </div>
         `).join('');
     }
 
-    // Funciones de control de paneles
-    function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
-    function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
-    function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
-    function toggleOfflineDetails() { document.getElementById("offline-details").classList.toggle("show"); }
-    function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
-
-    // CRUD simplificado para mantener el base
     async function saveEntry(e) {
         e.preventDefault();
         const id = document.getElementById("f-id").value;
@@ -322,6 +300,11 @@
         requestAnimationFrame(loop);
     }
 
+    function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
+    function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
+    function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
+    function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
+
     setInterval(() => {
         const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
         document.getElementById("clockDisplay").textContent = t;
@@ -330,7 +313,6 @@
 
     setInterval(updateNetwork, 5000); setInterval(syncEvents, 10000);
     updateNetwork(); syncEvents(); requestAnimationFrame(loop);
-    function downloadPDF() { /* Lógica PDF */ }
 </script>
 </body>
 </html>
