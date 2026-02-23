@@ -9,6 +9,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         /* === AISLAMIENTO TOTAL DEL CSS === */
         #cio-app {
@@ -40,52 +42,29 @@
         #cio-app.emergency-active { animation: cioEmergencyPulse 2s infinite; }
         @keyframes cioEmergencyPulse { 0%, 100% { background-color: #000; } 50% { background-color: #1a0505; } }
 
-        /* HEADER (DESKTOP) */
+        /* HEADER */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
 
-        /* REGLA FULLSCREEN: Oculta cabecera y muestra el reloj flotante */
-        #cio-app .fs-clock { display: none; } /* Oculto por defecto */
-
-        #cio-app:fullscreen .main-header,
-        #cio-app:-webkit-full-screen .main-header { display: none !important; }
-
-        #cio-app:fullscreen .fs-clock,
-        #cio-app:-webkit-full-screen .fs-clock { 
+        #cio-app .fs-clock { display: none; }
+        #cio-app:fullscreen .main-header, #cio-app:-webkit-full-screen .main-header { display: none !important; }
+        #cio-app:fullscreen .fs-clock, #cio-app:-webkit-full-screen .fs-clock { 
             display: block; position: absolute; top: 20px; right: 30px; 
             font-family: monospace; font-size: 2.5rem; font-weight: 900; 
-            color: var(--primary); text-shadow: 0 0 20px rgba(0,100,101,0.5);
-            z-index: 100;
+            color: var(--primary); text-shadow: 0 0 20px rgba(0,100,101,0.5); z-index: 100;
         }
 
-        /* TABLERO CENTRAL */
+        /* TABLERO */
         #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
         #cio-app .info-container { width: 100%; transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-
         #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; line-height: 1; }
         #cio-app #messageDisplay { font-size: 1.8rem; opacity: 0.7; max-width: 80%; margin: 0 auto; font-weight: 300; }
 
-        /* BARRA INFERIOR */
-        #cio-app #ticker-bar { 
-            height: 50px; background: #050505; border-top: 1px solid #111; 
-            display: flex; align-items: center; overflow: hidden; position: relative; 
-        }
-        #cio-app #ticker-content { display: flex; align-items: center; gap: 20px; white-space: nowrap; position: absolute; left: 20px; }
-
-        /* BOTÓN FLOTANTE MÓVIL */
-        #cio-app #menu-toggle-float {
-            display: none; position: fixed; bottom: 70px; right: 20px;
-            width: 60px; height: 60px; border-radius: 50%;
-            background: var(--primary); color: #fff; border: 2px solid rgba(255,255,255,0.2);
-            font-size: 24px; cursor: pointer; z-index: 10050;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.8); align-items: center; justify-content: center;
-        }
-
-        /* PANELES LATERALES */
+        /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
@@ -102,19 +81,27 @@
         #cio-app .btn-action { background: var(--primary) !important; color: #fff !important; border: none; padding: 14px; width: 100%; max-width: 320px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         #cio-app .btn-cancel { background: #222 !important; color: #888 !important; border: none; padding: 10px; width: 100%; max-width: 320px; border-radius: 8px; cursor: pointer; }
 
-        #cio-app .status-badge { padding: 5px 12px; border-radius: 5px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-        #cio-app .status-badge.offline { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; }
-        #cio-app .status-badge.restored { background: rgba(46, 204, 113, 0.2); border: 1px solid var(--exito); color: var(--exito); transform: scale(1.1); transition: 0.5s; }
+        #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 15px; }
+        #cio-app .stat-card { background: #111; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid #222; }
+        #cio-app .stat-num { display: block; font-size: 1.2rem; font-weight: 900; color: var(--accent); }
+        #cio-app .stat-txt { font-size: 0.5rem; text-transform: uppercase; opacity: 0.6; }
+
+        #cio-app #ticker-bar { height: 50px; background: #050505; border-top: 1px solid #111; display: flex; align-items: center; overflow: hidden; position: relative; }
+        #cio-app #ticker-content { display: flex; align-items: center; gap: 20px; white-space: nowrap; position: absolute; left: 20px; }
+
+        #cio-app #menu-toggle-float {
+            display: none; position: fixed; bottom: 70px; right: 20px;
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--primary); color: #fff; border: 2px solid rgba(255,255,255,0.2);
+            font-size: 24px; cursor: pointer; z-index: 10050;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.8); align-items: center; justify-content: center;
+        }
 
         @media (max-width: 768px) {
             #cio-app #menu-toggle-float { display: flex; }
             #cio-app .header-actions { display: none !important; }
-            #cio-app .main-header { height: 60px; padding: 0 15px; }
             #cio-app #titleDisplay { font-size: 34px !important; }
-            #cio-app #messageDisplay { font-size: 1.1rem !important; }
-            #cio-app #clockDisplay { font-size: 1.2rem !important; }
             #cio-app .side-panel { width: 85%; }
-            #cio-app #ticker-bar { height: 40px; }
         }
     </style>
 </head>
@@ -122,7 +109,6 @@
 
 <div id="cio-app">
     <div id="fsClockDisplay" class="fs-clock">00:00:00</div>
-
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
 
     <header class="main-header">
@@ -140,7 +126,7 @@
             <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.7rem; text-transform: uppercase; color: var(--accent);">CONECTANDO...</div>
             <div id="prioBadge" style="display: inline-block; padding: 3px 12px; border-radius: 4px; font-weight: 900; border: 1px solid var(--accent); font-size: 0.6rem; margin: 10px 0;">SISTEMA ACTIVO</div>
             <h1 id="titleDisplay">MASTERSON</h1>
-            <p id="messageDisplay">Sincronizando novedades con el servidor central...</p>
+            <p id="messageDisplay">Sincronizando...</p>
         </div>
     </main>
 
@@ -159,33 +145,35 @@
         <div class="form-content">
             <button onclick="openPanel('panelForm')" class="btn-action">＋ REGISTRAR NOVEDAD</button>
             <button onclick="openPanel('panelHistory')" class="btn-action" style="background:#1a1a1a !important;">📋 VER HISTORIAL</button>
-            <div style="width:100%; margin-top:30px; border-top:1px solid #222; padding-top:20px;">
-                <h3 style="font-size:0.8rem; color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO DE SERVICIOS</h3>
-                <div id="mobileServicesList" style="display:flex; flex-direction:column; gap:10px;"></div>
-            </div>
             <button onclick="closePanels()" class="btn-cancel" style="margin-top:40px;">CERRAR MENÚ</button>
         </div>
     </aside>
 
     <aside id="panelForm" class="side-panel">
         <div class="form-content">
-            <h2 style="color:var(--primary); margin-bottom:20px;">NUEVA NOVEDAD</h2>
-            <form onsubmit="saveNew(event)" style="display:contents;">
+            <h2 id="formTitle" style="color:var(--primary); margin-bottom:20px;">NUEVA NOVEDAD</h2>
+            <form id="mainForm" onsubmit="saveEntry(event)" style="display:contents;">
+                <input type="hidden" id="f-id" value="">
                 <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención</option><option>Novedad Interna</option></select>
                 <select id="f-prio"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
                 <input type="text" id="f-title" placeholder="Título corto" required>
                 <textarea id="f-msg" rows="4" placeholder="Descripción detallada..." required></textarea>
-                <button type="submit" class="btn-action">PUBLICAR</button>
-                <button type="button" onclick="closePanels()" class="btn-cancel">CANCELAR / CERRAR</button>
+                <button type="submit" id="btnSubmit" class="btn-action">PUBLICAR</button>
+                <button type="button" onclick="closePanels()" class="btn-cancel">CANCELAR</button>
             </form>
         </div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center;">HISTORIAL</h2>
-        <div id="historyList" style="margin:20px 0; width:100%;"></div>
-        <div class="form-content">
-            <button onclick="closePanels()" class="btn-cancel">CERRAR PANTALLA</button>
+        <h2 style="color:var(--accent); text-align:center;">REPORTE</h2>
+        <div class="stats-grid">
+            <div class="stat-card"><span id="stat-total" class="stat-num">0</span><span class="stat-txt">Total</span></div>
+            <div class="stat-card"><span id="stat-crit" class="stat-num" style="color:var(--critico)">0</span><span class="stat-txt">Críticos</span></div>
+        </div>
+        <button onclick="downloadPDF()" class="btn-action" style="background:#222 !important; margin-bottom:20px; font-size:0.7rem;">⬇ DESCARGAR PDF TURNO</button>
+        <div id="historyList" style="width:100%;"></div>
+        <div class="form-content" style="margin-top:20px;">
+            <button onclick="closePanels()" class="btn-cancel">CERRAR</button>
         </div>
     </aside>
 </div>
@@ -197,48 +185,121 @@
     let cio_logs = []; 
     let cio_currentIdx = 0; 
     let cio_startTime = null; 
-    let cio_lastNetworkStatus = {};
     const cio_SLIDE_TIME = 15;
 
-    // --- LÓGICA DE RED ---
-    async function updateNetwork() {
-        try {
-            const resp = await fetch(cio_RED_URL);
-            const status = await resp.json();
-            if(!status) return;
-            const ticker = document.getElementById("ticker-content");
-            const mobileList = document.getElementById("mobileServicesList");
-            let tickerHTML = ""; let mobileHTML = "";
-
-            Object.keys(status).forEach(id => {
-                const name = id.replace(/_/g, ' ');
-                const isOff = status[id].estado === "offline";
-                const wasOff = cio_lastNetworkStatus[id] === "offline";
-                if (!isOff && wasOff) {
-                    const successHTML = `<div class="status-badge restored" id="res-${id}">✔ ${name} ONLINE</div>`;
-                    tickerHTML += successHTML; mobileHTML += successHTML;
-                    setTimeout(() => { document.querySelectorAll(`#res-${id}`).forEach(el => el.remove()); }, 5000);
-                } else if (isOff) {
-                    const offHTML = `<div class="status-badge offline">⚠️ OFF: ${name}</div>`;
-                    tickerHTML += offHTML; mobileHTML += offHTML;
-                }
-                cio_lastNetworkStatus[id] = status[id].estado;
-            });
-            ticker.innerHTML = tickerHTML || `<span style="color:var(--primary); font-size:0.7rem;">✔ TODOS LOS NODOS OPERATIVOS</span>`;
-            mobileList.innerHTML = mobileHTML || `<div style="text-align:center; color:#444; font-size:0.8rem;">Sistemas sin alertas</div>`;
-        } catch(e) {}
+    // --- LÓGICA DE PDF ---
+    function getTurno() {
+        const hour = new Date().getHours();
+        if (hour >= 6 && hour < 14) return "MAÑANA";
+        if (hour >= 14 && hour < 22) return "TARDE";
+        return "NOCHE";
     }
 
-    // --- SINCRONIZACIÓN ---
+    async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const turno = getTurno();
+        const fecha = new Date().toLocaleDateString();
+
+        doc.setFontSize(18);
+        doc.text(`Novedad operativa de turno: ${turno}`, 20, 20);
+        doc.setFontSize(12);
+        doc.text(`Fecha: ${fecha}`, 20, 30);
+        doc.line(20, 35, 190, 35);
+
+        let y = 45;
+        cio_logs.forEach((it, i) => {
+            if (y > 270) { doc.addPage(); y = 20; }
+            doc.setFont(undefined, 'bold');
+            doc.text(`${i+1}. [${it.area}] ${it.title} (${it.priority})`, 20, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(`${it.message}`, 25, y + 7, { maxWidth: 160 });
+            y += 20;
+        });
+
+        doc.save(`Reporte_CIO_${turno}_${fecha}.pdf`);
+    }
+
+    // --- CRUD Y SYNC ---
     async function syncEvents() {
         try {
             const resp = await fetch(cio_DB_URL);
             const data = await resp.json();
-            cio_logs = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+            const now = Date.now();
+            
+            // Filtrar y auto-borrar registros de > 24hs
+            let rawLogs = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+            const filtered = rawLogs.filter(it => !it.timestamp || (now - it.timestamp < 86400000));
+            
+            if (rawLogs.length !== filtered.length) {
+                await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(filtered) });
+            }
+
+            cio_logs = filtered;
+            updateStats();
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
         } catch(e) {}
     }
 
+    function updateStats() {
+        document.getElementById("stat-total").textContent = cio_logs.length;
+        document.getElementById("stat-crit").textContent = cio_logs.filter(it => it.priority === "Crítica").length;
+    }
+
+    async function saveEntry(e) {
+        e.preventDefault();
+        const id = document.getElementById("f-id").value;
+        const entry = {
+            area: document.getElementById("f-area").value,
+            priority: document.getElementById("f-prio").value,
+            title: document.getElementById("f-title").value,
+            message: document.getElementById("f-msg").value,
+            timestamp: id ? cio_logs[id].timestamp : Date.now()
+        };
+
+        if (id !== "") cio_logs[id] = entry;
+        else cio_logs.push(entry);
+
+        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+        document.getElementById("mainForm").reset();
+        document.getElementById("f-id").value = "";
+        closePanels(); syncEvents();
+    }
+
+    function editEntry(idx) {
+        const it = cio_logs[idx];
+        document.getElementById("f-id").value = idx;
+        document.getElementById("f-area").value = it.area;
+        document.getElementById("f-prio").value = it.priority;
+        document.getElementById("f-title").value = it.title;
+        document.getElementById("f-msg").value = it.message;
+        document.getElementById("formTitle").textContent = "EDITAR NOVEDAD";
+        document.getElementById("btnSubmit").textContent = "ACTUALIZAR";
+        openPanel('panelForm');
+    }
+
+    async function deleteEntry(idx) {
+        if(!confirm("¿Borrar evento?")) return;
+        cio_logs.splice(idx, 1);
+        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs.length ? cio_logs : null) });
+        renderHistory(); syncEvents();
+    }
+
+    function renderHistory() {
+        const h = document.getElementById("historyList");
+        h.innerHTML = cio_logs.map((it, i) => `
+            <div style="background:#111; padding:12px; border-radius:8px; margin-bottom:10px; border-left:4px solid var(--primary);">
+                <small style="color:var(--accent)">${it.area} | ${it.priority}</small>
+                <div style="font-weight:bold; margin:3px 0;">${it.title}</div>
+                <div style="display:flex; gap:15px; margin-top:5px;">
+                    <button onclick="editEntry(${i})" style="background:none; border:none; color:var(--accent); font-size:10px; cursor:pointer; padding:0;">[ EDITAR ]</button>
+                    <button onclick="deleteEntry(${i})" style="background:none; border:none; color:#ff4d4d; font-size:10px; cursor:pointer; padding:0;">[ ELIMINAR ]</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // --- FRONT END LOGIC ---
     function renderSlide() {
         if(!cio_logs.length) return;
         const cont = document.getElementById("infoCont");
@@ -261,7 +322,10 @@
     }
 
     function openPanel(id) {
-        closePanels();
+        if (id === 'panelForm' && document.getElementById("f-id").value === "") {
+            document.getElementById("formTitle").textContent = "NUEVA NOVEDAD";
+            document.getElementById("btnSubmit").textContent = "PUBLICAR";
+        }
         document.getElementById(id).classList.add("active");
         document.getElementById("cio-overlay").style.display = "block";
         if(id === 'panelHistory') renderHistory();
@@ -272,41 +336,10 @@
         document.getElementById("cio-overlay").style.display = "none";
     }
 
-    function renderHistory() {
-        const h = document.getElementById("historyList");
-        h.innerHTML = cio_logs.map((it, i) => `
-            <div style="background:#111; padding:12px; border-radius:8px; margin-bottom:10px; border-left:4px solid var(--primary); text-align:left;">
-                <small style="color:var(--primary)">${it.area}</small>
-                <div style="font-weight:bold; margin:3px 0; font-size:0.9rem;">${it.title}</div>
-                <button onclick="deleteEntry(${i})" style="background:none !important; border:none; color:#ff4d4d; font-size:10px; cursor:pointer; padding:0;">[ ELIMINAR ]</button>
-            </div>
-        `).join('');
-    }
-
-    async function saveNew(e) {
-        e.preventDefault();
-        const entry = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value };
-        cio_logs.push(entry);
-        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        closePanels(); syncEvents();
-    }
-
-    async function deleteEntry(idx) {
-        if(!confirm("¿Borrar evento?")) return;
-        cio_logs.splice(idx, 1);
-        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs.length ? cio_logs : null) });
-        renderHistory(); syncEvents();
-    }
-
     function toggleFS() { 
         const app = document.getElementById("cio-app");
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (app.requestFullscreen) app.requestFullscreen();
-            else if (app.webkitRequestFullscreen) app.webkitRequestFullscreen();
-        } else {
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        }
+        if (!document.fullscreenElement) app.requestFullscreen();
+        else document.exitFullscreen();
     }
 
     function loop(ts) {
@@ -319,16 +352,14 @@
         requestAnimationFrame(loop);
     }
 
-    // Actualiza ambos relojes (Header y Fullscreen)
     setInterval(() => { 
         const time = new Date().toLocaleTimeString('es-UY', { hour12: false });
         document.getElementById("clockDisplay").textContent = time; 
         document.getElementById("fsClockDisplay").textContent = time; 
     }, 1000);
 
-    setInterval(updateNetwork, 4000);
     setInterval(syncEvents, 10000);
-    updateNetwork(); syncEvents(); requestAnimationFrame(loop);
+    syncEvents(); requestAnimationFrame(loop);
 </script>
 </body>
 </html>
