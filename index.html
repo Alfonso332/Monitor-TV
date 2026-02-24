@@ -32,7 +32,7 @@
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
         #cio-app * { box-sizing: border-box !important; margin: 0; padding: 0; }
 
-        /* CABECERA */
+        /* CABECERA PC */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 25px; background: rgba(5, 5, 5, 0.95);
@@ -40,7 +40,7 @@
         }
         #cio-app:fullscreen .main-header { display: none !important; }
 
-        /* KPI BAR */
+        /* KPI BAR PC */
         #cio-app .kpi-bar {
             display: flex; justify-content: space-evenly; align-items: center;
             background: #050505; padding: 0 15px; border-bottom: 2px solid #1a1a1a;
@@ -53,7 +53,7 @@
         }
         #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-top: 2px; }
 
-        /* PUESTOS */
+        /* PUESTOS PC */
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
         #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
@@ -71,7 +71,7 @@
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER */
+        /* TICKER PC */
         #cio-app #ticker-bar { 
             height: 60px; background: #050505; border-top: 1px solid #222; 
             display: flex; align-items: center; overflow: hidden; position: relative; flex-shrink: 0;
@@ -88,7 +88,7 @@
             font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
         }
 
-        /* PANELES */
+        /* PANELES LATERALES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 450px; height: 100%;
             background: #0d0d0d; border-left: 2px solid var(--primary); padding: 25px;
@@ -96,8 +96,13 @@
             overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app .p-field { background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px; }
         
+        /* FORMULARIOS Y BOTONES */
+        #cio-app .p-field { 
+            background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; 
+            border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
+            text-align: center;
+        }
         #cio-app .btn-pill {
             background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 50px;
             font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center;
@@ -121,15 +126,19 @@
             justify-content: center; align-items: center; font-size: 24px; cursor: pointer;
         }
 
-        /* DISEÑO MÓVIL ORDENADO */
+        /* DISEÑO MÓVIL PROFESIONAL */
+        .mobile-section-header {
+            color: var(--primary); font-size: 0.75rem; font-weight: bold; 
+            margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid #222; padding-bottom: 5px;
+        }
         .mobile-stat-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;
         }
         .mobile-stat-box { 
             background: linear-gradient(145deg, #1a1a1a, #0a0a0a); 
             padding: 20px 10px; border-radius: 15px; 
             border: 1px solid #222; text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         .mobile-puestos-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
@@ -145,11 +154,17 @@
         /* === RESPONSIVE CELULAR === */
         @media (max-width: 768px) {
             #hamb-menu { display: flex; }
-            #cio-app .kpi-bar, #cio-app #ticker-bar { display: none !important; }
+            #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app #progressLine { bottom: 0; }
-            #cio-app .main-header { height: 60px; padding: 0 15px; border-bottom: 1px solid #222; }
-            #cio-app .main-header img { height: 30px; }
-            #cio-app .side-panel { width: 100%; padding: 25px; border-left: none; }
+            #cio-app .main-header { height: 65px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; justify-content: center; }
+            #cio-app .main-header img { height: 35px; }
+            #cio-app #clockDisplay { position: absolute; left: 20px; font-size: 0.9rem; opacity: 0.7; }
+            
+            #cio-app .side-panel { 
+                width: 85%; max-width: 400px; padding: 25px; 
+                border-left: 2px solid var(--primary);
+                box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+            }
             #cio-app #titleDisplay { font-size: 2.4rem; line-height: 1.1; margin: 20px 0; }
             #cio-app #messageDisplay { font-size: 1.2rem; }
             #cio-app .area-tag { font-size: 0.9rem; letter-spacing: 4px; }
@@ -201,60 +216,78 @@
     <aside id="panelMobileDash" class="side-panel">
         <div style="text-align: center; margin-bottom: 25px;">
             <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
-            <h2 style="color:var(--accent); font-size: 1.4rem; letter-spacing: 1px;">MÉTRICAS EN VIVO</h2>
+            <h2 style="color:var(--accent); font-size: 1.4rem; letter-spacing: 1px;">PANEL DE CONTROL</h2>
         </div>
         
+        <div class="mobile-section-header">Métricas en Tiempo Real</div>
         <div class="mobile-stat-container">
             <div class="mobile-stat-box">
-                <div class="kpi-label" style="margin-bottom:8px;">SLA ACTUAL</div>
-                <div id="m-sla" class="kpi-value" style="justify-content:center; font-size: 2rem;">--%</div>
+                <div class="kpi-label" style="margin-bottom:8px;">SLA</div>
+                <div id="m-sla" class="kpi-value" style="justify-content:center; font-size: 1.8rem;">--%</div>
             </div>
             <div class="mobile-stat-box">
                 <div class="kpi-label" style="margin-bottom:8px;">LLAMADAS</div>
-                <div id="m-calls" class="kpi-value" style="justify-content:center; font-size: 2rem;">0</div>
+                <div id="m-calls" class="kpi-value" style="justify-content:center; font-size: 1.8rem;">0</div>
             </div>
         </div>
 
-        <label style="color:var(--primary); font-size:0.75rem; font-weight:bold; display:block; margin-bottom:10px; text-transform: uppercase;">Disponibilidad Puestos</label>
+        <div class="mobile-section-header">Disponibilidad Puestos</div>
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-        <label style="color:var(--critico); font-size:0.75rem; font-weight:bold; display:block; margin:25px 0 10px; text-transform: uppercase;">Alertas de Infraestructura</label>
+        <div class="mobile-section-header">Estatus Servicios (Offline)</div>
         <div id="m-offline-list"></div>
 
-        <button onclick="closePanels()" class="btn-pill" style="margin-top:30px; background: #222; border: 1px solid #333;">VOLVER AL MONITOR</button>
+        <div class="mobile-section-header">Acciones de Sistema</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill" style="font-size: 0.7rem; background:#1a1a1a; border:1px solid var(--primary);">⚙️ CONFIG</button>
+            <button onclick="toggleFS(); closePanels();" class="btn-pill" style="font-size: 0.7rem; background:#1a1a1a; border:1px solid var(--primary);">⛶ FULLSCREEN</button>
+        </div>
+
+        <button onclick="closePanels()" class="btn-pill" style="margin-top:30px; background: #c0392b;">CERRAR MENÚ</button>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">CONFIGURACIÓN</h2>
+        
         <div style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px;">
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">MÉTRICAS KPI</label>
             <div style="display:flex; gap:10px; margin:10px 0;">
                 <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
                 <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
             </div>
+            
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">PUESTOS (P1-P9)</label>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:10px;" id="p-inputs-grid"></div>
+            
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px;">GUARDAR CAMBIOS</button>
         </div>
+
         <button onclick="openForm(null)" class="btn-pill" style="background:var(--online); color:#000;">＋ NUEVA NOVEDAD</button>
         <button onclick="downloadPDF()" class="btn-pill btn-sec">⬇ DESCARGAR PDF</button>
-        <div id="historyList" style="margin-top:20px;"></div>
-        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
+        
+        <div class="mobile-section-header">Historial de Novedades</div>
+        <div id="historyList"></div>
+        
+        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">VOLVER</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
-        <h2 id="formTitle">EDITAR NOVEDAD</h2>
+        <h2 id="formTitle" style="text-align:center; color:var(--accent); margin-bottom:20px;">EDITAR NOVEDAD</h2>
         <form id="mainForm" onsubmit="saveEntry(event)">
             <input type="hidden" id="f-id">
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">ÁREA</label>
             <select id="f-area" class="p-field">
                 <option>Monitoreo</option><option>Freschat</option><option>Atención al Cliente</option>
                 <option>Infraestructura</option><option>Novedad Interna</option>
             </select>
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">PRIORIDAD</label>
             <select id="f-prio" class="p-field">
                 <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
             </select>
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">DETALLES</label>
             <input type="text" id="f-title" placeholder="Título" required class="p-field">
-            <textarea id="f-msg" rows="8" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
+            <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
+            
             <button type="submit" class="btn-pill">PUBLICAR AHORA</button>
             <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec">CANCELAR</button>
         </form>
@@ -272,8 +305,9 @@
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
 
+    // Generar inputs de puestos automáticamente
     const pGrid = document.getElementById('p-inputs-grid');
-    for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}">`;
+    for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
 
     async function syncData() {
         try {
@@ -282,13 +316,8 @@
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
                 if (prevSLA !== null && sla !== prevSLA) {
-                    if (sla < prevSLA) {
-                        currentArrow = "▼";
-                        currentColor = "var(--critico)";
-                    } else if (sla > prevSLA) {
-                        currentArrow = "▲";
-                        currentColor = "var(--online)";
-                    }
+                    if (sla < prevSLA) { currentArrow = "▼"; currentColor = "var(--critico)"; } 
+                    else if (sla > prevSLA) { currentArrow = "▲"; currentColor = "var(--online)"; }
                 }
                 const contentSLA = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
                 document.getElementById('v-sla').innerHTML = contentSLA;
@@ -328,7 +357,6 @@
         const pcCont = document.getElementById('puestos-display');
         const mbCont = document.getElementById('m-puestos');
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
-        
         const vals = activeEntries.map(([k, v]) => parseInt(v));
         const maxVal = Math.max(...vals), minVal = Math.min(...vals);
         let html = "";
@@ -349,39 +377,24 @@
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // Obtener fecha, hora y turno
         const ahora = new Date();
         const horaStr = ahora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         const fechaStr = ahora.toLocaleDateString();
         const horaH = ahora.getHours();
-        
-        let turno = "Noche";
-        if (horaH >= 6 && horaH < 14) turno = "Mañana";
-        else if (horaH >= 14 && horaH < 22) turno = "Tarde";
+        let turno = horaH >= 6 && horaH < 14 ? "Mañana" : (horaH >= 14 && horaH < 22 ? "Tarde" : "Noche");
 
-        // Estilo de cabecera
-        doc.setFillColor(0, 100, 101); 
-        doc.rect(0, 0, 210, 40, 'F');
-        
-        doc.setTextColor(255, 255, 255); 
-        doc.setFontSize(22); 
-        doc.text("REPORTE OPERATIVO", 15, 20);
-        
-        doc.setFontSize(10);
-        doc.text(`Fecha: ${fechaStr} | Hora de descarga: ${horaStr}`, 15, 30);
-        doc.text(`Turno Operativo: ${turno}`, 15, 35);
+        doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("REPORTE OPERATIVO", 15, 20);
+        doc.setFontSize(10); doc.text(`Fecha: ${fechaStr} | Hora: ${horaStr} | Turno: ${turno}`, 15, 30);
 
         doc.autoTable({
             startY: 45,
             head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
             body: cio_logs.map(it => [it.area, it.priority, it.title, it.message]),
             headStyles: { fillColor: [0, 80, 81] },
-            styles: { fontSize: 8 },
-            alternateRowStyles: { fillColor: [240, 240, 240] }
+            styles: { fontSize: 8 }
         });
-
-        doc.save(`Reporte_Operativo_${fechaStr.replace(/\//g,'-')}_${turno}.pdf`);
+        doc.save(`Reporte_CIO_${fechaStr}.pdf`);
     }
 
     function renderSlide() {
@@ -463,12 +476,24 @@
 
     function toggleFS() {
         const app = document.getElementById('cio-app');
-        if(!document.fullscreenElement) app.requestFullscreen(); else document.exitFullscreen();
+        if(!document.fullscreenElement) app.requestFullscreen().catch(e => console.log(e)); 
+        else document.exitFullscreen();
     }
 
-    function openPanel(id) { closePanels(); document.getElementById(id).classList.add('active'); document.getElementById('cio-overlay').style.display = 'block'; }
-    function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById('cio-overlay').style.display = 'none'; }
-    function openForm(idx) { document.getElementById('mainForm').reset(); document.getElementById('f-id').value = ""; openPanel('panelForm'); }
+    function openPanel(id) { 
+        closePanels(); 
+        document.getElementById(id).classList.add('active'); 
+        document.getElementById('cio-overlay').style.display = 'block'; 
+    }
+    function closePanels() { 
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); 
+        document.getElementById('cio-overlay').style.display = 'none'; 
+    }
+    function openForm(idx) { 
+        document.getElementById('mainForm').reset(); 
+        document.getElementById('f-id').value = ""; 
+        openPanel('panelForm'); 
+    }
 
     setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); }, 1000);
     setInterval(syncData, 10000);
