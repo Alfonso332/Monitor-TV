@@ -88,7 +88,7 @@
             font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
         }
 
-        /* PANELES ADMIN */
+        /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 450px; height: 100%;
             background: #0d0d0d; border-left: 2px solid var(--primary); padding: 25px;
@@ -112,51 +112,28 @@
 
         .history-card { background: #151515; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
 
+        /* HAMBURGUESA CELULAR */
+        #hamb-menu {
+            display: none; position: fixed; bottom: 80px; right: 20px;
+            width: 60px; height: 60px; background: var(--primary);
+            border-radius: 50%; z-index: 10050; border: 2px solid var(--accent);
+            box-shadow: 0 0 15px rgba(0,209,209,0.4);
+            justify-content: center; align-items: center; font-size: 24px; cursor: pointer;
+        }
+
+        /* DISEÑO ESPECÍFICO DASHBOARD MÓVIL */
+        .mobile-stat-box { background: #151515; padding: 15px; border-radius: 12px; border: 1px solid #222; text-align: center; margin-bottom: 10px; }
+        .off-service-item { background: rgba(255, 77, 77, 0.1); border-left: 4px solid var(--critico); padding: 10px; margin-bottom: 8px; font-size: 0.9rem; }
+
         /* === RESPONSIVE CELULAR === */
         @media (max-width: 768px) {
+            #hamb-menu { display: flex; }
+            #cio-app .kpi-bar, #cio-app #ticker-bar { display: none !important; }
+            #cio-app #progressLine { bottom: 0; }
             #cio-app .main-header { height: 60px; padding: 0 15px; }
-            #cio-app .main-header img { height: 30px; }
-            #cio-app #clockDisplay { font-size: 1.2rem; }
-
-            #cio-app .kpi-bar {
-                height: auto;
-                flex-direction: column;
-                padding: 15px;
-                gap: 15px;
-            }
-
-            #cio-app .kpi-card {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                border-bottom: 1px solid #222;
-                padding-bottom: 5px;
-            }
-
-            #cio-app .kpi-value { font-size: 1.4rem; }
-            #cio-app .kpi-label { margin-top: 0; }
-
-            #cio-app .puestos-container {
-                border-left: none;
-                padding-left: 0;
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                width: 100%;
-                gap: 10px;
-                padding-top: 10px;
-            }
-
-            #cio-app .puesto-val { font-size: 1.2rem; }
-            #cio-app .area-tag { letter-spacing: 4px; font-size: 1rem; }
-            
             #cio-app .side-panel { width: 100%; padding: 20px; }
-            
-            #cio-app #display-board { padding: 10px; }
-            #cio-app #titleDisplay { font-size: 2.2rem; line-height: 1; }
+            #cio-app #titleDisplay { font-size: 2.2rem; }
             #cio-app #messageDisplay { font-size: 1.1rem; }
-            
-            #cio-app #progressLine { bottom: 60px; }
         }
     </style>
 </head>
@@ -164,6 +141,8 @@
 
 <div id="cio-app">
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090;" onclick="closePanels()"></div>
+
+    <div id="hamb-menu" onclick="openPanel('panelMobileDash')">☰</div>
 
     <header class="main-header">
         <div style="display:flex; gap:8px;">
@@ -199,6 +178,29 @@
     <div id="ticker-bar">
         <div id="ticker-content">...</div>
     </div>
+
+    <aside id="panelMobileDash" class="side-panel">
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">DASHBOARD MÓVIL</h2>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="mobile-stat-box">
+                <div class="kpi-label">SLA</div>
+                <div id="m-sla" class="kpi-value" style="justify-content:center; margin-top:5px;">--%</div>
+            </div>
+            <div class="mobile-stat-box">
+                <div class="kpi-label">Llamadas</div>
+                <div id="m-calls" class="kpi-value" style="justify-content:center; margin-top:5px;">0</div>
+            </div>
+        </div>
+
+        <h3 style="font-size:0.7rem; color:var(--primary); margin:15px 0 10px;">ESTADO PUESTOS</h3>
+        <div id="m-puestos" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px;"></div>
+
+        <h3 style="font-size:0.7rem; color:var(--critico); margin-bottom:10px;">SERVICIOS OFFLINE</h3>
+        <div id="m-offline-list"></div>
+
+        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
+    </aside>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">GESTOR MONITOR</h2>
@@ -257,17 +259,21 @@
             const dK = await rK.json();
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
+                // LÓGICA DE PERSISTENCIA DE COLOR Y FLECHA
                 if (prevSLA !== null && sla !== prevSLA) {
                     if (sla < prevSLA) {
                         currentArrow = "▼";
                         currentColor = "var(--critico)";
-                    } else {
+                    } else if (sla > prevSLA) {
                         currentArrow = "▲";
                         currentColor = "var(--online)";
                     }
                 }
-                document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
+                const contentSLA = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
+                document.getElementById('v-sla').innerHTML = contentSLA;
+                document.getElementById('m-sla').innerHTML = contentSLA;
                 document.getElementById('v-calls').textContent = dK.calls;
+                document.getElementById('m-calls').textContent = dK.calls;
                 renderPuestos(dK.puestos);
                 prevSLA = sla;
             }
@@ -281,20 +287,28 @@
             const rR = await fetch(RED_URL);
             const dR = await rR.json();
             const ticker = document.getElementById('ticker-content');
-            let html = "";
+            const mOffList = document.getElementById('m-offline-list');
+            let tHtml = "", mHtml = "";
             if(dR) {
                 Object.entries(dR).forEach(([id, v]) => {
-                    if(v.estado === "offline") html += `<div class="capsula-off">⚠️ OFF: ${id.replace(/_/g,' ').toUpperCase()}</div>`;
+                    if(v.estado === "offline") {
+                        const name = id.replace(/_/g,' ').toUpperCase();
+                        tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
+                        mHtml += `<div class="off-service-item">⚠️ ${name}</div>`;
+                    }
                 });
             }
-            ticker.innerHTML = html || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
+            ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
+            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem;">✔ Todo operativo</div>`;
         } catch(e) { console.error(e); }
     }
 
     function renderPuestos(data) {
-        const cont = document.getElementById('puestos-display');
+        const pcCont = document.getElementById('puestos-display');
+        const mbCont = document.getElementById('m-puestos');
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
-        if (activeEntries.length === 0) { cont.innerHTML = ""; return; }
+        if (activeEntries.length === 0) { pcCont.innerHTML = ""; mbCont.innerHTML = ""; return; }
+        
         const vals = activeEntries.map(([k, v]) => parseInt(v));
         const maxVal = Math.max(...vals), minVal = Math.min(...vals);
         let html = "";
@@ -305,14 +319,11 @@
                 if (maxVal === minVal) color = "var(--online)";
                 else if (v === maxVal) color = "var(--online)";
                 else if (v === minVal) color = "var(--critico)";
-                else {
-                    const ratio = (v - minVal) / (maxVal - minVal);
-                    color = ratio > 0.5 ? "var(--accent)" : "var(--orange)";
-                }
                 html += `<div class="puesto-item"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
             }
         }
-        cont.innerHTML = html;
+        pcCont.innerHTML = html;
+        mbCont.innerHTML = html;
     }
 
     function downloadPDF() {
