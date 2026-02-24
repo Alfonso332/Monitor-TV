@@ -238,10 +238,10 @@
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
     let prevStatus = {}; 
     let recentlyRestored = {}; 
-    let offlineTimes = {}; 
+    let offlineTimes = {}; // Persistencia de la primera detección
     const cio_SLIDE_TIME = 45;
 
-    // Lógica Swipe
+    // Swipe
     let touchStartX = 0;
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
@@ -266,8 +266,8 @@
                     const name = id.replace(/_/g, ' ');
 
                     if (currentItem.estado === "offline") {
-                        if (!offlineTimes[id] || (prevStatus[id] && prevStatus[id].estado === "online")) {
-                            // FORMATO 24H SIN AM/PM
+                        // SI NO EXISTE HORA PREVIA, CAPTURAMOS LA ACTUAL (Primera detección)
+                        if (!offlineTimes[id]) {
                             offlineTimes[id] = new Date().toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'});
                         }
                         
@@ -287,17 +287,17 @@
                         offCount++;
                         delete recentlyRestored[id];
                     } else {
-                        if (prevStatus[id] && prevStatus[id].estado === "offline") {
+                        // Si vuelve a estar online, marcamos restauración y BORRAMOS la hora inicial
+                        if (offlineTimes[id]) {
                             recentlyRestored[id] = 2;
+                            delete offlineTimes[id];
                         }
-                        delete offlineTimes[id];
                         if (recentlyRestored[id] > 0) {
                             tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
                             recentlyRestored[id]--;
                         }
                     }
                 });
-                prevStatus = JSON.parse(JSON.stringify(status));
             }
 
             if(tickerHTML !== "") {
@@ -345,7 +345,6 @@
 
     function renderHistory() {
         document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => {
-            // FORMATO 24H PARA HISTORIAL
             const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'}) : '--:--';
             return `
             <div class="history-item">
@@ -453,7 +452,6 @@
         requestAnimationFrame(loop);
     }
 
-    // RELOJ PRINCIPAL EN 24H
     setInterval(() => {
         const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
         document.getElementById("clockDisplay").textContent = t;
