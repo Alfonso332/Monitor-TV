@@ -238,10 +238,10 @@
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
     let prevStatus = {}; 
     let recentlyRestored = {}; 
-    let offlineTimes = {}; // Registro de horas de caída
+    let offlineTimes = {}; 
     const cio_SLIDE_TIME = 45;
 
-    // Swipe to close
+    // Lógica Swipe
     let touchStartX = 0;
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
@@ -266,9 +266,9 @@
                     const name = id.replace(/_/g, ' ');
 
                     if (currentItem.estado === "offline") {
-                        // Capturar hora si es nueva detección
                         if (!offlineTimes[id] || (prevStatus[id] && prevStatus[id].estado === "online")) {
-                            offlineTimes[id] = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                            // FORMATO 24H SIN AM/PM
+                            offlineTimes[id] = new Date().toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'});
                         }
                         
                         const timeStr = offlineTimes[id];
@@ -345,7 +345,8 @@
 
     function renderHistory() {
         document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => {
-            const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+            // FORMATO 24H PARA HISTORIAL
+            const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'}) : '--:--';
             return `
             <div class="history-item">
                 <div style="display:flex; justify-content:space-between;">
@@ -409,7 +410,7 @@
         
         doc.setFontSize(10); doc.setTextColor(100);
         doc.text(`Turno: ${currentTurno}`, 14, 28);
-        doc.text(`Fecha y Hora de descarga: ${now.toLocaleString()}`, 14, 34);
+        doc.text(`Fecha y Hora: ${now.toLocaleString('es-UY', {hour12:false})}`, 14, 34);
 
         const getTurnoDeNovedad = (timestamp) => {
             const h = new Date(timestamp).getHours();
@@ -425,7 +426,7 @@
             head: [['Hora', 'Área', 'Prioridad', 'Título', 'Novedad']],
             body: novedadesFiltradas.length > 0 
                 ? novedadesFiltradas.map(it => [
-                    new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'}),
                     it.area, it.priority, it.title, it.message
                   ])
                 : [['-', '-', '-', 'No se registraron novedades', '-']],
@@ -452,6 +453,7 @@
         requestAnimationFrame(loop);
     }
 
+    // RELOJ PRINCIPAL EN 24H
     setInterval(() => {
         const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
         document.getElementById("clockDisplay").textContent = t;
