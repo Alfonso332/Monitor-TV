@@ -198,6 +198,11 @@
                 border-left: 2px solid var(--primary);
             }
 
+            /* Espaciado de 1cm (~38px) entre secciones del widget móvil */
+            .mobile-stat-container, .mobile-puestos-grid, #m-offline-list {
+                margin-bottom: 38px !important;
+            }
+
             #cio-app #titleDisplay { font-size: 2.2rem; }
             
             #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
@@ -281,7 +286,7 @@
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
         <div class="mobile-section-header">Estado de Servicios</div>
-        <div id="m-offline-list" style="margin-bottom: 30px;"></div>
+        <div id="m-offline-list"></div>
 
         <div style="margin-top: 20px; margin-bottom: 40px;">
             <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">VOLVER AL MONITOR</button>
