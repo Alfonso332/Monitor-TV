@@ -53,7 +53,15 @@
 
         /* FULLSCREEN ADJUSTMENTS */
         #cio-app:fullscreen .main-header { display: none !important; }
-        #cio-app:fullscreen .kpi-bar { background: transparent; border: none; position: absolute; top: 80px; width: 100%; }
+        
+        /* AJUSTE: top 25px para que no choque con el nombre del servicio */
+        #cio-app:fullscreen .kpi-bar { 
+            background: transparent; 
+            border: none; 
+            position: absolute; 
+            top: 25px; 
+            width: 100%; 
+        }
         
         #cio-app .fs-clock { display: none; }
         #cio-app:fullscreen .fs-clock { 
@@ -183,7 +191,6 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center;">ESTADO OPERATIVO</h2>
-        
         <div class="kpi-manager">
             <h4 style="text-align:center; font-size:0.7rem; color:var(--accent); margin-bottom:10px;">QUEUEMETRICS</h4>
             <div style="display:flex; gap:10px;">
@@ -192,7 +199,6 @@
             </div>
             <button onclick="updateKPIs()" class="btn-pill" style="padding:8px; font-size:0.7rem;">ACTUALIZAR</button>
         </div>
-
         <div class="stats-grid">
             <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Nueva</small></div>
             <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
@@ -333,20 +339,16 @@
     function downloadPDF() {
         const { jsPDF } = window.jspdf; const doc = jsPDF(); const now = new Date(); const curH = now.getHours();
         let currentTurno = (curH >= 6 && curH < 14) ? "Mañana (06:00 - 14:00)" : (curH >= 14 && curH < 22) ? "Tarde (14:00 - 22:00)" : "Noche (22:00 - 06:00)";
-        
         doc.setFontSize(16); doc.setTextColor(0, 100, 101); doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
         doc.setFontSize(10); doc.setTextColor(100); doc.text(`Turno Actual: ${currentTurno}`, 14, 28);
         doc.text(`Generado: ${now.toLocaleString('es-UY')}`, 14, 34);
-
         const getTurnoStr = (ts) => {
             const h = new Date(ts).getHours();
             if (h >= 6 && h < 14) return "Mañana (06:00 - 14:00)";
             if (h >= 14 && h < 22) return "Tarde (14:00 - 22:00)";
             return "Noche (22:00 - 06:00)";
         };
-
         const filtradas = cio_logs.filter(it => getTurnoStr(it.timestamp) === currentTurno);
-
         doc.autoTable({ startY: 45, head: [['Hora', 'Área', 'Prioridad', 'Título', 'Mensaje']],
             body: filtradas.map(it => [new Date(it.timestamp).toLocaleTimeString('es-UY',{hour12:false, hour:'2-digit', minute:'2-digit'}), it.area, it.priority, it.title, it.message]),
             theme: 'striped', headStyles: { fillColor: [0, 100, 101] }
@@ -354,7 +356,6 @@
         doc.save(`Reporte_Masterson_${now.toLocaleDateString()}.pdf`);
     }
 
-    // --- UI ---
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
     function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
     function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
