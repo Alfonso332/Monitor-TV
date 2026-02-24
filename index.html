@@ -41,24 +41,24 @@
         #cio-app:fullscreen .main-header,
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
 
-        /* KPI BAR */
+        /* KPI BAR (Ticker Superior) - AJUSTADO A 70PX */
         #cio-app .kpi-bar {
             display: flex; justify-content: space-evenly; align-items: center;
-            background: #050505; padding: 15px 0; border-bottom: 2px solid #1a1a1a;
-            min-height: 100px; flex-shrink: 0;
+            background: #050505; padding: 0; border-bottom: 2px solid #1a1a1a;
+            height: 70px; min-height: 70px; flex-shrink: 0;
         }
         #cio-app .kpi-card { text-align: center; }
         #cio-app .kpi-value { 
-            font-size: 2.5rem; font-weight: 900; color: var(--accent); 
+            font-size: 1.8rem; font-weight: 900; color: var(--accent); 
             line-height: 1; display: flex; align-items: center; gap: 10px;
         }
-        #cio-app .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-top: 5px; }
+        #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-top: 2px; }
 
         /* PUESTOS CON ESCALA DE COLOR */
-        #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; }
+        #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
-        #cio-app .puesto-val { font-size: 1.8rem; font-weight: 900; font-family: monospace; }
-        #cio-app .puesto-lab { font-size: 0.6rem; opacity: 0.5; font-weight: bold; }
+        #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
+        #cio-app .puesto-lab { font-size: 0.5rem; opacity: 0.5; font-weight: bold; }
 
         /* ÁREA CENTRAL */
         #cio-app #display-board { 
@@ -253,21 +253,15 @@
         for(let i=1; i<=9; i++) {
             const v = parseInt(data[`p${i}`]) || 0;
             if(v > 0) {
-                let color = "var(--warning)"; // Por defecto amarillo/medio
-                
-                if (maxVal === minVal) {
-                    color = "var(--online)"; // Si todos son iguales, verde
-                } else if (v === maxVal) {
-                    color = "var(--online)"; // El más alto en verde
-                } else if (v === minVal) {
-                    color = "var(--critico)"; // El más bajo en rojo
-                } else {
-                    // Lógica para valores intermedios
+                let color = "var(--warning)";
+                if (maxVal === minVal) color = "var(--online)";
+                else if (v === maxVal) color = "var(--online)";
+                else if (v === minVal) color = "var(--critico)";
+                else {
                     const ratio = (v - minVal) / (maxVal - minVal);
                     if (ratio > 0.6) color = "var(--accent)";
                     else if (ratio < 0.4) color = "var(--orange)";
                 }
-
                 html += `<div class="puesto-item"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
             }
         }
