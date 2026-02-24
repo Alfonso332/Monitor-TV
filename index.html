@@ -65,7 +65,6 @@
         }
         .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; margin-top: 5px; display: block;}
         
-        /* FLECHA ANIMADA */
         .trend-arrow { display: inline-block; animation: arrowMove 1.5s infinite alternate ease-in-out; font-size: 1.8rem; }
         @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
@@ -120,7 +119,15 @@
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333 !important; }
         #cio-app .btn-pdf { background: transparent !important; border: 1px solid var(--accent) !important; color: var(--accent) !important; }
 
-        .history-card { background: #151515; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+        /* ESTETICA DE HISTORIAL */
+        .history-card { 
+            background: #151515; padding: 15px; border-radius: 12px; margin-bottom: 12px; 
+            border-left: 4px solid var(--primary); 
+        }
+        .history-card.critico { border-left-color: var(--critico); }
+        .history-actions { display: flex; gap: 15px; margin-top: 10px; border-top: 1px solid #222; padding-top: 10px; }
+        .action-btn { background: none; border: none; font-size: 0.75rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        
         #progressLine { position: fixed; bottom: 80px; height: 5px; width: 0%; background: var(--primary); z-index: 10; }
     </style>
 </head>
@@ -132,7 +139,7 @@
 
     <header class="main-header">
         <div style="display:flex; gap:12px;">
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="padding:10px 20px; width:auto;">⚙️ PANEL CONTROL</button>
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="padding:10px 20px; width:auto; margin:0;">⚙️ PANEL CONTROL</button>
             <button onclick="toggleFS()" style="background:none; border:1px solid #444; color:#666; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:bold;">⛶ MODO TV</button>
         </div>
         <div id="clockDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:900; color:var(--primary);">00:00:00</div>
@@ -160,11 +167,8 @@
     </main>
 
     <div id="ticker-bar">
-        <div id="ticker-content">
-            <span style="color:#222; font-weight:900;">INICIALIZANDO SISTEMAS...</span>
-        </div>
+        <div id="ticker-content">...</div>
     </div>
-    
     <div id="progressLine"></div>
 
     <aside id="panelHistory" class="side-panel">
@@ -195,41 +199,38 @@
         <h2 id="formTitle" style="color:var(--primary); text-align:center;">NUEVA ENTRADA</h2>
         <form id="mainForm" onsubmit="saveEntry(event)">
             <input type="hidden" id="f-id" value="">
-            <select id="f-area" class="p-field" style="text-align:left;"><option>Monitoreo</option><option>Freschat</option><option>Atención al cliente</option><option>Infraestructura</option><option>Novedad Interna</option></select>
-            <select id="f-prio" class="p-field" style="text-align:left;"><option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option></select>
+            <label style="font-size: 0.7rem; opacity: 0.5;">ÁREA RESPONSABLE</label>
+            <select id="f-area" class="p-field" style="text-align:left;">
+                <option>Monitoreo</option><option>Freschat</option><option>Atención al cliente</option>
+                <option>Infraestructura</option><option>Novedad Interna</option>
+            </select>
+            <label style="font-size: 0.7rem; opacity: 0.5;">PRIORIDAD</label>
+            <select id="f-prio" class="p-field" style="text-align:left;">
+                <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
+            </select>
             <input type="text" id="f-title" placeholder="Título corto" required class="p-field" style="text-align:left;">
-            <textarea id="f-msg" rows="8" placeholder="Descripción detallada de la incidencia..." required class="p-field" style="text-align:left;"></textarea>
-            <button type="submit" class="btn-pill">PUBLICAR AHORA</button>
-            <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec">REGRESAR</button>
+            <textarea id="f-msg" rows="8" placeholder="Descripción detallada..." required class="p-field" style="text-align:left;"></textarea>
+            <button type="submit" class="btn-pill">GUARDAR Y PUBLICAR</button>
+            <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec">CANCELAR</button>
         </form>
     </aside>
 </div>
 
 <script>
-    const cio_DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
-    const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
-    const cio_KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
+    const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
+    const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
+    const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
     
-    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
-    let prevSLA = -1; // Inicializamos para detectar el primer cambio
-    const cio_SLIDE_TIME = 40;
+    let cio_logs = [], currentIdx = 0, startTime = null, prevSLA = -1;
+    const SLIDE_DURATION = 45; // 45 segundos
 
-    function initPuestos() {
-        const inputCont = document.getElementById('puestos-inputs');
-        for(let i=1; i<=9; i++) {
-            inputCont.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" value="0">`;
-        }
+    // Inicializar inputs
+    const inputCont = document.getElementById('puestos-inputs');
+    for(let i=1; i<=9; i++) {
+        inputCont.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" value="0">`;
     }
 
-    function getLevelColor(val, max) {
-        if(val <= 0) return '#333';
-        const ratio = val / (max || 1);
-        if(ratio < 0.3) return 'var(--critico)';
-        if(ratio < 0.6) return 'var(--orange)';
-        if(ratio < 0.8) return 'var(--warning)';
-        return 'var(--online)';
-    }
-
+    // --- SINCRONIZACIÓN KPI ---
     async function saveKPIs() {
         const payload = {
             sla: document.getElementById("kpi-sla-input").value || 0,
@@ -237,88 +238,62 @@
             puestos: {}
         };
         for(let i=1; i<=9; i++) { payload.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0; }
-        await fetch(cio_KPI_URL, { method: 'PUT', body: JSON.stringify(payload) });
+        await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(payload) });
         syncKPIs();
     }
 
     async function syncKPIs() {
         try {
-            const resp = await fetch(cio_KPI_URL);
+            const resp = await fetch(KPI_URL);
             const data = await resp.json();
             if(!data) return;
 
             const currentSLA = parseFloat(data.sla) || 0;
-            
-            // LÓGICA DE COMPARACIÓN DE FLECHA
-            let arrowIcon = "▲";
-            let arrowColor = "var(--online)";
+            let arrow = currentSLA < prevSLA ? "▼" : "▲";
+            let color = currentSLA < prevSLA ? "var(--critico)" : "var(--online)";
+            if(prevSLA === -1) { arrow = "▲"; color = "var(--accent)"; }
 
-            if (prevSLA !== -1 && currentSLA < prevSLA) {
-                arrowIcon = "▼";
-                arrowColor = "var(--critico)";
-            }
-
-            document.getElementById("v-sla").innerHTML = `${data.sla}% <span class="trend-arrow" style="color:${arrowColor}">${arrowIcon}</span>`;
-            document.getElementById("v-calls").textContent = parseInt(data.calls).toLocaleString('es-UY');
+            document.getElementById("v-sla").innerHTML = `${currentSLA}% <span class="trend-arrow" style="color:${color}">${arrow}</span>`;
+            document.getElementById("v-calls").textContent = parseInt(data.calls).toLocaleString();
             
+            // Puestos
             const pDisplay = document.getElementById("puestos-display");
-            const pValues = Object.values(data.puestos || {}).map(Number);
-            const maxVal = Math.max(...pValues, 1);
-            
-            let pHTML = "";
-            for(let i=1; i<=9; i++) {
+            const values = Object.values(data.puestos || {}).map(Number);
+            const maxVal = Math.max(...values, 1);
+            let html = "";
+            for(let i=1; i<=9; i++){
                 const val = parseInt(data.puestos[`p${i}`] || 0);
                 document.getElementById(`inp-p${i}`).value = val;
-                if(val > 0) {
-                    const color = getLevelColor(val, maxVal);
-                    pHTML += `<div class="puesto-item">
-                                <span class="puesto-val" style="color:${color}">${val}</span>
-                                <span class="puesto-lab">P${i}</span>
-                              </div>`;
+                if(val > 0){
+                    const pColor = val === maxVal ? "var(--online)" : (val < maxVal*0.4 ? "var(--critico)" : "#fff");
+                    html += `<div class="puesto-item"><span class="puesto-val" style="color:${pColor}">${val}</span><span class="puesto-lab">P${i}</span></div>`;
                 }
             }
-            pDisplay.innerHTML = pHTML;
-            prevSLA = currentSLA; // Guardamos el valor actual para la próxima comparación
-        } catch(e) {}
+            pDisplay.innerHTML = html;
+            prevSLA = currentSLA;
+        } catch(e){}
     }
 
-    async function updateNetwork() {
-        try {
-            const resp = await fetch(cio_RED_URL);
-            const status = await resp.json();
-            const ticker = document.getElementById("ticker-content");
-            let tickerHTML = "";
-
-            if(status) {
-                Object.keys(status).forEach(id => {
-                    if (status[id].estado === "offline") {
-                        const name = id.toUpperCase().replace(/_/g, ' ');
-                        tickerHTML += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
-                    }
-                });
-            }
-            ticker.innerHTML = tickerHTML || `<span style="color:var(--online); font-size:1.5rem; font-weight:900;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
-        } catch(e) {}
-    }
-
+    // --- SINCRONIZACIÓN EVENTOS ---
     async function syncEvents() {
         try {
-            const resp = await fetch(cio_DB_URL);
+            const resp = await fetch(DB_URL);
             const data = await resp.json();
-            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []);
-            if(cio_logs.length > 0 && !cio_startTime) renderSlide();
+            cio_logs = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
             renderHistory();
-        } catch(e) {}
+            if(cio_logs.length > 0 && startTime === null) renderSlide();
+        } catch(e){}
     }
 
     function renderSlide() {
         if(!cio_logs.length) return;
         const cont = document.getElementById("infoCont");
         cont.classList.add("oculto");
+        
         setTimeout(() => {
-            const item = cio_logs[cio_currentIdx % cio_logs.length];
-            const colors = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"};
-            const color = colors[item.priority] || "#fff";
+            const item = cio_logs[currentIdx % cio_logs.length];
+            const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
+            const color = colors[item.priority] || "var(--accent)";
 
             document.getElementById("cio-app").classList.toggle("pantalla-critica", item.priority === "Crítica");
             document.getElementById("areaLabel").textContent = item.area;
@@ -326,58 +301,40 @@
             document.getElementById("titleDisplay").textContent = item.title;
             document.getElementById("messageDisplay").textContent = item.message;
             document.getElementById("progressLine").style.background = color;
+            
             cont.classList.remove("oculto");
         }, 700);
     }
 
+    // --- CRUD ---
     function renderHistory() {
         document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => `
-            <div class="history-card">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <div class="history-card ${it.priority === 'Crítica' ? 'critico' : ''}">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem;">
                     <b style="color:var(--accent)">${it.area}</b>
-                    <small style="opacity:0.5">${it.priority}</small>
+                    <span>${it.priority}</span>
                 </div>
-                <div style="font-weight:bold; font-size:0.9rem;">${it.title}</div>
-                <div style="display:flex; gap:15px; margin-top:10px;">
-                    <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:bold;">EDITAR</button>
-                    <button onclick="deleteEntry(${i})" style="color:red; background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:bold;">BORRAR</button>
+                <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
+                <div class="history-actions">
+                    <button class="action-btn" style="color:var(--warning)" onclick="editEntry(${i})">Editar</button>
+                    <button class="action-btn" style="color:var(--critico)" onclick="deleteEntry(${i})">Borrar</button>
                 </div>
             </div>`).join('');
-    }
-
-    function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = jsPDF();
-        const now = new Date(), h = now.getHours();
-        let turno = (h >= 6 && h < 14) ? "MAÑANA" : (h >= 14 && h < 22) ? "TARDE" : "NOCHE";
-
-        doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text(`REPORTE CIO - TURNO ${turno}`, 15, 25);
-        doc.setFontSize(10); doc.text(`Fecha: ${now.toLocaleString()}`, 15, 33);
-
-        doc.autoTable({
-            startY: 45,
-            head: [['Área', 'Prioridad', 'Título', 'Descripción']],
-            body: cio_logs.map(it => [it.area, it.priority, it.title, it.message]),
-            theme: 'grid',
-            headStyles: { fillColor: [0, 80, 81] },
-            styles: { fontSize: 8, overflow: 'linebreak' },
-            columnStyles: { 3: { cellWidth: 90 } }
-        });
-        doc.save(`CIO_Reporte_${turno}.pdf`);
     }
 
     async function saveEntry(e) {
         e.preventDefault();
         const id = document.getElementById("f-id").value;
         const entry = {
-            area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value,
-            title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value,
-            timestamp: id !== "" ? cio_logs[id].timestamp : Date.now()
+            area: document.getElementById("f-area").value,
+            priority: document.getElementById("f-prio").value,
+            title: document.getElementById("f-title").value,
+            message: document.getElementById("f-msg").value
         };
         if(id !== "") cio_logs[id] = entry; else cio_logs.push(entry);
-        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        openPanel('panelHistory'); syncEvents();
+        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+        openPanel('panelHistory');
+        syncEvents();
     }
 
     function editEntry(idx) {
@@ -387,23 +344,79 @@
         document.getElementById("f-prio").value = it.priority;
         document.getElementById("f-title").value = it.title;
         document.getElementById("f-msg").value = it.message;
+        document.getElementById("formTitle").textContent = "EDITAR ENTRADA";
         openPanel('panelForm');
     }
 
-    async function deleteEntry(idx) { if(confirm("¿Eliminar?")) { cio_logs.splice(idx, 1); await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) }); syncEvents(); } }
-    function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
-    function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
-    function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
-    function openFormPanel() { document.getElementById("mainForm").reset(); document.getElementById("f-id").value = ""; openPanel('panelForm'); }
+    async function deleteEntry(idx) {
+        if(confirm("¿Eliminar novedad?")) {
+            cio_logs.splice(idx, 1);
+            await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+            syncEvents();
+        }
+    }
+
+    // --- RED STATUS ---
+    async function updateNetwork() {
+        try {
+            const resp = await fetch(RED_URL);
+            const status = await resp.json();
+            const ticker = document.getElementById("ticker-content");
+            let html = "";
+            if(status) {
+                Object.keys(status).forEach(id => {
+                    if(status[id].estado === "offline") {
+                        html += `<div class="capsula-off">⚠️ OFF: ${id.replace(/_/g,' ').toUpperCase()}</div>`;
+                    }
+                });
+            }
+            ticker.innerHTML = html || `<span style="color:var(--online); font-weight:900; font-size:1.5rem;">✔ SISTEMAS OPERATIVOS</span>`;
+        } catch(e){}
+    }
+
+    // --- UTILS ---
+    function openFormPanel() { 
+        document.getElementById("mainForm").reset(); 
+        document.getElementById("f-id").value = ""; 
+        document.getElementById("formTitle").textContent = "NUEVA ENTRADA";
+        openPanel('panelForm'); 
+    }
+    function openPanel(id) { 
+        closePanels(); 
+        document.getElementById(id).classList.add("active"); 
+        document.getElementById("cio-overlay").style.display = "block"; 
+    }
+    function closePanels() { 
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); 
+        document.getElementById("cio-overlay").style.display = "none"; 
+    }
+    function toggleFS() { 
+        if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); 
+        else document.exitFullscreen(); 
+    }
 
     function loop(ts) {
         if(cio_logs.length) {
-            if(!cio_startTime) cio_startTime = ts;
-            const progress = (ts - cio_startTime) / (cio_SLIDE_TIME * 1000);
+            if(!startTime) startTime = ts;
+            const progress = (ts - startTime) / (SLIDE_DURATION * 1000);
             document.getElementById("progressLine").style.width = (Math.min(progress, 1) * 100) + "%";
-            if(progress >= 1) { cio_currentIdx++; renderSlide(); cio_startTime = ts; }
+            if(progress >= 1) { currentIdx++; renderSlide(); startTime = ts; }
         }
         requestAnimationFrame(loop);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(255, 255, 255); doc.text("REPORTE CIO MASTERSON", 15, 20);
+        doc.autoTable({
+            startY: 35,
+            head: [['Área', 'Prioridad', 'Título']],
+            body: cio_logs.map(l => [l.area, l.priority, l.title]),
+            theme: 'grid'
+        });
+        doc.save("Reporte_CIO.pdf");
     }
 
     setInterval(() => {
@@ -412,8 +425,10 @@
         document.getElementById("fsClockDisplay").textContent = t;
     }, 1000);
 
-    initPuestos();
-    setInterval(updateNetwork, 6000); setInterval(syncEvents, 10000); setInterval(syncKPIs, 5000);
+    // Inicio
+    setInterval(updateNetwork, 10000); 
+    setInterval(syncEvents, 15000); 
+    setInterval(syncKPIs, 5000);
     updateNetwork(); syncEvents(); syncKPIs(); requestAnimationFrame(loop);
 </script>
 </body>
