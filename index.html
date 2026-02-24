@@ -48,17 +48,24 @@
             color: var(--primary); z-index: 100;
         }
 
-        /* KPI BAR */
+        /* KPI BAR - AJUSTADA PARA NÚMEROS GRANDES */
         .kpi-bar {
             display: flex;
             justify-content: center;
             background: #050505;
             padding: 10px 0;
             border-bottom: 1px solid #1a1a1a;
-            gap: 40px;
+            gap: 60px; /* Mayor espacio entre elementos */
         }
-        .kpi-card { text-align: center; min-width: 180px; }
-        .kpi-value { display: block; font-size: 1.8rem; font-weight: 900; font-family: monospace; color: var(--accent); }
+        .kpi-card { text-align: center; min-width: 220px; } /* Ancho aumentado */
+        .kpi-value { 
+            display: block; 
+            font-size: 2rem; /* Tamaño optimizado */
+            font-weight: 900; 
+            font-family: monospace; 
+            color: var(--accent);
+            white-space: nowrap; 
+        }
         .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
         
         .trend-arrow { font-size: 1.2rem; margin-left: 5px; vertical-align: middle; animation: kpiPulse 2s infinite; }
@@ -241,8 +248,8 @@
         
         <div style="background:#151515; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #222;">
             <small style="color:var(--primary); font-weight:bold; display:block; margin-bottom:10px;">DATOS KPI BAR</small>
-            <input type="number" id="kpi-sla-input" placeholder="NS (ej: 95)" style="font-size:1.2rem; margin-bottom:8px;">
-            <input type="number" id="kpi-calls-input" placeholder="Cantidad de llamadas" style="font-size:1.2rem;">
+            <input type="number" id="kpi-sla-input" placeholder="NS (ej: 100)" style="font-size:1.2rem; margin-bottom:8px;">
+            <input type="number" id="kpi-calls-input" placeholder="Cantidad (ej: 1500)" style="font-size:1.2rem;">
             <button onclick="saveKPIs()" class="btn-pill" style="margin-bottom:0; font-size:0.8rem;">ACTUALIZAR BARRA</button>
         </div>
 
@@ -287,15 +294,23 @@
             const resp = await fetch(cio_KPI_URL);
             const data = await resp.json();
             if(data) {
+                // Manejo de valores sin límites
                 const currentSLA = parseFloat(data.sla) || 0;
                 let trendIcon = currentSLA >= prevSLA ? 
                     '<span class="trend-arrow" style="color:var(--online)">▲</span>' : 
                     '<span class="trend-arrow" style="color:var(--critico)">▼</span>';
 
-                document.getElementById("v-sla").innerHTML = `${currentSLA}% ${trendIcon}`;
-                document.getElementById("v-calls").textContent = data.calls || "0";
+                // Renderizado directo del valor (admite 100 o más)
+                document.getElementById("v-sla").innerHTML = `${data.sla}% ${trendIcon}`;
+                
+                // Formateo de miles para las llamadas (ej: 1.250)
+                const callsVal = data.calls ? parseInt(data.calls).toLocaleString('es-UY') : "0";
+                document.getElementById("v-calls").textContent = callsVal;
+
+                // Actualizar inputs del panel
                 document.getElementById("kpi-sla-input").value = data.sla || "";
                 document.getElementById("kpi-calls-input").value = data.calls || "";
+                
                 prevSLA = currentSLA;
             }
         } catch(e) {}
