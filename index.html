@@ -40,7 +40,21 @@
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
+
+        /* BARRA KPI QUEUEMETRICS */
+        #cio-app .kpi-bar {
+            display: flex; justify-content: center; gap: 50px; 
+            background: #050505; padding: 12px; border-bottom: 1px solid #111;
+            z-index: 100;
+        }
+        .kpi-item { text-align: center; }
+        .kpi-item label { display: block; font-size: 0.7rem; color: var(--accent); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-item span { font-size: 1.8rem; font-family: monospace; font-weight: bold; color: #fff; }
+
+        /* FULLSCREEN ADJUSTMENTS */
         #cio-app:fullscreen .main-header { display: none !important; }
+        #cio-app:fullscreen .kpi-bar { background: transparent; border: none; position: absolute; top: 80px; width: 100%; }
+        
         #cio-app .fs-clock { display: none; }
         #cio-app:fullscreen .fs-clock { 
             display: block; position: absolute; top: 20px; right: 30px; 
@@ -54,74 +68,47 @@
         #cio-app .info-container { transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER CONFIGURADO */
+        /* TICKER */
         #cio-app #ticker-bar { 
             height: 75px; background: #050505; border-top: 1px solid #111; 
             display: flex; align-items: center; overflow: hidden; position: relative; 
         }
-
         #cio-app #ticker-content { 
             display: flex; align-items: center; gap: 80px; white-space: nowrap; 
-            position: absolute; left: 0;
-            animation: scroll-ticker 25s linear infinite; 
+            position: absolute; left: 0; animation: scroll-ticker 25s linear infinite; 
         }
 
-        @keyframes scroll-ticker {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes scroll-ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
         #cio-app .status-badge { 
-            display: flex; align-items: center; gap: 15px;
-            padding: 12px 25px; border-radius: 8px; font-size: 1.6rem; 
-            font-weight: 900; text-transform: uppercase; flex-shrink: 0;
+            display: flex; align-items: center; gap: 15px; padding: 12px 25px; 
+            border-radius: 8px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; flex-shrink: 0;
         }
-        
-        #cio-app .status-badge .time-tag {
-            font-family: monospace; font-size: 1.1rem; padding: 2px 8px;
-            background: rgba(255,255,255,0.1); border-radius: 4px; opacity: 0.8;
-        }
+        #cio-app .status-badge .time-tag { font-family: monospace; font-size: 1.1rem; padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; opacity: 0.8; }
 
-        #cio-app .status-badge.offline { 
-            background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); 
-            color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
-        }
-        #cio-app .status-badge.restored { 
-            background: rgba(46, 204, 113, 0.15); border: 3px solid var(--online); 
-            color: var(--online); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
-        }
+        #cio-app .status-badge.offline { background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
+        #cio-app .status-badge.restored { background: rgba(46, 204, 113, 0.15); border: 3px solid var(--online); color: var(--online); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3); }
 
         /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 400px; height: 100%;
             background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
-            transform: translateX(100%); transition: 0.4s ease; z-index: 10100;
-            overflow-y: auto; touch-action: pan-y;
+            transform: translateX(100%); transition: 0.4s ease; z-index: 10100; overflow-y: auto; touch-action: pan-y;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
 
         /* ESTADISTICAS */
+        .kpi-manager { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #222; }
         #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 15px; }
         #cio-app .stat-box { background: #111; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #222; cursor: pointer; transition: 0.2s; }
         #cio-app .stat-box b { display: block; font-size: 1.3rem; }
         #cio-app .stat-box small { font-size: 0.65rem; opacity: 0.6; text-transform: uppercase; }
 
-        /* DETALLES OFFLINE */
-        #cio-app #offline-details {
-            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out;
-            background: #111; border-radius: 12px; margin-bottom: 20px;
-        }
+        /* OFFLINE DETAILS */
+        #cio-app #offline-details { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: #111; border-radius: 12px; margin-bottom: 20px; }
         #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 5px 10px; margin-top: -5px; }
-        
-        #cio-app .off-item { 
-            font-size: 0.85rem; color: #ff4d4d; padding: 12px 0; 
-            border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center;
-        }
-        #cio-app .off-item:last-child { border-bottom: none; }
-        #cio-app .off-item .time { 
-            font-family: monospace; background: #220000; padding: 2px 6px; 
-            border-radius: 4px; border: 1px solid #441111; color: #ff8888;
-        }
+        #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 12px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
+        #cio-app .off-item .time { font-family: monospace; background: #220000; padding: 2px 6px; border-radius: 4px; border: 1px solid #441111; color: #ff8888; }
 
         /* INPUTS Y BOTONES */
         #cio-app input, #cio-app textarea, #cio-app select {
@@ -135,28 +122,15 @@
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
 
         /* HISTORIAL CARDS */
-        #cio-app .history-item {
-            background: #111; padding: 15px; border-radius: 12px; margin-bottom: 12px;
-            border-left: 4px solid var(--primary);
-        }
+        #cio-app .history-item { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
 
-        /* === AJUSTES EXCLUSIVOS CELULAR === */
+        /* MOBILE */
         #mobile-fab { display: none; }
-
         @media (max-width: 768px) {
-            #cio-app { overflow: hidden; position: fixed; height: 100vh; }
-            #cio-app .main-header, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
-            #cio-app #display-board { padding: 15px; }
-            #cio-app #titleDisplay { font-size: 28px !important; margin: 5px 0; }
-            #cio-app #messageDisplay { font-size: 1.1rem !important; }
-            #cio-app .side-panel { width: 100%; border-left: none; }
-            
-            #mobile-fab {
-                display: flex; position: fixed; bottom: 30px; right: 25px; 
-                width: 65px; height: 65px; background: var(--primary);
-                border-radius: 50%; z-index: 1000005; align-items: center; justify-content: center;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid var(--accent);
-            }
+            #cio-app .main-header, #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
+            #cio-app #titleDisplay { font-size: 28px !important; }
+            #cio-app .side-panel { width: 100%; }
+            #mobile-fab { display: flex; position: fixed; bottom: 30px; right: 25px; width: 65px; height: 65px; background: var(--primary); border-radius: 50%; z-index: 1000005; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid var(--accent); }
             #mobile-fab span { font-size: 30px; color: white; }
         }
     </style>
@@ -177,6 +151,11 @@
         <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="35">
     </header>
 
+    <div class="kpi-bar">
+        <div class="kpi-item"><label>Nivel de Servicio (<5s)</label><span id="kpi-ns">--%</span></div>
+        <div class="kpi-item"><label>Llamadas Totales</label><span id="kpi-llamadas">0</span></div>
+    </div>
+
     <main id="display-board">
         <div id="infoCont" class="info-container">
             <div id="areaLabel" style="letter-spacing: 5px; font-weight: 900; font-size: 0.75rem;">MASTERSON MONITOR</div>
@@ -185,17 +164,9 @@
         </div>
     </main>
 
-    <div id="ticker-bar">
-        <div id="ticker-content">
-            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">ESCANEANDO...</span>
-        </div>
-    </div>
-    
+    <div id="ticker-bar"><div id="ticker-content"><span>ESCANEANDO...</span></div></div>
     <div id="progressLine" style="position: fixed; bottom: 75px; height: 4px; width: 0%; background: var(--primary); z-index: 5;"></div>
-
-    <div id="mobile-fab" onclick="openPanel('panelHistory')">
-        <span>☰</span>
-    </div>
+    <div id="mobile-fab" onclick="openPanel('panelHistory')"><span>☰</span></div>
 
     <aside id="panelForm" class="side-panel">
         <h2 id="formTitle" style="color:var(--primary); text-align:center;">NOVEDAD</h2>
@@ -211,21 +182,24 @@
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">ESTADO OPERATIVO</h2>
+        <h2 style="color:var(--accent); text-align:center;">ESTADO OPERATIVO</h2>
         
+        <div class="kpi-manager">
+            <h4 style="text-align:center; font-size:0.7rem; color:var(--accent); margin-bottom:10px;">QUEUEMETRICS</h4>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="input-ns" placeholder="NS %" style="margin-bottom:5px;">
+                <input type="number" id="input-llamadas" placeholder="Llamadas" style="margin-bottom:5px;">
+            </div>
+            <button onclick="updateKPIs()" class="btn-pill" style="padding:8px; font-size:0.7rem;">ACTUALIZAR</button>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Nueva</small></div>
             <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
-            <div class="stat-box" onclick="toggleOfflineDetails()">
-                <b id="stat-off" style="color:var(--accent)">0</b>
-                <small>Off ▾</small>
-            </div>
+            <div class="stat-box" onclick="toggleOfflineDetails()"><b id="stat-off" style="color:var(--accent)">0</b><small>Off ▾</small></div>
         </div>
-
         <div id="offline-details"></div>
-
-        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE TURNO ACTUAL</button>
-
+        <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE TURNO</button>
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
@@ -234,90 +208,63 @@
 <script>
     const cio_DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
+    const cio_KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_qm.json";
     
-    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
-    let prevStatus = {}; 
-    let recentlyRestored = {}; 
-    let offlineTimes = {}; // Persistencia de la primera detección
+    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null, offlineTimes = {}, recentlyRestored = {};
     const cio_SLIDE_TIME = 45;
 
     // Swipe
     let touchStartX = 0;
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-        panel.addEventListener('touchend', e => {
-            let touchEndX = e.changedTouches[0].screenX;
-            if (touchEndX - touchStartX > 100) closePanels(); 
-        });
+        panel.addEventListener('touchend', e => { if (e.changedTouches[0].screenX - touchStartX > 100) closePanels(); });
     });
 
+    // --- KPIs ---
+    async function updateKPIs() {
+        const ns = document.getElementById("input-ns").value || "0%";
+        const data = { nivelServicio: ns.includes('%') ? ns : ns+"%", llamadas: document.getElementById("input-llamadas").value || "0" };
+        await fetch(cio_KPI_URL, { method: 'PUT', body: JSON.stringify(data) });
+        syncKPIs();
+    }
+    async function syncKPIs() {
+        try { const r = await fetch(cio_KPI_URL); const d = await r.json();
+            if(d){ document.getElementById("kpi-ns").textContent = d.nivelServicio; document.getElementById("kpi-llamadas").textContent = d.llamadas; }
+        } catch(e){}
+    }
+
+    // --- RED ---
     async function updateNetwork() {
         try {
-            const resp = await fetch(cio_RED_URL);
-            const status = await resp.json();
+            const resp = await fetch(cio_RED_URL); const status = await resp.json();
             const ticker = document.getElementById("ticker-content");
             const offDetails = document.getElementById("offline-details");
-            let tickerHTML = "", detailsHTML = "";
-            let offCount = 0;
+            let tickerHTML = "", detailsHTML = "", offCount = 0;
 
             if(status) {
                 Object.keys(status).forEach(id => {
-                    const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
-
-                    if (currentItem.estado === "offline") {
-                        // SI NO EXISTE HORA PREVIA, CAPTURAMOS LA ACTUAL (Primera detección)
-                        if (!offlineTimes[id]) {
-                            offlineTimes[id] = new Date().toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'});
-                        }
-                        
-                        const timeStr = offlineTimes[id];
-                        tickerHTML += `
-                            <div class="status-badge offline">
-                                <span>⚠️ OFF: ${name}</span>
-                                <span class="time-tag">${timeStr}</span>
-                            </div>`;
-                        
-                        detailsHTML += `
-                            <div class="off-item">
-                                <span>● ${name}</span>
-                                <span class="time">${timeStr}</span>
-                            </div>`;
-                            
-                        offCount++;
-                        delete recentlyRestored[id];
+                    if (status[id].estado === "offline") {
+                        if (!offlineTimes[id]) offlineTimes[id] = new Date().toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'});
+                        tickerHTML += `<div class="status-badge offline"><span>⚠️ OFF: ${name}</span><span class="time-tag">${offlineTimes[id]}</span></div>`;
+                        detailsHTML += `<div class="off-item"><span>● ${name}</span><span class="time">${offlineTimes[id]}</span></div>`;
+                        offCount++; delete recentlyRestored[id];
                     } else {
-                        // Si vuelve a estar online, marcamos restauración y BORRAMOS la hora inicial
-                        if (offlineTimes[id]) {
-                            recentlyRestored[id] = 2;
-                            delete offlineTimes[id];
-                        }
-                        if (recentlyRestored[id] > 0) {
-                            tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
-                            recentlyRestored[id]--;
-                        }
+                        if (offlineTimes[id]) { recentlyRestored[id] = 2; delete offlineTimes[id]; }
+                        if (recentlyRestored[id] > 0) { tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`; recentlyRestored[id]--; }
                     }
                 });
             }
-
-            if(tickerHTML !== "") {
-                ticker.innerHTML = tickerHTML;
-                const itemsCount = offCount + Object.keys(recentlyRestored).filter(k => recentlyRestored[k] > 0).length;
-                ticker.style.animation = `scroll-ticker ${itemsCount * 8 + 5}s linear infinite`;
-                offDetails.innerHTML = detailsHTML;
-            } else {
-                ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
-                ticker.style.animation = "none"; ticker.style.left = "0";
-                offDetails.innerHTML = "<div class='off-item' style='color:#666; justify-content:center;'>No hay servicios offline</div>";
-            }
+            ticker.innerHTML = tickerHTML || `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
+            offDetails.innerHTML = detailsHTML || "<div class='off-item' style='color:#666; justify-content:center;'>No hay servicios offline</div>";
             document.getElementById("stat-off").textContent = offCount;
         } catch(e) {}
     }
 
+    // --- EVENTOS ---
     async function syncEvents() {
         try {
-            const resp = await fetch(cio_DB_URL);
-            const data = await resp.json();
+            const resp = await fetch(cio_DB_URL); const data = await resp.json();
             const now = Date.now();
             cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (now - it.timestamp < 86400000));
             document.getElementById("stat-total").textContent = cio_logs.length;
@@ -333,7 +280,7 @@
         setTimeout(() => {
             const item = cio_logs[cio_currentIdx % cio_logs.length];
             const color = {"Baja":"var(--accent)", "Media":"#f1c40f", "Alta":"#e67e22", "Crítica":"#ff4d4d"}[item.priority] || "#fff";
-            if(item.priority === "Crítica") app.classList.add("pantalla-critica"); else app.classList.remove("pantalla-critica");
+            app.classList.toggle("pantalla-critica", item.priority === "Crítica");
             document.getElementById("areaLabel").textContent = item.area;
             document.getElementById("areaLabel").style.color = color;
             document.getElementById("titleDisplay").textContent = item.title;
@@ -358,21 +305,14 @@
                     <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; padding:0; cursor:pointer; font-size:0.7rem; font-weight:bold;">EDITAR</button>
                     <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; padding:0; cursor:pointer; font-size:0.7rem; font-weight:bold;">ELIMINAR</button>
                 </div>
-            </div>
-        `}).join('');
+            </div>`;
+        }).join('');
     }
 
-    async function deleteEntry(idx) {
-        if(confirm("¿Eliminar?")) {
-            cio_logs.splice(idx, 1);
-            await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-            syncEvents();
-        }
-    }
+    async function deleteEntry(idx) { if(confirm("¿Eliminar?")) { cio_logs.splice(idx, 1); await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) }); syncEvents(); } }
 
     async function saveEntry(e) {
-        e.preventDefault();
-        const id = document.getElementById("f-id").value;
+        e.preventDefault(); const id = document.getElementById("f-id").value;
         const entry = {
             area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value,
             title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value,
@@ -384,58 +324,37 @@
     }
 
     function editEntry(idx) {
-        const it = cio_logs[idx];
-        document.getElementById("f-id").value = idx;
-        document.getElementById("f-area").value = it.area;
-        document.getElementById("f-prio").value = it.priority;
-        document.getElementById("f-title").value = it.title;
-        document.getElementById("f-msg").value = it.message;
+        const it = cio_logs[idx]; document.getElementById("f-id").value = idx;
+        document.getElementById("f-area").value = it.area; document.getElementById("f-prio").value = it.priority;
+        document.getElementById("f-title").value = it.title; document.getElementById("f-msg").value = it.message;
         openPanel('panelForm');
     }
 
     function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = jsPDF();
-        const now = new Date();
-        const currentH = now.getHours();
+        const { jsPDF } = window.jspdf; const doc = jsPDF(); const now = new Date(); const curH = now.getHours();
+        let currentTurno = (curH >= 6 && curH < 14) ? "Mañana (06:00 - 14:00)" : (curH >= 14 && curH < 22) ? "Tarde (14:00 - 22:00)" : "Noche (22:00 - 06:00)";
         
-        let currentTurno = "";
-        if (currentH >= 6 && currentH < 14) currentTurno = "Turno Mañana (06:00 - 14:00)";
-        else if (currentH >= 14 && currentH < 22) currentTurno = "Turno Tarde (14:00 - 22:00)";
-        else currentTurno = "Turno Noche (22:00 - 06:00)";
+        doc.setFontSize(16); doc.setTextColor(0, 100, 101); doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
+        doc.setFontSize(10); doc.setTextColor(100); doc.text(`Turno Actual: ${currentTurno}`, 14, 28);
+        doc.text(`Generado: ${now.toLocaleString('es-UY')}`, 14, 34);
 
-        doc.setFontSize(16); doc.setTextColor(0, 100, 101);
-        doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
-        
-        doc.setFontSize(10); doc.setTextColor(100);
-        doc.text(`Turno: ${currentTurno}`, 14, 28);
-        doc.text(`Fecha y Hora: ${now.toLocaleString('es-UY', {hour12:false})}`, 14, 34);
-
-        const getTurnoDeNovedad = (timestamp) => {
-            const h = new Date(timestamp).getHours();
-            if (h >= 6 && h < 14) return "Turno Mañana (06:00 - 14:00)";
-            if (h >= 14 && h < 22) return "Turno Tarde (14:00 - 22:00)";
-            return "Turno Noche (22:00 - 06:00)";
+        const getTurnoStr = (ts) => {
+            const h = new Date(ts).getHours();
+            if (h >= 6 && h < 14) return "Mañana (06:00 - 14:00)";
+            if (h >= 14 && h < 22) return "Tarde (14:00 - 22:00)";
+            return "Noche (22:00 - 06:00)";
         };
 
-        const novedadesFiltradas = cio_logs.filter(it => getTurnoDeNovedad(it.timestamp) === currentTurno);
+        const filtradas = cio_logs.filter(it => getTurnoStr(it.timestamp) === currentTurno);
 
-        doc.autoTable({
-            startY: 45,
-            head: [['Hora', 'Área', 'Prioridad', 'Título', 'Novedad']],
-            body: novedadesFiltradas.length > 0 
-                ? novedadesFiltradas.map(it => [
-                    new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'}),
-                    it.area, it.priority, it.title, it.message
-                  ])
-                : [['-', '-', '-', 'No se registraron novedades', '-']],
-            theme: 'striped',
-            headStyles: { fillColor: [0, 100, 101] }
+        doc.autoTable({ startY: 45, head: [['Hora', 'Área', 'Prioridad', 'Título', 'Mensaje']],
+            body: filtradas.map(it => [new Date(it.timestamp).toLocaleTimeString('es-UY',{hour12:false, hour:'2-digit', minute:'2-digit'}), it.area, it.priority, it.title, it.message]),
+            theme: 'striped', headStyles: { fillColor: [0, 100, 101] }
         });
-
-        doc.save(`Reporte_${now.toLocaleDateString()}.pdf`);
+        doc.save(`Reporte_Masterson_${now.toLocaleDateString()}.pdf`);
     }
 
+    // --- UI ---
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
     function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById("cio-overlay").style.display = "none"; }
     function toggleFS() { if (!document.fullscreenElement) document.getElementById("cio-app").requestFullscreen(); else document.exitFullscreen(); }
@@ -452,14 +371,12 @@
         requestAnimationFrame(loop);
     }
 
-    setInterval(() => {
-        const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
-        document.getElementById("clockDisplay").textContent = t;
-        document.getElementById("fsClockDisplay").textContent = t;
+    setInterval(() => { const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
+        document.getElementById("clockDisplay").textContent = t; document.getElementById("fsClockDisplay").textContent = t;
     }, 1000);
 
-    setInterval(updateNetwork, 5000); setInterval(syncEvents, 10000);
-    updateNetwork(); syncEvents(); requestAnimationFrame(loop);
+    setInterval(updateNetwork, 5000); setInterval(syncEvents, 10000); setInterval(syncKPIs, 10000);
+    updateNetwork(); syncEvents(); syncKPIs(); requestAnimationFrame(loop);
 </script>
 </body>
 </html>
