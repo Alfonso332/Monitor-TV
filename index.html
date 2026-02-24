@@ -72,9 +72,16 @@
         }
 
         #cio-app .status-badge { 
-            padding: 12px 30px; border-radius: 8px; font-size: 1.6rem; 
+            display: flex; align-items: center; gap: 15px;
+            padding: 12px 25px; border-radius: 8px; font-size: 1.6rem; 
             font-weight: 900; text-transform: uppercase; flex-shrink: 0;
         }
+        
+        #cio-app .status-badge .time-tag {
+            font-family: monospace; font-size: 1.1rem; padding: 2px 8px;
+            background: rgba(255,255,255,0.1); border-radius: 4px; opacity: 0.8;
+        }
+
         #cio-app .status-badge.offline { 
             background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); 
             color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
@@ -104,8 +111,17 @@
             max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out;
             background: #111; border-radius: 12px; margin-bottom: 20px;
         }
-        #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 10px; margin-top: -5px; }
-        #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: space-between;}
+        #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 5px 10px; margin-top: -5px; }
+        
+        #cio-app .off-item { 
+            font-size: 0.85rem; color: #ff4d4d; padding: 12px 0; 
+            border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center;
+        }
+        #cio-app .off-item:last-child { border-bottom: none; }
+        #cio-app .off-item .time { 
+            font-family: monospace; background: #220000; padding: 2px 6px; 
+            border-radius: 4px; border: 1px solid #441111; color: #ff8888;
+        }
 
         /* INPUTS Y BOTONES */
         #cio-app input, #cio-app textarea, #cio-app select {
@@ -222,10 +238,10 @@
     let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
     let prevStatus = {}; 
     let recentlyRestored = {}; 
-    let offlineTimes = {}; // Almacena la hora de detección por cada ID
+    let offlineTimes = {}; // Registro de horas de caída
     const cio_SLIDE_TIME = 45;
 
-    // Lógica de Deslizamiento (Swipe to close)
+    // Swipe to close
     let touchStartX = 0;
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
@@ -249,26 +265,32 @@
                     const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
 
-                    // Lógica para detectar el momento exacto en que pasa a offline
                     if (currentItem.estado === "offline") {
-                        // Si no teníamos registrada la hora o antes estaba online, guardamos la hora actual
+                        // Capturar hora si es nueva detección
                         if (!offlineTimes[id] || (prevStatus[id] && prevStatus[id].estado === "online")) {
                             offlineTimes[id] = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                         }
                         
                         const timeStr = offlineTimes[id];
-                        tickerHTML += `<div class="status-badge offline">⚠️ OFF: ${name} [${timeStr}]</div>`;
-                        detailsHTML += `<div class="off-item"><span>● ${name}</span> <small style="opacity:0.6;">Detección: ${timeStr}</small></div>`;
+                        tickerHTML += `
+                            <div class="status-badge offline">
+                                <span>⚠️ OFF: ${name}</span>
+                                <span class="time-tag">${timeStr}</span>
+                            </div>`;
+                        
+                        detailsHTML += `
+                            <div class="off-item">
+                                <span>● ${name}</span>
+                                <span class="time">${timeStr}</span>
+                            </div>`;
+                            
                         offCount++;
                         delete recentlyRestored[id];
                     } else {
-                        // Si vuelve a estar online, detectamos si acaba de restablecerse
                         if (prevStatus[id] && prevStatus[id].estado === "offline") {
                             recentlyRestored[id] = 2;
                         }
-                        // Limpiamos la hora de offline ya que el servicio está UP
                         delete offlineTimes[id];
-
                         if (recentlyRestored[id] > 0) {
                             tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`;
                             recentlyRestored[id]--;
@@ -286,7 +308,7 @@
             } else {
                 ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
                 ticker.style.animation = "none"; ticker.style.left = "0";
-                offDetails.innerHTML = "<div class='off-item' style='color:#666'>No hay servicios offline</div>";
+                offDetails.innerHTML = "<div class='off-item' style='color:#666; justify-content:center;'>No hay servicios offline</div>";
             }
             document.getElementById("stat-off").textContent = offCount;
         } catch(e) {}
@@ -404,24 +426,14 @@
             body: novedadesFiltradas.length > 0 
                 ? novedadesFiltradas.map(it => [
                     new Date(it.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                    it.area, 
-                    it.priority, 
-                    it.title, 
-                    it.message
+                    it.area, it.priority, it.title, it.message
                   ])
-                : [['-', '-', '-', 'No se registraron novedades en este turno', '-']],
+                : [['-', '-', '-', 'No se registraron novedades', '-']],
             theme: 'striped',
-            headStyles: { fillColor: [0, 100, 101] },
-            columnStyles: {
-                0: { cellWidth: 20 },
-                1: { cellWidth: 35 },
-                2: { cellWidth: 25 },
-                4: { cellWidth: 'auto' }
-            }
+            headStyles: { fillColor: [0, 100, 101] }
         });
 
-        const fileName = `Reporte_${currentTurno.split(' ')[1]}_${now.toLocaleDateString().replace(/\//g, '-')}.pdf`;
-        doc.save(fileName);
+        doc.save(`Reporte_${now.toLocaleDateString()}.pdf`);
     }
 
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
