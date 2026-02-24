@@ -51,10 +51,21 @@
         #cio-app .kpi-item label { display: block; font-size: 0.7rem; color: var(--accent); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
         #cio-app .kpi-item span { font-size: 1.8rem; font-family: monospace; font-weight: bold; color: #fff; display: inline-flex; align-items: center; gap: 8px; }
 
-        /* ESTILO PERSISTENTE DE FLECHAS */
-        #cio-app .trend-arrow { font-size: 1.2rem; min-width: 20px; font-style: normal; }
-        #cio-app .trend-up { color: var(--online); }
-        #cio-app .trend-down { color: var(--critico); }
+        /* ANIMACIÓN DE FLECHA */
+        @keyframes pulse-trend {
+            0% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(-4px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 0.7; }
+        }
+        @keyframes pulse-trend-down {
+            0% { transform: translateY(0); opacity: 0.7; }
+            50% { transform: translateY(4px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 0.7; }
+        }
+
+        #cio-app .trend-arrow { font-size: 1.4rem; min-width: 20px; font-style: normal; display: inline-block; transition: all 0.3s ease; }
+        #cio-app .trend-up { color: var(--online); animation: pulse-trend 1.5s infinite ease-in-out; }
+        #cio-app .trend-down { color: var(--critico); animation: pulse-trend-down 1.5s infinite ease-in-out; }
 
         /* FULLSCREEN */
         #cio-app:fullscreen .main-header { display: none !important; }
@@ -194,24 +205,30 @@
         panel.addEventListener('touchend', e => { if (e.changedTouches[0].screenX - touchStartX > 100) closePanels(); });
     });
 
-    // LÓGICA DE FLECHA PERSISTENTE
+    // LÓGICA DE FLECHA CON MOVIMIENTO CONSTANTE
     function updateTrendUI(currentStr) {
         const currentVal = parseFloat(currentStr.replace('%','')) || 0;
         const lastVal = parseFloat(localStorage.getItem('cio_last_ns_val')) || 0;
         const icon = document.getElementById("trend-icon");
         
+        let trend = localStorage.getItem('cio_trend_cache');
+
         if (currentVal > lastVal) {
-            icon.innerHTML = " ▲"; icon.className = "trend-arrow trend-up";
-            localStorage.setItem('cio_trend_cache', 'up');
+            trend = 'up';
         } else if (currentVal < lastVal) {
-            icon.innerHTML = " ▼"; icon.className = "trend-arrow trend-down";
-            localStorage.setItem('cio_trend_cache', 'down');
-        } else {
-            // Si son iguales, mantenemos la última tendencia guardada para que no desaparezca
-            const cache = localStorage.getItem('cio_trend_cache');
-            if(cache === 'up') { icon.innerHTML = " ▲"; icon.className = "trend-arrow trend-up"; }
-            else if(cache === 'down') { icon.innerHTML = " ▼"; icon.className = "trend-arrow trend-down"; }
+            trend = 'down';
         }
+
+        if (trend === 'up') {
+            icon.innerHTML = " ▲"; 
+            icon.className = "trend-arrow trend-up";
+            localStorage.setItem('cio_trend_cache', 'up');
+        } else if (trend === 'down') {
+            icon.innerHTML = " ▼"; 
+            icon.className = "trend-arrow trend-down";
+            localStorage.setItem('cio_trend_cache', 'down');
+        }
+
         localStorage.setItem('cio_last_ns_val', currentVal);
     }
 
