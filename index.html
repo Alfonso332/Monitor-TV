@@ -129,27 +129,32 @@
         /* DISEÑO MÓVIL PROFESIONAL */
         .mobile-section-header {
             color: var(--primary); font-size: 0.75rem; font-weight: bold; 
-            margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px;
-            border-bottom: 1px solid #222; padding-bottom: 5px;
+            margin: 25px 0 12px; text-transform: uppercase; letter-spacing: 1.5px;
+            display: flex; align-items: center; gap: 10px;
         }
+        .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+
         .mobile-stat-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;
         }
         .mobile-stat-box { 
-            background: linear-gradient(145deg, #1a1a1a, #0a0a0a); 
-            padding: 20px 10px; border-radius: 15px; 
+            background: linear-gradient(145deg, #151515, #0a0a0a); 
+            padding: 15px 10px; border-radius: 12px; 
             border: 1px solid #222; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         .mobile-puestos-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
             background: #111; padding: 15px; border-radius: 15px; border: 1px solid #222;
         }
         .off-service-item { 
-            background: rgba(255, 77, 77, 0.08); border: 1px solid rgba(255, 77, 77, 0.2);
-            border-left: 4px solid var(--critico); padding: 12px; margin-bottom: 10px; 
-            border-radius: 8px; font-size: 0.85rem; font-weight: bold;
-            display: flex; align-items: center; gap: 10px;
+            background: linear-gradient(90deg, rgba(255, 77, 77, 0.12), transparent); 
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            border-left: 4px solid var(--critico); padding: 15px; margin-bottom: 8px; 
+            border-radius: 10px; font-size: 0.8rem; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .off-service-tag { background: var(--critico); color: black; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
 
         /* === RESPONSIVE CELULAR === */
         @media (max-width: 768px) {
@@ -158,23 +163,23 @@
             #cio-app #progressLine { bottom: 0; }
             #cio-app .main-header { height: 65px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; justify-content: center; }
             #cio-app .main-header img { height: 35px; }
-            #cio-app #clockDisplay { position: absolute; left: 20px; font-size: 0.9rem; opacity: 0.7; }
+            #cio-app #clockDisplay { position: absolute; left: 20px; font-size: 0.8rem; opacity: 0.7; }
             
             #cio-app .side-panel { 
-                width: 85%; max-width: 400px; padding: 25px; 
-                border-left: 2px solid var(--primary);
-                box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+                width: 90%; max-width: 400px; padding: 20px; 
+                border-left: 3px solid var(--primary);
+                box-shadow: -15px 0 35px rgba(0,0,0,0.9);
             }
-            #cio-app #titleDisplay { font-size: 2.4rem; line-height: 1.1; margin: 20px 0; }
-            #cio-app #messageDisplay { font-size: 1.2rem; }
-            #cio-app .area-tag { font-size: 0.9rem; letter-spacing: 4px; }
+            #cio-app #titleDisplay { font-size: 2.2rem; line-height: 1.1; margin: 15px 0; }
+            #cio-app #messageDisplay { font-size: 1.1rem; }
+            #cio-app .area-tag { font-size: 0.8rem; letter-spacing: 3px; }
         }
     </style>
 </head>
 <body>
 
 <div id="cio-app">
-    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090;" onclick="closePanels()"></div>
+    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(4px);" onclick="closePanels()"></div>
 
     <div id="hamb-menu" onclick="openPanel('panelMobileDash')">☰</div>
 
@@ -214,61 +219,60 @@
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
-        <div style="text-align: center; margin-bottom: 25px;">
-            <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
-            <h2 style="color:var(--accent); font-size: 1.4rem; letter-spacing: 1px;">PANEL DE CONTROL</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 50px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 20px;"></div>
+            <h2 style="color:var(--accent); font-size: 1.2rem; letter-spacing: 2px; font-weight: 900;">OPERACIONES</h2>
         </div>
         
-        <div class="mobile-section-header">Métricas en Tiempo Real</div>
+        <div class="mobile-section-header">Performance del Centro</div>
         <div class="mobile-stat-container">
             <div class="mobile-stat-box">
-                <div class="kpi-label" style="margin-bottom:8px;">SLA</div>
-                <div id="m-sla" class="kpi-value" style="justify-content:center; font-size: 1.8rem;">--%</div>
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:5px;">SLA Global</div>
+                <div id="m-sla" class="kpi-value" style="justify-content:center; font-size: 1.6rem;">--%</div>
             </div>
             <div class="mobile-stat-box">
-                <div class="kpi-label" style="margin-bottom:8px;">LLAMADAS</div>
-                <div id="m-calls" class="kpi-value" style="justify-content:center; font-size: 1.8rem;">0</div>
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:5px;">En Espera</div>
+                <div id="m-calls" class="kpi-value" style="justify-content:center; font-size: 1.6rem; color: #fff;">0</div>
             </div>
         </div>
 
-        <div class="mobile-section-header">Disponibilidad Puestos</div>
+        <div class="mobile-section-header">Puestos Activos</div>
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-        <div class="mobile-section-header">Estatus Servicios (Offline)</div>
-        <div id="m-offline-list"></div>
+        <div class="mobile-section-header">Alertas de Infraestructura</div>
+        <div id="m-offline-list">
+            </div>
 
-        <div class="mobile-section-header">Acciones de Sistema</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button onclick="openPanel('panelHistory')" class="btn-pill" style="font-size: 0.7rem; background:#1a1a1a; border:1px solid var(--primary);">⚙️ CONFIG</button>
-            <button onclick="toggleFS(); closePanels();" class="btn-pill" style="font-size: 0.7rem; background:#1a1a1a; border:1px solid var(--primary);">⛶ FULLSCREEN</button>
+        <div class="mobile-section-header">Controles</div>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill" style="font-size: 0.8rem; background:#1a1a1a; border:1px solid var(--primary); border-radius: 12px;">⚙️ CONFIGURACIÓN DE SISTEMA</button>
+            <button onclick="closePanels()" class="btn-pill" style="margin-top:10px; background: #222; border: 1px solid #444; border-radius: 12px;">CERRAR PANEL</button>
         </div>
-
-        <button onclick="closePanels()" class="btn-pill" style="margin-top:30px; background: #c0392b;">CERRAR MENÚ</button>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">CONFIGURACIÓN</h2>
         
         <div style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px;">
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">MÉTRICAS KPI</label>
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center;">MÉTRICAS KPI</label>
             <div style="display:flex; gap:10px; margin:10px 0;">
                 <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
                 <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
             </div>
             
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">PUESTOS (P1-P9)</label>
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-top:10px;">ESTADO DE PUESTOS (P1-P9)</label>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:10px;" id="p-inputs-grid"></div>
             
-            <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px;">GUARDAR CAMBIOS</button>
+            <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
         </div>
 
-        <button onclick="openForm(null)" class="btn-pill" style="background:var(--online); color:#000;">＋ NUEVA NOVEDAD</button>
-        <button onclick="downloadPDF()" class="btn-pill btn-sec">⬇ DESCARGAR PDF</button>
+        <button onclick="openForm(null)" class="btn-pill" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
+        <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
         
         <div class="mobile-section-header">Historial de Novedades</div>
         <div id="historyList"></div>
         
-        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">VOLVER</button>
+        <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; border-radius: 8px;">VOLVER</button>
     </aside>
 
     <aside id="panelForm" class="side-panel">
@@ -288,8 +292,8 @@
             <input type="text" id="f-title" placeholder="Título" required class="p-field">
             <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
             
-            <button type="submit" class="btn-pill">PUBLICAR AHORA</button>
-            <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec">CANCELAR</button>
+            <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICAR AHORA</button>
+            <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="border-radius: 8px;">CANCELAR</button>
         </form>
     </aside>
 </div>
@@ -344,12 +348,16 @@
                     if(v.estado === "offline") {
                         const name = id.replace(/_/g,' ').toUpperCase();
                         tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
-                        mHtml += `<div class="off-service-item"><span>⚠️</span> ${name}</div>`;
+                        mHtml += `
+                            <div class="off-service-item">
+                                <span><span style="color:var(--critico); margin-right:10px;">●</span> ${name}</span>
+                                <span class="off-service-tag">Fuera de Línea</span>
+                            </div>`;
                     }
                 });
             }
             ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
-            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.9rem; text-align:center; padding:10px;">✔ Todos los servicios en línea</div>`;
+            mOffList.innerHTML = mHtml || `<div style="background: rgba(46, 204, 113, 0.1); border: 1px dashed var(--online); color:var(--online); font-size:0.8rem; text-align:center; padding:15px; border-radius:10px;">✔ Todos los servicios están operando con normalidad</div>`;
         } catch(e) { console.error(e); }
     }
 
@@ -371,7 +379,7 @@
             }
         }
         pcCont.innerHTML = html;
-        mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.5; font-size:0.8rem; text-align:center;">Sin puestos activos</div>`;
+        mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.5; font-size:0.8rem; text-align:center; padding: 10px;">Sin puestos activos</div>`;
     }
 
     function downloadPDF() {
@@ -459,8 +467,8 @@
             <div class="history-card">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem;"><b>${it.area}</b><span>${it.priority}</span></div>
                 <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
-                <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; font-weight:bold; margin-right:15px;">EDITAR</button>
-                <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; font-weight:bold;">BORRAR</button>
+                <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; font-weight:bold; margin-right:15px; cursor:pointer;">EDITAR</button>
+                <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; font-weight:bold; cursor:pointer;">BORRAR</button>
             </div>`).join('');
     }
 
