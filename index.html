@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
-        /* === CSS ENCAPSULADO === */
+        /* === BASE CIO === */
         #cio-app {
             --primary: #006465;
             --accent: #00d1d1;
@@ -32,7 +32,7 @@
         }
 
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
-        #cio-app * { box-sizing: border-box !important; margin: 0; padding: 0; }
+        #cio-app * { box-sizing: border-box !important; }
 
         /* HEADER */
         #cio-app .main-header {
@@ -40,82 +40,140 @@
             padding: 0 20px; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--primary); z-index: 10;
         }
-
-        /* BARRA KPI */
-        #cio-app .kpi-bar {
-            display: flex; justify-content: center; gap: 50px; 
-            background: #050505; padding: 12px; border-bottom: 1px solid #111;
-            z-index: 100;
-        }
-        #cio-app .kpi-item { text-align: center; }
-        #cio-app .kpi-item label { display: block; font-size: 0.7rem; color: var(--accent); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        #cio-app .kpi-item span { font-size: 1.8rem; font-family: monospace; font-weight: bold; color: #fff; display: inline-flex; align-items: center; gap: 8px; }
-
-        /* ANIMACIÓN DE FLECHA */
-        @keyframes pulse-trend {
-            0% { transform: translateY(0); opacity: 0.7; }
-            50% { transform: translateY(-4px); opacity: 1; }
-            100% { transform: translateY(0); opacity: 0.7; }
-        }
-        @keyframes pulse-trend-down {
-            0% { transform: translateY(0); opacity: 0.7; }
-            50% { transform: translateY(4px); opacity: 1; }
-            100% { transform: translateY(0); opacity: 0.7; }
-        }
-
-        #cio-app .trend-arrow { font-size: 1.4rem; min-width: 20px; font-style: normal; display: inline-block; transition: all 0.3s ease; }
-        #cio-app .trend-up { color: var(--online); animation: pulse-trend 1.5s infinite ease-in-out; }
-        #cio-app .trend-down { color: var(--critico); animation: pulse-trend-down 1.5s infinite ease-in-out; }
-
-        /* FULLSCREEN */
         #cio-app:fullscreen .main-header { display: none !important; }
-        #cio-app:fullscreen .kpi-bar { background: transparent; border: none; position: absolute; top: 25px; width: 100%; }
         #cio-app .fs-clock { display: none; }
-        #cio-app:fullscreen .fs-clock { display: block; position: absolute; top: 20px; right: 30px; font-family: monospace; font-size: 2.5rem; font-weight: 900; color: var(--primary); z-index: 100; }
+        #cio-app:fullscreen .fs-clock { 
+            display: block; position: absolute; top: 20px; right: 30px; 
+            font-family: monospace; font-size: 2.5rem; font-weight: 900; 
+            color: var(--primary); z-index: 100;
+        }
+
+        /* KPI BAR */
+        .kpi-bar {
+            display: flex;
+            justify-content: center;
+            background: #050505;
+            padding: 10px 0;
+            border-bottom: 1px solid #1a1a1a;
+            gap: 40px;
+        }
+        .kpi-card { text-align: center; min-width: 180px; }
+        .kpi-value { display: block; font-size: 1.8rem; font-weight: 900; font-family: monospace; color: var(--accent); }
+        .kpi-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; }
+        
+        .trend-arrow { font-size: 1.2rem; margin-left: 5px; vertical-align: middle; animation: kpiPulse 2s infinite; }
+        @keyframes kpiPulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         /* DISPLAY CENTRAL */
         #cio-app #display-board { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 1.1; }
+        #cio-app #titleDisplay { font-size: 75px; font-weight: 900; margin: 10px 0; text-transform: uppercase; }
         #cio-app .info-container { transition: all 0.6s ease; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
         /* TICKER */
-        #cio-app #ticker-bar { height: 75px; background: #050505; border-top: 1px solid #111; display: flex; align-items: center; overflow: hidden; position: relative; }
-        #cio-app #ticker-content { display: flex; align-items: center; gap: 80px; white-space: nowrap; position: absolute; left: 0; animation: scroll-ticker 25s linear infinite; }
-        @keyframes scroll-ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+        #cio-app #ticker-bar { 
+            height: 75px; background: #050505; border-top: 1px solid #111; 
+            display: flex; align-items: center; overflow: hidden; position: relative; 
+        }
 
-        #cio-app .status-badge { display: flex; align-items: center; gap: 15px; padding: 12px 25px; border-radius: 8px; font-size: 1.6rem; font-weight: 900; text-transform: uppercase; flex-shrink: 0; }
-        #cio-app .status-badge .time-tag { font-family: monospace; font-size: 1.1rem; padding: 2px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; opacity: 0.8; }
-        #cio-app .status-badge.offline { background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
-        #cio-app .status-badge.restored { background: rgba(46, 204, 113, 0.15); border: 3px solid var(--online); color: var(--online); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3); }
+        #cio-app #ticker-content { 
+            display: flex; align-items: center; gap: 80px; white-space: nowrap; 
+            position: absolute; left: 0;
+            animation: scroll-ticker 25s linear infinite; 
+        }
+
+        @keyframes scroll-ticker {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+
+        #cio-app .status-badge { 
+            display: flex; align-items: center; gap: 15px;
+            padding: 12px 25px; border-radius: 8px; font-size: 1.6rem; 
+            font-weight: 900; text-transform: uppercase; flex-shrink: 0;
+        }
+        
+        #cio-app .status-badge .time-tag {
+            font-family: monospace; font-size: 1.1rem; padding: 2px 8px;
+            background: rgba(255,255,255,0.1); border-radius: 4px; opacity: 0.8;
+        }
+
+        #cio-app .status-badge.offline { 
+            background: rgba(255, 77, 77, 0.15); border: 3px solid var(--critico); 
+            color: var(--critico); box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
+        }
+        #cio-app .status-badge.restored { 
+            background: rgba(46, 204, 113, 0.15); border: 3px solid var(--online); 
+            color: var(--online); box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+        }
 
         /* PANELES */
-        #cio-app .side-panel { position: fixed; right: 0; top: 0; width: 400px; height: 100%; background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px; transform: translateX(100%); transition: 0.4s ease; z-index: 10100; overflow-y: auto; touch-action: pan-y; }
+        #cio-app .side-panel {
+            position: fixed; right: 0; top: 0; width: 400px; height: 100%;
+            background: #0a0a0a; border-left: 1px solid var(--primary); padding: 30px;
+            transform: translateX(100%); transition: 0.4s ease; z-index: 10100;
+            overflow-y: auto; touch-action: pan-y;
+        }
         #cio-app .side-panel.active { transform: translateX(0); }
 
-        /* KPI & STATS */
-        .kpi-manager { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #222; }
+        /* ESTADISTICAS */
         #cio-app .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; margin-bottom: 15px; }
-        #cio-app .stat-box { background: #111; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #222; cursor: pointer; }
+        #cio-app .stat-box { background: #111; padding: 12px; border-radius: 12px; text-align: center; border: 1px solid #222; cursor: pointer; transition: 0.2s; }
         #cio-app .stat-box b { display: block; font-size: 1.3rem; }
         #cio-app .stat-box small { font-size: 0.65rem; opacity: 0.6; text-transform: uppercase; }
 
-        #cio-app #offline-details { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: #111; border-radius: 12px; }
-        #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 10px; margin-bottom: 15px; }
-        #cio-app .off-item { font-size: 0.85rem; color: #ff4d4d; padding: 10px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-        #cio-app .off-item .time { font-family: monospace; background: #220000; padding: 2px 6px; border-radius: 4px; border: 1px solid #441111; color: #ff8888; }
+        /* DETALLES OFFLINE */
+        #cio-app #offline-details {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out;
+            background: #111; border-radius: 12px; margin-bottom: 20px;
+        }
+        #cio-app #offline-details.show { max-height: 400px; border: 1px solid #444; padding: 5px 10px; margin-top: -5px; }
+        
+        #cio-app .off-item { 
+            font-size: 0.85rem; color: #ff4d4d; padding: 12px 0; 
+            border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center;
+        }
+        #cio-app .off-item:last-child { border-bottom: none; }
+        #cio-app .off-item .time { 
+            font-family: monospace; background: #220000; padding: 2px 6px; 
+            border-radius: 4px; border: 1px solid #441111; color: #ff8888;
+        }
 
-        /* INPUTS & BOTONES */
-        #cio-app input, #cio-app textarea, #cio-app select { width: 100%; padding: 14px; background: #151515 !important; color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center; margin-bottom: 12px; font-size: 1rem; }
-        #cio-app .btn-pill { background: var(--primary) !important; color: #fff !important; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center; display: block; }
+        /* INPUTS Y BOTONES */
+        #cio-app input, #cio-app textarea, #cio-app select {
+            width: 100%; padding: 14px; background: #151515 !important;
+            color: #fff !important; border: 1px solid #252525 !important; border-radius: 12px; text-align: center; margin-bottom: 12px;
+        }
+        #cio-app .btn-pill {
+            background: var(--primary) !important; color: #fff !important; border: none; padding: 12px 24px; border-radius: 50px;
+            font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center;
+        }
         #cio-app .btn-sec { background: #1a1a1a !important; border: 1px solid #333; }
-        #cio-app .history-item { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
+
+        /* HISTORIAL CARDS */
+        #cio-app .history-item {
+            background: #111; padding: 15px; border-radius: 12px; margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* CELULAR */
+        #mobile-fab { display: none; }
 
         @media (max-width: 768px) {
-            #cio-app .main-header, #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app #progressLine { display: none !important; }
-            #cio-app #titleDisplay { font-size: 28px !important; }
-            #cio-app .side-panel { width: 100%; }
-            #mobile-fab { display: flex; position: fixed; bottom: 30px; right: 25px; width: 65px; height: 65px; background: var(--primary); border-radius: 50%; z-index: 1000005; align-items: center; justify-content: center; border: 2px solid var(--accent); }
+            #cio-app { overflow: hidden; position: fixed; height: 100vh; }
+            #cio-app .main-header, #cio-app #ticker-bar, #cio-app #progressLine, .kpi-bar { display: none !important; }
+            #cio-app #display-board { padding: 15px; }
+            #cio-app #titleDisplay { font-size: 28px !important; margin: 5px 0; }
+            #cio-app #messageDisplay { font-size: 1.1rem !important; }
+            #cio-app .side-panel { width: 100%; border-left: none; }
+            
+            #mobile-fab {
+                display: flex; position: fixed; bottom: 30px; right: 25px; 
+                width: 65px; height: 65px; background: var(--primary);
+                border-radius: 50%; z-index: 1000005; align-items: center; justify-content: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid var(--accent);
+            }
+            #mobile-fab span { font-size: 30px; color: white; }
         }
     </style>
 </head>
@@ -126,9 +184,8 @@
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090; backdrop-filter:blur(5px);" onclick="closePanels()"></div>
 
     <header class="main-header">
-        <div style="display:flex; gap:10px;">
-            <button onclick="openFormPanel()" class="btn-pill" style="padding:8px 20px; width:auto;">＋ NUEVA</button>
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="padding:8px 20px; width:auto;">📋 HISTORIAL</button>
+        <div class="header-actions" style="display:flex; gap:10px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="padding:8px 20px; width:auto; border-color:var(--primary); color:var(--accent) !important;">⚙️ SISTEMA</button>
             <button onclick="toggleFS()" style="background:none; border:1px solid #333; color:#555; padding:8px 12px; border-radius:8px; cursor:pointer;">⛶ TV</button>
         </div>
         <div id="clockDisplay" style="font-family:monospace; font-size:1.6rem; font-weight:900; color:var(--primary);">00:00:00</div>
@@ -136,11 +193,14 @@
     </header>
 
     <div class="kpi-bar">
-        <div class="kpi-item">
-            <label>Nivel de Servicio (<5s)</label>
-            <span><span id="kpi-ns">--%</span><i id="trend-icon" class="trend-arrow"></i></span>
+        <div class="kpi-card">
+            <span id="v-sla" class="kpi-value">--%</span>
+            <span class="kpi-label">NS < 5 SEG</span>
         </div>
-        <div class="kpi-item"><label>Llamadas Totales</label><span id="kpi-llamadas">0</span></div>
+        <div class="kpi-card">
+            <span id="v-calls" class="kpi-value">0</span>
+            <span class="kpi-label">TOTAL LLAMADAS</span>
+        </div>
     </div>
 
     <main id="display-board">
@@ -151,12 +211,20 @@
         </div>
     </main>
 
-    <div id="ticker-bar"><div id="ticker-content"><span>ESCANEANDO...</span></div></div>
+    <div id="ticker-bar">
+        <div id="ticker-content">
+            <span style="font-size: 1.2rem; color: #333; font-weight: bold;">ESCANEANDO...</span>
+        </div>
+    </div>
+    
     <div id="progressLine" style="position: fixed; bottom: 75px; height: 4px; width: 0%; background: var(--primary); z-index: 5;"></div>
-    <div id="mobile-fab" onclick="openPanel('panelHistory')"><span style="color:white; font-size:30px;">☰</span></div>
+
+    <div id="mobile-fab" onclick="openPanel('panelHistory')">
+        <span>⚙️</span>
+    </div>
 
     <aside id="panelForm" class="side-panel">
-        <h2 style="color:var(--primary); text-align:center; margin-bottom:20px;">NOVEDAD</h2>
+        <h2 id="formTitle" style="color:var(--primary); text-align:center;">NOVEDAD</h2>
         <form id="mainForm" onsubmit="saveEntry(event)">
             <input type="hidden" id="f-id" value="">
             <select id="f-area"><option>Monitoreo</option><option>Freschat</option><option>Atención al cliente</option><option>Novedad Interna</option></select>
@@ -164,27 +232,33 @@
             <input type="text" id="f-title" placeholder="Título novedad" required>
             <textarea id="f-msg" rows="5" placeholder="Descripción..." required></textarea>
             <button type="submit" class="btn-pill">PUBLICAR</button>
-            <button type="button" onclick="closePanels()" class="btn-pill btn-sec">CANCELAR</button>
+            <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec">VOLVER</button>
         </form>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
-        <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">ESTADO OPERATIVO</h2>
-        <div class="kpi-manager">
-            <h4 style="text-align:center; font-size:0.7rem; color:var(--accent); margin-bottom:10px;">QUEUEMETRICS</h4>
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="input-ns" placeholder="NS %">
-                <input type="number" id="input-llamadas" placeholder="Llamadas">
-            </div>
-            <button onclick="updateKPIs()" class="btn-pill" style="padding:8px; font-size:0.7rem;">ACTUALIZAR</button>
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">PANEL DE CONTROL</h2>
+        
+        <div style="background:#151515; padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid #222;">
+            <small style="color:var(--primary); font-weight:bold; display:block; margin-bottom:10px;">DATOS KPI BAR</small>
+            <input type="number" id="kpi-sla-input" placeholder="NS (ej: 95)" style="font-size:1.2rem; margin-bottom:8px;">
+            <input type="number" id="kpi-calls-input" placeholder="Cantidad de llamadas" style="font-size:1.2rem;">
+            <button onclick="saveKPIs()" class="btn-pill" style="margin-bottom:0; font-size:0.8rem;">ACTUALIZAR BARRA</button>
         </div>
+
         <div class="stats-grid">
             <div class="stat-box" onclick="openFormPanel()"><b style="color:var(--primary)">＋</b><small>Nueva</small></div>
             <div class="stat-box"><b id="stat-total">0</b><small>Total</small></div>
-            <div class="stat-box" onclick="toggleOfflineDetails()"><b id="stat-off" style="color:var(--accent)">0</b><small>Off ▾</small></div>
+            <div class="stat-box" onclick="toggleOfflineDetails()">
+                <b id="stat-off" style="color:var(--accent)">0</b>
+                <small>Off ▾</small>
+            </div>
         </div>
+
         <div id="offline-details"></div>
+
         <button onclick="downloadPDF()" class="btn-pill" style="background:#222 !important; margin-bottom:20px; font-size:0.75rem;">⬇ DESCARGAR REPORTE TURNO</button>
+
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
@@ -193,96 +267,83 @@
 <script>
     const cio_DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     const cio_RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
-    const cio_KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_qm.json";
+    const cio_KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis.json";
     
-    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null, offlineTimes = {}, recentlyRestored = {};
+    let cio_logs = [], cio_currentIdx = 0, cio_startTime = null;
+    let offlineTimes = {}; 
+    let recentlyRestored = {};
+    let prevSLA = 0;
     const cio_SLIDE_TIME = 45;
 
-    // SWIPE PARA CERRAR
-    let touchStartX = 0;
-    document.querySelectorAll('.side-panel').forEach(panel => {
-        panel.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX);
-        panel.addEventListener('touchend', e => { if (e.changedTouches[0].screenX - touchStartX > 100) closePanels(); });
-    });
-
-    // LÓGICA DE FLECHA CON MOVIMIENTO CONSTANTE
-    function updateTrendUI(currentStr) {
-        const currentVal = parseFloat(currentStr.replace('%','')) || 0;
-        const lastVal = parseFloat(localStorage.getItem('cio_last_ns_val')) || 0;
-        const icon = document.getElementById("trend-icon");
-        
-        let trend = localStorage.getItem('cio_trend_cache');
-
-        if (currentVal > lastVal) {
-            trend = 'up';
-        } else if (currentVal < lastVal) {
-            trend = 'down';
-        }
-
-        if (trend === 'up') {
-            icon.innerHTML = " ▲"; 
-            icon.className = "trend-arrow trend-up";
-            localStorage.setItem('cio_trend_cache', 'up');
-        } else if (trend === 'down') {
-            icon.innerHTML = " ▼"; 
-            icon.className = "trend-arrow trend-down";
-            localStorage.setItem('cio_trend_cache', 'down');
-        }
-
-        localStorage.setItem('cio_last_ns_val', currentVal);
-    }
-
-    // KPIs
-    async function updateKPIs() {
-        const ns = document.getElementById("input-ns").value || "0%";
-        const data = { nivelServicio: ns.includes('%') ? ns : ns+"%", llamadas: document.getElementById("input-llamadas").value || "0" };
-        await fetch(cio_KPI_URL, { method: 'PUT', body: JSON.stringify(data) });
+    async function saveKPIs() {
+        const sla = document.getElementById("kpi-sla-input").value;
+        const calls = document.getElementById("kpi-calls-input").value;
+        await fetch(cio_KPI_URL, { method: 'PUT', body: JSON.stringify({ sla, calls }) });
         syncKPIs();
     }
 
     async function syncKPIs() {
-        try { const r = await fetch(cio_KPI_URL); const d = await r.json();
-            if(d){ 
-                document.getElementById("kpi-ns").textContent = d.nivelServicio; 
-                document.getElementById("kpi-llamadas").textContent = d.llamadas; 
-                updateTrendUI(d.nivelServicio);
+        try {
+            const resp = await fetch(cio_KPI_URL);
+            const data = await resp.json();
+            if(data) {
+                const currentSLA = parseFloat(data.sla) || 0;
+                let trendIcon = currentSLA >= prevSLA ? 
+                    '<span class="trend-arrow" style="color:var(--online)">▲</span>' : 
+                    '<span class="trend-arrow" style="color:var(--critico)">▼</span>';
+
+                document.getElementById("v-sla").innerHTML = `${currentSLA}% ${trendIcon}`;
+                document.getElementById("v-calls").textContent = data.calls || "0";
+                document.getElementById("kpi-sla-input").value = data.sla || "";
+                document.getElementById("kpi-calls-input").value = data.calls || "";
+                prevSLA = currentSLA;
             }
-        } catch(e){}
+        } catch(e) {}
     }
 
-    // RED
     async function updateNetwork() {
         try {
-            const resp = await fetch(cio_RED_URL); const status = await resp.json();
+            const resp = await fetch(cio_RED_URL);
+            const status = await resp.json();
             const ticker = document.getElementById("ticker-content");
             const offDetails = document.getElementById("offline-details");
-            let tickerHTML = "", detailsHTML = "", offCount = 0;
+            let tickerHTML = "", detailsHTML = "";
+            let offCount = 0;
+
             if(status) {
                 Object.keys(status).forEach(id => {
+                    const currentItem = status[id];
                     const name = id.replace(/_/g, ' ');
-                    if (status[id].estado === "offline") {
-                        if (!offlineTimes[id]) offlineTimes[id] = new Date().toLocaleTimeString('es-UY', {hour12: false, hour:'2-digit', minute:'2-digit'});
+                    if (currentItem.estado === "offline") {
+                        if (!offlineTimes[id]) offlineTimes[id] = new Date().toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'});
                         tickerHTML += `<div class="status-badge offline"><span>⚠️ OFF: ${name}</span><span class="time-tag">${offlineTimes[id]}</span></div>`;
                         detailsHTML += `<div class="off-item"><span>● ${name}</span><span class="time">${offlineTimes[id]}</span></div>`;
-                        offCount++; delete recentlyRestored[id];
+                        offCount++;
                     } else {
                         if (offlineTimes[id]) { recentlyRestored[id] = 2; delete offlineTimes[id]; }
-                        if (recentlyRestored[id] > 0) { tickerHTML += `<div class="status-badge restored">✔ ${name}: RESTABLECIDO</div>`; recentlyRestored[id]--; }
+                        if (recentlyRestored[id] > 0) { tickerHTML += `<div class="status-badge restored">✔ ${name}: OK</div>`; recentlyRestored[id]--; }
                     }
                 });
             }
-            ticker.innerHTML = tickerHTML || `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
-            offDetails.innerHTML = detailsHTML || "<div class='off-item' style='color:#666; justify-content:center;'>No hay servicios offline</div>";
+
+            if(tickerHTML) {
+                ticker.innerHTML = tickerHTML;
+                ticker.style.animation = `scroll-ticker ${(offCount + 2) * 8}s linear infinite`;
+                offDetails.innerHTML = detailsHTML;
+            } else {
+                ticker.innerHTML = `<span style="color:var(--primary); font-size:1.3rem; font-weight:bold; width:100vw; text-align:center;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
+                ticker.style.animation = "none"; ticker.style.left = "0";
+                offDetails.innerHTML = "<div class='off-item' style='color:#666; justify-content:center;'>No hay servicios offline</div>";
+            }
             document.getElementById("stat-off").textContent = offCount;
         } catch(e) {}
     }
 
-    // EVENTOS
     async function syncEvents() {
         try {
-            const resp = await fetch(cio_DB_URL); const data = await resp.json();
-            const now = Date.now();
-            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (now - it.timestamp < 86400000));
+            const resp = await fetch(cio_DB_URL);
+            const data = await resp.json();
+            cio_logs = (data ? (Array.isArray(data) ? data : Object.values(data)) : []).filter(it => !it.timestamp || (Date.now() - it.timestamp < 86400000));
             document.getElementById("stat-total").textContent = cio_logs.length;
             if(cio_logs.length > 0 && !cio_startTime) renderSlide();
             renderHistory();
@@ -307,51 +368,57 @@
     }
 
     function renderHistory() {
-        document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => {
-            const h = it.timestamp ? new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour: '2-digit', minute:'2-digit'}) : '--:--';
-            return `<div class="history-item">
-                <div style="display:flex; justify-content:space-between;"><small style="color:var(--accent); font-weight:bold;">${it.area}</small><small style="opacity:0.5;">${h}</small></div>
+        document.getElementById("historyList").innerHTML = cio_logs.map((it, i) => `
+            <div class="history-item">
+                <div style="display:flex; justify-content:space-between;">
+                    <small style="color:var(--accent); font-weight:bold;">${it.area}</small>
+                    <small style="opacity:0.5;">${it.timestamp ? new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour:'2-digit', minute:'2-digit'}) : '--:--'}</small>
+                </div>
                 <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
                 <div style="font-size:0.8rem; opacity:0.7; margin-bottom:10px;">${it.message}</div>
                 <div style="display:flex; gap:10px;">
                     <button onclick="editEntry(${i})" style="color:var(--accent); background:none; border:none; cursor:pointer; font-size:0.7rem; font-weight:bold;">EDITAR</button>
                     <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; cursor:pointer; font-size:0.7rem; font-weight:bold;">ELIMINAR</button>
                 </div>
-            </div>`;
-        }).join('');
-    }
-
-    async function saveEntry(e) {
-        e.preventDefault(); const id = document.getElementById("f-id").value;
-        const entry = { area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value, title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value, timestamp: id !== "" ? cio_logs[id].timestamp : Date.now() };
-        if(id !== "") cio_logs[id] = entry; else cio_logs.push(entry);
-        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        closePanels(); syncEvents();
-    }
-
-    function editEntry(idx) {
-        const it = cio_logs[idx]; document.getElementById("f-id").value = idx;
-        document.getElementById("f-area").value = it.area; document.getElementById("f-prio").value = it.priority;
-        document.getElementById("f-title").value = it.title; document.getElementById("f-msg").value = it.message;
-        openPanel('panelForm');
+            </div>`).join('');
     }
 
     async function deleteEntry(idx) { if(confirm("¿Eliminar?")) { cio_logs.splice(idx, 1); await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) }); syncEvents(); } }
+    async function saveEntry(e) {
+        e.preventDefault();
+        const id = document.getElementById("f-id").value;
+        const entry = {
+            area: document.getElementById("f-area").value, priority: document.getElementById("f-prio").value,
+            title: document.getElementById("f-title").value, message: document.getElementById("f-msg").value,
+            timestamp: id !== "" ? cio_logs[id].timestamp : Date.now()
+        };
+        if(id !== "") cio_logs[id] = entry; else cio_logs.push(entry);
+        await fetch(cio_DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+        openPanel('panelHistory'); syncEvents();
+    }
+
+    function editEntry(idx) {
+        const it = cio_logs[idx];
+        document.getElementById("f-id").value = idx;
+        document.getElementById("f-area").value = it.area;
+        document.getElementById("f-prio").value = it.priority;
+        document.getElementById("f-title").value = it.title;
+        document.getElementById("f-msg").value = it.message;
+        openPanel('panelForm');
+    }
 
     function downloadPDF() {
-        const { jsPDF } = window.jspdf; const doc = jsPDF(); const now = new Date(); const curH = now.getHours();
-        let currentTurno = (curH >= 6 && curH < 14) ? "Mañana (06:00 - 14:00)" : (curH >= 14 && curH < 22) ? "Tarde (14:00 - 22:00)" : "Noche (22:00 - 06:00)";
-        doc.setFontSize(16); doc.setTextColor(0, 100, 101); doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
-        doc.setFontSize(10); doc.setTextColor(100); doc.text(`Turno Actual: ${currentTurno} | Generado: ${now.toLocaleString('es-UY')}`, 14, 28);
-        const getTurnoStr = (ts) => {
-            const h = new Date(ts).getHours();
-            if (h >= 6 && h < 14) return "Mañana (06:00 - 14:00)";
-            if (h >= 14 && h < 22) return "Tarde (14:00 - 22:00)";
-            return "Noche (22:00 - 06:00)";
-        };
-        const filtradas = cio_logs.filter(it => getTurnoStr(it.timestamp) === currentTurno);
-        doc.autoTable({ startY: 40, head: [['Hora', 'Área', 'Prioridad', 'Título', 'Mensaje']], body: filtradas.map(it => [new Date(it.timestamp).toLocaleTimeString('es-UY',{hour12:false, hour:'2-digit', minute:'2-digit'}), it.area, it.priority, it.title, it.message]), theme: 'striped', headStyles: { fillColor: [0, 100, 101] } });
-        doc.save(`Reporte_Masterson_${now.toLocaleDateString()}.pdf`);
+        const { jsPDF } = window.jspdf;
+        const doc = jsPDF();
+        doc.setFontSize(16); doc.setTextColor(0, 100, 101);
+        doc.text("REPORTE OPERATIVO MASTERSON", 14, 20);
+        doc.autoTable({
+            startY: 40,
+            head: [['Hora', 'Área', 'Prioridad', 'Título', 'Novedad']],
+            body: cio_logs.map(it => [new Date(it.timestamp).toLocaleTimeString('es-UY', {hour12: false, hour:'2-digit', minute:'2-digit'}), it.area, it.priority, it.title, it.message]),
+            headStyles: { fillColor: [0, 100, 101] }
+        });
+        doc.save(`Reporte_CIO.pdf`);
     }
 
     function openPanel(id) { closePanels(); document.getElementById(id).classList.add("active"); document.getElementById("cio-overlay").style.display = "block"; }
@@ -370,11 +437,13 @@
         requestAnimationFrame(loop);
     }
 
-    setInterval(() => { const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
-        document.getElementById("clockDisplay").textContent = t; document.getElementById("fsClockDisplay").textContent = t;
+    setInterval(() => {
+        const t = new Date().toLocaleTimeString('es-UY', { hour12: false });
+        document.getElementById("clockDisplay").textContent = t;
+        document.getElementById("fsClockDisplay").textContent = t;
     }, 1000);
 
-    setInterval(updateNetwork, 5000); setInterval(syncEvents, 10000); setInterval(syncKPIs, 10000);
+    setInterval(updateNetwork, 5000); setInterval(syncEvents, 10000); setInterval(syncKPIs, 5000);
     updateNetwork(); syncEvents(); syncKPIs(); requestAnimationFrame(loop);
 </script>
 </body>
