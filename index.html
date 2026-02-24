@@ -127,7 +127,7 @@
             justify-content: center; align-items: center; font-size: 24px; cursor: pointer;
         }
 
-        /* DISEÑO MÓVIL */
+        /* DISEÑO MÓVIL ESPECÍFICO */
         .mobile-section-header {
             color: var(--primary); font-size: 0.75rem; font-weight: bold; 
             margin: 30px 0 15px; text-transform: uppercase; letter-spacing: 2px;
@@ -136,24 +136,42 @@
         .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
 
         .mobile-stat-container {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 20px; align-items: center;
         }
+        
+        /* Chart Circular SLA */
+        .sla-circle-container { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+        .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
+        .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease, stroke 1s ease; }
+        .sla-text-overlay { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            text-align: center; width: 100%; 
+        }
+
         .mobile-stat-box { 
             background: linear-gradient(145deg, #151515, #0a0a0a); 
-            padding: 20px 10px; border-radius: 15px; 
+            padding: 15px; border-radius: 15px; 
             border: 1px solid #222; text-align: center;
+            height: 100%; display: flex; flex-direction: column; justify-content: center;
         }
+        
         .mobile-puestos-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            background: #0a0a0a; padding: 15px; border-radius: 18px; border: 1px solid #1a1a1a;
         }
-        .off-service-item { 
-            background: rgba(255, 77, 77, 0.05); 
-            border: 1px solid rgba(255, 77, 77, 0.1);
-            border-left: 4px solid var(--critico); padding: 18px; margin-bottom: 12px; 
-            border-radius: 12px; font-size: 0.85rem; font-weight: bold;
-            display: flex; justify-content: space-between; align-items: center;
+
+        /* Estilo mejorado Servicios Offline */
+        .off-service-card {
+            background: rgba(255, 77, 77, 0.03); border: 1px solid rgba(255, 77, 77, 0.1);
+            border-radius: 12px; padding: 12px 15px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 15px;
         }
+        .off-status-dot {
+            width: 10px; height: 10px; background: var(--critico); border-radius: 50%;
+            box-shadow: 0 0 10px var(--critico); animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
         /* RESPONSIVE CELULAR */
         @media (max-width: 768px) {
@@ -163,12 +181,12 @@
             #cio-app .main-header { height: 70px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; justify-content: center; }
             
             #cio-app .side-panel { 
-                width: 88%; padding: 30px 20px; 
+                width: 90%; padding: 30px 20px; 
                 border-left: 2px solid var(--primary);
                 box-shadow: -20px 0 50px rgba(0,0,0,0.95);
             }
-            #cio-app #titleDisplay { font-size: 2.4rem; }
-            /* Ocultar edición en móvil dentro del panel de configuración */
+            #cio-app #titleDisplay { font-size: 2.2rem; }
+            
             #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
             #panelHistory .btn-sec { display: block !important; width: 100%; }
         }
@@ -217,54 +235,59 @@
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
-        <div style="text-align: center; margin-bottom: 30px;">
+        <div style="text-align: center; margin-bottom: 25px;">
             <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
-            <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900;">DASHBOARD</h2>
+            <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900;">CENTRO DE MANDO</h2>
         </div>
         
         <div class="mobile-section-header">Performance Actual</div>
         <div class="mobile-stat-container">
-            <div class="mobile-stat-box">
-                <div class="kpi-label" style="color:var(--primary); margin-bottom:8px;">SLA Global</div>
-                <div id="m-sla" class="kpi-value" style="justify-content:center; font-size: 1.8rem;">--%</div>
+            <div class="mobile-stat-box" style="padding: 10px;">
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:10px;">Nivel de Servicio</div>
+                <div class="sla-circle-container">
+                    <svg class="sla-circle-svg" viewBox="0 0 100 100">
+                        <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
+                        <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
+                    </svg>
+                    <div class="sla-text-overlay">
+                        <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900; line-height: 1;">--%</div>
+                        <div id="m-sla-trend" style="font-size: 0.7rem;"></div>
+                    </div>
+                </div>
             </div>
             <div class="mobile-stat-box">
-                <div class="kpi-label" style="color:var(--primary); margin-bottom:8px;">En Espera</div>
-                <div id="m-calls" class="kpi-value" style="justify-content:center; font-size: 1.8rem; color: #fff;">0</div>
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:10px;">Llamadas Total</div>
+                <div id="m-calls" style="font-size: 2.5rem; font-weight: 900; color: #fff;">0</div>
+                <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase;">En curso</div>
             </div>
         </div>
 
         <div class="mobile-section-header">Puestos en Operación</div>
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-        <div class="mobile-section-header">Infraestructura (Offline)</div>
+        <div class="mobile-section-header">Estado de Servicios</div>
         <div id="m-offline-list"></div>
 
-        <div style="margin-top: 40px;">
-            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">CERRAR VISTA</button>
+        <div style="margin-top: 30px;">
+            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">VOLVER AL MONITOR</button>
         </div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
-        
         <div id="pc-only-controls" style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px;">
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center;">MÉTRICAS KPI</label>
             <div style="display:flex; gap:10px; margin:10px 0;">
                 <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
                 <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
             </div>
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-top:10px;">PUESTOS (P1-P9)</label>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:10px;" id="p-inputs-grid"></div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
         </div>
-
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
         <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
-        
         <div class="mobile-section-header">Novedades Recientes</div>
         <div id="historyList"></div>
-        
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; border-radius: 8px;">VOLVER</button>
     </aside>
 
@@ -314,11 +337,16 @@
                     if (sla < prevSLA) { currentArrow = "▼"; currentColor = "var(--critico)"; } 
                     else if (sla > prevSLA) { currentArrow = "▲"; currentColor = "var(--online)"; }
                 }
+                
+                // Actualización Vista PC
                 const contentSLA = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
                 document.getElementById('v-sla').innerHTML = contentSLA;
-                document.getElementById('m-sla').innerHTML = contentSLA;
                 document.getElementById('v-calls').textContent = dK.calls;
+                
+                // Actualización Vista Celular (Chart Circular)
+                updateMobileSLA(sla);
                 document.getElementById('m-calls').textContent = dK.calls;
+                
                 renderPuestos(dK.puestos);
                 prevSLA = sla;
             }
@@ -340,16 +368,43 @@
                         const name = id.replace(/_/g,' ').toUpperCase();
                         tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
                         mHtml += `
-                            <div class="off-service-item">
-                                <span><span style="color:var(--critico); margin-right:10px;">●</span> ${name}</span>
-                                <span style="color:var(--critico); font-size:0.6rem; border:1px solid var(--critico); padding:2px 5px; border-radius:4px;">OFFLINE</span>
+                            <div class="off-service-card">
+                                <div class="off-status-dot"></div>
+                                <div style="flex:1">
+                                    <div style="font-size:0.8rem; font-weight:900; color:#fff;">${name}</div>
+                                    <div style="font-size:0.6rem; color:var(--critico); font-weight:bold;">SISTEMA FUERA DE LÍNEA</div>
+                                </div>
+                                <div style="font-size:0.5rem; background:rgba(255,77,77,0.2); padding:3px 6px; border-radius:4px; color:var(--critico);">ERROR 503</div>
                             </div>`;
                     }
                 });
             }
             ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
-            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:20px; border:1px dashed #222; border-radius:12px;">✔ Sin alertas de infraestructura</div>`;
+            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:25px; border:1px dashed #222; border-radius:15px; background:rgba(46,204,113,0.02);">✔ Todos los servicios operan con normalidad</div>`;
         } catch(e) { console.error(e); }
+    }
+
+    function updateMobileSLA(val) {
+        const circle = document.getElementById('m-sla-circle');
+        const textVal = document.getElementById('m-sla-val');
+        const trend = document.getElementById('m-sla-trend');
+        
+        const circumference = 2 * Math.PI * 45;
+        const offset = circumference - (val / 100) * circumference;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = offset;
+
+        // Lógica de colores dinámica
+        let color = "var(--critico)";
+        if (val >= 85) color = "#00ff88"; // Verde Brillante
+        else if (val >= 70) color = "var(--online)";
+        else if (val >= 60) color = "var(--warning)";
+        else if (val >= 45) color = "var(--orange)";
+
+        circle.style.stroke = color;
+        textVal.style.color = color;
+        textVal.textContent = val + "%";
+        trend.innerHTML = `<span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
     }
 
     function renderPuestos(data) {
@@ -370,7 +425,7 @@
             }
         }
         pcCont.innerHTML = html;
-        mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.3; font-size:0.7rem; text-align:center;">No hay puestos activos</div>`;
+        mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.3; font-size:0.7rem; text-align:center; padding:10px;">Sin puestos activos</div>`;
     }
 
     function renderSlide() {
