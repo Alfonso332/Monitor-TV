@@ -32,27 +32,26 @@
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
         #cio-app * { box-sizing: border-box !important; margin: 0; padding: 0; }
 
-        /* CABECERA: Se oculta en Fullscreen */
+        /* CABECERA */
         #cio-app .main-header {
             height: 70px; display: flex; justify-content: space-between; align-items: center;
             padding: 0 25px; background: rgba(5, 5, 5, 0.95);
             border-bottom: 1px solid var(--primary); flex-shrink: 0;
         }
-        #cio-app:fullscreen .main-header,
-        #cio-app:-webkit-full-screen .main-header { display: none !important; }
+        #cio-app:fullscreen .main-header { display: none !important; }
 
         /* KPI BAR */
         #cio-app .kpi-bar {
             display: flex; justify-content: space-evenly; align-items: center;
-            background: #050505; padding: 0; border-bottom: 2px solid #1a1a1a;
-            height: 70px; min-height: 70px; flex-shrink: 0;
+            background: #050505; padding: 0 15px; border-bottom: 2px solid #1a1a1a;
+            height: 70px; min-height: 70px; flex-shrink: 0; gap: 10px;
         }
         #cio-app .kpi-card { text-align: center; }
         #cio-app .kpi-value { 
             font-size: 1.8rem; font-weight: 900; color: var(--accent); 
-            line-height: 1; display: flex; align-items: center; gap: 10px;
+            line-height: 1; display: flex; align-items: center; gap: 8px;
         }
-        #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-top: 2px; }
+        #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-top: 2px; }
 
         /* PUESTOS */
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
@@ -63,18 +62,18 @@
         /* ÁREA CENTRAL */
         #cio-app #display-board { 
             flex: 1; display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; text-align: center; padding: 20px 60px;
+            align-items: center; text-align: center; padding: 20px;
         }
-        #cio-app #titleDisplay { font-size: clamp(40px, 8vw, 100px); font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.85; }
-        #cio-app #messageDisplay { font-size: clamp(20px, 3vw, 45px); opacity: 0.85; max-width: 90%; line-height: 1.1; font-weight: 300; }
-        #cio-app .area-tag { letter-spacing: 15px; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; margin-bottom: 20px; color: var(--accent); }
+        #cio-app #titleDisplay { font-size: clamp(32px, 8vw, 100px); font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.9; }
+        #cio-app #messageDisplay { font-size: clamp(18px, 3vw, 45px); opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300; }
+        #cio-app .area-tag { letter-spacing: 8px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; color: var(--accent); }
         
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER INFERIOR */
+        /* TICKER */
         #cio-app #ticker-bar { 
-            height: 70px; background: #050505; border-top: 1px solid #222; 
+            height: 60px; background: #050505; border-top: 1px solid #222; 
             display: flex; align-items: center; overflow: hidden; position: relative; flex-shrink: 0;
         }
         #cio-app #ticker-content { 
@@ -85,19 +84,19 @@
 
         #cio-app .capsula-off {
             background: rgba(255, 77, 77, 0.15); border: 2px solid var(--critico);
-            color: var(--critico); padding: 6px 20px; border-radius: 50px;
-            font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;
+            color: var(--critico); padding: 4px 15px; border-radius: 50px;
+            font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
         }
 
-        /* PANELES */
+        /* PANELES ADMIN */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 450px; height: 100%;
-            background: #0d0d0d; border-left: 2px solid var(--primary); padding: 30px;
+            background: #0d0d0d; border-left: 2px solid var(--primary); padding: 25px;
             transform: translateX(100%); transition: 0.4s cubic-bezier(0.7, 0, 0.3, 1); z-index: 10100;
             overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-        #cio-app .p-field { background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; border-radius: 8px; width: 100%; margin-bottom: 15px; }
+        #cio-app .p-field { background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px; }
         
         #cio-app .btn-pill {
             background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 50px;
@@ -105,12 +104,60 @@
         }
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
 
-        #cio-app #progressLine { position: fixed; bottom: 70px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
+        #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
-        .trend-arrow { display: inline-block; animation: arrowMove 1s infinite alternate; }
-        @keyframes arrowMove { from { transform: translateY(2px); } to { transform: translateY(-2px); } }
+        /* TREND ARROW */
+        .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
+        @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
         .history-card { background: #151515; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
+
+        /* === RESPONSIVE CELULAR === */
+        @media (max-width: 768px) {
+            #cio-app .main-header { height: 60px; padding: 0 15px; }
+            #cio-app .main-header img { height: 30px; }
+            #cio-app #clockDisplay { font-size: 1.2rem; }
+
+            #cio-app .kpi-bar {
+                height: auto;
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            #cio-app .kpi-card {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                border-bottom: 1px solid #222;
+                padding-bottom: 5px;
+            }
+
+            #cio-app .kpi-value { font-size: 1.4rem; }
+            #cio-app .kpi-label { margin-top: 0; }
+
+            #cio-app .puestos-container {
+                border-left: none;
+                padding-left: 0;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                width: 100%;
+                gap: 10px;
+                padding-top: 10px;
+            }
+
+            #cio-app .puesto-val { font-size: 1.2rem; }
+            #cio-app .area-tag { letter-spacing: 4px; font-size: 1rem; }
+            
+            #cio-app .side-panel { width: 100%; padding: 20px; }
+            
+            #cio-app #display-board { padding: 10px; }
+            #cio-app #titleDisplay { font-size: 2.2rem; line-height: 1; }
+            #cio-app #messageDisplay { font-size: 1.1rem; }
+            
+            #cio-app #progressLine { bottom: 60px; }
+        }
     </style>
 </head>
 <body>
@@ -119,22 +166,22 @@
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; z-index:10090;" onclick="closePanels()"></div>
 
     <header class="main-header">
-        <div style="display:flex; gap:10px;">
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:10px 20px; margin:0;">⚙️ CONFIGURACIÓN</button>
-            <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:10px 20px; margin:0;">⛶ MODO TV</button>
+        <div style="display:flex; gap:8px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️ CONFIG</button>
+            <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
         </div>
-        <div id="clockDisplay" style="font-family:monospace; font-size:1.8rem; font-weight:900; color:var(--primary);">00:00:00</div>
+        <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary);">00:00:00</div>
         <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40">
     </header>
 
     <div class="kpi-bar">
         <div class="kpi-card">
+            <span class="kpi-label">SLA</span>
             <span id="v-sla" class="kpi-value">--%</span>
-            <span class="kpi-label">Nivel de Servicio</span>
         </div>
         <div class="kpi-card">
+            <span class="kpi-label">Llamadas</span>
             <span id="v-calls" class="kpi-value">0</span>
-            <span class="kpi-label">Llamadas Hoy</span>
         </div>
         <div class="puestos-container" id="puestos-display"></div>
     </div>
@@ -166,7 +213,7 @@
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px;">ACTUALIZAR MÉTRICAS</button>
         </div>
         <button onclick="openForm(null)" class="btn-pill" style="background:var(--online); color:#000;">＋ NUEVA NOVEDAD</button>
-        <button onclick="downloadPDF()" class="btn-pill btn-sec">⬇ DESCARGAR PDF COMPLETO</button>
+        <button onclick="downloadPDF()" class="btn-pill btn-sec">⬇ DESCARGAR PDF</button>
         <div id="historyList" style="margin-top:20px;"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px;">CERRAR</button>
     </aside>
@@ -195,7 +242,10 @@
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
 
-    let cio_logs = [], currentIdx = 0, startTime = null, prevSLA = null;
+    let cio_logs = [], currentIdx = 0, startTime = null;
+    let prevSLA = null;
+    let currentArrow = "▲";
+    let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
 
     const pGrid = document.getElementById('p-inputs-grid');
@@ -207,30 +257,18 @@
             const dK = await rK.json();
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
-                
-                // Lógica de flecha: Solo comparar si ya teníamos un valor previo
-                let arrow = "▲";
-                let color = "var(--online)";
-                
-                if (prevSLA !== null) {
+                if (prevSLA !== null && sla !== prevSLA) {
                     if (sla < prevSLA) {
-                        arrow = "▼";
-                        color = "var(--critico)";
-                    } else if (sla > prevSLA) {
-                        arrow = "▲";
-                        color = "var(--online)";
+                        currentArrow = "▼";
+                        currentColor = "var(--critico)";
                     } else {
-                        // Si es igual, mantenemos tendencia previa o neutro
-                        arrow = "▲";
-                        color = "var(--online)";
+                        currentArrow = "▲";
+                        currentColor = "var(--online)";
                     }
                 }
-                
-                document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${color}">${arrow}</span>`;
+                document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
                 document.getElementById('v-calls').textContent = dK.calls;
                 renderPuestos(dK.puestos);
-                
-                // Actualizar valor previo para la siguiente sincronización
                 prevSLA = sla;
             }
 
@@ -249,20 +287,17 @@
                     if(v.estado === "offline") html += `<div class="capsula-off">⚠️ OFF: ${id.replace(/_/g,' ').toUpperCase()}</div>`;
                 });
             }
-            ticker.innerHTML = html || `<span style="color:var(--online); font-weight:900; font-size:1.4rem;">✔ TODOS LOS SERVICIOS OPERATIVOS</span>`;
-        } catch(e) {}
+            ticker.innerHTML = html || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
+        } catch(e) { console.error(e); }
     }
 
     function renderPuestos(data) {
         const cont = document.getElementById('puestos-display');
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
         if (activeEntries.length === 0) { cont.innerHTML = ""; return; }
-
         const vals = activeEntries.map(([k, v]) => parseInt(v));
-        const maxVal = Math.max(...vals);
-        const minVal = Math.min(...vals);
+        const maxVal = Math.max(...vals), minVal = Math.min(...vals);
         let html = "";
-        
         for(let i=1; i<=9; i++) {
             const v = parseInt(data[`p${i}`]) || 0;
             if(v > 0) {
@@ -272,8 +307,7 @@
                 else if (v === minVal) color = "var(--critico)";
                 else {
                     const ratio = (v - minVal) / (maxVal - minVal);
-                    if (ratio > 0.6) color = "var(--accent)";
-                    else if (ratio < 0.4) color = "var(--orange)";
+                    color = ratio > 0.5 ? "var(--accent)" : "var(--orange)";
                 }
                 html += `<div class="puesto-item"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
             }
@@ -284,17 +318,14 @@
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const now = new Date().toLocaleString();
         doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 35, 'F');
         doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("REPORTE OPERATIVO CIO", 15, 20);
-        doc.setFontSize(10); doc.text(`Fecha: ${now} | Monitor Masterson Elite`, 15, 28);
         doc.autoTable({
             startY: 40,
             head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
             body: cio_logs.map(it => [it.area, it.priority, it.title, it.message]),
             headStyles: { fillColor: [0, 80, 81] },
-            styles: { fontSize: 8, overflow: 'linebreak' },
-            columnStyles: { 3: { cellWidth: 80 } }
+            styles: { fontSize: 8 }
         });
         doc.save(`CIO_Masterson_${Date.now()}.pdf`);
     }
@@ -317,6 +348,13 @@
         }, 600);
     }
 
+    async function saveKPIs() {
+        const payload = { sla: document.getElementById('in-sla').value, calls: document.getElementById('in-calls').value, puestos: {} };
+        for(let i=1; i<=9; i++) payload.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
+        await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(payload) });
+        syncData();
+    }
+
     async function saveEntry(e) {
         e.preventDefault();
         const id = document.getElementById('f-id').value;
@@ -331,21 +369,6 @@
         syncData(); openPanel('panelHistory');
     }
 
-    async function saveKPIs() {
-        const payload = { sla: document.getElementById('in-sla').value, calls: document.getElementById('in-calls').value, puestos: {} };
-        for(let i=1; i<=9; i++) payload.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
-        await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(payload) });
-        syncData();
-    }
-
-    async function deleteEntry(idx) {
-        if(confirm("¿Eliminar?")) {
-            cio_logs.splice(idx, 1);
-            await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-            syncData();
-        }
-    }
-
     function editEntry(idx) {
         const it = cio_logs[idx];
         document.getElementById('f-id').value = idx;
@@ -356,13 +379,21 @@
         openPanel('panelForm');
     }
 
+    async function deleteEntry(idx) {
+        if(confirm("¿Eliminar?")) {
+            cio_logs.splice(idx, 1);
+            await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+            syncData();
+        }
+    }
+
     function renderHistory() {
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => `
             <div class="history-card">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem;"><b>${it.area}</b><span>${it.priority}</span></div>
                 <div style="font-weight:bold; margin:5px 0;">${it.title}</div>
-                <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; cursor:pointer; font-weight:bold; margin-right:15px;">EDITAR</button>
-                <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; cursor:pointer; font-weight:bold;">BORRAR</button>
+                <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; font-weight:bold; margin-right:15px;">EDITAR</button>
+                <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; font-weight:bold;">BORRAR</button>
             </div>`).join('');
     }
 
@@ -385,7 +416,7 @@
     function closePanels() { document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); document.getElementById('cio-overlay').style.display = 'none'; }
     function openForm(idx) { document.getElementById('mainForm').reset(); document.getElementById('f-id').value = ""; openPanel('panelForm'); }
 
-    setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
+    setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}); }, 1000);
     setInterval(syncData, 10000);
     syncData();
     requestAnimationFrame(loop);
