@@ -41,7 +41,7 @@
         #cio-app:fullscreen .main-header,
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
 
-        /* KPI BAR (Ticker Superior) - AJUSTADO A 70PX */
+        /* KPI BAR */
         #cio-app .kpi-bar {
             display: flex; justify-content: space-evenly; align-items: center;
             background: #050505; padding: 0; border-bottom: 2px solid #1a1a1a;
@@ -54,7 +54,7 @@
         }
         #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; margin-top: 2px; }
 
-        /* PUESTOS CON ESCALA DE COLOR */
+        /* PUESTOS */
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
         #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
@@ -89,7 +89,7 @@
             font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;
         }
 
-        /* PANELES ADMIN */
+        /* PANELES */
         #cio-app .side-panel {
             position: fixed; right: 0; top: 0; width: 450px; height: 100%;
             background: #0d0d0d; border-left: 2px solid var(--primary); padding: 30px;
@@ -105,10 +105,8 @@
         }
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
 
-        /* PROGRESO */
         #cio-app #progressLine { position: fixed; bottom: 70px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
-        /* TREND ARROW */
         .trend-arrow { display: inline-block; animation: arrowMove 1s infinite alternate; }
         @keyframes arrowMove { from { transform: translateY(2px); } to { transform: translateY(-2px); } }
 
@@ -197,7 +195,7 @@
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
 
-    let cio_logs = [], currentIdx = 0, startTime = null, prevSLA = -1;
+    let cio_logs = [], currentIdx = 0, startTime = null, prevSLA = null;
     const SLIDE_DURATION = 45000;
 
     const pGrid = document.getElementById('p-inputs-grid');
@@ -209,11 +207,30 @@
             const dK = await rK.json();
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
-                let arrow = sla < prevSLA ? "▼" : "▲";
-                let color = sla < prevSLA ? "var(--critico)" : "var(--online)";
+                
+                // Lógica de flecha: Solo comparar si ya teníamos un valor previo
+                let arrow = "▲";
+                let color = "var(--online)";
+                
+                if (prevSLA !== null) {
+                    if (sla < prevSLA) {
+                        arrow = "▼";
+                        color = "var(--critico)";
+                    } else if (sla > prevSLA) {
+                        arrow = "▲";
+                        color = "var(--online)";
+                    } else {
+                        // Si es igual, mantenemos tendencia previa o neutro
+                        arrow = "▲";
+                        color = "var(--online)";
+                    }
+                }
+                
                 document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${color}">${arrow}</span>`;
                 document.getElementById('v-calls').textContent = dK.calls;
                 renderPuestos(dK.puestos);
+                
+                // Actualizar valor previo para la siguiente sincronización
                 prevSLA = sla;
             }
 
@@ -239,11 +256,7 @@
     function renderPuestos(data) {
         const cont = document.getElementById('puestos-display');
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
-        
-        if (activeEntries.length === 0) {
-            cont.innerHTML = "";
-            return;
-        }
+        if (activeEntries.length === 0) { cont.innerHTML = ""; return; }
 
         const vals = activeEntries.map(([k, v]) => parseInt(v));
         const maxVal = Math.max(...vals);
