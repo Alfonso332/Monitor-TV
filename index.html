@@ -142,17 +142,17 @@
 
         /* DISEÑO MÓVIL ESPECÍFICO */
         .mobile-section-header {
-            color: var(--primary); font-size: 0.75rem; font-weight: bold; 
-            margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
-            display: flex; align-items: center; gap: 10px;
+            color: var(--primary); font-size: 0.85rem; font-weight: 900; 
+            margin: 45px 0 38px; text-transform: uppercase; letter-spacing: 2.5px;
+            display: flex; align-items: center; gap: 12px;
         }
-        .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+        .mobile-section-header::after { content: ""; flex: 1; height: 2px; background: rgba(0, 100, 101, 0.2); }
 
         .mobile-stat-container {
-            display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center;
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 38px; align-items: stretch;
         }
         
-        .sla-circle-container { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+        .sla-circle-container { position: relative; width: 130px; height: 130px; margin: 0 auto; }
         .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
         .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
         .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease, stroke 1s ease; }
@@ -162,27 +162,29 @@
         }
 
         .mobile-stat-box { 
-            background: linear-gradient(145deg, #151515, #0a0a0a); 
-            padding: 20px 15px; border-radius: 15px; 
-            border: 1px solid #222; text-align: center;
+            background: linear-gradient(145deg, #121212, #080808); 
+            padding: 25px 15px; border-radius: 20px; 
+            border: 1px solid #1a1a1a; text-align: center;
             height: 100%; display: flex; flex-direction: column; justify-content: center;
         }
         
         .mobile-puestos-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
-            background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+            background: #080808; padding: 25px; border-radius: 20px; border: 1px solid #1a1a1a;
+            margin-bottom: 38px;
         }
 
         /* Estilo Servicios Offline Limpio */
         .off-service-card {
-            background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2);
-            border-radius: 12px; padding: 15px 20px; margin-bottom: 15px;
-            display: flex; align-items: center; gap: 15px;
+            background: rgba(255, 77, 77, 0.08); border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 15px; padding: 18px 22px; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 18px;
         }
+        #m-offline-list { margin-bottom: 38px; }
+
         .off-status-dot {
-            width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
-            box-shadow: 0 0 10px var(--critico); animation: pulse-red 1.5s infinite;
+            width: 14px; height: 14px; background: var(--critico); border-radius: 50%;
+            box-shadow: 0 0 12px var(--critico); animation: pulse-red 1.5s infinite;
         }
         @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
@@ -192,26 +194,20 @@
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app #progressLine { bottom: 0; }
             
-            /* Ajuste de Cabecera Móvil para mayor separación */
             #cio-app .main-header { 
                 height: 85px; 
                 padding: 0 20px; 
                 border-bottom: 1px solid #1a1a1a; 
                 justify-content: center;
-                margin-bottom: 38px !important; /* Separación de 1cm con el contenido principal */
+                margin-bottom: 38px !important;
             }
             
             #cio-app .side-panel { 
-                width: 90%; padding: 30px 20px; 
-                border-left: 2px solid var(--primary);
+                width: 95%; padding: 40px 25px; 
+                border-left: 3px solid var(--primary);
             }
 
-            /* Espaciado de 1cm (~38px) entre secciones del widget móvil */
-            .mobile-stat-container, .mobile-puestos-grid, #m-offline-list {
-                margin-bottom: 38px !important;
-            }
-
-            #cio-app #titleDisplay { font-size: 2.2rem; }
+            #cio-app #titleDisplay { font-size: 2.4rem; }
             
             #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
             #panelHistory .btn-sec { display: block !important; width: 100%; }
@@ -221,7 +217,7 @@
 <body>
 
 <div id="cio-app">
-    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(6px);" onclick="closePanels()"></div>
+    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(8px);" onclick="closePanels()"></div>
 
     <div id="hamb-menu" onclick="openPanel('panelMobileDash')">
         <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Menu">
@@ -263,30 +259,30 @@
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
-        <div style="text-align: center; margin-bottom: 25px;">
-            <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
-            <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900;">CENTRO DE MANDO</h2>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 50px; height: 5px; background: #333; border-radius: 10px; margin: 0 auto 20px;"></div>
+            <h2 style="color:var(--accent); font-size: 1.5rem; letter-spacing: 3px; font-weight: 900;">CENTRO DE MANDO</h2>
         </div>
         
         <div class="mobile-section-header">Performance Actual</div>
         <div class="mobile-stat-container">
             <div class="mobile-stat-box">
-                <div class="kpi-label" style="color:var(--primary); margin-bottom:15px;">Nivel de Servicio</div>
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:18px; font-weight:bold;">Nivel de Servicio</div>
                 <div class="sla-circle-container">
                     <svg class="sla-circle-svg" viewBox="0 0 100 100">
                         <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
                         <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
                     </svg>
                     <div class="sla-text-overlay">
-                        <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900; line-height: 1;">--%</div>
-                        <div id="m-sla-trend" style="font-size: 0.7rem;"></div>
+                        <div id="m-sla-val" style="font-size: 1.8rem; font-weight: 900; line-height: 1;">--%</div>
+                        <div id="m-sla-trend" style="font-size: 0.8rem;"></div>
                     </div>
                 </div>
             </div>
             <div class="mobile-stat-box">
-                <div class="kpi-label" style="color:var(--primary); margin-bottom:15px;">Llamadas Total</div>
-                <div id="m-calls" style="font-size: 2.8rem; font-weight: 900; color: #fff;">0</div>
-                <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase; margin-top:5px;">En curso</div>
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:18px; font-weight:bold;">Llamadas Total</div>
+                <div id="m-calls" style="font-size: 3.2rem; font-weight: 900; color: #fff;">0</div>
+                <div style="font-size: 0.7rem; opacity: 0.4; text-transform: uppercase; margin-top:8px; font-weight: 900;">En tiempo real</div>
             </div>
         </div>
 
@@ -297,7 +293,7 @@
         <div id="m-offline-list"></div>
 
         <div style="margin-top: 20px; margin-bottom: 40px;">
-            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">VOLVER AL MONITOR</button>
+            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 18px; padding: 18px;">CERRAR PANEL</button>
         </div>
     </aside>
 
@@ -392,15 +388,15 @@
                             <div class="off-service-card">
                                 <div class="off-status-dot"></div>
                                 <div style="flex:1">
-                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">OFF: ${name}</div>
-                                    <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
+                                    <div style="font-size:1rem; font-weight:900; color:#fff;">${name}</div>
+                                    <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase; margin-top:2px;">Servicio no disponible</div>
                                 </div>
                             </div>`;
                     }
                 });
             }
             ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
-            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:25px; border:1px dashed #222; border-radius:15px; background:rgba(46,204,113,0.02);">✔ Todos los servicios operan con normalidad</div>`;
+            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:35px; border:1px dashed #222; border-radius:15px; background:rgba(46,204,113,0.02);">✔ Todos los servicios operan con normalidad</div>`;
         } catch(e) { console.error(e); }
     }
 
@@ -459,7 +455,6 @@
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
             const pColor = colors[it.priority] || "var(--accent)";
-            
             return `
             <div class="history-card" style="border-left-color:${pColor} !important">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom: 5px;">
