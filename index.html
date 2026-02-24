@@ -349,16 +349,39 @@
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFillColor(0, 100, 101); doc.rect(0, 0, 210, 35, 'F');
-        doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("REPORTE OPERATIVO CIO", 15, 20);
+        
+        // Obtener fecha, hora y turno
+        const ahora = new Date();
+        const horaStr = ahora.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const fechaStr = ahora.toLocaleDateString();
+        const horaH = ahora.getHours();
+        
+        let turno = "Noche";
+        if (horaH >= 6 && horaH < 14) turno = "Mañana";
+        else if (horaH >= 14 && horaH < 22) turno = "Tarde";
+
+        // Estilo de cabecera
+        doc.setFillColor(0, 100, 101); 
+        doc.rect(0, 0, 210, 40, 'F');
+        
+        doc.setTextColor(255, 255, 255); 
+        doc.setFontSize(22); 
+        doc.text("REPORTE OPERATIVO", 15, 20);
+        
+        doc.setFontSize(10);
+        doc.text(`Fecha: ${fechaStr} | Hora de descarga: ${horaStr}`, 15, 30);
+        doc.text(`Turno Operativo: ${turno}`, 15, 35);
+
         doc.autoTable({
-            startY: 40,
+            startY: 45,
             head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
             body: cio_logs.map(it => [it.area, it.priority, it.title, it.message]),
             headStyles: { fillColor: [0, 80, 81] },
-            styles: { fontSize: 8 }
+            styles: { fontSize: 8 },
+            alternateRowStyles: { fillColor: [240, 240, 240] }
         });
-        doc.save(`CIO_Masterson_${Date.now()}.pdf`);
+
+        doc.save(`Reporte_Operativo_${fechaStr.replace(/\//g,'-')}_${turno}.pdf`);
     }
 
     function renderSlide() {
