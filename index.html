@@ -1,1121 +1,561 @@
-Ahora necesito que a este codigo le saque eso que dice en el cel error 503 en los servicios offline y solo diga Off y tal servicio, tambien que separes un poco los widgets, parece amontonados y tienen mas espacio hacia abajo para estar mas separados. y tambien que el boton tipo hamburguesa, de icono tenga la imagen que tiene el url cargada en el html, eso donde ahora tiene un boton de una grafica, ahi que el icono sea redondo y del mismo tamaño del boton para que aprezca eso el boton SOLO en el cel eso y dam,e el html completo con el css interno sin que choque con el externo: <!DOCTYPE html>
-
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-
     <title>CIO Monitor Elite | Masterson</title>
-
     
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
-
-
     <style>
-
         /* === ESTRUCTURA Y RESET === */
-
         #cio-app {
-
             --primary: #006465;
-
             --accent: #00d1d1;
-
             --dark-bg: #000000;
-
             --critico: #ff4d4d;
-
             --online: #2ecc71;
-
             --warning: #f1c40f;
-
             --orange: #e67e22;
-
             --bg-emergencia: #1a0000;
 
-
-
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-
             background: var(--dark-bg) !important;
-
             color: #ffffff !important;
-
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-
             display: flex; flex-direction: column;
-
             overflow: hidden; z-index: 999999; margin: 0; padding: 0;
-
             transition: background 0.5s ease;
-
         }
 
-
-
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
-
         #cio-app * { box-sizing: border-box !important; margin: 0; padding: 0; }
 
-
-
         /* CABECERA PC */
-
         #cio-app .main-header {
-
             height: 70px; display: flex; justify-content: space-between; align-items: center;
-
             padding: 0 25px; background: rgba(5, 5, 5, 0.95);
-
             border-bottom: 1px solid var(--primary); flex-shrink: 0;
-
         }
 
         /* REGLA FULLSCREEN: Ocultar botones e historial */
-
         #cio-app:fullscreen .main-header, 
-
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
 
-
-
         /* KPI BAR PC */
-
         #cio-app .kpi-bar {
-
             display: flex; justify-content: space-evenly; align-items: center;
-
             background: #050505; padding: 0 15px; border-bottom: 2px solid #1a1a1a;
-
             height: 70px; min-height: 70px; flex-shrink: 0; gap: 10px;
-
         }
-
         #cio-app .kpi-card { text-align: center; }
-
         #cio-app .kpi-value { 
-
             font-size: 1.8rem; font-weight: 900; color: var(--accent); 
-
             line-height: 1; display: flex; align-items: center; gap: 8px;
-
         }
-
         #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-top: 2px; }
 
-
-
         /* PUESTOS PC */
-
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
-
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
-
         #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
-
         #cio-app .puesto-lab { font-size: 0.5rem; opacity: 0.5; font-weight: bold; }
 
-
-
         /* ÁREA CENTRAL */
-
         #cio-app #display-board { 
-
             flex: 1; display: flex; flex-direction: column; justify-content: center; 
-
             align-items: center; text-align: center; padding: 20px;
-
         }
-
         #cio-app #titleDisplay { font-size: clamp(32px, 8vw, 100px); font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.9; }
-
         #cio-app #messageDisplay { font-size: clamp(18px, 3vw, 45px); opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300; }
-
         #cio-app .area-tag { letter-spacing: 8px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; color: var(--accent); }
-
         
-
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
-
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-
-
         /* TICKER PC */
-
         #cio-app #ticker-bar { 
-
             height: 60px; background: #050505; border-top: 1px solid #222; 
-
             display: flex; align-items: center; overflow: hidden; position: relative; flex-shrink: 0;
-
         }
-
         #cio-app #ticker-content { 
-
             display: flex; align-items: center; gap: 50px; white-space: nowrap; 
-
             position: absolute; left: 0; animation: scroll-ticker 30s linear infinite; 
-
         }
-
         @keyframes scroll-ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
 
-
-
         #cio-app .capsula-off {
-
             background: rgba(255, 77, 77, 0.15); border: 2px solid var(--critico);
-
             color: var(--critico); padding: 4px 15px; border-radius: 50px;
-
             font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
-
         }
-
-
 
         /* PANELES LATERALES */
-
         #cio-app .side-panel {
-
             position: fixed; right: 0; top: 0; width: 450px; height: 100%;
-
             background: #0d0d0d; border-left: 2px solid var(--primary); padding: 25px;
-
             transform: translateX(100%); transition: 0.4s cubic-bezier(0.7, 0, 0.3, 1); z-index: 10100;
-
             overflow-y: auto;
-
         }
-
         #cio-app .side-panel.active { transform: translateX(0); }
-
         
-
         /* FORMULARIOS Y BOTONES */
-
         #cio-app .p-field { 
-
             background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; 
-
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
-
             text-align: center;
-
         }
-
         #cio-app .btn-pill {
-
             background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 50px;
-
             font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center;
-
         }
-
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
-
-
 
         #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
-
-
         .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
-
         @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
-
-
-        /* SEPARACIÓN DE HISTORIAL (ARREGLADO) */
-
+        /* SEPARACIÓN DE HISTORIAL */
         .history-card { 
-
             background: #111111 !important; 
-
             padding: 20px !important; 
-
             border-radius: 12px !important; 
-
-            margin-bottom: 25px !important; /* Espacio masivo entre bloques */
-
+            margin-bottom: 30px !important; 
             border: 1px solid #222 !important;
-
             border-left: 5px solid var(--primary) !important;
-
             display: block !important;
-
             position: relative !important;
-
         }
 
-
-
-        /* BOTÓN FLOTANTE MÓVIL */
-
+        /* BOTÓN FLOTANTE MÓVIL (HAMBURGUESA CON LOGO) */
         #hamb-menu {
-
-            display: none; position: fixed; bottom: 30px; right: 20px;
-
-            width: 60px; height: 60px; background: var(--primary);
-
-            border-radius: 50%; z-index: 10050; border: 2px solid var(--accent);
-
-            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-
-            justify-content: center; align-items: center; font-size: 24px; cursor: pointer;
-
+            display: none; position: fixed; bottom: 35px; right: 25px;
+            width: 65px; height: 65px; background: #000;
+            border-radius: 50%; z-index: 10050; border: 3px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            justify-content: center; align-items: center; cursor: pointer;
+            overflow: hidden;
         }
-
-
+        #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
         /* DISEÑO MÓVIL ESPECÍFICO */
-
         .mobile-section-header {
-
             color: var(--primary); font-size: 0.75rem; font-weight: bold; 
-
-            margin: 30px 0 15px; text-transform: uppercase; letter-spacing: 2px;
-
+            margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
             display: flex; align-items: center; gap: 10px;
-
         }
-
         .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
 
-
-
         .mobile-stat-container {
-
-            display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 20px; align-items: center;
-
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center;
         }
-
         
-
-        /* Chart Circular SLA */
-
         .sla-circle-container { position: relative; width: 120px; height: 120px; margin: 0 auto; }
-
         .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-
         .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
-
         .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease, stroke 1s ease; }
-
         .sla-text-overlay { 
-
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-
             text-align: center; width: 100%; 
-
         }
-
-
 
         .mobile-stat-box { 
-
             background: linear-gradient(145deg, #151515, #0a0a0a); 
-
-            padding: 15px; border-radius: 15px; 
-
+            padding: 20px 15px; border-radius: 15px; 
             border: 1px solid #222; text-align: center;
-
             height: 100%; display: flex; flex-direction: column; justify-content: center;
-
         }
-
         
-
         .mobile-puestos-grid {
-
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-
-            background: #0a0a0a; padding: 15px; border-radius: 18px; border: 1px solid #1a1a1a;
-
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a;
+            margin-bottom: 30px;
         }
 
-
-
-        /* Estilo mejorado Servicios Offline */
-
+        /* Estilo Servicios Offline Limpio */
         .off-service-card {
-
-            background: rgba(255, 77, 77, 0.03); border: 1px solid rgba(255, 77, 77, 0.1);
-
-            border-radius: 12px; padding: 12px 15px; margin-bottom: 10px;
-
+            background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: 12px; padding: 15px 20px; margin-bottom: 15px;
             display: flex; align-items: center; gap: 15px;
-
         }
-
         .off-status-dot {
-
-            width: 10px; height: 10px; background: var(--critico); border-radius: 50%;
-
+            width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
             box-shadow: 0 0 10px var(--critico); animation: pulse-red 1.5s infinite;
-
         }
-
         @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-
-
         /* RESPONSIVE CELULAR */
-
         @media (max-width: 768px) {
-
             #hamb-menu { display: flex; }
-
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
-
             #cio-app #progressLine { bottom: 0; }
-
             #cio-app .main-header { height: 70px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; justify-content: center; }
-
             
-
             #cio-app .side-panel { 
-
                 width: 90%; padding: 30px 20px; 
-
                 border-left: 2px solid var(--primary);
-
-                box-shadow: none !important;
-
             }
-
-            #cio-app #cio-overlay {
-
-                background: rgba(0,0,0,0.5) !important;
-
-            }
-
-
 
             #cio-app #titleDisplay { font-size: 2.2rem; }
-
             
-
             #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
-
             #panelHistory .btn-sec { display: block !important; width: 100%; }
-
         }
-
     </style>
-
 </head>
-
 <body>
 
-
-
 <div id="cio-app">
-
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(6px);" onclick="closePanels()"></div>
 
-
-
-    <div id="hamb-menu" onclick="openPanel('panelMobileDash')">📊</div>
-
-
-
-    <header class="main-header">
-
-        <div style="display:flex; gap:8px;">
-
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
-
-            <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
-
-        </div>
-
-        <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
-
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40">
-
-    </header>
-
-
-
-    <div class="kpi-bar">
-
-        <div class="kpi-card">
-
-            <span class="kpi-label">SLA</span>
-
-            <span id="v-sla" class="kpi-value">--%</span>
-
-        </div>
-
-        <div class="kpi-card">
-
-            <span class="kpi-label">Llamadas</span>
-
-            <span id="v-calls" class="kpi-value">0</span>
-
-        </div>
-
-        <div class="puestos-container" id="puestos-display"></div>
-
+    <div id="hamb-menu" onclick="openPanel('panelMobileDash')">
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Menu">
     </div>
 
+    <header class="main-header">
+        <div style="display:flex; gap:8px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
+            <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
+        </div>
+        <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
+        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40">
+    </header>
 
+    <div class="kpi-bar">
+        <div class="kpi-card">
+            <span class="kpi-label">SLA</span>
+            <span id="v-sla" class="kpi-value">--%</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Llamadas</span>
+            <span id="v-calls" class="kpi-value">0</span>
+        </div>
+        <div class="puestos-container" id="puestos-display"></div>
+    </div>
 
     <main id="display-board">
-
         <div id="infoCont" class="info-container">
-
             <div id="areaLabel" class="area-tag">MASTERSON CIO</div>
-
             <h1 id="titleDisplay">SISTEMA INICIANDO</h1>
-
             <p id="messageDisplay">Cargando base de datos operativa...</p>
-
         </div>
-
     </main>
-
-
 
     <div id="progressLine"></div>
 
-
-
     <div id="ticker-bar">
-
         <div id="ticker-content">...</div>
-
     </div>
 
-
-
     <aside id="panelMobileDash" class="side-panel">
-
         <div style="text-align: center; margin-bottom: 25px;">
-
             <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
-
             <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900;">CENTRO DE MANDO</h2>
-
         </div>
-
         
-
         <div class="mobile-section-header">Performance Actual</div>
-
         <div class="mobile-stat-container">
-
-            <div class="mobile-stat-box" style="padding: 10px;">
-
-                <div class="kpi-label" style="color:var(--primary); margin-bottom:10px;">Nivel de Servicio</div>
-
-                <div class="sla-circle-container">
-
-                    <svg class="sla-circle-svg" viewBox="0 0 100 100">
-
-                        <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
-
-                        <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
-
-                    </svg>
-
-                    <div class="sla-text-overlay">
-
-                        <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900; line-height: 1;">--%</div>
-
-                        <div id="m-sla-trend" style="font-size: 0.7rem;"></div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
             <div class="mobile-stat-box">
-
-                <div class="kpi-label" style="color:var(--primary); margin-bottom:10px;">Llamadas Total</div>
-
-                <div id="m-calls" style="font-size: 2.5rem; font-weight: 900; color: #fff;">0</div>
-
-                <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase;">En curso</div>
-
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:15px;">Nivel de Servicio</div>
+                <div class="sla-circle-container">
+                    <svg class="sla-circle-svg" viewBox="0 0 100 100">
+                        <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
+                        <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
+                    </svg>
+                    <div class="sla-text-overlay">
+                        <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900; line-height: 1;">--%</div>
+                        <div id="m-sla-trend" style="font-size: 0.7rem;"></div>
+                    </div>
+                </div>
             </div>
-
+            <div class="mobile-stat-box">
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:15px;">Llamadas Total</div>
+                <div id="m-calls" style="font-size: 2.8rem; font-weight: 900; color: #fff;">0</div>
+                <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase; margin-top:5px;">En curso</div>
+            </div>
         </div>
-
-
 
         <div class="mobile-section-header">Puestos en Operación</div>
-
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-
-
         <div class="mobile-section-header">Estado de Servicios</div>
+        <div id="m-offline-list" style="margin-bottom: 30px;"></div>
 
-        <div id="m-offline-list"></div>
-
-
-
-        <div style="margin-top: 30px;">
-
+        <div style="margin-top: 20px; margin-bottom: 40px;">
             <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">VOLVER AL MONITOR</button>
-
         </div>
-
     </aside>
-
-
 
     <aside id="panelHistory" class="side-panel">
-
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
-
         <div id="pc-only-controls" style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px;">
-
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center;">MÉTRICAS KPI</label>
-
             <div style="display:flex; gap:10px; margin:10px 0;">
-
                 <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
-
                 <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
-
             </div>
-
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
-
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
-
         </div>
-
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
-
         <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
-
         <div class="mobile-section-header">Novedades Recientes</div>
-
         <div id="historyList"></div>
-
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; border-radius: 8px;">VOLVER</button>
-
     </aside>
-
-
 
     <aside id="panelForm" class="side-panel">
-
         <h2 id="formTitle" style="text-align:center; color:var(--accent); margin-bottom:20px;">EDITAR NOVEDAD</h2>
-
         <form id="mainForm" onsubmit="saveEntry(event)">
-
             <input type="hidden" id="f-id">
-
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">ÁREA</label>
-
             <select id="f-area" class="p-field">
-
                 <option>Monitoreo</option><option>Freschat</option><option>Atención al Cliente</option>
-
                 <option>Infraestructura</option><option>Novedad Interna</option>
-
             </select>
-
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">PRIORIDAD</label>
-
             <select id="f-prio" class="p-field">
-
                 <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
-
             </select>
-
             <input type="text" id="f-title" placeholder="Título" required class="p-field">
-
             <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
-
             <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICAR AHORA</button>
-
             <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="border-radius: 8px;">CANCELAR</button>
-
         </form>
-
     </aside>
-
 </div>
 
-
-
 <script>
-
     const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
-
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
-
     const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
 
-
-
     let cio_logs = [], currentIdx = 0, startTime = null;
-
     let prevSLA = null;
-
     let currentArrow = "▲";
-
     let currentColor = "var(--online)";
-
     const SLIDE_DURATION = 45000;
 
-
-
     const pGrid = document.getElementById('p-inputs-grid');
-
     for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
 
-
-
     async function syncData() {
-
         try {
-
             const rK = await fetch(KPI_URL);
-
             const dK = await rK.json();
-
             if(dK) {
-
                 const sla = parseFloat(dK.sla) || 0;
-
                 if (prevSLA !== null && sla !== prevSLA) {
-
                     if (sla < prevSLA) { currentArrow = "▼"; currentColor = "var(--critico)"; } 
-
                     else if (sla > prevSLA) { currentArrow = "▲"; currentColor = "var(--online)"; }
-
                 }
-
                 document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
-
                 document.getElementById('v-calls').textContent = dK.calls;
-
                 updateMobileSLA(sla);
-
                 document.getElementById('m-calls').textContent = dK.calls;
-
                 renderPuestos(dK.puestos);
-
                 prevSLA = sla;
-
             }
-
-
 
             const rE = await fetch(DB_URL);
-
             const dE = await rE.json();
-
             cio_logs = dE ? (Array.isArray(dE) ? dE : Object.values(dE)) : [];
-
             renderHistory();
-
             if(cio_logs.length > 0 && startTime === null) renderSlide();
 
-
-
             const rR = await fetch(RED_URL);
-
             const dR = await rR.json();
-
             const ticker = document.getElementById('ticker-content');
-
             const mOffList = document.getElementById('m-offline-list');
-
             let tHtml = "", mHtml = "";
-
             if(dR) {
-
                 Object.entries(dR).forEach(([id, v]) => {
-
                     if(v.estado === "offline") {
-
                         const name = id.replace(/_/g,' ').toUpperCase();
-
                         tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
-
                         mHtml += `
-
                             <div class="off-service-card">
-
                                 <div class="off-status-dot"></div>
-
                                 <div style="flex:1">
-
-                                    <div style="font-size:0.8rem; font-weight:900; color:#fff;">${name}</div>
-
-                                    <div style="font-size:0.6rem; color:var(--critico); font-weight:bold;">SISTEMA FUERA DE LÍNEA</div>
-
+                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">OFF: ${name}</div>
+                                    <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
                                 </div>
-
-                                <div style="font-size:0.5rem; background:rgba(255,77,77,0.2); padding:3px 6px; border-radius:4px; color:var(--critico);">ERROR 503</div>
-
                             </div>`;
-
                     }
-
                 });
-
             }
-
             ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
-
             mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:25px; border:1px dashed #222; border-radius:15px; background:rgba(46,204,113,0.02);">✔ Todos los servicios operan con normalidad</div>`;
-
         } catch(e) { console.error(e); }
-
     }
-
-
 
     function updateMobileSLA(val) {
-
         const circle = document.getElementById('m-sla-circle');
-
         const textVal = document.getElementById('m-sla-val');
-
         const trend = document.getElementById('m-sla-trend');
-
         const circ = 2 * Math.PI * 45;
-
         circle.style.strokeDasharray = `${circ} ${circ}`;
-
         circle.style.strokeDashoffset = circ - (val / 100) * circ;
-
         let color = val >= 85 ? "#00ff88" : val >= 70 ? "var(--online)" : val >= 60 ? "var(--warning)" : "var(--critico)";
-
         circle.style.stroke = color;
-
         textVal.style.color = color;
-
         textVal.textContent = val + "%";
-
         trend.innerHTML = `<span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
-
     }
-
-
 
     function renderPuestos(data) {
-
         const pcCont = document.getElementById('puestos-display');
-
         const mbCont = document.getElementById('m-puestos');
-
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
-
         const vals = activeEntries.map(([k, v]) => parseInt(v));
-
         const maxVal = Math.max(...vals), minVal = Math.min(...vals);
-
         let html = "";
-
         for(let i=1; i<=9; i++) {
-
             const v = parseInt(data[`p${i}`]) || 0;
-
             if(v > 0) {
-
                 let color = (maxVal === minVal || v === maxVal) ? "var(--online)" : v === minVal ? "var(--critico)" : "var(--warning)";
-
                 html += `<div class="puesto-item"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
-
             }
-
         }
-
         pcCont.innerHTML = html;
-
         mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.3; font-size:0.7rem; text-align:center; padding:10px;">Sin puestos activos</div>`;
-
     }
-
-
 
     function renderSlide() {
-
         if(!cio_logs.length) return;
-
         const cont = document.getElementById('infoCont');
-
         cont.classList.add('oculto');
-
         setTimeout(() => {
-
             const item = cio_logs[currentIdx % cio_logs.length];
-
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-
             const color = colors[item.priority] || "var(--accent)";
-
             document.getElementById('cio-app').classList.toggle('pantalla-critica', item.priority === "Crítica");
-
             document.getElementById('areaLabel').textContent = item.area;
-
             document.getElementById('areaLabel').style.color = color;
-
             document.getElementById('titleDisplay').textContent = item.title;
-
             document.getElementById('messageDisplay').textContent = item.message;
-
             document.getElementById('progressLine').style.background = color;
-
             cont.classList.remove('oculto');
-
         }, 600);
-
     }
-
-
 
     function renderHistory() {
-
         const isMobile = window.innerWidth <= 768;
-
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
-
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-
             const pColor = colors[it.priority] || "var(--accent)";
-
             
-
             return `
-
             <div class="history-card" style="border-left-color:${pColor} !important">
-
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom: 5px;">
-
                     <b style="color:var(--accent)">${it.area.toUpperCase()}</b>
-
                     <span style="color:${pColor}; font-weight:bold">${it.priority}</span>
-
                 </div>
-
                 <div style="font-weight:bold; margin:10px 0; color:#fff; font-size:1.1rem">${it.title}</div>
-
                 ${!isMobile ? `
-
                 <div style="margin-top:15px; display:flex; gap:15px;">
-
                     <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; font-weight:bold; cursor:pointer; font-size:0.8rem">EDITAR</button>
-
                     <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; font-weight:bold; cursor:pointer; font-size:0.8rem">BORRAR</button>
-
                 </div>
-
                 ` : ''}
-
             </div>`;
-
         }).join('');
-
     }
-
-
 
     async function saveKPIs() {
-
         const payload = { sla: document.getElementById('in-sla').value, calls: document.getElementById('in-calls').value, puestos: {} };
-
         for(let i=1; i<=9; i++) payload.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
-
         await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(payload) });
-
         syncData();
-
     }
-
-
 
     async function saveEntry(e) {
-
         e.preventDefault();
-
         const id = document.getElementById('f-id').value;
-
         const data = {
-
             area: document.getElementById('f-area').value,
-
             priority: document.getElementById('f-prio').value,
-
             title: document.getElementById('f-title').value,
-
             message: document.getElementById('f-msg').value
-
         };
-
         if(id !== "") cio_logs[id] = data; else cio_logs.push(data);
-
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-
         syncData(); openPanel('panelHistory');
-
     }
-
-
 
     function editEntry(idx) {
-
         const it = cio_logs[idx];
-
         document.getElementById('f-id').value = idx;
-
         document.getElementById('f-area').value = it.area;
-
         document.getElementById('f-prio').value = it.priority;
-
         document.getElementById('f-title').value = it.title;
-
         document.getElementById('f-msg').value = it.message;
-
         openPanel('panelForm');
-
     }
-
-
 
     async function deleteEntry(idx) {
-
         if(confirm("¿Eliminar?")) {
-
             cio_logs.splice(idx, 1);
-
             await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-
             syncData();
-
         }
-
     }
-
-
 
     function downloadPDF() {
-
         const { jsPDF } = window.jspdf;
-
         const doc = new jsPDF();
-
         doc.autoTable({
-
             head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
-
             body: cio_logs.map(it => [it.area, it.priority, it.title, it.message]),
-
         });
-
         doc.save(`Reporte_CIO.pdf`);
-
     }
-
-
 
     function loop(now) {
-
         if(cio_logs.length) {
-
             if(!startTime) startTime = now;
-
             const elapsed = now - startTime;
-
             document.getElementById('progressLine').style.width = Math.min((elapsed / SLIDE_DURATION) * 100, 100) + "%";
-
             if(elapsed >= SLIDE_DURATION) { currentIdx++; renderSlide(); startTime = now; }
-
         }
-
         requestAnimationFrame(loop);
-
     }
-
-
 
     function toggleFS() {
-
         const app = document.getElementById('cio-app');
-
         if(!document.fullscreenElement) app.requestFullscreen().catch(e => console.log(e)); 
-
         else document.exitFullscreen();
-
     }
-
-
 
     function openPanel(id) { 
-
         closePanels(); 
-
         document.getElementById(id).classList.add('active'); 
-
         document.getElementById('cio-overlay').style.display = 'block'; 
-
     }
-
     function closePanels() { 
-
         document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); 
-
         document.getElementById('cio-overlay').style.display = 'none'; 
-
     }
-
     function openForm(idx) { 
-
         document.getElementById('mainForm').reset(); 
-
         document.getElementById('f-id').value = ""; 
-
         openPanel('panelForm'); 
-
     }
-
-
 
     let touchstartX = 0;
-
     let touchendX = 0;
-
     function handleGesture() { if (touchendX > touchstartX + 50) closePanels(); }
-
     document.querySelectorAll('.side-panel').forEach(panel => {
-
         panel.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-
         panel.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleGesture(); }, {passive: true});
-
     });
 
-
-
     setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
-
     setInterval(syncData, 10000);
-
     syncData();
-
     requestAnimationFrame(loop);
-
 </script>
-
 </body>
-
 </html>
