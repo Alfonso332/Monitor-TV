@@ -396,15 +396,33 @@
             renderHistory();
             if(cio_logs.length > 0 && startTime === null) renderSlide();
 
+            // SINCRONIZACIÓN DE RED Y CÁMARAS NARIÑO
             const rR = await fetch(RED_URL);
             const dR = await rR.json();
             const ticker = document.getElementById('ticker-content');
             const mOffList = document.getElementById('m-offline-list');
             let tHtml = "", mHtml = "";
+            
             if(dR) {
                 Object.entries(dR).forEach(([id, v]) => {
+                    const name = id.replace(/_/g,' ').toUpperCase();
+                    
+                    // Lógica especial de cámaras Nariño (ticker prioritario)
+                    if(id === "Nariño" && v.alerta_camaras && v.alerta_camaras !== "") {
+                        const msgCam = v.alerta_camaras.toUpperCase();
+                        tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${msgCam}</div>`;
+                        mHtml += `
+                            <div class="off-service-card" style="border-color:rgba(230,126,34,0.3)">
+                                <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
+                                <div style="flex:1">
+                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">ALERTA: NARIÑO</div>
+                                    <div style="font-size:0.65rem; color:var(--orange); font-weight:bold;">${v.alerta_camaras}</div>
+                                </div>
+                            </div>`;
+                    }
+
+                    // Lógica estándar de equipos offline (NVRs)
                     if(v.estado === "offline") {
-                        const name = id.replace(/_/g,' ').toUpperCase();
                         tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
                         mHtml += `
                             <div class="off-service-card">
