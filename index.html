@@ -87,7 +87,7 @@
             display: flex; overflow: hidden; position: relative; flex-shrink: 0;
             padding: 5px 10px; gap: 10px;
         }
-        .ticker-section {
+        #cio-app .ticker-section {
             flex: 1; position: relative; overflow: hidden; display: flex; align-items: center;
             background: rgba(1, 1, 1);
             backdrop-filter: blur(12px) saturate(180%);
@@ -96,7 +96,7 @@
             border-radius: 12px;
             box-shadow: inset 0 0 15px rgb(1,1,1);
         }
-        .ticker-label {
+        #cio-app .ticker-label {
             position: absolute; left: 0px; z-index: 10;
             background: #000;
             padding: 2px 10px; border-radius: 6px;
@@ -106,7 +106,7 @@
             backdrop-filter: blur(4px);
         }
 
-        .ticker-wrapper { 
+        #cio-app .ticker-wrapper { 
             display: flex; align-items: center; gap: 50px; white-space: nowrap; 
             position: absolute; left: 0; animation: scroll-ticker 25s linear infinite; 
             padding-left: 120px; 
@@ -142,10 +142,10 @@
 
         #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
-        .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
+        #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
-        .history-card { 
+        #cio-app .history-card { 
             background: #111111 !important; 
             padding: 20px !important; 
             border-radius: 12px !important; 
@@ -156,8 +156,7 @@
             position: relative !important;
         }
 
-        /* === INICIAN MEJORAS EXCLUSIVAS PARA CELULAR === */
-
+        /* === MEJORAS CELULAR === */
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -171,39 +170,36 @@
         #hamb-menu:active { transform: scale(0.9); box-shadow: 0 5px 15px rgba(0,209,209,0.5); }
         #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-        /* Estilo Servicios Offline y Acordeón MÓVIL REFINADO */
-        .off-service-card {
+        #cio-app .off-service-card {
             background: #111; border: 1px solid #111;
             border-radius: 25px; padding: 18px 20px; margin-bottom: 1px;
             display: flex; align-items: center; gap: 55px; cursor: pointer;
             transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
-        .off-service-card:active { transform: scale(0.98); background: #151515; }
-        .off-service-card.expanded-header { border-bottom-left-radius: 10; border-bottom-right-radius: 10; border-color: var(--primary); }
+        #cio-app .off-service-card:active { transform: scale(0.98); background: #151515; }
+        #cio-app .off-service-card.expanded-header { border-bottom-left-radius: 10; border-bottom-right-radius: 10; border-color: var(--primary); }
         
-        .off-status-dot {
+        #cio-app .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
             box-shadow: 0 0 10px var(--critico); animation: pulse-red 1s infinite;
         }
         
-        /* Contenedor Expandible (Desplegables) */
-        .generic-details {
+        #cio-app .generic-details {
             max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s, padding 0.3s;
             opacity: 0; background: #111; border: 1px solid #111; border-top: 2;
             border-bottom-left-radius: 2px; border-bottom-right-radius: 2px;
             margin-bottom: 15px; padding: 0 20px;
         }
-        .generic-details.expanded { max-height: 400px; opacity: 1; padding: 20px; }
+        #cio-app .generic-details.expanded { max-height: 400px; opacity: 1; padding: 20px; }
         
-        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-label { color: #FFF; font-size: 1rem; font-weight: bold; text-transform: uppercase; }
-        .detail-value { color: #FFF; font-size: 1rem; font-weight: 700; }
+        #cio-app .detail-row { display: flex; justify-content: center; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
+        #cio-app .detail-row:last-child { border-bottom: none; }
+        #cio-app .detail-value { color: #FFF; font-size: 1rem; font-weight: 700; text-align: center; }
 
         @keyframes pulse-red { 0% { opacity: 0.1; } 50% { opacity: 1; } 100% { opacity: 0.1; } }
 
-        /* REGLAS ESTRICTAS DE RESPONSIVE (SOLO CELULAR) */
+        /* RESPONSIVE CELULAR */
         @media (max-width: 768px) {
             #hamb-menu { display: flex; }
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
@@ -220,7 +216,7 @@
                 border-radius: 25px 25px 0 0; top: auto; bottom: 0; height: 90vh;
                 transform: translateY(100%);
                 box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
-                touch-action: pan-y; /* Permite scroll vertical pero escuchamos el gesto abajo */
+                touch-action: pan-y;
             }
             #cio-app .side-panel.active { transform: translateY(0); }
             
@@ -230,30 +226,30 @@
                 background: #333; border-radius: 10px;
             }
 
-            .mobile-section-header {
+            #cio-app .mobile-section-header {
                 color: var(--primary); font-size: 0.9rem; font-weight: bold; 
                 margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
                 display: flex; align-items: center; gap: 10px;
             }
-            .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+            #cio-app .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
 
-            .mobile-stat-container { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center; }
-            .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+            #cio-app .mobile-stat-container { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center; }
+            #cio-app .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
 
-            .sla-circle-container { position: relative; width: 110px; height: 110px; margin: 0 auto; }
-            .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-            .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
-            .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
-            .sla-text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
+            #cio-app .sla-circle-container { position: relative; width: 110px; height: 110px; margin: 0 auto; }
+            #cio-app .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+            #cio-app .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
+            #cio-app .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
+            #cio-app .sla-text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
 
-            .mobile-puestos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a; margin-bottom: 30px; }
+            #cio-app .mobile-puestos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a; margin-bottom: 30px; }
 
             #cio-app #titleDisplay { font-size: 2.2rem; }
-            #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
-            #panelHistory .btn-sec { display: block !important; width: 100%; }
+            #cio-app #panelHistory .p-field, #cio-app #panelHistory label, #cio-app #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
+            #cio-app #panelHistory .btn-sec { display: block !important; width: 100%; }
             
-            #panelForm { text-align: center; }
-            #panelForm .p-field { font-size: 1.1rem; padding: 15px; border-radius: 12px; background: #151515; }
+            #cio-app #panelForm { text-align: center; }
+            #cio-app #panelForm .p-field { font-size: 1.1rem; padding: 15px; border-radius: 12px; background: #151515; }
         }
     </style>
 </head>
@@ -397,14 +393,14 @@
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
 
-    // === GESTIÓN DE GESTOS (ARRASTRAR PARA CERRAR) ===
+    // === GESTIÓN DE GESTOS ===
     let touchStartY = 0;
     const panels = document.querySelectorAll('.side-panel');
     panels.forEach(panel => {
         panel.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
         panel.addEventListener('touchmove', e => {
             const currentY = e.touches[0].clientY;
-            if (currentY - touchStartY > 120) closePanels(); // Si arrastra más de 120px hacia abajo
+            if (currentY - touchStartY > 120) closePanels();
         }, {passive: true});
     });
 
@@ -418,7 +414,6 @@
         if(el) el.textContent = shiftText;
     }
 
-    // Función genérica para abrir desplegables
     function toggleAccordion(id) {
         const content = document.getElementById('acc-' + id);
         const header = document.getElementById('head-' + id);
@@ -451,6 +446,15 @@
                 document.getElementById('m-calls').textContent = dK.calls;
                 renderPuestos(dK.puestos);
                 prevSLA = sla;
+                
+                if(document.getElementById('panelHistory').classList.contains('active')) {
+                     if(!document.getElementById('in-sla').value) document.getElementById('in-sla').value = dK.sla;
+                     if(!document.getElementById('in-calls').value) document.getElementById('in-calls').value = dK.calls;
+                     for(let i=1; i<=9; i++) {
+                         let pInp = document.getElementById(`inp-p${i}`);
+                         if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
+                     }
+                }
             }
 
             const rE = await fetch(DB_URL);
@@ -472,14 +476,20 @@
             if(dR) {
                 Object.entries(dR).forEach(([id, v], index) => {
                     let name = id.replace(/_/g,' ').toUpperCase();
-                    let lastDown = v.hora_caida || "Desconocida"; // Agregado para servicios
+                    let lastDown = v.hora_caida || "Desconocida";
                     
                     if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
-                        let descCam = v.alerta_camaras.toUpperCase()
-                            .replace(id.toUpperCase(), "").replace("ALERTA:", "").replace("CÁMARAS FUERA DE LÍNEA", "").trim();
-                        
-                        camTickerHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${descCam}</div>`;
-                        
+                        // LIMPIEZA TOTAL: Solo el contenido puro de Firebase
+                        let cleanData = v.alerta_camaras.toUpperCase()
+                                        .replace(id.toUpperCase(), "")
+                                        .replace("ALERTA:", "")
+                                        .replace("CÁMARAS FUERA DE LÍNEA", "")
+                                        .replace("DISPOSITIVOS:", "")
+                                        .replace("DISPOSITIVOS", "")
+                                        .replace("CÁMARAS", "")
+                                        .trim();
+                                        
+                        camTickerHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${cleanData}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-cam${index}" onclick="toggleAccordion('cam${index}')">
@@ -491,7 +501,7 @@
                                 <div id="arr-cam${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
                             <div id="acc-cam${index}" class="generic-details">
-                                <div class="detail-row"><span class="detail-label">Dispositivos</span><span class="detail-value">${descCam}</span></div>
+                                <div class="detail-row"><span class="detail-value">${cleanData}</span></div>
                             </div>
                         </div>`;
                     }
@@ -509,7 +519,7 @@
                                 <div id="arr-srv${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
                             <div id="acc-srv${index}" class="generic-details">
-                                <div class="detail-row"><span class="detail-label">Hora Caída</span><span class="detail-value">${lastDown}</span></div>
+                                <div class="detail-row" style="justify-content:space-between"><span style="font-size:0.7rem; opacity:0.5">HORA CAÍDA</span><span class="detail-value">${lastDown}</span></div>
                             </div>
                         </div>`;
                     }
@@ -522,6 +532,21 @@
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
             
         } catch(e) { console.error(e); }
+    }
+
+    async function saveKPIs() {
+        const kpiData = {
+            sla: document.getElementById('in-sla').value || 0,
+            calls: document.getElementById('in-calls').value || 0,
+            puestos: {}
+        };
+        for(let i=1; i<=9; i++) {
+            kpiData.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
+        }
+        try {
+            await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(kpiData) });
+            syncData();
+        } catch(e) { console.error("Error al guardar:", e); }
     }
 
     function updateMobileSLA(val) {
@@ -540,7 +565,13 @@
     function renderPuestos(data) {
         const pcCont = document.getElementById('puestos-display');
         const mbCont = document.getElementById('m-puestos');
+        if(!data) return;
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
+        if(activeEntries.length === 0) {
+            pcCont.innerHTML = "";
+            mbCont.innerHTML = `<div style="grid-column: span 3; opacity:0.3; font-size:0.7rem; text-align:center; padding:10px;">Sin puestos activos</div>`;
+            return;
+        }
         const vals = activeEntries.map(([k, v]) => parseInt(v));
         const maxVal = Math.max(...vals), minVal = Math.min(...vals);
         let html = "";
@@ -552,7 +583,7 @@
             }
         }
         pcCont.innerHTML = html;
-        mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.3; font-size:0.7rem; text-align:center; padding:10px;">Sin puestos activos</div>`;
+        mbCont.innerHTML = html;
     }
 
     function renderSlide() {
@@ -584,23 +615,25 @@
     function renderHistory() {
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-            return `<div class="history-card" style="border-left-color:${colors[it.priority]}">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <b style="color:${colors[it.priority]}">${it.area}</b>
-                    <small style="opacity:0.4">${it.timestamp || ''}</small>
+            const color = colors[it.priority] || "var(--accent)";
+            return `
+            <div class="history-card" style="border-left-color:${color} !important">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:0.6rem; font-weight:900; color:${color}">${it.area.toUpperCase()}</span>
+                    <span style="font-size:0.6rem; opacity:0.4;">${it.time || ''}</span>
                 </div>
-                <h4 style="margin:5px 0;">${it.title}</h4>
-                <p style="font-size:0.8rem; opacity:0.7; margin-bottom:10px;">${it.message}</p>
-                <div style="display:flex; gap:10px;">
-                    <button onclick="openForm(${i})" class="btn-pill btn-sec" style="width:auto; padding:5px 10px; font-size:0.6rem; margin:0;">EDITAR</button>
-                    <button onclick="deleteEntry(${i})" class="btn-pill btn-sec" style="width:auto; padding:5px 10px; font-size:0.6rem; margin:0; color:var(--critico)">BORRAR</button>
+                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px;">${it.title}</div>
+                <div style="font-size:0.7rem; opacity:0.7; line-height:1.4;">${it.message}</div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button onclick="openForm(${i})" style="background:none; border:none; color:var(--accent); font-size:0.7rem; font-weight:bold; cursor:pointer;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="background:none; border:none; color:var(--critico); font-size:0.7rem; font-weight:bold; cursor:pointer;">ELIMINAR</button>
                 </div>
             </div>`;
         }).join('');
     }
 
     function openPanel(id) {
-        closePanels();
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         document.getElementById('cio-overlay').style.display = 'block';
     }
@@ -610,62 +643,74 @@
         document.getElementById('cio-overlay').style.display = 'none';
     }
 
-    function openForm(idx) {
-        openPanel('panelForm');
-        const it = idx !== null ? cio_logs[idx] : {area:'Monitoreo', priority:'Baja', title:'', message:''};
-        document.getElementById('f-id').value = idx !== null ? idx : '';
-        document.getElementById('f-area').value = it.area;
-        document.getElementById('f-prio').value = it.priority;
-        document.getElementById('f-title').value = it.title;
-        document.getElementById('f-msg').value = it.message;
-        document.getElementById('formTitle').textContent = idx !== null ? 'EDITAR NOVEDAD' : 'NUEVA NOVEDAD';
+    function toggleFS() {
+        if (!document.fullscreenElement) {
+            document.getElementById('cio-app').requestFullscreen().catch(err => { console.log(err.message); });
+        } else {
+            document.exitFullscreen();
+        }
     }
 
-    async function saveKPIs() {
-        const data = { sla: document.getElementById('in-sla').value || 0, calls: document.getElementById('in-calls').value || 0, puestos: {} };
-        for(let i=1; i<=9; i++) data.puestos[`p${i}`] = document.getElementById('inp-p${i}').value || 0;
-        await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(data) });
-        syncData(); closePanels();
+    function openForm(index) {
+        const isNew = index === null;
+        document.getElementById('formTitle').textContent = isNew ? "NUEVA NOVEDAD" : "EDITAR NOVEDAD";
+        if(!isNew) {
+            const it = cio_logs[index];
+            document.getElementById('f-id').value = index;
+            document.getElementById('f-area').value = it.area;
+            document.getElementById('f-prio').value = it.priority;
+            document.getElementById('f-title').value = it.title;
+            document.getElementById('f-msg').value = it.message;
+        } else {
+            document.getElementById('mainForm').reset();
+            document.getElementById('f-id').value = "";
+        }
+        openPanel('panelForm');
     }
 
     async function saveEntry(e) {
         e.preventDefault();
-        const idx = document.getElementById('f-id').value;
-        const entry = { area: document.getElementById('f-area').value, priority: document.getElementById('f-prio').value, title: document.getElementById('f-title').value, message: document.getElementById('f-msg').value, timestamp: new Date().toLocaleString() };
-        if(idx === '') cio_logs.push(entry); else cio_logs[idx] = entry;
-        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        syncData(); openPanel('panelHistory');
-    }
-
-    async function deleteEntry(idx) {
-        if(!confirm("¿Eliminar novedad?")) return;
-        cio_logs.splice(idx, 1);
+        const id = document.getElementById('f-id').value;
+        const entry = {
+            area: document.getElementById('f-area').value,
+            priority: document.getElementById('f-prio').value,
+            title: document.getElementById('f-title').value,
+            message: document.getElementById('f-msg').value,
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        };
+        if(id === "") cio_logs.push(entry); else cio_logs[id] = entry;
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
         syncData();
+        openPanel('panelHistory');
     }
 
-    function toggleFS() {
-        const el = document.getElementById('cio-app');
-        if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen();
+    async function deleteEntry(index) {
+        if(confirm("¿Eliminar esta novedad?")) {
+            cio_logs.splice(index, 1);
+            await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+            syncData();
+        }
     }
 
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(18); doc.text("REPORTE OPERATIVO CIO", 14, 20);
-        const rows = cio_logs.map(it => [it.timestamp, it.area, it.priority, it.title]);
-        doc.autoTable({ head: [['Fecha', 'Área', 'Prioridad', 'Título']], body: rows, startY: 30 });
-        doc.save("Reporte_CIO.pdf");
+        doc.setFontSize(18);
+        doc.text("REPORTE OPERATIVO - MASTERSON", 14, 20);
+        const rows = cio_logs.map(it => [it.time, it.area, it.priority, it.title, it.message]);
+        doc.autoTable({
+            startY: 35,
+            head: [['Hora', 'Área', 'Prioridad', 'Título', 'Mensaje']],
+            body: rows,
+            theme: 'striped',
+            headStyles: {fillColor: [0, 100, 101]}
+        });
+        doc.save(`CIO_Reporte_${Date.now()}.pdf`);
     }
 
-    setInterval(() => {
-        document.getElementById('clockDisplay').textContent = new Date().toTimeString().split(' ')[0];
-    }, 1000);
-
+    setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
     syncData();
-    setInterval(syncData, 10000);
+    setInterval(syncData, 30000);
 </script>
-
 </body>
 </html>
-
