@@ -39,6 +39,7 @@
             border-bottom: 1px solid var(--primary); flex-shrink: 0;
         }
 
+        /* REGLA FULLSCREEN: Ocultar botones e historial */
         #cio-app:fullscreen .main-header, 
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
 
@@ -116,6 +117,7 @@
         .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
+        /* SEPARACIÓN DE HISTORIAL */
         .history-card { 
             background: #111111 !important; 
             padding: 20px !important; 
@@ -127,6 +129,7 @@
             position: relative !important;
         }
 
+        /* BOTÓN FLOTANTE MÓVIL (HAMBURGUESA CON LOGO) */
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -137,71 +140,78 @@
         }
         #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-        /* ESTILOS ACORDEÓN MÓVIL (EXPANDIDOS) */
-        .mobile-accordion-btn {
-            width: 100%; background: #080808; border: none; color: var(--accent);
-            font-size: 0.85rem; font-weight: 900; text-transform: uppercase;
-            letter-spacing: 2px; display: flex; align-items: center; gap: 10px;
-            padding: 22px 15px; cursor: pointer; border-bottom: 1px solid #1a1a1a;
-            margin-bottom: 5px; border-radius: 12px 12px 0 0;
+        /* DISEÑO MÓVIL ESPECÍFICO */
+        .mobile-section-header {
+            color: var(--primary); font-size: 0.75rem; font-weight: bold; 
+            margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
+            display: flex; align-items: center; gap: 10px;
         }
-        .mobile-accordion-btn::after { content: "▼"; font-size: 0.7rem; opacity: 0.5; transition: 0.3s; margin-left: auto; }
-        .mobile-accordion-btn.open { background: #111; color: #fff; }
-        .mobile-accordion-btn.open::after { transform: rotate(180deg); }
+        .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+
+        .mobile-stat-container {
+            display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center;
+        }
         
-        .mobile-accordion-btn .off-count-tag {
-            background: var(--critico); color: white; font-size: 0.65rem;
-            padding: 3px 8px; border-radius: 6px; font-weight: 900; margin-left: 5px;
-        }
-
-        .mobile-accordion-content { 
-            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); 
-            background: #111; border-radius: 0 0 12px 12px; margin-bottom: 15px;
-        }
-        .mobile-accordion-content.open { max-height: 2000px; padding: 20px 15px; margin-bottom: 25px; border: 1px solid #222; border-top: none; }
-
-        /* KPI MOBILE ENHANCED */
-        .mobile-stat-container { display: flex; flex-direction: column; gap: 20px; }
-        .mobile-stat-box { 
-            background: linear-gradient(145deg, #1a1a1a, #0d0d0d); 
-            padding: 25px 20px; border-radius: 20px; border: 1px solid #222; text-align: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        .sla-circle-container { position: relative; width: 160px; height: 160px; margin: 0 auto; }
+        .sla-circle-container { position: relative; width: 120px; height: 120px; margin: 0 auto; }
         .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .sla-circle-bg { fill: none; stroke: #222; stroke-width: 10; }
-        .sla-circle-bar { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
-        .sla-text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
+        .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
+        .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease, stroke 1s ease; }
+        .sla-text-overlay { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            text-align: center; width: 100%; 
+        }
 
+        .mobile-stat-box { 
+            background: linear-gradient(145deg, #151515, #0a0a0a); 
+            padding: 20px 15px; border-radius: 15px; 
+            border: 1px solid #222; text-align: center;
+            height: 100%; display: flex; flex-direction: column; justify-content: center;
+        }
+        
         .mobile-puestos-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-        }
-        .puesto-item-mobile {
-            background: #1a1a1a; padding: 15px 5px; border-radius: 12px; border: 1px solid #333;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a;
+            margin-bottom: 30px;
         }
 
+        /* Estilo Servicios Offline Limpio */
         .off-service-card {
-            background: rgba(255, 77, 77, 0.08); border: 1px solid rgba(255, 77, 77, 0.3);
-            border-radius: 15px; padding: 20px; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 18px;
+            background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2);
+            border-radius: 12px; padding: 15px 20px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 15px;
         }
         .off-status-dot {
-            width: 14px; height: 14px; background: var(--critico); border-radius: 50%;
-            box-shadow: 0 0 15px var(--critico); animation: pulse-red 1.5s infinite;
+            width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
+            box-shadow: 0 0 10px var(--critico); animation: pulse-red 1.5s infinite;
         }
         @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
+        /* RESPONSIVE CELULAR */
         @media (max-width: 768px) {
             #hamb-menu { display: flex; }
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app #progressLine { bottom: 0; }
-            #cio-app .main-header { height: 85px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; justify-content: center; }
-            #cio-app .side-panel { width: 92%; padding: 35px 20px; border-left: 3px solid var(--primary); }
-            #cio-app #titleDisplay { font-size: 2.2rem; }
             
-            /* Centrar campos de edición según instrucciones */
-            #panelForm .p-field, #panelForm label { text-align: center; display: block; margin-left: auto; margin-right: auto; }
+            /* Ajuste de Cabecera Móvil para mayor separación */
+            #cio-app .main-header { 
+                height: 85px; 
+                padding: 0 20px; 
+                border-bottom: 1px solid #1a1a1a; 
+                justify-content: center;
+                margin-bottom: 38px !important; /* Separación de 1cm con el contenido principal */
+            }
+            
+            #cio-app .side-panel { 
+                width: 90%; padding: 30px 20px; 
+                border-left: 2px solid var(--primary);
+            }
+
+            /* Espaciado de 1cm (~38px) entre secciones del widget móvil */
+            .mobile-stat-container, .mobile-puestos-grid, #m-offline-list {
+                margin-bottom: 38px !important;
+            }
+
+            #cio-app #titleDisplay { font-size: 2.2rem; }
             
             #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
             #panelHistory .btn-sec { display: block !important; width: 100%; }
@@ -211,7 +221,7 @@
 <body>
 
 <div id="cio-app">
-    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(8px);" onclick="closePanels()"></div>
+    <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(6px);" onclick="closePanels()"></div>
 
     <div id="hamb-menu" onclick="openPanel('panelMobileDash')">
         <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Menu">
@@ -253,51 +263,41 @@
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 50px; height: 5px; background: var(--primary); border-radius: 10px; margin: 0 auto 15px; opacity: 0.5;"></div>
-            <h2 style="color:var(--accent); font-size: 1.4rem; letter-spacing: 3px; font-weight: 900;">OPERACIONES</h2>
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
+            <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900;">CENTRO DE MANDO</h2>
         </div>
         
-        <button class="mobile-accordion-btn" onclick="toggleAccordion('acc-perf', this)">Performance Actual</button>
-        <div id="acc-perf" class="mobile-accordion-content">
-            <div class="mobile-stat-container">
-                <div class="mobile-stat-box">
-                    <div class="kpi-label" style="color:var(--primary); margin-bottom:20px; font-weight: 900;">Nivel de Servicio</div>
-                    <div class="sla-circle-container">
-                        <svg class="sla-circle-svg" viewBox="0 0 100 100">
-                            <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
-                            <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
-                        </svg>
-                        <div class="sla-text-overlay">
-                            <div id="m-sla-val" style="font-size: 2rem; font-weight: 900; line-height: 1;">--%</div>
-                            <div id="m-sla-trend" style="font-size: 0.9rem; margin-top: 5px;"></div>
-                        </div>
+        <div class="mobile-section-header">Performance Actual</div>
+        <div class="mobile-stat-container">
+            <div class="mobile-stat-box">
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:15px;">Nivel de Servicio</div>
+                <div class="sla-circle-container">
+                    <svg class="sla-circle-svg" viewBox="0 0 100 100">
+                        <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
+                        <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
+                    </svg>
+                    <div class="sla-text-overlay">
+                        <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900; line-height: 1;">--%</div>
+                        <div id="m-sla-trend" style="font-size: 0.7rem;"></div>
                     </div>
                 </div>
-                <div class="mobile-stat-box" style="display: flex; justify-content: space-around; align-items: center; padding: 30px;">
-                    <div style="text-align: left;">
-                        <div class="kpi-label" style="color:var(--primary); margin-bottom:5px;">Llamadas</div>
-                        <div style="font-size: 0.6rem; opacity: 0.5; text-transform: uppercase;">En curso hoy</div>
-                    </div>
-                    <div id="m-calls" style="font-size: 3.5rem; font-weight: 900; color: #fff; line-height: 1;">0</div>
-                </div>
+            </div>
+            <div class="mobile-stat-box">
+                <div class="kpi-label" style="color:var(--primary); margin-bottom:15px;">Llamadas Total</div>
+                <div id="m-calls" style="font-size: 2.8rem; font-weight: 900; color: #fff;">0</div>
+                <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase; margin-top:5px;">En curso</div>
             </div>
         </div>
 
-        <button class="mobile-accordion-btn" onclick="toggleAccordion('acc-puestos', this)">Puestos en Operación</button>
-        <div id="acc-puestos" class="mobile-accordion-content">
-            <div id="m-puestos" class="mobile-puestos-grid"></div>
-        </div>
+        <div class="mobile-section-header">Puestos en Operación</div>
+        <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-        <button class="mobile-accordion-btn" onclick="toggleAccordion('acc-servicios', this)">
-            Estado de Servicios <span id="m-off-count" class="off-count-tag" style="display:none;">0</span>
-        </button>
-        <div id="acc-servicios" class="mobile-accordion-content">
-            <div id="m-offline-list"></div>
-        </div>
+        <div class="mobile-section-header">Estado de Servicios</div>
+        <div id="m-offline-list"></div>
 
-        <div style="margin-top: 20px; padding-bottom: 50px;">
-            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px; height: 60px;">CERRAR MENÚ</button>
+        <div style="margin-top: 20px; margin-bottom: 40px;">
+            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">VOLVER AL MONITOR</button>
         </div>
     </aside>
 
@@ -314,7 +314,7 @@
         </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
         <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
-        <div class="mobile-accordion-btn" style="border:none; cursor:default; pointer-events:none; background:none;">Novedades Recientes</div>
+        <div class="mobile-section-header">Novedades Recientes</div>
         <div id="historyList"></div>
         <button onclick="closePanels()" class="btn-pill btn-sec" style="margin-top:20px; border-radius: 8px;">VOLVER</button>
     </aside>
@@ -334,7 +334,7 @@
             </select>
             <input type="text" id="f-title" placeholder="Título" required class="p-field">
             <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
-            <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICA AHORA</button>
+            <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICAR AHORA</button>
             <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="border-radius: 8px;">CANCELAR</button>
         </form>
     </aside>
@@ -353,14 +353,6 @@
 
     const pGrid = document.getElementById('p-inputs-grid');
     for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
-
-    function toggleAccordion(id, btn) {
-        const content = document.getElementById(id);
-        const isOpen = content.classList.contains('open');
-        document.querySelectorAll('.mobile-accordion-content').forEach(c => c.classList.remove('open'));
-        document.querySelectorAll('.mobile-accordion-btn').forEach(b => b.classList.remove('open'));
-        if(!isOpen) { content.classList.add('open'); btn.classList.add('open'); }
-    }
 
     async function syncData() {
         try {
@@ -390,29 +382,25 @@
             const dR = await rR.json();
             const ticker = document.getElementById('ticker-content');
             const mOffList = document.getElementById('m-offline-list');
-            const mOffCountTag = document.getElementById('m-off-count');
-            let tHtml = "", mHtml = "", offCount = 0;
+            let tHtml = "", mHtml = "";
             if(dR) {
                 Object.entries(dR).forEach(([id, v]) => {
                     if(v.estado === "offline") {
-                        offCount++;
                         const name = id.replace(/_/g,' ').toUpperCase();
                         tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
                         mHtml += `
                             <div class="off-service-card">
                                 <div class="off-status-dot"></div>
                                 <div style="flex:1">
-                                    <div style="font-size:1rem; font-weight:900; color:#fff;">OFF: ${name}</div>
-                                    <div style="font-size:0.75rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
+                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">OFF: ${name}</div>
+                                    <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
                                 </div>
                             </div>`;
                     }
                 });
             }
             ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
-            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.9rem; text-align:center; padding:35px; border:1px dashed #333; border-radius:20px; background:rgba(46,204,113,0.02);">✔ Todos los sistemas operativos</div>`;
-            mOffCountTag.textContent = offCount;
-            mOffCountTag.style.display = offCount > 0 ? 'inline-block' : 'none';
+            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:25px; border:1px dashed #222; border-radius:15px; background:rgba(46,204,113,0.02);">✔ Todos los servicios operan con normalidad</div>`;
         } catch(e) { console.error(e); }
     }
 
@@ -436,17 +424,16 @@
         const activeEntries = Object.entries(data).filter(([k, v]) => parseInt(v) > 0);
         const vals = activeEntries.map(([k, v]) => parseInt(v));
         const maxVal = Math.max(...vals), minVal = Math.min(...vals);
-        let pcHtml = "", mbHtml = "";
+        let html = "";
         for(let i=1; i<=9; i++) {
             const v = parseInt(data[`p${i}`]) || 0;
             if(v > 0) {
                 let color = (maxVal === minVal || v === maxVal) ? "var(--online)" : v === minVal ? "var(--critico)" : "var(--warning)";
-                pcHtml += `<div class="puesto-item"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
-                mbHtml += `<div class="puesto-item-mobile"><span style="font-size:1.4rem; font-weight:900; color:${color}">${v}</span><span style="font-size:0.6rem; opacity:0.5; font-weight:bold;">PUESTO ${i}</span></div>`;
+                html += `<div class="puesto-item"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
             }
         }
-        pcCont.innerHTML = pcHtml;
-        mbCont.innerHTML = mbHtml || `<div style="grid-column: span 3; opacity:0.3; font-size:0.8rem; text-align:center; padding:30px; border: 1px dashed #333; border-radius:15px;">Sin puestos activos</div>`;
+        pcCont.innerHTML = html;
+        mbCont.innerHTML = html || `<div style="grid-column: span 3; opacity:0.3; font-size:0.7rem; text-align:center; padding:10px;">Sin puestos activos</div>`;
     }
 
     function renderSlide() {
@@ -472,6 +459,7 @@
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
             const pColor = colors[it.priority] || "var(--accent)";
+            
             return `
             <div class="history-card" style="border-left-color:${pColor} !important">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom: 5px;">
@@ -568,6 +556,14 @@
         document.getElementById('f-id').value = ""; 
         openPanel('panelForm'); 
     }
+
+    let touchstartX = 0;
+    let touchendX = 0;
+    function handleGesture() { if (touchendX > touchstartX + 50) closePanels(); }
+    document.querySelectorAll('.side-panel').forEach(panel => {
+        panel.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+        panel.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleGesture(); }, {passive: true});
+    });
 
     setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
     setInterval(syncData, 10000);
