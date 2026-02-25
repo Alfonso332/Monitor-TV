@@ -81,21 +81,26 @@
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER PC */
+        /* TICKER PC MODIFICADO */
         #cio-app #ticker-bar { 
             height: 60px; background: #050505; border-top: 1px solid #222; 
-            display: flex; align-items: center; overflow: hidden; position: relative; flex-shrink: 0;
+            display: flex; overflow: hidden; position: relative; flex-shrink: 0;
         }
-        #cio-app #ticker-content { 
+        .ticker-section {
+            flex: 1; position: relative; overflow: hidden; display: flex; align-items: center;
+        }
+        .ticker-section:first-child { border-right: 1px solid #222; }
+
+        .ticker-wrapper { 
             display: flex; align-items: center; gap: 50px; white-space: nowrap; 
-            position: absolute; left: 0; animation: scroll-ticker 30s linear infinite; 
+            position: absolute; left: 0; animation: scroll-ticker 25s linear infinite; 
         }
-        @keyframes scroll-ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+        @keyframes scroll-ticker { 0% { transform: translateX(50vw); } 100% { transform: translateX(-100%); } }
 
         #cio-app .capsula-off {
             background: rgba(255, 77, 77, 0.15); border: 2px solid var(--critico);
             color: var(--critico); padding: 4px 15px; border-radius: 50px;
-            font-weight: 900; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+            font-weight: 900; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;
         }
 
         /* PANELES LATERALES */
@@ -279,7 +284,12 @@
     <div id="progressLine"></div>
 
     <div id="ticker-bar">
-        <div id="ticker-content">...</div>
+        <div class="ticker-section">
+            <div id="ticker-services" class="ticker-wrapper"></div>
+        </div>
+        <div class="ticker-section">
+            <div id="ticker-cameras" class="ticker-wrapper"></div>
+        </div>
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
@@ -385,7 +395,6 @@
         if(el) el.textContent = shiftText;
     }
 
-    // Función para expandir/colapsar cámaras en el celular
     function toggleCam(id) {
         const detail = document.getElementById('detail-' + id);
         const arrow = document.getElementById('arrow-' + id);
@@ -426,23 +435,28 @@
             const rR = await fetch(RED_URL);
             const dR = await rR.json();
             
-            const ticker = document.getElementById('ticker-content');
+            const tickerSrv = document.getElementById('ticker-services');
+            const tickerCam = document.getElementById('ticker-cameras');
             const mNvrList = document.getElementById('m-nvr-list');
             const mCamList = document.getElementById('m-cam-list');
             
-            let tHtml = "", nvrHtml = "", camHtml = "";
+            let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "";
             
             if(dR) {
                 Object.entries(dR).forEach(([id, v], index) => {
-                    const name = id.replace(/_/g,' ').toUpperCase();
+                    let name = id.replace(/_/g,' ').toLowerCase();
+                    name = name.charAt(0).toUpperCase() + name.slice(1);
                     
-                    // LÓGICA CÁMARAS (Con Acordeón)
                     if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
-                        let descCam = v.alerta_camaras.toUpperCase().replace(name, "").replace("ALERTA:", "").replace(":", "").trim();
+                        let descCam = v.alerta_camaras.toUpperCase()
+                            .replace(id.toUpperCase(), "")
+                            .replace("ALERTA:", "")
+                            .replace("⚠️ – CÁMARAS FUERA DE LÍNEA", "")
+                            .replace("CÁMARAS FUERA DE LÍNEA", "")
+                            .replace(":", "")
+                            .trim();
                         
-                        tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${descCam}</div>`;
-                        
-                        // Widget expandible
+                        camTickerHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${descCam}</div>`;
                         camHtml += `
                         <div>
                             <div class="off-service-card" style="border-color:rgba(230,126,34,0.3); margin-bottom:5px;" onclick="toggleCam('${index}')">
@@ -459,13 +473,12 @@
                         </div>`;
                     }
                     
-                    // LÓGICA NVR / SERVICIO OFFLINE
                     if(v.estado === "offline") {
-                        tHtml += `<div class="capsula-off">${name}: OFFLINE</div>`;
+                        srvHtml += `<div class="capsula-off">${name.toUpperCase()}: OFFLINE</div>`;
                         nvrHtml += `<div class="off-service-card">
                             <div class="off-status-dot"></div>
                             <div style="flex:1">
-                                <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
+                                <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name.toUpperCase()}</div>
                                 <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
                             </div>
                         </div>`;
@@ -473,7 +486,8 @@
                 });
             }
             
-            ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
+            tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:0.8rem;">✔ SERVICIOS OK</span>`;
+            tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:0.8rem;">✔ CÁMARAS OK</span>`;
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ NVRs operando</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Cámaras operando</div>`;
             
@@ -596,50 +610,46 @@
         doc.save(`Reporte_CIO.pdf`);
     }
 
+    function openPanel(id) {
+        closePanels();
+        document.getElementById(id).classList.add('active');
+        document.getElementById('cio-overlay').style.display = 'block';
+    }
+
+    function closePanels() {
+        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('cio-overlay').style.display = 'none';
+        document.getElementById('mainForm').reset();
+        document.getElementById('f-id').value = "";
+    }
+
+    function toggleFS() {
+        if (!document.fullscreenElement) document.getElementById('cio-app').requestFullscreen();
+        else document.exitFullscreen();
+    }
+
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clockDisplay').textContent = now.toLocaleTimeString('es-AR', { hour12: false });
+    }
+
     function loop(now) {
         if(cio_logs.length) {
             if(!startTime) startTime = now;
             const elapsed = now - startTime;
-            document.getElementById('progressLine').style.width = Math.min((elapsed / SLIDE_DURATION) * 100, 100) + "%";
-            if(elapsed >= SLIDE_DURATION) { currentIdx++; renderSlide(); startTime = now; }
+            document.getElementById('progressLine').style.width = (elapsed / SLIDE_DURATION * 100) + "%";
+            if(elapsed >= SLIDE_DURATION) {
+                currentIdx++; startTime = now; renderSlide();
+            }
         }
         requestAnimationFrame(loop);
     }
 
-    function toggleFS() {
-        const app = document.getElementById('cio-app');
-        if(!document.fullscreenElement) app.requestFullscreen().catch(e => console.log(e)); 
-        else document.exitFullscreen();
-    }
-
-    function openPanel(id) { 
-        closePanels(); 
-        document.getElementById(id).classList.add('active'); 
-        document.getElementById('cio-overlay').style.display = 'block'; 
-    }
-    
-    function closePanels() { 
-        document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); 
-        document.getElementById('cio-overlay').style.display = 'none'; 
-    }
-    
-    function openForm(idx) { 
-        document.getElementById('mainForm').reset(); 
-        document.getElementById('f-id').value = ""; 
-        openPanel('panelForm'); 
-    }
-
-    let touchstartX = 0;
-    let touchendX = 0;
-    document.querySelectorAll('.side-panel').forEach(panel => {
-        panel.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-        panel.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; if (touchendX > touchstartX + 50) closePanels(); }, {passive: true});
-    });
-
-    setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
-    setInterval(syncData, 10000);
+    setInterval(updateClock, 1000);
+    setInterval(syncData, 5000);
     syncData();
     requestAnimationFrame(loop);
 </script>
+
 </body>
 </html>
