@@ -104,7 +104,7 @@
         #cio-app .p-field { 
             background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; 
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
-            text-align: center;
+            text-align: center; display: block; margin-left: auto; margin-right: auto;
         }
         #cio-app .btn-pill {
             background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 50px;
@@ -129,7 +129,7 @@
             position: relative !important;
         }
 
-        /* BOTÓN FLOTANTE MÓVIL (HAMBURGUESA CON LOGO) */
+        /* BOTÓN FLOTANTE MÓVIL */
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -192,29 +192,33 @@
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app #progressLine { bottom: 0; }
             
-            /* Ajuste de Cabecera Móvil para mayor separación */
             #cio-app .main-header { 
-                height: 85px; 
-                padding: 0 20px; 
-                border-bottom: 1px solid #1a1a1a; 
-                justify-content: center;
-                margin-bottom: 38px !important; /* Separación de 1cm con el contenido principal */
+                height: 85px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; 
+                justify-content: center; margin-bottom: 38px !important;
             }
             
-            #cio-app .side-panel { 
-                width: 90%; padding: 30px 20px; 
-                border-left: 2px solid var(--primary);
+            #cio-app .side-panel { width: 90%; padding: 30px 20px; border-left: 2px solid var(--primary); }
+
+            /* AJUSTES SOLICITADOS SOLO MÓVIL */
+            .mobile-section-header {
+                font-size: 0.9rem !important; /* Más grande */
+                color: var(--accent) !important;
+                margin-bottom: 25px !important; /* Más espacio inferior con la info */
             }
 
-            /* Espaciado de 1cm (~38px) entre secciones del widget móvil */
             .mobile-stat-container, .mobile-puestos-grid, #m-offline-list {
+                margin-top: 15px !important; /* Separación del título */
                 margin-bottom: 38px !important;
             }
 
             #cio-app #titleDisplay { font-size: 2.2rem; }
-            
             #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
             #panelHistory .btn-sec { display: block !important; width: 100%; }
+            
+            #shift-display { 
+                font-size: 0.7rem; font-weight: bold; color: var(--primary); 
+                text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;
+            }
         }
     </style>
 </head>
@@ -265,7 +269,8 @@
     <aside id="panelMobileDash" class="side-panel">
         <div style="text-align: center; margin-bottom: 25px;">
             <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
-            <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900;">CENTRO DE MANDO</h2>
+            <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900; margin: 0;">CENTRO DE MANDO</h2>
+            <div id="shift-display">CARGANDO TURNO...</div>
         </div>
         
         <div class="mobile-section-header">Performance Actual</div>
@@ -323,12 +328,12 @@
         <h2 id="formTitle" style="text-align:center; color:var(--accent); margin-bottom:20px;">EDITAR NOVEDAD</h2>
         <form id="mainForm" onsubmit="saveEntry(event)">
             <input type="hidden" id="f-id">
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">ÁREA</label>
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-bottom:5px;">ÁREA</label>
             <select id="f-area" class="p-field">
                 <option>Monitoreo</option><option>Freschat</option><option>Atención al Cliente</option>
                 <option>Infraestructura</option><option>Novedad Interna</option>
             </select>
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold;">PRIORIDAD</label>
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-bottom:5px;">PRIORIDAD</label>
             <select id="f-prio" class="p-field">
                 <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
             </select>
@@ -354,8 +359,21 @@
     const pGrid = document.getElementById('p-inputs-grid');
     for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
 
+    // Función para determinar el turno
+    function updateShift() {
+        const hour = new Date().getHours();
+        let shiftText = "";
+        if(hour >= 6 && hour < 14) shiftText = "TURNO MAÑANA";
+        else if(hour >= 14 && hour < 22) shiftText = "TURNO TARDE";
+        else shiftText = "TURNO NOCHE";
+        
+        const el = document.getElementById('shift-display');
+        if(el) el.textContent = shiftText;
+    }
+
     async function syncData() {
         try {
+            updateShift();
             const rK = await fetch(KPI_URL);
             const dK = await rK.json();
             if(dK) {
