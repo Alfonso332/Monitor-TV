@@ -162,7 +162,7 @@
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
             border-radius: 50%; z-index: 10050; border: 3px solid var(--primary);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0);
             justify-content: center; align-items: center; cursor: pointer;
             overflow: hidden;
             transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
@@ -173,8 +173,8 @@
 
         /* Estilo Servicios Offline y Acordeón MÓVIL REFINADO */
         .off-service-card {
-            background: #0a0a0a; border: 1px solid #222;
-            border-radius: 15px; padding: 18px 20px; margin-bottom: 10px;
+            background: #111; border: 10px solid #111;
+            border-radius: 1px; padding: 18px 20px; margin-bottom: 1px;
             display: flex; align-items: center; gap: 15px; cursor: pointer;
             transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
@@ -184,24 +184,24 @@
         
         .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
-            box-shadow: 0 0 10px var(--critico); animation: pulse-red 1.5s infinite;
+            box-shadow: 0 0 10px var(--critico); animation: pulse-red 1s infinite;
         }
         
         /* Contenedor Expandible (Desplegables) */
         .generic-details {
             max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s, padding 0.3s;
-            opacity: 0; background: #080808; border: 1px solid #222; border-top: none;
-            border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
+            opacity: 0; background: #111; border: 1px solid #111; border-top: 2;
+            border-bottom-left-radius: 2px; border-bottom-right-radius: 2px;
             margin-bottom: 15px; padding: 0 20px;
         }
         .generic-details.expanded { max-height: 400px; opacity: 1; padding: 20px; }
         
-        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
         .detail-row:last-child { border-bottom: none; }
-        .detail-label { color: #555; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
-        .detail-value { color: #fff; font-size: 0.85rem; font-weight: 700; }
+        .detail-label { color: #FFF; font-size: 1rem; font-weight: bold; text-transform: uppercase; }
+        .detail-value { color: #FFF; font-size: 1rem; font-weight: 700; }
 
-        @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        @keyframes pulse-red { 0% { opacity: 0.1; } 50% { opacity: 1; } 100% { opacity: 0.1; } }
 
         /* REGLAS ESTRICTAS DE RESPONSIVE (SOLO CELULAR) */
         @media (max-width: 768px) {
@@ -492,7 +492,6 @@
                             </div>
                             <div id="acc-cam${index}" class="generic-details">
                                 <div class="detail-row"><span class="detail-label">Dispositivos</span><span class="detail-value">${descCam}</span></div>
-                                <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" style="color:var(--orange)">ALERTA</span></div>
                             </div>
                         </div>`;
                     }
@@ -511,7 +510,6 @@
                             </div>
                             <div id="acc-srv${index}" class="generic-details">
                                 <div class="detail-row"><span class="detail-label">Hora Caída</span><span class="detail-value">${lastDown}</span></div>
-                                <div class="detail-row"><span class="detail-label">Severidad</span><span class="detail-value" style="color:var(--critico)">CRÍTICA</span></div>
                             </div>
                         </div>`;
                     }
@@ -670,3 +668,4 @@
 
 </body>
 </html>
+
