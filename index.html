@@ -62,18 +62,18 @@
         #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
         #cio-app .puesto-lab { font-size: 0.5rem; opacity: 0.5; font-weight: bold; }
 
-        /* ÁREA CENTRAL - AJUSTADA PARA PC/TV */
+        /* ÁREA CENTRAL */
         #cio-app #display-board { 
             flex: 1; display: flex; flex-direction: column; justify-content: center; 
             align-items: center; text-align: center; padding: 20px;
             overflow: hidden;
         }
         #cio-app #titleDisplay { 
-            font-size: clamp(32px, 7vw, 75px); /* Reducido el max de 100 a 75 */
+            font-size: clamp(32px, 7vw, 75px); 
             font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.95; 
         }
         #cio-app #messageDisplay { 
-            font-size: clamp(18px, 2.5vw, 40px); /* Ajustado proporcionalmente */
+            font-size: clamp(18px, 2.5vw, 40px); 
             opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300; 
         }
         #cio-app .area-tag { letter-spacing: 8px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; color: var(--accent); }
@@ -124,7 +124,6 @@
         .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
-        /* SEPARACIÓN DE HISTORIAL */
         .history-card { 
             background: #111111 !important; 
             padding: 20px !important; 
@@ -136,7 +135,7 @@
             position: relative !important;
         }
 
-        /* BOTÓN FLOTANTE MÓVIL ABAJO DERECHA */
+        /* BOTÓN FLOTANTE MÓVIL */
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -212,7 +211,7 @@
                 margin-bottom: 25px !important; 
             }
 
-            .mobile-stat-container, .mobile-puestos-grid, #m-offline-list {
+            .offline-group {
                 margin-top: 15px !important; 
                 margin-bottom: 38px !important;
             }
@@ -304,8 +303,11 @@
         <div class="mobile-section-header">Puestos en Operación</div>
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-        <div class="mobile-section-header">Estado de Servicios</div>
-        <div id="m-offline-list"></div>
+        <div class="mobile-section-header">NVR Offline</div>
+        <div id="m-nvr-list" class="offline-group"></div>
+
+        <div class="mobile-section-header">Cámaras Offline</div>
+        <div id="m-cam-list" class="offline-group"></div>
 
         <div style="margin-top: 20px; margin-bottom: 40px;">
             <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">VOLVER AL MONITOR</button>
@@ -362,7 +364,6 @@
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
 
-    // Generar inputs de puestos P1-P9
     const pGrid = document.getElementById('p-inputs-grid');
     for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
 
@@ -400,25 +401,51 @@
 
             const rR = await fetch(RED_URL);
             const dR = await rR.json();
+            
             const ticker = document.getElementById('ticker-content');
-            const mOffList = document.getElementById('m-offline-list');
-            let tHtml = "", mHtml = "";
+            const mNvrList = document.getElementById('m-nvr-list');
+            const mCamList = document.getElementById('m-cam-list');
+            
+            let tHtml = "", nvrHtml = "", camHtml = "";
             
             if(dR) {
                 Object.entries(dR).forEach(([id, v]) => {
                     const name = id.replace(/_/g,' ').toUpperCase();
-                    if(id === "Nariño" && v.alerta_camaras && v.alerta_camaras !== "") {
-                        tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${v.alerta_camaras.toUpperCase()}</div>`;
-                        mHtml += `<div class="off-service-card" style="border-color:rgba(230,126,34,0.3)"><div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div><div style="flex:1"><div style="font-size:0.9rem; font-weight:900; color:#fff;">ALERTA: NARIÑO</div><div style="font-size:0.65rem; color:var(--orange); font-weight:bold;">${v.alerta_camaras}</div></div></div>`;
+                    
+                    // LÓGICA CÁMARAS (Casos como Nariño)
+                    if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
+                        // Limpiamos el texto para que no repita el nombre del servicio si ya viene en el string
+                        let descCam = v.alerta_camaras.toUpperCase().replace(name, "").replace("ALERTA:", "").replace(":", "").trim();
+                        
+                        tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${descCam}</div>`;
+                        
+                        camHtml += `<div class="off-service-card" style="border-color:rgba(230,126,34,0.3)">
+                            <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
+                            <div style="flex:1">
+                                <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
+                                <div style="font-size:0.65rem; color:var(--orange); font-weight:bold;">${descCam}</div>
+                            </div>
+                        </div>`;
                     }
+                    
+                    // LÓGICA NVR / SERVICIO OFFLINE
                     if(v.estado === "offline") {
-                        tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
-                        mHtml += `<div class="off-service-card"><div class="off-status-dot"></div><div style="flex:1"><div style="font-size:0.9rem; font-weight:900; color:#fff;">OFF: ${name}</div><div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div></div></div>`;
+                        tHtml += `<div class="capsula-off">${name}: OFFLINE</div>`;
+                        nvrHtml += `<div class="off-service-card">
+                            <div class="off-status-dot"></div>
+                            <div style="flex:1">
+                                <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
+                                <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
+                            </div>
+                        </div>`;
                     }
                 });
             }
+            
             ticker.innerHTML = tHtml || `<span style="color:var(--online); font-weight:900;">✔ SERVICIOS OPERATIVOS</span>`;
-            mOffList.innerHTML = mHtml || `<div style="color:var(--online); font-size:0.8rem; text-align:center; padding:25px; border:1px dashed #222; border-radius:15px; background:rgba(46,204,113,0.02);">✔ Todos los servicios operan con normalidad</div>`;
+            mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ NVRs operando</div>`;
+            mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Cámaras operando</div>`;
+            
         } catch(e) { console.error(e); }
     }
 
@@ -559,10 +586,12 @@
         document.getElementById(id).classList.add('active'); 
         document.getElementById('cio-overlay').style.display = 'block'; 
     }
+    
     function closePanels() { 
         document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active')); 
         document.getElementById('cio-overlay').style.display = 'none'; 
     }
+    
     function openForm(idx) { 
         document.getElementById('mainForm').reset(); 
         document.getElementById('f-id').value = ""; 
