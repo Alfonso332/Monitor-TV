@@ -180,16 +180,27 @@
             margin-bottom: 30px;
         }
 
-        /* Estilo Servicios Offline */
+        /* Estilo Servicios Offline y Acordeón MÓVIL */
         .off-service-card {
             background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2);
             border-radius: 12px; padding: 15px 20px; margin-bottom: 15px;
-            display: flex; align-items: center; gap: 15px;
+            display: flex; align-items: center; gap: 15px; cursor: pointer;
+            transition: background 0.3s ease;
         }
+        .off-service-card:active { background: rgba(255, 77, 77, 0.15); }
+        
         .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
             box-shadow: 0 0 10px var(--critico); animation: pulse-red 1.5s infinite;
         }
+        
+        /* Contenedor Expandible SOLO para Cámaras */
+        .cam-details {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s;
+            opacity: 0; padding-left: 27px;
+        }
+        .cam-details.expanded { max-height: 500px; opacity: 1; padding-bottom: 10px; }
+        
         @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
         /* RESPONSIVE CELULAR */
@@ -374,6 +385,19 @@
         if(el) el.textContent = shiftText;
     }
 
+    // Función para expandir/colapsar cámaras en el celular
+    function toggleCam(id) {
+        const detail = document.getElementById('detail-' + id);
+        const arrow = document.getElementById('arrow-' + id);
+        if (detail.classList.contains('expanded')) {
+            detail.classList.remove('expanded');
+            arrow.textContent = "▼";
+        } else {
+            detail.classList.add('expanded');
+            arrow.textContent = "▲";
+        }
+    }
+
     async function syncData() {
         try {
             updateShift();
@@ -409,21 +433,28 @@
             let tHtml = "", nvrHtml = "", camHtml = "";
             
             if(dR) {
-                Object.entries(dR).forEach(([id, v]) => {
+                Object.entries(dR).forEach(([id, v], index) => {
                     const name = id.replace(/_/g,' ').toUpperCase();
                     
-                    // LÓGICA CÁMARAS (Casos como Nariño)
+                    // LÓGICA CÁMARAS (Con Acordeón)
                     if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
-                        // Limpiamos el texto para que no repita el nombre del servicio si ya viene en el string
                         let descCam = v.alerta_camaras.toUpperCase().replace(name, "").replace("ALERTA:", "").replace(":", "").trim();
                         
                         tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${descCam}</div>`;
                         
-                        camHtml += `<div class="off-service-card" style="border-color:rgba(230,126,34,0.3)">
-                            <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
-                            <div style="flex:1">
-                                <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                <div style="font-size:0.65rem; color:var(--orange); font-weight:bold;">${descCam}</div>
+                        // Widget expandible
+                        camHtml += `
+                        <div>
+                            <div class="off-service-card" style="border-color:rgba(230,126,34,0.3); margin-bottom:5px;" onclick="toggleCam('${index}')">
+                                <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
+                                <div style="flex:1">
+                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
+                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Tocar para ver cámaras</div>
+                                </div>
+                                <div id="arrow-${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
+                            </div>
+                            <div id="detail-${index}" class="cam-details">
+                                <div style="font-size:0.65rem; color:var(--orange); font-weight:bold; border-left:2px solid var(--orange); padding-left:10px;">${descCam}</div>
                             </div>
                         </div>`;
                     }
