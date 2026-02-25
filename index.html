@@ -62,13 +62,20 @@
         #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
         #cio-app .puesto-lab { font-size: 0.5rem; opacity: 0.5; font-weight: bold; }
 
-        /* ÁREA CENTRAL */
+        /* ÁREA CENTRAL - AJUSTADA PARA PC/TV */
         #cio-app #display-board { 
             flex: 1; display: flex; flex-direction: column; justify-content: center; 
             align-items: center; text-align: center; padding: 20px;
+            overflow: hidden;
         }
-        #cio-app #titleDisplay { font-size: clamp(32px, 8vw, 100px); font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.9; }
-        #cio-app #messageDisplay { font-size: clamp(18px, 3vw, 45px); opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300; }
+        #cio-app #titleDisplay { 
+            font-size: clamp(32px, 7vw, 75px); /* Reducido el max de 100 a 75 */
+            font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.95; 
+        }
+        #cio-app #messageDisplay { 
+            font-size: clamp(18px, 2.5vw, 40px); /* Ajustado proporcionalmente */
+            opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300; 
+        }
         #cio-app .area-tag { letter-spacing: 8px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; color: var(--accent); }
         
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
@@ -100,7 +107,7 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
-        /* FORMULARIOS Y BOTONES */
+        /* FORMULARIOS Y BOTONES CENTRADOS */
         #cio-app .p-field { 
             background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; 
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
@@ -129,7 +136,7 @@
             position: relative !important;
         }
 
-        /* BOTÓN FLOTANTE MÓVIL */
+        /* BOTÓN FLOTANTE MÓVIL ABAJO DERECHA */
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -174,7 +181,7 @@
             margin-bottom: 30px;
         }
 
-        /* Estilo Servicios Offline Limpio */
+        /* Estilo Servicios Offline */
         .off-service-card {
             background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2);
             border-radius: 12px; padding: 15px 20px; margin-bottom: 15px;
@@ -199,15 +206,14 @@
             
             #cio-app .side-panel { width: 90%; padding: 30px 20px; border-left: 2px solid var(--primary); }
 
-            /* AJUSTES SOLICITADOS SOLO MÓVIL */
             .mobile-section-header {
-                font-size: 0.9rem !important; /* Más grande */
+                font-size: 0.9rem !important; 
                 color: var(--accent) !important;
-                margin-bottom: 25px !important; /* Más espacio inferior con la info */
+                margin-bottom: 25px !important; 
             }
 
             .mobile-stat-container, .mobile-puestos-grid, #m-offline-list {
-                margin-top: 15px !important; /* Separación del título */
+                margin-top: 15px !important; 
                 margin-bottom: 38px !important;
             }
 
@@ -356,17 +362,13 @@
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
 
+    // Generar inputs de puestos P1-P9
     const pGrid = document.getElementById('p-inputs-grid');
     for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
 
-    // Función para determinar el turno
     function updateShift() {
         const hour = new Date().getHours();
-        let shiftText = "";
-        if(hour >= 6 && hour < 14) shiftText = "TURNO MAÑANA";
-        else if(hour >= 14 && hour < 22) shiftText = "TURNO TARDE";
-        else shiftText = "TURNO NOCHE";
-        
+        let shiftText = (hour >= 6 && hour < 14) ? "TURNO MAÑANA" : (hour >= 14 && hour < 22) ? "TURNO TARDE" : "TURNO NOCHE";
         const el = document.getElementById('shift-display');
         if(el) el.textContent = shiftText;
     }
@@ -379,8 +381,8 @@
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
                 if (prevSLA !== null && sla !== prevSLA) {
-                    if (sla < prevSLA) { currentArrow = "▼"; currentColor = "var(--critico)"; } 
-                    else if (sla > prevSLA) { currentArrow = "▲"; currentColor = "var(--online)"; }
+                    currentArrow = (sla < prevSLA) ? "▼" : "▲";
+                    currentColor = (sla < prevSLA) ? "var(--critico)" : "var(--online)";
                 }
                 document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
                 document.getElementById('v-calls').textContent = dK.calls;
@@ -396,7 +398,6 @@
             renderHistory();
             if(cio_logs.length > 0 && startTime === null) renderSlide();
 
-            // SINCRONIZACIÓN DE RED Y CÁMARAS NARIÑO
             const rR = await fetch(RED_URL);
             const dR = await rR.json();
             const ticker = document.getElementById('ticker-content');
@@ -406,32 +407,13 @@
             if(dR) {
                 Object.entries(dR).forEach(([id, v]) => {
                     const name = id.replace(/_/g,' ').toUpperCase();
-                    
-                    // Lógica especial de cámaras Nariño (ticker prioritario)
                     if(id === "Nariño" && v.alerta_camaras && v.alerta_camaras !== "") {
-                        const msgCam = v.alerta_camaras.toUpperCase();
-                        tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${msgCam}</div>`;
-                        mHtml += `
-                            <div class="off-service-card" style="border-color:rgba(230,126,34,0.3)">
-                                <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
-                                <div style="flex:1">
-                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">ALERTA: NARIÑO</div>
-                                    <div style="font-size:0.65rem; color:var(--orange); font-weight:bold;">${v.alerta_camaras}</div>
-                                </div>
-                            </div>`;
+                        tHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${v.alerta_camaras.toUpperCase()}</div>`;
+                        mHtml += `<div class="off-service-card" style="border-color:rgba(230,126,34,0.3)"><div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div><div style="flex:1"><div style="font-size:0.9rem; font-weight:900; color:#fff;">ALERTA: NARIÑO</div><div style="font-size:0.65rem; color:var(--orange); font-weight:bold;">${v.alerta_camaras}</div></div></div>`;
                     }
-
-                    // Lógica estándar de equipos offline (NVRs)
                     if(v.estado === "offline") {
                         tHtml += `<div class="capsula-off">⚠️ OFF: ${name}</div>`;
-                        mHtml += `
-                            <div class="off-service-card">
-                                <div class="off-status-dot"></div>
-                                <div style="flex:1">
-                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">OFF: ${name}</div>
-                                    <div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div>
-                                </div>
-                            </div>`;
+                        mHtml += `<div class="off-service-card"><div class="off-status-dot"></div><div style="flex:1"><div style="font-size:0.9rem; font-weight:900; color:#fff;">OFF: ${name}</div><div style="font-size:0.65rem; color:var(--critico); font-weight:bold; text-transform:uppercase;">Servicio no disponible</div></div></div>`;
                     }
                 });
             }
@@ -495,7 +477,6 @@
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
             const pColor = colors[it.priority] || "var(--accent)";
-            
             return `
             <div class="history-card" style="border-left-color:${pColor} !important">
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom: 5px;">
@@ -523,12 +504,7 @@
     async function saveEntry(e) {
         e.preventDefault();
         const id = document.getElementById('f-id').value;
-        const data = {
-            area: document.getElementById('f-area').value,
-            priority: document.getElementById('f-prio').value,
-            title: document.getElementById('f-title').value,
-            message: document.getElementById('f-msg').value
-        };
+        const data = { area: document.getElementById('f-area').value, priority: document.getElementById('f-prio').value, title: document.getElementById('f-title').value, message: document.getElementById('f-msg').value };
         if(id !== "") cio_logs[id] = data; else cio_logs.push(data);
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
         syncData(); openPanel('panelHistory');
@@ -595,10 +571,9 @@
 
     let touchstartX = 0;
     let touchendX = 0;
-    function handleGesture() { if (touchendX > touchstartX + 50) closePanels(); }
     document.querySelectorAll('.side-panel').forEach(panel => {
         panel.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
-        panel.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleGesture(); }, {passive: true});
+        panel.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; if (touchendX > touchstartX + 50) closePanels(); }, {passive: true});
     });
 
     setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
