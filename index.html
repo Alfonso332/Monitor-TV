@@ -81,7 +81,7 @@
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER PC MODIFICADO */
+        /* TICKER PC MODIFICADO CON EFECTO LIQUID GLASS */
         #cio-app #ticker-bar { 
             height: 60px; background: #000; border-top: 1px solid #111; 
             display: flex; overflow: hidden; position: relative; flex-shrink: 0;
@@ -128,6 +128,7 @@
         }
         #cio-app .side-panel.active { transform: translateX(0); }
         
+        /* FORMULARIOS Y BOTONES CENTRADOS */
         #cio-app .p-field { 
             background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; 
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
@@ -155,7 +156,8 @@
             position: relative !important;
         }
 
-        /* CELULAR */
+        /* === INICIAN MEJORAS EXCLUSIVAS PARA CELULAR === */
+
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -163,68 +165,95 @@
             box-shadow: 0 10px 30px rgba(0,0,0);
             justify-content: center; align-items: center; cursor: pointer;
             overflow: hidden;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
             -webkit-tap-highlight-color: transparent;
         }
+        #hamb-menu:active { transform: scale(0.9); box-shadow: 0 5px 15px rgba(0,209,209,0.5); }
         #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
+        /* Estilo Servicios Offline y Acordeón MÓVIL REFINADO */
         .off-service-card {
             background: #111; border: 1px solid #111;
             border-radius: 25px; padding: 18px 20px; margin-bottom: 1px;
-            display: flex; align-items: center; gap: 15px; cursor: pointer;
+            display: flex; align-items: center; gap: 55px; cursor: pointer;
             transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
-        .off-service-card.expanded-header { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: var(--primary); }
+        .off-service-card:active { transform: scale(0.98); background: #151515; }
+        .off-service-card.expanded-header { border-bottom-left-radius: 10; border-bottom-right-radius: 10; border-color: var(--primary); }
         
         .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
             box-shadow: 0 0 10px var(--critico); animation: pulse-red 1s infinite;
         }
         
+        /* Contenedor Expandible (Desplegables) */
         .generic-details {
-            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s;
-            opacity: 0; background: #111; border: 1px solid #111;
-            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s, padding 0.3s;
+            opacity: 0; background: #111; border: 1px solid #111; border-top: 2;
+            border-bottom-left-radius: 2px; border-bottom-right-radius: 2px;
             margin-bottom: 15px; padding: 0 20px;
         }
-        .generic-details.expanded { max-height: 400px; opacity: 1; padding: 20px; border-color: var(--primary); border-top:none; }
+        .generic-details.expanded { max-height: 400px; opacity: 1; padding: 20px; }
         
-        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #222; }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
         .detail-row:last-child { border-bottom: none; }
-        .detail-label { color: #888; font-size: 0.8rem; text-transform: uppercase; }
-        .detail-value { color: #FFF; font-size: 0.9rem; font-weight: 700; }
+        .detail-label { color: #FFF; font-size: 1rem; font-weight: bold; text-transform: uppercase; }
+        .detail-value { color: #FFF; font-size: 1rem; font-weight: 700; }
 
         @keyframes pulse-red { 0% { opacity: 0.1; } 50% { opacity: 1; } 100% { opacity: 0.1; } }
 
+        /* REGLAS ESTRICTAS DE RESPONSIVE (SOLO CELULAR) */
         @media (max-width: 768px) {
             #hamb-menu { display: flex; }
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app #progressLine { bottom: 0; }
-            #cio-app .main-header { height: 85px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; justify-content: center; }
+            
+            #cio-app .main-header { 
+                height: 5px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; 
+                justify-content: center; margin-bottom: 38px !important;
+            }
+            
             #cio-app .side-panel { 
                 width: 100%; padding: 40px 20px 80px 20px; 
                 border-left: none; border-top: 3px solid var(--primary);
                 border-radius: 25px 25px 0 0; top: auto; bottom: 0; height: 90vh;
                 transform: translateY(100%);
                 box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
+                touch-action: pan-y; /* Permite scroll vertical pero escuchamos el gesto abajo */
             }
             #cio-app .side-panel.active { transform: translateY(0); }
+            
+            #cio-app .side-panel::before {
+                content: ''; position: absolute; top: 12px; left: 50%;
+                transform: translateX(-50%); width: 45px; height: 5px;
+                background: #333; border-radius: 10px;
+            }
+
             .mobile-section-header {
                 color: var(--primary); font-size: 0.9rem; font-weight: bold; 
                 margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
                 display: flex; align-items: center; gap: 10px;
             }
             .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
-            .mobile-stat-container { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; }
-            .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; }
+
+            .mobile-stat-container { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center; }
+            .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+
             .sla-circle-container { position: relative; width: 110px; height: 110px; margin: 0 auto; }
             .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
             .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
             .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
             .sla-text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
+
             .mobile-puestos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a; margin-bottom: 30px; }
+
             #cio-app #titleDisplay { font-size: 2.2rem; }
+            #panelHistory .p-field, #panelHistory label, #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
+            #panelHistory .btn-sec { display: block !important; width: 100%; }
+            
+            #panelForm { text-align: center; }
+            #panelForm .p-field { font-size: 1.1rem; padding: 15px; border-radius: 12px; background: #151515; }
         }
     </style>
 </head>
@@ -368,13 +397,14 @@
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
 
-    // GESTIÓN DE GESTOS
+    // === GESTIÓN DE GESTOS (ARRASTRAR PARA CERRAR) ===
     let touchStartY = 0;
-    document.querySelectorAll('.side-panel').forEach(panel => {
+    const panels = document.querySelectorAll('.side-panel');
+    panels.forEach(panel => {
         panel.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive: true});
         panel.addEventListener('touchmove', e => {
             const currentY = e.touches[0].clientY;
-            if (currentY - touchStartY > 120) closePanels();
+            if (currentY - touchStartY > 120) closePanels(); // Si arrastra más de 120px hacia abajo
         }, {passive: true});
     });
 
@@ -388,6 +418,7 @@
         if(el) el.textContent = shiftText;
     }
 
+    // Función genérica para abrir desplegables
     function toggleAccordion(id) {
         const content = document.getElementById('acc-' + id);
         const header = document.getElementById('head-' + id);
@@ -441,31 +472,30 @@
             if(dR) {
                 Object.entries(dR).forEach(([id, v], index) => {
                     let name = id.replace(/_/g,' ').toUpperCase();
-                    let ip = v.ip || "0.0.0.0";
-                    let fallos = v.fallos || 0;
-
-                    // Procesar Cámaras individuales
-                    if(v.camaras_offline && v.camaras_offline.length > 0) {
-                        let camStr = v.camaras_offline.join(", ");
-                        camTickerHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${camStr}</div>`;
+                    let lastDown = v.hora_caida || "Desconocida"; // Agregado para servicios
+                    
+                    if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
+                        let descCam = v.alerta_camaras.toUpperCase()
+                            .replace(id.toUpperCase(), "").replace("ALERTA:", "").replace("CÁMARAS FUERA DE LÍNEA", "").trim();
+                        
+                        camTickerHtml += `<div class="capsula-off" style="border-color:var(--orange); color:var(--orange)">${name}: ${descCam}</div>`;
+                        
                         camHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-cam${index}" onclick="toggleAccordion('cam${index}')">
                                 <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">CÁMARAS FUERA</div>
+                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Cámaras Offline</div>
                                 </div>
                                 <div id="arr-cam${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
                             <div id="acc-cam${index}" class="generic-details">
-                                <div class="detail-row"><span class="detail-label">Cámaras</span><span class="detail-value">${camStr}</span></div>
-                                <div class="detail-row"><span class="detail-label">NVR IP</span><span class="detail-value">${ip}</span></div>
+                                <div class="detail-row"><span class="detail-label">Dispositivos</span><span class="detail-value">${descCam}</span></div>
                             </div>
                         </div>`;
                     }
                     
-                    // Procesar Servicio (NVR) caído
                     if(v.estado === "offline") {
                         srvHtml += `<div class="capsula-off">${name}: OFFLINE</div>`;
                         nvrHtml += `
@@ -474,14 +504,12 @@
                                 <div class="off-status-dot"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                    <div style="font-size:0.6rem; color:var(--critico); font-weight:bold;">NVR DESCONECTADO</div>
+                                    <div style="font-size:0.6rem; color:var(--critico); font-weight:bold;">SISTEMA CAÍDO</div>
                                 </div>
                                 <div id="arr-srv${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
                             <div id="acc-srv${index}" class="generic-details">
-                                <div class="detail-row"><span class="detail-label">IP Equipo</span><span class="detail-value">${ip}</span></div>
-                                <div class="detail-row"><span class="detail-label">Fallos Consec.</span><span class="detail-value">${fallos}</span></div>
-                                <div class="detail-row"><span class="detail-label">Visto por última vez</span><span class="detail-value">${v.last_seen || '--'}</span></div>
+                                <div class="detail-row"><span class="detail-label">Hora Caída</span><span class="detail-value">${lastDown}</span></div>
                             </div>
                         </div>`;
                     }
@@ -557,74 +585,56 @@
         document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
             return `<div class="history-card" style="border-left-color:${colors[it.priority]}">
-                <div style="display:flex; justify:space-between; align-items:start; margin-bottom:10px;">
-                    <span style="font-size:0.6rem; font-weight:bold; color:${colors[it.priority]}">${it.area.toUpperCase()}</span>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="openForm(${i})" style="background:none; border:none; cursor:pointer; color:#888;">✎</button>
-                        <button onclick="deleteEntry(${i})" style="background:none; border:none; cursor:pointer; color:#888;">✕</button>
-                    </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <b style="color:${colors[it.priority]}">${it.area}</b>
+                    <small style="opacity:0.4">${it.timestamp || ''}</small>
                 </div>
-                <h4 style="font-size:1.1rem; margin-bottom:5px;">${it.title}</h4>
+                <h4 style="margin:5px 0;">${it.title}</h4>
                 <p style="font-size:0.8rem; opacity:0.7; margin-bottom:10px;">${it.message}</p>
-                <div style="font-size:0.6rem; opacity:0.4;">${it.timestamp || ''}</div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="openForm(${i})" class="btn-pill btn-sec" style="width:auto; padding:5px 10px; font-size:0.6rem; margin:0;">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" class="btn-pill btn-sec" style="width:auto; padding:5px 10px; font-size:0.6rem; margin:0; color:var(--critico)">BORRAR</button>
+                </div>
             </div>`;
         }).join('');
     }
 
     function openPanel(id) {
-        document.getElementById('cio-overlay').style.display = "block";
+        closePanels();
         document.getElementById(id).classList.add('active');
+        document.getElementById('cio-overlay').style.display = 'block';
     }
 
     function closePanels() {
-        document.getElementById('cio-overlay').style.display = "none";
         document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('active'));
-    }
-
-    function toggleFS() {
-        if (!document.fullscreenElement) document.getElementById('cio-app').requestFullscreen();
-        else document.exitFullscreen();
-    }
-
-    async function saveKPIs() {
-        const data = {
-            sla: document.getElementById('in-sla').value || 0,
-            calls: document.getElementById('in-calls').value || 0,
-            puestos: {}
-        };
-        for(let i=1; i<=9; i++) data.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
-        await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(data) });
-        syncData();
-        closePanels();
+        document.getElementById('cio-overlay').style.display = 'none';
     }
 
     function openForm(idx) {
-        const isEdit = idx !== null;
-        const it = isEdit ? cio_logs[idx] : { area: 'Monitoreo', priority: 'Baja', title: '', message: '' };
-        document.getElementById('f-id').value = isEdit ? idx : '';
+        openPanel('panelForm');
+        const it = idx !== null ? cio_logs[idx] : {area:'Monitoreo', priority:'Baja', title:'', message:''};
+        document.getElementById('f-id').value = idx !== null ? idx : '';
         document.getElementById('f-area').value = it.area;
         document.getElementById('f-prio').value = it.priority;
         document.getElementById('f-title').value = it.title;
         document.getElementById('f-msg').value = it.message;
-        document.getElementById('formTitle').textContent = isEdit ? "EDITAR NOVEDAD" : "NUEVA NOVEDAD";
-        openPanel('panelForm');
+        document.getElementById('formTitle').textContent = idx !== null ? 'EDITAR NOVEDAD' : 'NUEVA NOVEDAD';
+    }
+
+    async function saveKPIs() {
+        const data = { sla: document.getElementById('in-sla').value || 0, calls: document.getElementById('in-calls').value || 0, puestos: {} };
+        for(let i=1; i<=9; i++) data.puestos[`p${i}`] = document.getElementById('inp-p${i}').value || 0;
+        await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(data) });
+        syncData(); closePanels();
     }
 
     async function saveEntry(e) {
         e.preventDefault();
         const idx = document.getElementById('f-id').value;
-        const entry = {
-            area: document.getElementById('f-area').value,
-            priority: document.getElementById('f-prio').value,
-            title: document.getElementById('f-title').value,
-            message: document.getElementById('f-msg').value,
-            timestamp: new Date().toLocaleString()
-        };
-        if(idx === '') cio_logs.push(entry);
-        else cio_logs[idx] = entry;
+        const entry = { area: document.getElementById('f-area').value, priority: document.getElementById('f-prio').value, title: document.getElementById('f-title').value, message: document.getElementById('f-msg').value, timestamp: new Date().toLocaleString() };
+        if(idx === '') cio_logs.push(entry); else cio_logs[idx] = entry;
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        syncData();
-        openPanel('panelHistory');
+        syncData(); openPanel('panelHistory');
     }
 
     async function deleteEntry(idx) {
@@ -634,23 +644,28 @@
         syncData();
     }
 
+    function toggleFS() {
+        const el = document.getElementById('cio-app');
+        if(!document.fullscreenElement) el.requestFullscreen(); else document.exitFullscreen();
+    }
+
     function downloadPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.setFontSize(18); doc.text("REPORTE OPERATIVO CIO ELITE", 14, 20);
-        doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 28);
-        const rows = cio_logs.map(it => [it.timestamp, it.area, it.priority, it.title, it.message]);
-        doc.autoTable({ head: [['Fecha', 'Área', 'Prioridad', 'Título', 'Mensaje']], body: rows, startY: 35 });
-        doc.save(`Reporte_CIO_${Date.now()}.pdf`);
+        doc.setFontSize(18); doc.text("REPORTE OPERATIVO CIO", 14, 20);
+        const rows = cio_logs.map(it => [it.timestamp, it.area, it.priority, it.title]);
+        doc.autoTable({ head: [['Fecha', 'Área', 'Prioridad', 'Título']], body: rows, startY: 30 });
+        doc.save("Reporte_CIO.pdf");
     }
 
     setInterval(() => {
-        document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString('es-ES', { hour12: false });
+        document.getElementById('clockDisplay').textContent = new Date().toTimeString().split(' ')[0];
     }, 1000);
 
     syncData();
-    setInterval(syncData, 30000);
+    setInterval(syncData, 10000);
 </script>
 
 </body>
 </html>
+
