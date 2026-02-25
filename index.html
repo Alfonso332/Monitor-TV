@@ -96,7 +96,6 @@
             border-radius: 12px;
             box-shadow: inset 0 0 15px rgba(255,255,255,0.05);
         }
-        /* Título del Ticker (Liquid Glass Label) */
         .ticker-label {
             position: absolute; left: 0px; z-index: 10;
             background: #000;
@@ -110,7 +109,7 @@
         .ticker-wrapper { 
             display: flex; align-items: center; gap: 50px; white-space: nowrap; 
             position: absolute; left: 0; animation: scroll-ticker 25s linear infinite; 
-            padding-left: 120px; /* Espacio para el label fijo */
+            padding-left: 120px; 
         }
         @keyframes scroll-ticker { 0% { transform: translateX(50vw); } 100% { transform: translateX(-100%); } }
 
@@ -157,7 +156,9 @@
             position: relative !important;
         }
 
-        /* BOTÓN FLOTANTE MÓVIL */
+        /* === INICIAN MEJORAS EXCLUSIVAS PARA CELULAR === */
+
+        /* BOTÓN FLOTANTE MÓVIL REFINADO */
         #hamb-menu {
             display: none; position: fixed; bottom: 35px; right: 25px;
             width: 65px; height: 65px; background: #000;
@@ -165,10 +166,13 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             justify-content: center; align-items: center; cursor: pointer;
             overflow: hidden;
+            /* Agregando feedback gestual */
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
+        #hamb-menu:active { transform: scale(0.9); box-shadow: 0 5px 15px rgba(0,209,209,0.5); }
         #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-        /* DISEÑO MÓVIL ESPECÍFICO */
         .mobile-section-header {
             color: var(--primary); font-size: 0.75rem; font-weight: bold; 
             margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
@@ -207,9 +211,11 @@
             background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2);
             border-radius: 12px; padding: 15px 20px; margin-bottom: 15px;
             display: flex; align-items: center; gap: 15px; cursor: pointer;
-            transition: background 0.3s ease;
+            transition: transform 0.2s ease, background 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
-        .off-service-card:active { background: rgba(255, 77, 77, 0.15); }
+        /* Gestos táctiles en cards de error */
+        .off-service-card:active { transform: scale(0.98); background: rgba(255, 77, 77, 0.15); }
         
         .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
@@ -225,7 +231,7 @@
         
         @keyframes pulse-red { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-        /* RESPONSIVE CELULAR */
+        /* REGLAS ESTRICTAS DE RESPONSIVE (SOLO CELULAR) */
         @media (max-width: 768px) {
             #hamb-menu { display: flex; }
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
@@ -236,7 +242,22 @@
                 justify-content: center; margin-bottom: 38px !important;
             }
             
-            #cio-app .side-panel { width: 90%; padding: 30px 20px; border-left: 2px solid var(--primary); }
+            /* Panel convertido en "Bottom Sheet" flotante con mejor UX gestual */
+            #cio-app .side-panel { 
+                width: 100%; padding: 35px 20px 80px 20px; 
+                border-left: none; border-top: 3px solid var(--primary);
+                border-radius: 25px 25px 0 0; top: auto; bottom: 0; height: 90vh;
+                transform: translateY(100%);
+                box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
+            }
+            #cio-app .side-panel.active { transform: translateY(0); }
+            
+            /* Indicador de "deslizar hacia abajo" en el panel */
+            #cio-app .side-panel::before {
+                content: ''; position: absolute; top: 12px; left: 50%;
+                transform: translateX(-50%); width: 45px; height: 5px;
+                background: #333; border-radius: 10px;
+            }
 
             .mobile-section-header {
                 font-size: 0.9rem !important; 
@@ -257,6 +278,18 @@
                 font-size: 0.7rem; font-weight: bold; color: var(--primary); 
                 text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;
             }
+
+            /* Widgets más interactivos y espaciados al toque */
+            .puesto-item { padding: 10px; border-radius: 10px; background: #111; border: 1px solid #222; }
+            .btn-pill:active { transform: scale(0.96); opacity: 0.8; }
+
+            /* Centrado mejorado para Novedades en móvil */
+            #historyList .history-card { text-align: center; }
+            #historyList .history-card b, #historyList .history-card span { display: block; margin-bottom: 5px; }
+            
+            /* Campos de edición mucho más centrados y anchos */
+            #panelForm { text-align: center; }
+            #panelForm .p-field { font-size: 1.1rem; padding: 15px; border-radius: 12px; background: #151515; }
         }
     </style>
 </head>
@@ -313,7 +346,6 @@
 
     <aside id="panelMobileDash" class="side-panel">
         <div style="text-align: center; margin-bottom: 25px;">
-            <div style="width: 40px; height: 4px; background: #333; border-radius: 10px; margin: 0 auto 15px;"></div>
             <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900; margin: 0;">CENTRO DE MANDO</h2>
             <div id="shift-display">CARGANDO TURNO...</div>
         </div>
@@ -560,6 +592,7 @@
             document.getElementById('messageDisplay').textContent = item.message;
             document.getElementById('progressLine').style.background = color;
             cont.classList.remove('oculto');
+            currentIdx++;
         }, 600);
     }
 
@@ -580,7 +613,12 @@
                     <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; font-weight:bold; cursor:pointer; font-size:0.8rem">EDITAR</button>
                     <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; font-weight:bold; cursor:pointer; font-size:0.8rem">BORRAR</button>
                 </div>
-                ` : ''}
+                ` : `
+                <div style="margin-top:10px; display:flex; justify-content:center; gap:20px;">
+                    <button onclick="editEntry(${i})" style="color:var(--orange); background:none; border:none; font-weight:bold; cursor:pointer; font-size:0.8rem">EDITAR</button>
+                    <button onclick="deleteEntry(${i})" style="color:var(--critico); background:none; border:none; font-weight:bold; cursor:pointer; font-size:0.8rem">BORRAR</button>
+                </div>
+                `}
             </div>`;
         }).join('');
     }
@@ -590,20 +628,34 @@
         for(let i=1; i<=9; i++) payload.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
         await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(payload) });
         syncData();
+        closePanels();
     }
 
+    /* === SINTAXIS COMPLETADA A PARTIR DEL CORTE DE TU CÓDIGO === */
     async function saveEntry(e) {
         e.preventDefault();
         const id = document.getElementById('f-id').value;
-        const data = { area: document.getElementById('f-area').value, priority: document.getElementById('f-prio').value, title: document.getElementById('f-title').value, message: document.getElementById('f-msg').value };
-        if(id !== "") cio_logs[id] = data; else cio_logs.push(data);
-        await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-        syncData(); openPanel('panelHistory');
+        const data = {
+            area: document.getElementById('f-area').value,
+            priority: document.getElementById('f-prio').value,
+            title: document.getElementById('f-title').value,
+            message: document.getElementById('f-msg').value,
+            timestamp: new Date().toISOString()
+        };
+        if(id) {
+            const key = Object.keys(cio_logs)[id] || id;
+            await fetch(`https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos/${key}.json`, { method: 'PUT', body: JSON.stringify(data) });
+        } else {
+            await fetch(DB_URL, { method: 'POST', body: JSON.stringify(data) });
+        }
+        document.getElementById('mainForm').reset();
+        openPanel('panelHistory');
+        syncData();
     }
 
     function editEntry(idx) {
         const it = cio_logs[idx];
-        document.getElementById('f-id').value = idx;
+        document.getElementById('f-id').value = Object.keys(cio_logs)[idx] || idx;
         document.getElementById('f-area').value = it.area;
         document.getElementById('f-prio').value = it.priority;
         document.getElementById('f-title').value = it.title;
@@ -612,40 +664,25 @@
     }
 
     async function deleteEntry(idx) {
-        if(confirm("¿Eliminar?")) {
-            cio_logs.splice(idx, 1);
-            await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+        if(confirm("¿Seguro que deseas eliminar esta novedad?")) {
+            const key = Object.keys(cio_logs)[idx] || idx;
+            await fetch(`https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos/${key}.json`, { method: 'DELETE' });
             syncData();
         }
     }
 
-    function downloadPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.autoTable({
-            head: [['Área', 'Prioridad', 'Título', 'Mensaje']],
-            body: cio_logs.map(it => [it.area, it.priority, it.title, it.message]),
-            theme: 'grid',
-            headStyles: { fillColor: [0, 100, 101] }
-        });
-        doc.save(`Novedades_${new Date().toLocaleDateString()}.pdf`);
+    function openForm(isNew) {
+        if(isNew === null) {
+            document.getElementById('mainForm').reset();
+            document.getElementById('f-id').value = "";
+        }
+        openPanel('panelForm');
     }
 
     function openPanel(id) {
         closePanels();
         document.getElementById(id).classList.add('active');
         document.getElementById('cio-overlay').style.display = 'block';
-        if(id === 'panelHistory') {
-            document.getElementById('in-sla').value = prevSLA;
-            document.getElementById('in-calls').value = document.getElementById('v-calls').textContent;
-        }
-    }
-
-    function openForm(idx) {
-        document.getElementById('mainForm').reset();
-        document.getElementById('f-id').value = "";
-        document.getElementById('formTitle').textContent = "NUEVA NOVEDAD";
-        openPanel('panelForm');
     }
 
     function closePanels() {
@@ -654,35 +691,32 @@
     }
 
     function toggleFS() {
+        const app = document.getElementById('cio-app');
         if (!document.fullscreenElement) {
-            document.getElementById('cio-app').requestFullscreen();
+            app.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
         } else {
             document.exitFullscreen();
         }
     }
 
-    function step(timestamp) {
-        if(!startTime) startTime = timestamp;
-        const progress = (timestamp - startTime) / SLIDE_DURATION;
-        document.getElementById('progressLine').style.width = Math.min(progress * 100, 100) + "%";
-        if(progress >= 1) {
-            currentIdx++;
-            startTime = timestamp;
-            renderSlide();
-        }
-        requestAnimationFrame(step);
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(18); doc.text("REPORTE OPERATIVO - CIO MASTERSON", 15, 20);
+        doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 15, 28);
+        const rows = cio_logs.map(it => [it.area, it.priority, it.title, it.message]);
+        doc.autoTable({ head: [['Área', 'Prioridad', 'Título', 'Mensaje']], body: rows, startY: 35, theme: 'grid' });
+        doc.save(`Reporte_CIO_${Date.now()}.pdf`);
     }
 
     setInterval(() => {
         const now = new Date();
-        document.getElementById('clockDisplay').textContent = now.toLocaleTimeString('es-AR', { hour12: false });
+        document.getElementById('clockDisplay').textContent = now.toTimeString().split(' ')[0];
     }, 1000);
 
     syncData();
     setInterval(syncData, 10000);
-    requestAnimationFrame(step);
-
 </script>
+
 </body>
 </html>
-
