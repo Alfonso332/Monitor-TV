@@ -116,7 +116,7 @@
         #cio-app .capsula-off {
             background: rgba(1, 1, 1); border: 1px solid var(--critico);
             color: var(--critico); padding: 4px 15px; border-radius: 50px;
-            font-weight: 900; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;
+            font-weight: 900; font-size: 1.4rem; display: flex; align-items: center; gap: 1px;
         }
 
         /* PANELES LATERALES */
@@ -173,14 +173,14 @@
 
         /* Estilo Servicios Offline y Acordeón MÓVIL REFINADO */
         .off-service-card {
-            background: #111; border: 10px solid #111;
-            border-radius: 1px; padding: 18px 20px; margin-bottom: 1px;
-            display: flex; align-items: center; gap: 15px; cursor: pointer;
+            background: #111; border: 1px solid #111;
+            border-radius: 25px; padding: 18px 20px; margin-bottom: 1px;
+            display: flex; align-items: center; gap: 55px; cursor: pointer;
             transition: all 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
         .off-service-card:active { transform: scale(0.98); background: #151515; }
-        .off-service-card.expanded-header { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: var(--primary); }
+        .off-service-card.expanded-header { border-bottom-left-radius: 10; border-bottom-right-radius: 10; border-color: var(--primary); }
         
         .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
