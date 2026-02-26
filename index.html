@@ -40,6 +40,7 @@
         }
 
         #cio-app .mobile-bottom-icon { display: none; }
+        #cio-app .mobile-only-section { display: none; }
 
         /* REGLA FULLSCREEN: Ocultar botones e historial */
         #cio-app:fullscreen .main-header, 
@@ -199,6 +200,7 @@
 
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app .main-header > div:first-child { display: none !important; }
+            #cio-app .mobile-only-section { display: block; }
             #cio-app #progressLine { bottom: 0; }
 
             #cio-app .main-header {
@@ -411,9 +413,12 @@
         <div class="mobile-section-header">Alertas Cámaras</div>
         <div id="m-cam-list" class="offline-group"></div>
 
+        <div class="mobile-only-section">
         <div class="mobile-section-header">Novedades Recientes</div>
         <div id="historyListMobile"></div>
+        </div>
 
+        <div class="mobile-only-section">
         <div class="mobile-section-header">Información disponible</div>
         <div class="service-widget">
             <div class="service-widget-header">
@@ -421,6 +426,7 @@
                 <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:8px 12px; border-radius:10px;" onclick="promptAddInfo()">Agregar info</button>
             </div>
             <div id="serviceInfoBox" style="display:none;"></div>
+        </div>
         </div>
     </aside>
 
