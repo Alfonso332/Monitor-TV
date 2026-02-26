@@ -39,6 +39,8 @@
             border-bottom: 1px solid var(--primary); flex-shrink: 0;
         }
 
+        #cio-app .mobile-bottom-icon { display: none; }
+
         /* REGLA FULLSCREEN: Ocultar botones e historial */
         #cio-app:fullscreen .main-header, 
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
@@ -333,6 +335,10 @@
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(6px);" onclick="closePanels()"></div>
 
     <header class="main-header">
+        <div style="display:flex; gap:8px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
+            <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
+        </div>
         <img class="mobile-bottom-icon" src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Monitor">
         <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
     </header>
@@ -877,9 +883,10 @@
         const hour = now.getHours();
         const shiftLabel = getShiftLabelByHour(hour);
         const time24h = now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
         const clockEl = document.getElementById('clockDisplay');
-        if (clockEl) clockEl.textContent = `${time24h} · ${shiftLabel}`;
+        if (clockEl) clockEl.textContent = isMobile ? `${time24h} · ${shiftLabel}` : time24h;
 
         const shiftEl = document.getElementById('shift-display');
         if (shiftEl) shiftEl.textContent = shiftLabel;
