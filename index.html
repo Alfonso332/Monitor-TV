@@ -200,26 +200,36 @@
             #cio-app #progressLine { bottom: 0; }
 
             #cio-app .main-header {
-                position: sticky;
-                top: 0;
-                left: auto;
-                bottom: auto;
-                transform: none;
-                width: 100%;
-                min-height: 56px;
-                padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
-                border: none;
-                border-bottom: 1px solid #1a1a1a;
-                border-radius: 0;
-                justify-content: flex-start;
+                position: fixed;
+                left: 50%;
+                bottom: calc(14px + env(safe-area-inset-bottom));
+                transform: translateX(-50%);
+                width: calc(100% - 28px);
+                min-height: 58px;
+                padding: 10px 14px;
+                border: 1px solid #1a1a1a;
+                border-radius: 16px;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
                 background: rgba(5, 5, 5, 0.95);
                 z-index: 10020;
             }
 
             #cio-app .main-header #clockDisplay {
-                font-size: 1rem !important;
+                font-size: 0.95rem !important;
                 line-height: 1;
                 white-space: nowrap;
+                color: var(--primary);
+                font-weight: 900;
+            }
+
+            #cio-app .main-header .mobile-bottom-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid #2a2a2a;
             }
 
             #cio-app #display-board {
@@ -238,7 +248,7 @@
                 border-top: 1px solid #1a1a1a;
                 border-radius: 0;
                 box-shadow: none;
-                padding: 20px 14px calc(24px + env(safe-area-inset-bottom));
+                padding: 20px 14px calc(108px + env(safe-area-inset-bottom));
                 touch-action: auto;
                 overflow: visible;
             }
@@ -258,6 +268,31 @@
                 display: flex; align-items: center; gap: 10px;
             }
             #cio-app .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+
+            #cio-app .service-widget {
+                border: 1px solid #222;
+                background: #0b0b0b;
+                border-radius: 14px;
+                padding: 14px;
+                margin-top: 14px;
+            }
+            #cio-app .service-widget-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            #cio-app .service-widget-toggle {
+                border: 1px solid #2c2c2c;
+                background: #151515;
+                color: var(--accent);
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                font-weight: 900;
+                font-size: 1rem;
+            }
 
             #cio-app .mobile-stat-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; align-items: stretch; }
             #cio-app .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
@@ -298,11 +333,8 @@
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(6px);" onclick="closePanels()"></div>
 
     <header class="main-header">
-        <div style="display:flex; gap:8px;">
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
-            <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
-        </div>
-                <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
+        <img class="mobile-bottom-icon" src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Monitor">
+        <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
     </header>
 
     <div class="kpi-bar">
@@ -375,6 +407,15 @@
 
         <div class="mobile-section-header">Novedades Recientes</div>
         <div id="historyListMobile"></div>
+
+        <div class="mobile-section-header">Información disponible</div>
+        <div class="service-widget">
+            <div class="service-widget-header">
+                <button class="service-widget-toggle" onclick="toggleServiceInfo()">+</button>
+                <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:8px 12px; border-radius:10px;" onclick="promptAddInfo()">Agregar info</button>
+            </div>
+            <div id="serviceInfoBox" style="display:none;"></div>
+        </div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
@@ -421,6 +462,8 @@
     const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
 
     let cio_logs = [], currentIdx = 0, startTime = null;
+    let serviceWidgetExpanded = false;
+    let serviceWidgetData = { loaded: [], unavailable: [] };
     let prevSLA = null;
     let currentArrow = "▲";
     let currentColor = "var(--online)";
@@ -460,6 +503,73 @@
             header.classList.add('expanded-header');
             arrow.textContent = "▲";
         }
+    }
+
+
+    function getStoredManualServiceInfo() {
+        try {
+            return JSON.parse(localStorage.getItem('manual_service_info') || '[]');
+        } catch (_) {
+            return [];
+        }
+    }
+
+    function setStoredManualServiceInfo(items) {
+        localStorage.setItem('manual_service_info', JSON.stringify(items));
+    }
+
+    function renderServiceInfoWidget() {
+        const box = document.getElementById('serviceInfoBox');
+        if (!box) return;
+
+        const manual = getStoredManualServiceInfo();
+        const loadedHtml = serviceWidgetData.loaded.length
+            ? serviceWidgetData.loaded.map(it => `<li style="margin-bottom:6px;">${it.service} · ${it.cameras}</li>`).join('')
+            : '<li style="opacity:0.7;">Sin servicios cargados detectados.</li>';
+
+        const unavailableHtml = serviceWidgetData.unavailable.length
+            ? serviceWidgetData.unavailable.map(it => `<li style="margin-bottom:6px; color:var(--critico);">${it.service}${it.reason ? ` · ${it.reason}` : ''}</li>`).join('')
+            : '<li style="opacity:0.7;">No hay servicios marcados como no cargables.</li>';
+
+        const manualHtml = manual.length
+            ? manual.map(it => `<li style="margin-bottom:6px;">${it.service} · ${it.cameras} · ${it.status}</li>`).join('')
+            : '<li style="opacity:0.7;">Sin información manual agregada.</li>';
+
+        box.innerHTML = `
+            <div style="font-size:0.72rem; opacity:0.75; margin-bottom:8px;">Actualizado: ${new Date().toLocaleString('es-AR')}</div>
+            <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--online);">Servicios cargados hoy</div>
+            <ul style="padding-left:16px; margin-bottom:10px;">${loadedHtml}</ul>
+            <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--critico);">Servicios no cargables</div>
+            <ul style="padding-left:16px; margin-bottom:10px;">${unavailableHtml}</ul>
+            <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--accent);">Información manual</div>
+            <ul style="padding-left:16px;">${manualHtml}</ul>
+        `;
+
+        box.style.display = serviceWidgetExpanded ? 'block' : 'none';
+    }
+
+    function toggleServiceInfo() {
+        serviceWidgetExpanded = !serviceWidgetExpanded;
+        renderServiceInfoWidget();
+    }
+
+    function promptAddInfo() {
+        const user = prompt('Usuario');
+        if (user !== 'Alfonso') return alert('Usuario incorrecto.');
+        const pass = prompt('Contraseña');
+        if (pass !== '332112') return alert('Contraseña incorrecta.');
+
+        const service = prompt('Servicio');
+        if (!service) return;
+        const cameras = prompt('Cámaras asociadas');
+        if (!cameras) return;
+        const status = prompt('Estado (cargado / no cargable)', 'cargado') || 'cargado';
+
+        const manual = getStoredManualServiceInfo();
+        manual.push({ service, cameras, status, ts: Date.now() });
+        setStoredManualServiceInfo(manual);
+        renderServiceInfoWidget();
+        alert('Información agregada correctamente.');
     }
 
     async function syncData() {
@@ -507,9 +617,14 @@
             let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "";
             
             if(dR) {
+                const loaded = [];
+                const unavailable = [];
                 Object.entries(dR).forEach(([id, v], index) => {
                     let name = id.replace(/_/g,' ').toUpperCase();
                     let lastDown = v.hora_caida || "Desconocida";
+                    const cameraInfo = (v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras';
+                    if(v.estado === "online") loaded.push({ service: name, cameras: cameraInfo });
+                    else unavailable.push({ service: name, reason: `offline desde ${lastDown}` });
                     
                     if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
                         // LIMPIEZA TOTAL: Solo el contenido puro de Firebase
@@ -557,12 +672,16 @@
                         </div>`;
                     }
                 });
+                serviceWidgetData = { loaded, unavailable };
+            } else {
+                serviceWidgetData = { loaded: [], unavailable: [] };
             }
             
             tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:0.8rem;">✔ SERVICIOS OK</span>`;
             tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:0.8rem;">✔ CÁMARAS OK</span>`;
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
+            renderServiceInfoWidget();
             
         } catch(e) { console.error(e); }
     }
