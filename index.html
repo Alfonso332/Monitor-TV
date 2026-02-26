@@ -169,6 +169,26 @@
         }
         #hamb-menu:active { transform: scale(0.9); box-shadow: 0 5px 15px rgba(0,209,209,0.5); }
         #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        #cio-app .mobile-unified-btn {
+            display: none;
+            border: 1px solid #2a2a2a;
+            background: #111;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            overflow: hidden;
+        }
+        #cio-app .mobile-unified-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
         #cio-app .off-service-card {
             background: #111; border: 1px solid #111;
@@ -201,19 +221,58 @@
 
         /* RESPONSIVE CELULAR */
         @media (max-width: 768px) {
-            #hamb-menu { display: flex; }
+            #cio-app {
+                overflow-y: auto;
+                overscroll-behavior-y: contain;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #hamb-menu { display: none !important; }
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
+            #cio-app .main-header > div:first-child { display: none !important; }
+            #cio-app .mobile-unified-btn { display: inline-flex; }
             #cio-app #progressLine { bottom: 0; }
             
             #cio-app .main-header { 
-                height: 5px; padding: 0 20px; border-bottom: 1px solid #1a1a1a; 
-                justify-content: center; margin-bottom: 38px !important;
+                position: fixed;
+                left: 50%;
+                bottom: calc(22px + env(safe-area-inset-bottom));
+                transform: translateX(-50%);
+                width: auto;
+                height: auto;
+                min-height: 64px;
+                padding: 12px 16px;
+                border: 1px solid #1a1a1a;
+                border-radius: 999px;
+                justify-content: center;
+                gap: 14px;
+                margin-bottom: 0 !important;
+                background: rgba(5, 5, 5, 0.92);
+                z-index: 10020;
+            }
+
+            #cio-app .main-header #clockDisplay {
+                font-size: 1.05rem !important;
+                line-height: 1;
+                white-space: nowrap;
+            }
+
+            #cio-app #display-board {
+                justify-content: center;
+                padding: 28px 18px calc(120px + env(safe-area-inset-bottom));
+                min-height: 100dvh;
+                overflow-y: auto;
+                gap: 12px;
             }
             
             #cio-app .side-panel { 
-                width: 100%; padding: 40px 20px 80px 20px; 
+                width: 100%;
+                padding: 40px 20px calc(95px + env(safe-area-inset-bottom)) 20px;
                 border-left: none; border-top: 3px solid var(--primary);
-                border-radius: 25px 25px 0 0; top: auto; bottom: 0; height: 90vh;
+                border-radius: 25px 25px 0 0;
+                top: auto;
+                bottom: 0;
+                height: min(90vh, 820px);
                 transform: translateY(100%);
                 box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
                 touch-action: pan-y;
@@ -233,7 +292,7 @@
             }
             #cio-app .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
 
-            #cio-app .mobile-stat-container { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; margin-bottom: 30px; align-items: center; }
+            #cio-app .mobile-stat-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; align-items: stretch; }
             #cio-app .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
 
             #cio-app .sla-circle-container { position: relative; width: 110px; height: 110px; margin: 0 auto; }
@@ -242,14 +301,27 @@
             #cio-app .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
             #cio-app .sla-text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
 
-            #cio-app .mobile-puestos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; background: #0a0a0a; padding: 20px; border-radius: 18px; border: 1px solid #1a1a1a; margin-bottom: 30px; }
+            #cio-app .mobile-puestos-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; background: #0a0a0a; padding: 16px; border-radius: 18px; border: 1px solid #1a1a1a; margin-bottom: 24px; }
 
-            #cio-app #titleDisplay { font-size: 2.2rem; }
+            #cio-app .area-tag { letter-spacing: 3px; font-size: clamp(0.75rem, 2.8vw, 1rem); margin-bottom: 10px; }
+            #cio-app #titleDisplay { font-size: clamp(1.8rem, 8.5vw, 2.6rem); line-height: 1.05; }
+            #cio-app #messageDisplay { font-size: clamp(1rem, 4.2vw, 1.3rem); line-height: 1.35; max-width: 100%; }
             #cio-app #panelHistory .p-field, #cio-app #panelHistory label, #cio-app #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
             #cio-app #panelHistory .btn-sec { display: block !important; width: 100%; }
             
             #cio-app #panelForm { text-align: center; }
             #cio-app #panelForm .p-field { font-size: 1.1rem; padding: 15px; border-radius: 12px; background: #151515; }
+        }
+
+        @media (max-width: 480px) {
+            #cio-app #display-board {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            #cio-app .mobile-puestos-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
     </style>
 </head>
@@ -258,17 +330,13 @@
 <div id="cio-app">
     <div id="cio-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; z-index:10090; backdrop-filter: blur(6px);" onclick="closePanels()"></div>
 
-    <div id="hamb-menu" onclick="openPanel('panelMobileDash')">
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Menu">
-    </div>
-
     <header class="main-header">
         <div style="display:flex; gap:8px;">
             <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
         </div>
+        <button class="mobile-unified-btn" onclick="openPanel('panelMobileDash')" aria-label="Abrir barra lateral"><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Menú"></button>
         <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
-        <img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" height="40">
     </header>
 
     <div class="kpi-bar">
@@ -409,7 +477,7 @@
 
     function updateShift() {
         const hour = new Date().getHours();
-        let shiftText = (hour >= 6 && hour < 14) ? "TURNO MAÑANA" : (hour >= 14 && hour < 22) ? "TURNO TARDE" : "TURNO NOCHE";
+        const shiftText = getShiftLabelByHour(hour);
         const el = document.getElementById('shift-display');
         if(el) el.textContent = shiftText;
     }
@@ -676,7 +744,7 @@
             priority: document.getElementById('f-prio').value,
             title: document.getElementById('f-title').value,
             message: document.getElementById('f-msg').value,
-            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            time: new Date().toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
         };
         if(id === "") cio_logs.push(entry); else cio_logs[id] = entry;
         await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
@@ -708,7 +776,27 @@
         doc.save(`CIO_Reporte_${Date.now()}.pdf`);
     }
 
-    setInterval(() => { document.getElementById('clockDisplay').textContent = new Date().toLocaleTimeString(); }, 1000);
+    function getShiftLabelByHour(hour) {
+        if (hour >= 6 && hour < 14) return "TURNO MAÑANA";
+        if (hour >= 14 && hour < 22) return "TURNO TARDE";
+        return "TURNO NOCHE";
+    }
+
+    function updateLiveClock() {
+        const now = new Date();
+        const hour = now.getHours();
+        const shiftLabel = getShiftLabelByHour(hour);
+        const time24h = now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        const clockEl = document.getElementById('clockDisplay');
+        if (clockEl) clockEl.textContent = `${time24h} · ${shiftLabel}`;
+
+        const shiftEl = document.getElementById('shift-display');
+        if (shiftEl) shiftEl.textContent = shiftLabel;
+    }
+
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
     syncData();
     setInterval(syncData, 30000);
 </script>
