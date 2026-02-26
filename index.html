@@ -157,38 +157,6 @@
         }
 
         /* === MEJORAS CELULAR === */
-        #hamb-menu {
-            display: none; position: fixed; bottom: 35px; right: 25px;
-            width: 65px; height: 65px; background: #000;
-            border-radius: 50%; z-index: 10050; border: 3px solid var(--primary);
-            box-shadow: 0 10px 30px rgba(0,0,0);
-            justify-content: center; align-items: center; cursor: pointer;
-            overflow: hidden;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #hamb-menu:active { transform: scale(0.9); box-shadow: 0 5px 15px rgba(0,209,209,0.5); }
-        #hamb-menu img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        #cio-app .mobile-unified-btn {
-            display: none;
-            border: 1px solid #2a2a2a;
-            background: #111;
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border-radius: 50%;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            overflow: hidden;
-        }
-        #cio-app .mobile-unified-btn img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
 
         #cio-app .off-service-card {
             background: #111; border: 1px solid #111;
@@ -227,57 +195,56 @@
                 -webkit-overflow-scrolling: touch;
             }
 
-            #hamb-menu { display: none !important; }
             #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
             #cio-app .main-header > div:first-child { display: none !important; }
-            #cio-app .mobile-unified-btn { display: inline-flex; }
             #cio-app #progressLine { bottom: 0; }
-            
-            #cio-app .main-header { 
-                position: fixed;
-                left: 50%;
-                bottom: calc(22px + env(safe-area-inset-bottom));
-                transform: translateX(-50%);
-                width: auto;
-                height: auto;
-                min-height: 64px;
-                padding: 12px 16px;
-                border: 1px solid #1a1a1a;
-                border-radius: 999px;
-                justify-content: center;
-                gap: 14px;
-                margin-bottom: 0 !important;
-                background: rgba(5, 5, 5, 0.92);
+
+            #cio-app .main-header {
+                position: sticky;
+                top: 0;
+                left: auto;
+                bottom: auto;
+                transform: none;
+                width: 100%;
+                min-height: 56px;
+                padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+                border: none;
+                border-bottom: 1px solid #1a1a1a;
+                border-radius: 0;
+                justify-content: flex-start;
+                background: rgba(5, 5, 5, 0.95);
                 z-index: 10020;
             }
 
             #cio-app .main-header #clockDisplay {
-                font-size: 1.05rem !important;
+                font-size: 1rem !important;
                 line-height: 1;
                 white-space: nowrap;
             }
 
             #cio-app #display-board {
-                justify-content: center;
-                padding: 28px 18px calc(120px + env(safe-area-inset-bottom));
-                min-height: 100dvh;
-                overflow-y: auto;
-                gap: 12px;
+                display: none;
             }
-            
-            #cio-app .side-panel { 
-                width: 100%;
-                padding: 40px 20px calc(95px + env(safe-area-inset-bottom)) 20px;
-                border-left: none; border-top: 3px solid var(--primary);
-                border-radius: 25px 25px 0 0;
+
+            #cio-app #panelMobileDash {
+                position: relative;
                 top: auto;
-                bottom: 0;
-                height: min(90vh, 820px);
-                transform: translateY(100%);
-                box-shadow: 0 -10px 40px rgba(0,0,0,0.9);
-                touch-action: pan-y;
+                bottom: auto;
+                right: auto;
+                width: 100%;
+                height: auto;
+                transform: none !important;
+                border: none;
+                border-top: 1px solid #1a1a1a;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px 14px calc(24px + env(safe-area-inset-bottom));
+                touch-action: auto;
+                overflow: visible;
             }
-            #cio-app .side-panel.active { transform: translateY(0); }
+
+            #cio-app #panelMobileDash::before { display: none; }
+            #cio-app #panelHistory, #cio-app #panelForm { display: none !important; }
             
             #cio-app .side-panel::before {
                 content: ''; position: absolute; top: 12px; left: 50%;
@@ -335,8 +302,7 @@
             <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
         </div>
-        <button class="mobile-unified-btn" onclick="openPanel('panelMobileDash')" aria-label="Abrir barra lateral"><img src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Menú"></button>
-        <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
+                <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
     </header>
 
     <div class="kpi-bar">
@@ -407,9 +373,8 @@
         <div class="mobile-section-header">Alertas Cámaras</div>
         <div id="m-cam-list" class="offline-group"></div>
 
-        <div style="margin-top: 20px; margin-bottom: 40px;">
-            <button onclick="closePanels()" class="btn-pill" style="background: #1a1a1a; border: 1px solid #333; border-radius: 15px;">CERRAR PANEL</button>
-        </div>
+        <div class="mobile-section-header">Novedades Recientes</div>
+        <div id="historyListMobile"></div>
     </aside>
 
     <aside id="panelHistory" class="side-panel">
@@ -681,7 +646,7 @@
     }
 
     function renderHistory() {
-        document.getElementById('historyList').innerHTML = cio_logs.map((it, i) => {
+        const historyHtml = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
             const color = colors[it.priority] || "var(--accent)";
             return `
@@ -698,6 +663,12 @@
                 </div>
             </div>`;
         }).join('');
+
+        const historyDesktop = document.getElementById('historyList');
+        if (historyDesktop) historyDesktop.innerHTML = historyHtml;
+
+        const historyMobile = document.getElementById('historyListMobile');
+        if (historyMobile) historyMobile.innerHTML = historyHtml;
     }
 
     function openPanel(id) {
