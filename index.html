@@ -1000,7 +1000,7 @@
                                         .replace("CÁMARAS", "")
                                         .trim();
                                         
-                        camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6;">${name}: CÁMARAS OFFLINE</div>`;
+                        camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6;">${name}: ${cleanData || 'CÁMARAS OFFLINE'}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-cam${index}" onclick="toggleAccordion('cam${index}')">
@@ -1018,7 +1018,7 @@
                     }
                     
                     if(v.estado === "offline") {
-                        srvHtml += `<div class="capsula-off">${name}: SERVICIO OFFLINE</div>`;
+                        srvHtml += `<div class="capsula-off">${name}: Off</div>`;
                         nvrHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-srv${index}" onclick="toggleAccordion('srv${index}')">
