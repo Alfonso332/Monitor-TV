@@ -660,7 +660,20 @@
     const LOADED_SERVICES = [
         "21s","25_Sing","Admin_Libertador","Agra_Dorzan","Alamos_de_Carrasco2","Alamos_de_Carrasco1","Alhambra","Allegrezza","Alma_Brava","Alma_Corso","Alms_Sing","Aloa","Alpha_Place","Alpine","Altos_Punta_Carreta","Altos_de_Beldevere","Altos_de_Brasil","Altos_de_Pocitos","Altos_del_Shopping","Andalucia","Aquum","ARCA_Construcciones","Arcamar","Arcus","Argenta_Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av_al_Parque","Avita_Libertador","Avita_Parque","Avita_Vibra","Bage","Bahia_Esmeralda","Baliñas","Barrio_Pindó","Belle_Place","Berkes","Berro","Biarritz_Tower","Block_8_Octubre","Bloque_Maldonado","Bomar_3","Born","Brisas_Guana","Brusco","Cabo_Bella_Vista","Caleta_del_Golf","Canaro_1","Capri","Carmel","Casa_de_Pons","Cascada","Castell_del_Rey","Chapalco","Ciriacos_Brasil","Complejo_Terranova","Consorcio_Chucarro","Del_Sol","Deposito_Leonardi","Doce76","Doclan_1","Domus","Doral_Inn","Durandeau","Ebro","Edf_Moon","Edif_Agustine","Edif_Albo_Park","Edif_Altair","Edif_Bulevar","Edif_Cap_Camarat","Edif_Capitello","Edif_Carrera","Edif_Catare","Edif_Cenit","Edif_Copacabana","Edif_Diagonal","Edif_Gala_Pop","Edif_Harbour_Park","Edif_Lift_Universitat","Edif_Marejada","Edif_Maribor","Edif_Murano","Edif_Parque_Miramar","Edif_Pescador","Edif_Planeta","Edif_Preciado","Edif_Sinja","Edif_Solar_de_Verdi","Edif_Uniq","Edif_Via_21","Edif_Villa_Savoia","Edif_Vivo_Life","Edif_la_LLum","El_Cabo","El_Cardal","El_Ceibo","El_Entrevero","El_Molino","El_Pais","El_Parque_Montevideo","Emilio","Eray","Euskaro","Fab_Pan_de_Azucar","Federico_Core","First_Tower","Fundacion_Porsaleu","Galata","Gala_Biarritz","Gala_Point","Gala_Trend","Galería_London","Garibaldi_Plaza","Giulianova","Godilco","Golf_Montevideo","Golino","Greenport","Guaruja","Harbour_Bay","Ibirapita","Inmobiliaria_Pointer","Irlanda","Isla_de_las_Gaviotas","Ixou Mirlo","Jaime_Zudañez","Jambo","Jardines_Buschental","Joyería_Alianza","Kentaro","Kyoto","La_Castellana","La_Selva","La_Strada","Lancaster","Lars_Minas","Lars_Rivera","Lazaro_Gadea","Le_Vieux_Paris","Leon","Libertador","Lift_Alpha","Lift_EME","Lift_Paulier","Los_Caracoles","Los_Olimpicos","Lugano","Luna_del_Lago","Luzarin","Mar_Jonico","Marco_Polo","Marcos","Marina_de_Biarritz","Maria_Pita","MAS_MIO","Maui","MBC","Met_City","Met_Tech","Mille_Luci","Miramar","Moddo_Cavia","Mon_Reve","MVD_21","MVD_21_II","MySuit_Hotel","Nariño","Necochea","New_Park","Nobleza_Naviera","Nostrum_Malvin","Nostrum_Malvin_T2","Nostrum_Plaza_2","Nuevos_Vientos_1_y_2","Nuevos_Vientos_Biarritz","Nuevos_Vientos_Golf","Obra HEM","Obra_Aprahamian","Obra_Barcelona","Obra_Ciclades","Obra_Cumbre","Obra_Garden","Obra_HUB","Obra_Ixou_21","Obra_KIU_Rodo","Obra_Living_Marina","Obra_Mercedes","Obra_Parking_Prado","Obra_Press_Maua","Obra_Randa","Obra_Risco","Obra_Roosvelt","Obra_Torre_Alba","Obra_UpTown","Omikron","ONN_be_Hache_Colonia","Palatino_Flaminio","Palmas_de_Carrasco","Parma","Parque_Esmeralda","Parque_Mar","Paseo_real","Patria","Patria_Golf","Piaro","Playa_Oriente","Playa_Oriente_II","Playas_Bavaros","Plaza_Libertad","Plaza_San_Marino","Pocitos","Puerta_del_Sol","Puerta_del_Sol_4","Puerto_Nautilus","Puerto_Pirata","Puerto_Vallarta","Punta_Brava","Punto_Vazquez","Quorum","Rambla","Rambla_Luz","Rapallo","Regulus","Renaissance","Residencial_Artigas","Residencial_Beverly","Residencial_Dino","Residencial_Malvin","Residencial_Setiembre","Riazor","Rocamadour","Rubens","San_Francisco","Sarmiento","Sea_Side","Shafel","Sigma","Site_Italia","Sky_Polo","Skylon","Smart_Point","Smart_Point_2","Solanas_del_Prado","Solano_Antuna","Solano_Antuna_2725","Soleil_Playa","Soriano","Spazio_4","Strada_dei_Giardinni","Sun_Urquiza","Swing_23","Tempo_Rambla","Terrazas_de_la_Loma","The_Life","Tiffany","Torre_Independencia","Torre_Modelo","Torre_Plaza","Torre_de_las_Américas","Torre_de_los_Pocitos","Torres_García","Toulouse","Tropicana","UCM","UP_1","Valmont","Ventura_Tres_Cruces","Verde_Mora","Villa_Romana","Villa_di_Fiori","Vivo_Life_Centro","Waterloo","Working_Mitre","YES","YES_plaza_Varela","Ymaguare","Zafiro"
     ];
-    const LOADED_SERVICES_NORMALIZED = new Set(LOADED_SERVICES.map(svc => svc.toLowerCase()));
+    const UNAVAILABLE_SERVICES_FIXED = [
+        "Rincon del lago","Naciones Unidas","18 de diciembre","farmaco","Galielo","picasso","Palazzo Pitti","Exselsior","Arenal Grande","Ombu","Obra Ziel","Lazar","coopephi"
+    ];
+    const serviceLiveHistory = {};
+
+    function normalizeServiceName(value) {
+        return (value || '')
+            .toString()
+            .normalize('NFD')
+            .replace(/[̀-ͯ]/g, '')
+            .toLowerCase()
+            .replace(/[_\s-]+/g, ' ')
+            .trim();
+    }
 
 
     // === GESTIÓN DE GESTOS ===
@@ -702,13 +715,9 @@
         const box = document.getElementById('serviceInfoBox');
         if (!box) return;
 
-        const loadedHtml = serviceWidgetData.loaded.length
-            ? serviceWidgetData.loaded.slice(0, 80).map(it => `<li style="margin-bottom:6px;">${it.service} · ${it.cameras}</li>`).join('')
-            : '<li style="opacity:0.7;">Sin servicios cargados detectados en vivo.</li>';
-
-        const unavailableHtml = serviceWidgetData.unavailable.length
-            ? serviceWidgetData.unavailable.map(it => `<li style="margin-bottom:6px; color:var(--critico);">${it.service}${it.reason ? ` · ${it.reason}` : ''}</li>`).join('')
-            : '<li style="opacity:0.7;">Sin servicios no cargables en vivo.</li>';
+        const unavailableHtml = UNAVAILABLE_SERVICES_FIXED.length
+            ? UNAVAILABLE_SERVICES_FIXED.map(name => `<li style="margin-bottom:6px; color:var(--critico);">${name}</li>`).join('')
+            : '<li style="opacity:0.7;">Sin servicios no cargables configurados.</li>';
 
         const totalLoaded = LOADED_SERVICES.length;
         const loadedBadge = `<span style="color:var(--online); font-weight:900;">${totalLoaded}</span>`;
@@ -722,12 +731,8 @@
                     <div style="max-height:170px; overflow:auto; font-size:0.7rem; line-height:1.35; border:1px solid #1a1a1a; border-radius:10px; padding:8px; background:#090909;">${LOADED_SERVICES.join(' · ')}</div>
                 </div>
                 <div class="service-grid-card">
-                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--online);">Servicios cargados hoy (en vivo)</div>
-                    <ul style="padding-left:16px; margin-bottom:0; max-height:180px; overflow:auto;">${loadedHtml}</ul>
-                </div>
-                <div class="service-grid-card">
-                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--critico);">Servicios no cargables (en vivo)</div>
-                    <ul style="padding-left:16px; margin-bottom:0; max-height:180px; overflow:auto;">${unavailableHtml}</ul>
+                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--critico);">Servicios no cargables</div>
+                    <ul style="padding-left:16px; margin-bottom:0; max-height:220px; overflow:auto;">${unavailableHtml}</ul>
                 </div>
             </div>
         `;
@@ -773,12 +778,35 @@
             return;
         }
 
-        const isLoaded = LOADED_SERVICES_NORMALIZED.has(raw.toLowerCase());
-        if (isLoaded) {
-            result.innerHTML = `<span style="color:var(--online); font-weight:900;">✅ ${raw} está cargado en el sistema.</span>`;
-        } else {
-            result.innerHTML = `<span style="color:var(--critico); font-weight:900;">❌ ${raw} no está cargado en el sistema.</span>`;
+        const normalizedQuery = normalizeServiceName(raw);
+        const exactMatch = LOADED_SERVICES.find(svc => normalizeServiceName(svc) === normalizedQuery);
+        const similarMatches = LOADED_SERVICES.filter(svc => normalizeServiceName(svc).includes(normalizedQuery)).slice(0, 8);
+
+        if (exactMatch) {
+            const historyKey = normalizeServiceName(exactMatch);
+            const history = serviceLiveHistory[historyKey] || [];
+            const historyHtml = history.length
+                ? history.map(item => `<li style="margin-bottom:4px;">${item}</li>`).join('')
+                : '<li style="opacity:0.75;">Sin incidentes recientes reportados para este servicio.</li>';
+
+            result.innerHTML = `
+                <div style="color:var(--online); font-weight:900; margin-bottom:6px;">✅ ${exactMatch} está cargado en el sistema.</div>
+                <div style="font-size:0.72rem; opacity:0.8; margin-bottom:4px;">Último historial breve:</div>
+                <ul style="padding-left:16px; margin-bottom:0; max-height:120px; overflow:auto;">${historyHtml}</ul>
+            `;
+            return;
         }
+
+        if (similarMatches.length) {
+            result.innerHTML = `
+                <div style="color:var(--warning); font-weight:800; margin-bottom:6px;">No encontramos coincidencia exacta para "${raw}".</div>
+                <div style="font-size:0.72rem; opacity:0.82; margin-bottom:4px;">Servicios similares:</div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">${similarMatches.map(name => `<span style="border:1px solid #2a2a2a; border-radius:999px; padding:3px 8px; font-size:0.68rem;">${name}</span>`).join('')}</div>
+            `;
+            return;
+        }
+
+        result.innerHTML = `<span style="color:var(--critico); font-weight:900;">❌ ${raw} no está cargado en el sistema.</span>`;
     }
 
 
@@ -789,9 +817,12 @@
             const dK = await rK.json();
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
-                if (prevSLA !== null && sla !== prevSLA) {
-                    currentArrow = (sla < prevSLA) ? "▼" : "▲";
-                    currentColor = (sla < prevSLA) ? "var(--critico)" : "var(--online)";
+                if (prevSLA === null || sla === prevSLA) {
+                    currentArrow = '•';
+                    currentColor = 'var(--accent)';
+                } else {
+                    currentArrow = (sla < prevSLA) ? '▼' : '▲';
+                    currentColor = (sla < prevSLA) ? 'var(--critico)' : 'var(--online)';
                 }
                 document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
                 document.getElementById('v-calls').textContent = dK.calls;
@@ -829,10 +860,17 @@
             if(dR) {
                 const loaded = [];
                 const unavailable = [];
+                Object.keys(serviceLiveHistory).forEach(k => delete serviceLiveHistory[k]);
                 Object.entries(dR).forEach(([id, v], index) => {
                     let name = id.replace(/_/g,' ').toUpperCase();
                     let lastDown = v.hora_caida || "Desconocida";
                     const cameraInfo = (v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras';
+                    const historyKey = normalizeServiceName(id);
+                    const historyItems = [];
+                    if (v.estado === 'offline') historyItems.push(`Sistema offline desde ${lastDown}`);
+                    if (v.alerta_camaras && v.alerta_camaras.trim() !== '') historyItems.push(`Cámaras offline: ${cameraInfo}`);
+                    if (!historyItems.length) historyItems.push('Sin novedades críticas recientes');
+                    serviceLiveHistory[historyKey] = historyItems;
                     if(v.estado === "online") loaded.push({ service: name, cameras: cameraInfo });
                     else unavailable.push({ service: name, reason: `offline desde ${lastDown}` });
                     
@@ -921,7 +959,8 @@
         circle.style.stroke = color;
         textVal.style.color = color;
         textVal.textContent = val + "%";
-        document.getElementById('m-sla-trend').innerHTML = `<span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
+        const trendEl = document.getElementById('m-sla-trend');
+        if (trendEl) trendEl.innerHTML = `<span class="trend-arrow" style="color:${currentColor}; font-size:1rem;">${currentArrow}</span>`;
     }
 
     function renderPuestos(data) {
