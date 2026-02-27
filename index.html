@@ -146,6 +146,8 @@
         #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
         #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
+        #cio-app .trend-up { color: #2ecc71 !important; }
+        #cio-app .trend-down { color: #ff4d4d !important; }
         @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
 
         #cio-app .history-card { 
@@ -811,6 +813,14 @@
         modal.setAttribute('aria-hidden', 'true');
     }
 
+
+    function selectSimilarService(serviceName) {
+        const input = document.getElementById('serviceCheckInput');
+        if (!input || !serviceName) return;
+        input.value = serviceName;
+        checkServiceAvailability();
+    }
+
     function checkServiceAvailability() {
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const input = document.getElementById('serviceCheckInput');
@@ -850,7 +860,7 @@
             result.innerHTML = `
                 <div style="color:var(--warning); font-weight:800; margin-bottom:6px;">No encontramos coincidencia exacta para "${raw}".</div>
                 <div style="font-size:0.72rem; opacity:0.82; margin-bottom:4px;">Servicios similares:</div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px;">${similarMatches.map(name => `<span style="border:1px solid #2a2a2a; border-radius:999px; padding:3px 8px; font-size:0.68rem;">${name}</span>`).join('')}</div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">${similarMatches.map(name => `<button type="button" onclick="selectSimilarService(this.dataset.svc)" data-svc="${name.replace(/"/g, '&quot;')}" style="border:1px solid #2a2a2a; border-radius:999px; padding:3px 8px; font-size:0.68rem; background:#101010; color:#fff;">${name}</button>`).join('')}</div>
             `;
             return;
         }
@@ -858,6 +868,12 @@
         result.innerHTML = `<span style="color:var(--critico); font-weight:900;">❌ ${raw} no está cargado en el sistema.</span>`;
     }
 
+
+    function getTrendArrowMarkup() {
+        if (!currentArrow) return '';
+        const trendClass = currentArrow === '▲' ? 'trend-up' : 'trend-down';
+        return `<span class="trend-arrow ${trendClass}" style="font-size:1rem; margin-left:6px;">${currentArrow}</span>`;
+    }
 
     async function syncData() {
         try {
@@ -873,7 +889,7 @@
                     currentArrow = (sla < prevSLA) ? '▼' : '▲';
                     currentColor = (sla < prevSLA) ? '#ff4d4d' : '#2ecc71';
                 }
-                document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
+                document.getElementById('v-sla').innerHTML = `${sla}% ${getTrendArrowMarkup()}`;
                 document.getElementById('v-calls').textContent = dK.calls;
                 updateMobileSLA(sla);
                 document.getElementById('m-calls').textContent = dK.calls;
