@@ -159,6 +159,27 @@
             position: relative !important;
         }
 
+        #cio-app .service-check-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(8px);
+            z-index: 10150;
+        }
+        #cio-app .service-check-modal.active { display: flex; }
+        #cio-app .service-check-card {
+            width: min(94vw, 420px);
+            background: linear-gradient(180deg, #0f1111 0%, #050707 100%);
+            border: 1px solid rgba(0, 209, 209, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+        }
+
         /* === MEJORAS CELULAR === */
 
         #cio-app .off-service-card {
@@ -215,17 +236,16 @@
             #cio-app .main-header {
                 position: fixed;
                 left: 12px;
-                right: 12px;
+                right: 62px;
                 bottom: calc(12px + env(safe-area-inset-bottom));
-                transform: none;
                 width: auto;
-                min-height: 62px;
+                min-height: 58px;
                 padding: 10px 14px;
                 border: 1px solid rgba(0, 209, 209, 0.25);
                 border-radius: 18px;
                 justify-content: center;
                 align-items: center;
-                gap: 12px;
+                gap: 10px;
                 background: rgba(6, 10, 10, 0.94);
                 box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.03);
                 z-index: 10020;
@@ -233,15 +253,15 @@
             }
 
             #cio-app .main-header .mobile-bottom-icon {
-                width: 36px;
-                height: 36px;
+                width: 34px;
+                height: 34px;
                 border-radius: 50%;
                 object-fit: cover;
                 border: 1px solid rgba(0,209,209,0.35);
             }
 
             #cio-app .main-header #clockDisplay {
-                font-size: 0.95rem !important;
+                font-size: 0.9rem !important;
                 line-height: 1.2;
                 white-space: nowrap;
                 color: var(--accent) !important;
@@ -257,7 +277,7 @@
                 border: none;
                 border-radius: 0;
                 box-shadow: none;
-                padding: calc(14px + env(safe-area-inset-top)) 12px calc(112px + env(safe-area-inset-bottom));
+                padding: calc(14px + env(safe-area-inset-top)) 12px calc(92px + env(safe-area-inset-bottom));
                 touch-action: auto;
                 overflow: visible;
             }
@@ -269,7 +289,7 @@
                 color: var(--accent);
                 font-size: 0.72rem;
                 font-weight: 800;
-                margin: 24px 0 12px;
+                margin: 22px 0 10px;
                 text-transform: uppercase;
                 letter-spacing: 1.8px;
                 display: flex;
@@ -287,18 +307,24 @@
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 10px;
-                margin-bottom: 16px;
+                margin-bottom: 14px;
             }
             #cio-app .mobile-stat-box {
                 background: linear-gradient(165deg, #0f0f0f 0%, #090909 100%);
                 border: 1px solid #1f1f1f;
                 border-radius: 14px;
-                padding: 14px 10px;
-                min-height: 132px;
+                padding: 12px 10px;
+                min-height: 128px;
                 text-align: center;
+                overflow: hidden;
             }
 
-            #cio-app .sla-circle-container { width: 94px; height: 94px; }
+            #cio-app .sla-circle-container {
+                width: 86px;
+                height: 86px;
+                margin: 0 auto;
+            }
+
             #cio-app .mobile-puestos-grid {
                 display: grid;
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -312,19 +338,44 @@
             #cio-app .puesto-val { font-size: 1.45rem !important; }
             #cio-app .puesto-lab { font-size: 0.65rem !important; }
 
-            #cio-app .off-service-card {
-                border-radius: 14px;
-                padding: 14px 12px;
-                gap: 12px;
-                border: 1px solid #1f1f1f;
+            #cio-app .mobile-offline-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-top: 8px;
+            }
+            #cio-app .offline-widget {
                 background: #0a0a0a;
+                border: 1px solid #1f1f1f;
+                border-radius: 14px;
+                padding: 10px;
+                min-height: 148px;
+            }
+            #cio-app .offline-widget-title {
+                font-size: 0.66rem;
+                text-transform: uppercase;
+                letter-spacing: 1.2px;
+                color: #8d8d8d;
                 margin-bottom: 8px;
             }
+            #cio-app .offline-widget .offline-group { max-height: 126px; overflow: auto; }
+
+            #cio-app .off-service-card {
+                border-radius: 10px;
+                padding: 10px;
+                gap: 8px;
+                border: 1px solid #1f1f1f;
+                background: #0f0f0f;
+                margin-bottom: 6px;
+            }
+            #cio-app .off-service-card .detail-value { font-size: 0.78rem; }
             #cio-app .generic-details {
                 background: #0a0a0a;
                 border-color: #1f1f1f;
                 border-bottom-left-radius: 10px;
                 border-bottom-right-radius: 10px;
+                padding-left: 10px;
+                padding-right: 10px;
             }
 
             #cio-app #historyMobileWindow {
@@ -332,7 +383,7 @@
                 border: 1px solid #212121;
                 border-radius: 16px;
                 padding: 10px;
-                max-height: min(50vh, 430px);
+                max-height: min(42vh, 330px);
                 overflow-y: auto;
                 box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
             }
@@ -372,11 +423,15 @@
                 border: 1px solid #2b2b2b;
                 background: #141414;
                 color: var(--accent);
-                width: 30px;
-                height: 30px;
+                width: 32px;
+                height: 32px;
                 border-radius: 50%;
                 font-weight: 900;
                 font-size: 1rem;
+            }
+            #cio-app .service-widget-actions {
+                display: flex;
+                gap: 8px;
             }
             #cio-app .service-grid {
                 display: grid;
@@ -394,7 +449,7 @@
             #cio-app #scrollTopMobile {
                 position: fixed;
                 right: 14px;
-                bottom: calc(86px + env(safe-area-inset-bottom));
+                bottom: calc(14px + env(safe-area-inset-bottom));
                 width: 44px;
                 height: 44px;
                 border-radius: 50%;
@@ -409,6 +464,9 @@
                 justify-content: center;
                 box-shadow: 0 8px 20px rgba(0,0,0,0.35);
             }
+
+            #cio-app .service-check-modal { padding: 12px; }
+            #cio-app .service-check-card { width: 100%; max-width: 370px; }
         }
 
         @media (max-width: 480px) {
@@ -499,32 +557,53 @@
         <div class="mobile-section-header">Puestos en Operación</div>
         <div id="m-puestos" class="mobile-puestos-grid"></div>
 
-        <div class="mobile-section-header">Servicios Offline</div>
-        <div id="m-nvr-list" class="offline-group"></div>
-
-        <div class="mobile-section-header">Alertas Cámaras</div>
-        <div id="m-cam-list" class="offline-group"></div>
-
-        <div class="mobile-only-section">
-        <div class="mobile-section-header">Novedades Recientes</div>
-        <div id="historyMobileWindow">
-            <div id="historyMobileSlide"></div>
-        </div>
-        </div>
-
-        <div class="mobile-only-section">
-        <div class="mobile-section-header">Información disponible</div>
-        <div class="service-widget">
-            <div class="service-widget-header">
-                <button class="service-widget-toggle" onclick="toggleServiceInfo()">+</button>
-                <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:8px 12px; border-radius:10px;" onclick="promptAddInfo()">Agregar info</button>
+        <div class="mobile-section-header">Estado de infraestructura</div>
+        <div class="mobile-offline-grid">
+            <div class="offline-widget">
+                <div class="offline-widget-title">Servicios Offline</div>
+                <div id="m-nvr-list" class="offline-group"></div>
             </div>
-            <div id="serviceInfoBox" style="display:none;"></div>
+            <div class="offline-widget">
+                <div class="offline-widget-title">Cámaras Offline</div>
+                <div id="m-cam-list" class="offline-group"></div>
+            </div>
         </div>
+
+        <div class="mobile-only-section">
+            <div class="mobile-section-header">Novedades Recientes</div>
+            <div id="historyMobileWindow">
+                <div id="historyMobileSlide"></div>
+            </div>
+        </div>
+
+        <div class="mobile-only-section">
+            <div class="mobile-section-header">Información disponible</div>
+            <div class="service-widget">
+                <div class="service-widget-header">
+                    <button class="service-widget-toggle" onclick="toggleServiceInfo()">+</button>
+                    <div class="service-widget-actions">
+                        <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:8px 12px; border-radius:10px;" onclick="openServiceCheckModal()">Consultar servicio</button>
+                    </div>
+                </div>
+                <div id="serviceInfoBox" style="display:none;"></div>
+            </div>
         </div>
     </aside>
 
     <button id="scrollTopMobile" class="mobile-only-section" onclick="scrollToTopMobile()" aria-label="Volver arriba">↑</button>
+
+    <div id="serviceCheckModal" class="service-check-modal" aria-hidden="true">
+        <div class="service-check-card" role="dialog" aria-modal="true" aria-labelledby="service-check-title">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 id="service-check-title" style="font-size:0.9rem; color:var(--accent);">Consultar servicio</h3>
+                <button onclick="closeServiceCheckModal()" style="background:none; border:none; color:#9f9f9f; font-size:1.1rem;">✕</button>
+            </div>
+            <div style="font-size:0.74rem; opacity:0.8; margin-bottom:10px;">Escribí un servicio y te indicamos si está cargado en el sistema.</div>
+            <input id="serviceCheckInput" class="p-field" style="margin-bottom:10px;" placeholder="Ej: Admin_Libertador">
+            <button onclick="checkServiceAvailability()" class="btn-pill" style="border-radius:10px; margin-bottom:8px;">Verificar</button>
+            <div id="serviceCheckResult" style="font-size:0.78rem; min-height:28px;"></div>
+        </div>
+    </div>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
@@ -578,31 +657,10 @@
     let currentArrow = "▲";
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
-
-    const SERVICE_INFO_SEED = `IP SERVICIOS	IP CÁMARAS	Servicios no funcionales
-21s	IPs incompletas	Rincon del lago
-25_Sing	IPs incompletas	Naciones Unidas
-Admin_Libertador	Cargado	18 de diciembre
-Agra_Dorzan	IPs incompletas	farmaco
-Alamos_de_Carrasco2	Cargado	Galielo
-Alamos_de_Carrasco1	IPs incompletas	picasso
-Alhambra	IPs incompletas	Palazzo Pitti
-Allegrezza	IPs incompletas	Exselsior
-Alma_Brava	Cargado	Arenal Grande
-Alma_Corso	IPs incompletas	Ombu
-Alms_Sing	IPs incompletas (ninguna)	Obra Ziel
-Aloa		Lazar
-Alpha_Place		coopephi
-Alpine		
-Altos_Punta_Carreta		
-Altos_de_Beldevere		
-Altos_de_Brasil		
-Altos_de_Pocitos		
-Altos_del_Shopping		
-Andalucia		
-...
-(continúa listado provisto)
-Zafiro		`;
+    const LOADED_SERVICES = [
+        "21s","25_Sing","Admin_Libertador","Agra_Dorzan","Alamos_de_Carrasco2","Alamos_de_Carrasco1","Alhambra","Allegrezza","Alma_Brava","Alma_Corso","Alms_Sing","Aloa","Alpha_Place","Alpine","Altos_Punta_Carreta","Altos_de_Beldevere","Altos_de_Brasil","Altos_de_Pocitos","Altos_del_Shopping","Andalucia","Aquum","ARCA_Construcciones","Arcamar","Arcus","Argenta_Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av_al_Parque","Avita_Libertador","Avita_Parque","Avita_Vibra","Bage","Bahia_Esmeralda","Baliñas","Barrio_Pindó","Belle_Place","Berkes","Berro","Biarritz_Tower","Block_8_Octubre","Bloque_Maldonado","Bomar_3","Born","Brisas_Guana","Brusco","Cabo_Bella_Vista","Caleta_del_Golf","Canaro_1","Capri","Carmel","Casa_de_Pons","Cascada","Castell_del_Rey","Chapalco","Ciriacos_Brasil","Complejo_Terranova","Consorcio_Chucarro","Del_Sol","Deposito_Leonardi","Doce76","Doclan_1","Domus","Doral_Inn","Durandeau","Ebro","Edf_Moon","Edif_Agustine","Edif_Albo_Park","Edif_Altair","Edif_Bulevar","Edif_Cap_Camarat","Edif_Capitello","Edif_Carrera","Edif_Catare","Edif_Cenit","Edif_Copacabana","Edif_Diagonal","Edif_Gala_Pop","Edif_Harbour_Park","Edif_Lift_Universitat","Edif_Marejada","Edif_Maribor","Edif_Murano","Edif_Parque_Miramar","Edif_Pescador","Edif_Planeta","Edif_Preciado","Edif_Sinja","Edif_Solar_de_Verdi","Edif_Uniq","Edif_Via_21","Edif_Villa_Savoia","Edif_Vivo_Life","Edif_la_LLum","El_Cabo","El_Cardal","El_Ceibo","El_Entrevero","El_Molino","El_Pais","El_Parque_Montevideo","Emilio","Eray","Euskaro","Fab_Pan_de_Azucar","Federico_Core","First_Tower","Fundacion_Porsaleu","Galata","Gala_Biarritz","Gala_Point","Gala_Trend","Galería_London","Garibaldi_Plaza","Giulianova","Godilco","Golf_Montevideo","Golino","Greenport","Guaruja","Harbour_Bay","Ibirapita","Inmobiliaria_Pointer","Irlanda","Isla_de_las_Gaviotas","Ixou Mirlo","Jaime_Zudañez","Jambo","Jardines_Buschental","Joyería_Alianza","Kentaro","Kyoto","La_Castellana","La_Selva","La_Strada","Lancaster","Lars_Minas","Lars_Rivera","Lazaro_Gadea","Le_Vieux_Paris","Leon","Libertador","Lift_Alpha","Lift_EME","Lift_Paulier","Los_Caracoles","Los_Olimpicos","Lugano","Luna_del_Lago","Luzarin","Mar_Jonico","Marco_Polo","Marcos","Marina_de_Biarritz","Maria_Pita","MAS_MIO","Maui","MBC","Met_City","Met_Tech","Mille_Luci","Miramar","Moddo_Cavia","Mon_Reve","MVD_21","MVD_21_II","MySuit_Hotel","Nariño","Necochea","New_Park","Nobleza_Naviera","Nostrum_Malvin","Nostrum_Malvin_T2","Nostrum_Plaza_2","Nuevos_Vientos_1_y_2","Nuevos_Vientos_Biarritz","Nuevos_Vientos_Golf","Obra HEM","Obra_Aprahamian","Obra_Barcelona","Obra_Ciclades","Obra_Cumbre","Obra_Garden","Obra_HUB","Obra_Ixou_21","Obra_KIU_Rodo","Obra_Living_Marina","Obra_Mercedes","Obra_Parking_Prado","Obra_Press_Maua","Obra_Randa","Obra_Risco","Obra_Roosvelt","Obra_Torre_Alba","Obra_UpTown","Omikron","ONN_be_Hache_Colonia","Palatino_Flaminio","Palmas_de_Carrasco","Parma","Parque_Esmeralda","Parque_Mar","Paseo_real","Patria","Patria_Golf","Piaro","Playa_Oriente","Playa_Oriente_II","Playas_Bavaros","Plaza_Libertad","Plaza_San_Marino","Pocitos","Puerta_del_Sol","Puerta_del_Sol_4","Puerto_Nautilus","Puerto_Pirata","Puerto_Vallarta","Punta_Brava","Punto_Vazquez","Quorum","Rambla","Rambla_Luz","Rapallo","Regulus","Renaissance","Residencial_Artigas","Residencial_Beverly","Residencial_Dino","Residencial_Malvin","Residencial_Setiembre","Riazor","Rocamadour","Rubens","San_Francisco","Sarmiento","Sea_Side","Shafel","Sigma","Site_Italia","Sky_Polo","Skylon","Smart_Point","Smart_Point_2","Solanas_del_Prado","Solano_Antuna","Solano_Antuna_2725","Soleil_Playa","Soriano","Spazio_4","Strada_dei_Giardinni","Sun_Urquiza","Swing_23","Tempo_Rambla","Terrazas_de_la_Loma","The_Life","Tiffany","Torre_Independencia","Torre_Modelo","Torre_Plaza","Torre_de_las_Américas","Torre_de_los_Pocitos","Torres_García","Toulouse","Tropicana","UCM","UP_1","Valmont","Ventura_Tres_Cruces","Verde_Mora","Villa_Romana","Villa_di_Fiori","Vivo_Life_Centro","Waterloo","Working_Mitre","YES","YES_plaza_Varela","Ymaguare","Zafiro"
+    ];
+    const LOADED_SERVICES_NORMALIZED = new Set(LOADED_SERVICES.map(svc => svc.toLowerCase()));
 
 
     // === GESTIÓN DE GESTOS ===
@@ -640,53 +698,36 @@ Zafiro		`;
             arrow.textContent = "▲";
         }
     }
-
-
-    function getStoredManualServiceInfo() {
-        try {
-            return JSON.parse(localStorage.getItem('manual_service_info') || '[]');
-        } catch (_) {
-            return [];
-        }
-    }
-
-    function setStoredManualServiceInfo(items) {
-        localStorage.setItem('manual_service_info', JSON.stringify(items));
-    }
-
     function renderServiceInfoWidget() {
         const box = document.getElementById('serviceInfoBox');
         if (!box) return;
 
-        const manual = getStoredManualServiceInfo();
-        const manualHtml = manual.length
-            ? manual.map(it => `<li style="margin-bottom:6px;">${it.service} · ${it.cameras} · ${it.status}</li>`).join('')
-            : '<li style="opacity:0.7;">Sin información manual agregada.</li>';
-
         const loadedHtml = serviceWidgetData.loaded.length
-            ? serviceWidgetData.loaded.map(it => `<li style="margin-bottom:6px;">${it.service} · ${it.cameras}</li>`).join('')
+            ? serviceWidgetData.loaded.slice(0, 80).map(it => `<li style="margin-bottom:6px;">${it.service} · ${it.cameras}</li>`).join('')
             : '<li style="opacity:0.7;">Sin servicios cargados detectados en vivo.</li>';
 
         const unavailableHtml = serviceWidgetData.unavailable.length
             ? serviceWidgetData.unavailable.map(it => `<li style="margin-bottom:6px; color:var(--critico);">${it.service}${it.reason ? ` · ${it.reason}` : ''}</li>`).join('')
             : '<li style="opacity:0.7;">Sin servicios no cargables en vivo.</li>';
 
+        const totalLoaded = LOADED_SERVICES.length;
+        const loadedBadge = `<span style="color:var(--online); font-weight:900;">${totalLoaded}</span>`;
+
         box.innerHTML = `
             <div style="font-size:0.72rem; opacity:0.75; margin-bottom:8px;">Actualizado: ${new Date().toLocaleString('es-AR')}</div>
             <div class="service-grid">
                 <div class="service-grid-card">
-                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--accent);">Base de información disponible</div>
-                    <pre style="max-height:220px; overflow:auto; white-space:pre; font-size:0.68rem; line-height:1.35; background:#080808; border:1px solid #1a1a1a; border-radius:10px; padding:10px;">${SERVICE_INFO_SEED}</pre>
+                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--accent);">Base oficial de servicios cargados</div>
+                    <div style="font-size:0.72rem; opacity:0.78; margin-bottom:8px;">Servicios registrados: ${loadedBadge}</div>
+                    <div style="max-height:170px; overflow:auto; font-size:0.7rem; line-height:1.35; border:1px solid #1a1a1a; border-radius:10px; padding:8px; background:#090909;">${LOADED_SERVICES.join(' · ')}</div>
                 </div>
                 <div class="service-grid-card">
                     <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--online);">Servicios cargados hoy (en vivo)</div>
-                    <ul style="padding-left:16px; margin-bottom:0;">${loadedHtml}</ul>
+                    <ul style="padding-left:16px; margin-bottom:0; max-height:180px; overflow:auto;">${loadedHtml}</ul>
                 </div>
                 <div class="service-grid-card">
                     <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--critico);">Servicios no cargables (en vivo)</div>
-                    <ul style="padding-left:16px; margin-bottom:10px;">${unavailableHtml}</ul>
-                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--accent);">Info manual</div>
-                    <ul style="padding-left:16px; margin-bottom:0;">${manualHtml}</ul>
+                    <ul style="padding-left:16px; margin-bottom:0; max-height:180px; overflow:auto;">${unavailableHtml}</ul>
                 </div>
             </div>
         `;
@@ -699,26 +740,47 @@ Zafiro		`;
         renderServiceInfoWidget();
     }
 
-    function promptAddInfo() {
-        const user = prompt('Usuario');
-        if (user !== 'Alfonso') return alert('Usuario incorrecto.');
-        const pass = prompt('Contraseña');
-        if (pass !== '332112') return alert('Contraseña incorrecta.');
 
-        const type = prompt('¿Qué querés agregar?\n1) Nuevo servicio\n2) Cámaras\n3) Servicio no adaptable', '1');
-        const typeLabel = type === '2' ? 'CÁMARAS' : type === '3' ? 'NO ADAPTABLE' : 'SERVICIO';
-
-        const service = prompt(typeLabel === 'CÁMARAS' ? 'Nombre de grupo/cámaras' : 'Servicio');
-        if (!service) return;
-        const cameras = prompt('Detalle de cámaras / IPs asociadas', '');
-        const status = typeLabel === 'NO ADAPTABLE' ? 'no cargable' : (prompt('Estado (cargado / no cargable)', 'cargado') || 'cargado');
-
-        const manual = getStoredManualServiceInfo();
-        manual.push({ service, cameras: cameras || '-', status: `${typeLabel} · ${status}`, ts: Date.now() });
-        setStoredManualServiceInfo(manual);
-        renderServiceInfoWidget();
-        alert('Información agregada correctamente.');
+    function openServiceCheckModal() {
+        const modal = document.getElementById('serviceCheckModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        const input = document.getElementById('serviceCheckInput');
+        const result = document.getElementById('serviceCheckResult');
+        if (result) result.innerHTML = '';
+        if (input) {
+            input.value = '';
+            setTimeout(() => input.focus(), 60);
+        }
     }
+
+    function closeServiceCheckModal() {
+        const modal = document.getElementById('serviceCheckModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function checkServiceAvailability() {
+        const input = document.getElementById('serviceCheckInput');
+        const result = document.getElementById('serviceCheckResult');
+        if (!input || !result) return;
+
+        const raw = (input.value || '').trim();
+        if (!raw) {
+            result.innerHTML = '<span style="color:var(--warning);">Ingresá un servicio para consultar.</span>';
+            return;
+        }
+
+        const isLoaded = LOADED_SERVICES_NORMALIZED.has(raw.toLowerCase());
+        if (isLoaded) {
+            result.innerHTML = `<span style="color:var(--online); font-weight:900;">✅ ${raw} está cargado en el sistema.</span>`;
+        } else {
+            result.innerHTML = `<span style="color:var(--critico); font-weight:900;">❌ ${raw} no está cargado en el sistema.</span>`;
+        }
+    }
+
 
     async function syncData() {
         try {
