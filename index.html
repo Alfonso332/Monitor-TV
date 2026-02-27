@@ -196,160 +196,210 @@
                 overflow-y: auto;
                 overscroll-behavior-y: contain;
                 -webkit-overflow-scrolling: touch;
+                background: radial-gradient(circle at top, #0d1718 0%, #050505 35%, #000 100%) !important;
             }
 
-            #cio-app .kpi-bar, #cio-app #ticker-bar, #cio-app .main-header .btn-pill { display: none !important; }
-            #cio-app .main-header > div:first-child { display: none !important; }
+            #cio-app .kpi-bar,
+            #cio-app #ticker-bar,
+            #cio-app .main-header .btn-pill,
+            #cio-app .main-header > div:first-child,
+            #cio-app #panelHistory,
+            #cio-app #panelForm,
+            #cio-app #display-board {
+                display: none !important;
+            }
+
             #cio-app .mobile-only-section { display: block; }
             #cio-app #progressLine { bottom: 0; }
 
             #cio-app .main-header {
                 position: fixed;
-                left: 50%;
-                bottom: calc(14px + env(safe-area-inset-bottom));
-                transform: translateX(-50%);
-                width: calc(100% - 28px);
-                min-height: 58px;
+                left: 12px;
+                right: 12px;
+                bottom: calc(12px + env(safe-area-inset-bottom));
+                transform: none;
+                width: auto;
+                min-height: 62px;
                 padding: 10px 14px;
-                border: 1px solid #1a1a1a;
-                border-radius: 16px;
+                border: 1px solid rgba(0, 209, 209, 0.25);
+                border-radius: 18px;
                 justify-content: center;
                 align-items: center;
-                gap: 10px;
-                background: rgba(5, 5, 5, 0.95);
+                gap: 12px;
+                background: rgba(6, 10, 10, 0.94);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.03);
                 z-index: 10020;
+                backdrop-filter: blur(8px);
+            }
+
+            #cio-app .main-header .mobile-bottom-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid rgba(0,209,209,0.35);
             }
 
             #cio-app .main-header #clockDisplay {
                 font-size: 0.95rem !important;
-                line-height: 1;
+                line-height: 1.2;
                 white-space: nowrap;
-                color: var(--primary);
-                font-weight: 900;
-            }
-
-            #cio-app .main-header .mobile-bottom-icon {
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 1px solid #2a2a2a;
-            }
-
-            #cio-app #display-board {
-                display: none;
+                color: var(--accent) !important;
+                letter-spacing: 0.3px;
             }
 
             #cio-app #panelMobileDash {
                 position: relative;
-                top: auto;
-                bottom: auto;
-                right: auto;
+                inset: auto;
                 width: 100%;
                 height: auto;
                 transform: none !important;
                 border: none;
-                border-top: 1px solid #1a1a1a;
                 border-radius: 0;
                 box-shadow: none;
-                padding: 20px 14px calc(108px + env(safe-area-inset-bottom));
+                padding: calc(14px + env(safe-area-inset-top)) 12px calc(112px + env(safe-area-inset-bottom));
                 touch-action: auto;
                 overflow: visible;
             }
 
-            #cio-app #panelMobileDash::before { display: none; }
-            #cio-app #panelHistory, #cio-app #panelForm { display: none !important; }
-            
-            #cio-app .side-panel::before {
-                content: ''; position: absolute; top: 12px; left: 50%;
-                transform: translateX(-50%); width: 45px; height: 5px;
-                background: #333; border-radius: 10px;
-            }
+            #cio-app #panelMobileDash::before,
+            #cio-app .side-panel::before { display: none; }
 
             #cio-app .mobile-section-header {
-                color: var(--primary); font-size: 0.9rem; font-weight: bold; 
-                margin: 40px 0 20px; text-transform: uppercase; letter-spacing: 2px;
-                display: flex; align-items: center; gap: 10px;
+                color: var(--accent);
+                font-size: 0.72rem;
+                font-weight: 800;
+                margin: 24px 0 12px;
+                text-transform: uppercase;
+                letter-spacing: 1.8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
-            #cio-app .mobile-section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+            #cio-app .mobile-section-header::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(90deg, rgba(0,209,209,0.4), rgba(0,209,209,0.02));
+            }
+
+            #cio-app .mobile-stat-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            #cio-app .mobile-stat-box {
+                background: linear-gradient(165deg, #0f0f0f 0%, #090909 100%);
+                border: 1px solid #1f1f1f;
+                border-radius: 14px;
+                padding: 14px 10px;
+                min-height: 132px;
+                text-align: center;
+            }
+
+            #cio-app .sla-circle-container { width: 94px; height: 94px; }
+            #cio-app .mobile-puestos-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+                background: #0a0a0a;
+                border: 1px solid #1f1f1f;
+                border-radius: 14px;
+                padding: 12px;
+            }
+            #cio-app .puesto-item { gap: 4px; }
+            #cio-app .puesto-val { font-size: 1.45rem !important; }
+            #cio-app .puesto-lab { font-size: 0.65rem !important; }
+
+            #cio-app .off-service-card {
+                border-radius: 14px;
+                padding: 14px 12px;
+                gap: 12px;
+                border: 1px solid #1f1f1f;
+                background: #0a0a0a;
+                margin-bottom: 8px;
+            }
+            #cio-app .generic-details {
+                background: #0a0a0a;
+                border-color: #1f1f1f;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+
+            #cio-app #historyMobileWindow {
+                background: linear-gradient(180deg, #090909 0%, #060606 100%);
+                border: 1px solid #212121;
+                border-radius: 16px;
+                padding: 10px;
+                max-height: min(50vh, 430px);
+                overflow-y: auto;
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+            }
+            #cio-app #historyMobileWindow::before {
+                content: "MODO VISTA";
+                display: block;
+                font-size: 0.58rem;
+                letter-spacing: 2.4px;
+                color: #7a7a7a;
+                margin-bottom: 8px;
+            }
+            #cio-app #historyMobileSlide { transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease; }
+            #cio-app #historyMobileSlide.oculto { opacity: 0; transform: translateY(6px) scale(0.985); filter: blur(4px); }
+            #cio-app #historyMobileWindow .history-card {
+                border-radius: 14px !important;
+                margin-bottom: 0 !important;
+                padding: 14px !important;
+                background: radial-gradient(circle at top, #111 0%, #090909 100%) !important;
+                border-left-width: 4px !important;
+            }
 
             #cio-app .service-widget {
-                border: 1px solid #222;
-                background: #0b0b0b;
+                border: 1px solid #212121;
+                background: #080808;
                 border-radius: 14px;
-                padding: 14px;
-                margin-top: 14px;
+                padding: 12px;
+                margin-top: 12px;
             }
             #cio-app .service-widget-header {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 10px;
+                gap: 8px;
                 margin-bottom: 10px;
             }
             #cio-app .service-widget-toggle {
-                border: 1px solid #2c2c2c;
-                background: #151515;
+                border: 1px solid #2b2b2b;
+                background: #141414;
                 color: var(--accent);
-                width: 28px;
-                height: 28px;
+                width: 30px;
+                height: 30px;
                 border-radius: 50%;
                 font-weight: 900;
                 font-size: 1rem;
             }
-            #cio-app #historyMobileWindow {
-                background: #050505;
-                border: 1px solid #222;
-                border-radius: 14px;
-                padding: 10px;
-                max-height: min(52vh, 460px);
-                overflow-y: auto;
-                box-shadow: inset 0 0 0 1px #0f0f0f, 0 10px 24px rgba(0,0,0,0.35);
-            }
-            #cio-app #historyMobileWindow::before {
-                content: "NOVEDADES";
-                display: block;
-                font-size: 0.62rem;
-                letter-spacing: 2px;
-                color: #8a8a8a;
-                margin-bottom: 8px;
-            }
-            #cio-app #historyMobileWindow .history-card {
-                border-radius: 12px !important;
-                margin-bottom: 12px !important;
-                padding: 14px !important;
-                background: linear-gradient(180deg, #0d0d0d 0%, #080808 100%) !important;
-            }
-            #cio-app #historyMobileSlide {
-                transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
-            }
-            #cio-app #historyMobileSlide.oculto {
-                opacity: 0;
-                transform: scale(0.97);
-                filter: blur(6px);
-            }
             #cio-app .service-grid {
                 display: grid;
-                grid-template-columns: repeat(3, minmax(170px, 1fr));
+                grid-template-columns: 1fr;
                 gap: 10px;
-                overflow-x: auto;
             }
             #cio-app .service-grid-card {
-                background: #080808;
-                border: 1px solid #1a1a1a;
+                background: #0a0a0a;
+                border: 1px solid #1e1e1e;
                 border-radius: 10px;
                 padding: 10px;
-                min-height: 150px;
+                min-height: 120px;
             }
+
             #cio-app #scrollTopMobile {
                 position: fixed;
                 right: 14px;
                 bottom: calc(86px + env(safe-area-inset-bottom));
-                width: 42px;
-                height: 42px;
+                width: 44px;
+                height: 44px;
                 border-radius: 50%;
-                border: 1px solid #2a2a2a;
-                background: rgba(10,10,10,0.95);
+                border: 1px solid rgba(0,209,209,0.35);
+                background: rgba(8, 12, 12, 0.96);
                 color: var(--accent);
                 font-size: 1.2rem;
                 font-weight: 900;
@@ -357,27 +407,8 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.35);
             }
-
-            #cio-app .mobile-stat-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; align-items: stretch; }
-            #cio-app .mobile-stat-box { background: #0a0a0a; padding: 20px 15px; border-radius: 15px; border: 1px solid #222; text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center; }
-
-            #cio-app .sla-circle-container { position: relative; width: 110px; height: 110px; margin: 0 auto; }
-            #cio-app .sla-circle-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-            #cio-app .sla-circle-bg { fill: none; stroke: #1a1a1a; stroke-width: 8; }
-            #cio-app .sla-circle-bar { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 1s ease; }
-            #cio-app .sla-text-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; }
-
-            #cio-app .mobile-puestos-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; background: #0a0a0a; padding: 16px; border-radius: 18px; border: 1px solid #1a1a1a; margin-bottom: 24px; }
-
-            #cio-app .area-tag { letter-spacing: 3px; font-size: clamp(0.75rem, 2.8vw, 1rem); margin-bottom: 10px; }
-            #cio-app #titleDisplay { font-size: clamp(1.8rem, 8.5vw, 2.6rem); line-height: 1.05; }
-            #cio-app #messageDisplay { font-size: clamp(1rem, 4.2vw, 1.3rem); line-height: 1.35; max-width: 100%; }
-            #cio-app #panelHistory .p-field, #cio-app #panelHistory label, #cio-app #panelHistory .btn-pill:not(.btn-sec) { display: none !important; }
-            #cio-app #panelHistory .btn-sec { display: block !important; width: 100%; }
-            
-            #cio-app #panelForm { text-align: center; }
-            #cio-app #panelForm .p-field { font-size: 1.1rem; padding: 15px; border-radius: 12px; background: #151515; }
         }
 
         @media (max-width: 480px) {
