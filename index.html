@@ -696,11 +696,11 @@
         <div class="mobile-section-header">Estado de infraestructura</div>
         <div class="mobile-offline-grid">
             <div class="offline-widget">
-                <div class="offline-widget-title">Servicios Offline</div>
+                <div class="offline-widget-title" id="m-offline-services-title">Servicios Offline (0)</div>
                 <div id="m-nvr-list" class="offline-group"></div>
             </div>
             <div class="offline-widget">
-                <div class="offline-widget-title">Cámaras Offline</div>
+                <div class="offline-widget-title" id="m-offline-cameras-title">Cámaras Offline (0)</div>
                 <div id="m-cam-list" class="offline-group"></div>
             </div>
         </div>
@@ -1045,8 +1045,12 @@
             const tickerCam = document.getElementById('ticker-cameras');
             const mNvrList = document.getElementById('m-nvr-list');
             const mCamList = document.getElementById('m-cam-list');
+            const mOfflineServicesTitle = document.getElementById('m-offline-services-title');
+            const mOfflineCamerasTitle = document.getElementById('m-offline-cameras-title');
             
             let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "";
+            let offlineServicesCount = 0;
+            let cameraAffectedServicesCount = 0;
             
             if(dR) {
                 const loaded = [];
@@ -1067,6 +1071,7 @@
                     else unavailable.push({ service: name, reason: `offline desde ${offlineStamp.date} ${offlineStamp.time}` });
                     
                     if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
+                        cameraAffectedServicesCount++;
                         // LIMPIEZA TOTAL: Solo el contenido puro de Firebase
                         let cleanData = v.alerta_camaras.toUpperCase()
                                         .replace(id.toUpperCase(), "")
@@ -1084,7 +1089,7 @@
                                 <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Cámaras Offline</div>
+                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Cámaras Offline · ${offlineStamp.time}</div>
                                 </div>
                                 <div id="arr-cam${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
@@ -1097,6 +1102,7 @@
                     }
                     
                     if(v.estado === "offline") {
+                        offlineServicesCount++;
                         srvHtml += `<div class="capsula-off">${name}: Off</div>`;
                         nvrHtml += `
                         <div class="acc-wrapper">
@@ -1124,6 +1130,8 @@
             tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:0.85rem;">CÁMARAS: SIN INCIDENTES</span>`;
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
+            if (mOfflineServicesTitle) mOfflineServicesTitle.textContent = `Servicios Offline (${offlineServicesCount})`;
+            if (mOfflineCamerasTitle) mOfflineCamerasTitle.textContent = `Cámaras Offline (${cameraAffectedServicesCount})`;
             renderServiceInfoWidget();
             
         } catch(e) { console.error(e); }
