@@ -218,6 +218,127 @@
 
         @keyframes pulse-red { 0% { opacity: 0.1; } 50% { opacity: 1; } 100% { opacity: 0.1; } }
 
+        /* REFORMA VISUAL TV/PC (SOLO ESCRITORIO) */
+        @media (min-width: 769px) {
+            #cio-app {
+                background: radial-gradient(130% 120% at 50% 0%, #0c1416 0%, #050708 55%, #010203 100%) !important;
+            }
+
+            #cio-app .main-header {
+                height: 78px;
+                padding: 0 28px;
+                background: linear-gradient(180deg, rgba(7, 14, 15, 0.96), rgba(5, 9, 10, 0.92));
+                border-bottom: 1px solid rgba(0, 100, 101, 0.45);
+                box-shadow: 0 10px 32px rgba(0,0,0,0.35);
+            }
+
+            #cio-app .kpi-bar {
+                height: 92px;
+                min-height: 92px;
+                padding: 0 22px;
+                gap: 20px;
+                background: linear-gradient(180deg, rgba(5, 8, 9, 0.97), rgba(3, 6, 7, 0.9));
+                border-bottom: 1px solid rgba(0, 100, 101, 0.22);
+            }
+
+            #cio-app .kpi-card {
+                min-width: 180px;
+                padding: 8px 16px;
+                border-radius: 14px;
+                border: 1px solid rgba(255,255,255,0.05);
+                background: rgba(255,255,255,0.015);
+            }
+
+            #cio-app .kpi-value {
+                font-size: clamp(2.1rem, 2.9vw, 3rem);
+                letter-spacing: 0.5px;
+                text-shadow: 0 0 20px rgba(0, 209, 209, 0.14);
+            }
+
+            #cio-app .kpi-label {
+                font-size: 0.72rem;
+                letter-spacing: 1.8px;
+                opacity: 0.72;
+                margin-top: 5px;
+            }
+
+            #cio-app .puestos-container {
+                gap: 26px;
+                padding-left: 28px;
+                border-left: 1px solid rgba(255,255,255,0.08);
+            }
+
+            #cio-app .puesto-val {
+                font-size: clamp(2.3rem, 2.8vw, 3.4rem);
+                line-height: 1;
+                text-shadow: 0 0 18px rgba(46, 204, 113, 0.13);
+            }
+
+            #cio-app .puesto-lab {
+                font-size: 1.05rem;
+                opacity: 0.62;
+                letter-spacing: 0.7px;
+            }
+
+            #cio-app #display-board {
+                padding: 34px 54px;
+            }
+
+            #cio-app #titleDisplay {
+                font-size: clamp(46px, 5.8vw, 94px);
+                line-height: 0.92;
+                letter-spacing: 1.5px;
+                text-shadow: 0 12px 40px rgba(0,0,0,0.45);
+            }
+
+            #cio-app #messageDisplay {
+                font-size: clamp(24px, 2.2vw, 42px);
+                max-width: 88%;
+                line-height: 1.28;
+                opacity: 0.9;
+            }
+
+            #cio-app .area-tag {
+                font-size: 1.02rem;
+                letter-spacing: 10px;
+                margin-bottom: 20px;
+                text-shadow: 0 0 22px rgba(0, 209, 209, 0.24);
+            }
+
+            #cio-app #ticker-bar {
+                height: 72px;
+                padding: 8px 14px;
+                gap: 12px;
+                background: linear-gradient(180deg, rgba(4,7,8,0.96), rgba(1,3,4,0.96));
+                border-top: 1px solid rgba(0, 100, 101, 0.32);
+            }
+
+            #cio-app .ticker-section {
+                border: 1px solid rgba(0, 100, 101, 0.4);
+                border-radius: 14px;
+                background: rgba(5, 10, 11, 0.78);
+                box-shadow: inset 0 0 20px rgba(0, 209, 209, 0.05);
+            }
+
+            #cio-app .ticker-label {
+                left: 8px;
+                border: 1px solid rgba(0, 100, 101, 0.6);
+                font-size: 0.92rem;
+                padding: 4px 10px;
+                color: #00d1d1;
+                background: rgba(1, 7, 8, 0.9);
+                letter-spacing: 1px;
+            }
+
+            #cio-app .capsula-off {
+                padding: 7px 16px;
+                font-size: 0.86rem;
+                border-radius: 999px;
+                border-width: 1px;
+                background: rgba(70, 12, 12, 0.22);
+            }
+        }
+
         /* RESPONSIVE CELULAR */
         @media (max-width: 768px) {
             #cio-app {
