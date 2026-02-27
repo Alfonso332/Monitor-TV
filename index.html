@@ -450,19 +450,28 @@
                 position: fixed;
                 right: 14px;
                 bottom: calc(14px + env(safe-area-inset-bottom));
-                width: 44px;
-                height: 44px;
+                width: 46px;
+                height: 46px;
                 border-radius: 50%;
-                border: 1px solid rgba(0,209,209,0.35);
-                background: rgba(8, 12, 12, 0.96);
-                color: var(--accent);
-                font-size: 1.2rem;
+                border: 1px solid rgba(255,255,255,0.22);
+                background: #006465;
+                color: #ffffff;
+                font-size: 1.15rem;
                 font-weight: 900;
                 z-index: 10030;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+                opacity: 0;
+                transform: translateY(10px) scale(0.9);
+                pointer-events: none;
+                transition: opacity 0.25s ease, transform 0.25s ease;
+            }
+            #cio-app #scrollTopMobile.visible {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                pointer-events: auto;
             }
 
             #cio-app .service-check-modal { padding: 12px; }
@@ -818,11 +827,11 @@
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
                 if (prevSLA === null || sla === prevSLA) {
-                    currentArrow = '•';
-                    currentColor = 'var(--accent)';
+                    currentArrow = '';
+                    currentColor = 'transparent';
                 } else {
                     currentArrow = (sla < prevSLA) ? '▼' : '▲';
-                    currentColor = (sla < prevSLA) ? 'var(--critico)' : 'var(--online)';
+                    currentColor = (sla < prevSLA) ? '#ff4d4d' : '#2ecc71';
                 }
                 document.getElementById('v-sla').innerHTML = `${sla}% <span class="trend-arrow" style="color:${currentColor}">${currentArrow}</span>`;
                 document.getElementById('v-calls').textContent = dK.calls;
@@ -960,7 +969,14 @@
         textVal.style.color = color;
         textVal.textContent = val + "%";
         const trendEl = document.getElementById('m-sla-trend');
-        if (trendEl) trendEl.innerHTML = `<span class="trend-arrow" style="color:${currentColor}; font-size:1rem;">${currentArrow}</span>`;
+        if (trendEl) {
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            if (!isMobile || !currentArrow) {
+                trendEl.innerHTML = '';
+            } else {
+                trendEl.innerHTML = `<span class="trend-arrow" style="color:${currentColor}; font-size:1rem; font-weight:900;">${currentArrow}</span>`;
+            }
+        }
     }
 
     function renderPuestos(data) {
@@ -1082,6 +1098,21 @@
         document.getElementById('cio-overlay').style.display = 'none';
     }
 
+    function toggleScrollTopButton() {
+        const btn = document.getElementById('scrollTopMobile');
+        const panel = document.getElementById('panelMobileDash');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!btn) return;
+        if (!isMobile) {
+            btn.classList.remove('visible');
+            return;
+        }
+        const panelScroll = panel ? panel.scrollTop : 0;
+        const windowScroll = window.scrollY || 0;
+        const shouldShow = (panelScroll > 120 || windowScroll > 120);
+        btn.classList.toggle('visible', shouldShow);
+    }
+
     function scrollToTopMobile() {
         const panel = document.getElementById('panelMobileDash');
         if (panel) panel.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1173,10 +1204,16 @@
         if (shiftEl) shiftEl.textContent = shiftLabel;
     }
 
+    const panelMobileDash = document.getElementById('panelMobileDash');
+    if (panelMobileDash) panelMobileDash.addEventListener('scroll', toggleScrollTopButton, { passive: true });
+    window.addEventListener('scroll', toggleScrollTopButton, { passive: true });
+    window.addEventListener('resize', toggleScrollTopButton);
+
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
     syncData();
     setInterval(syncData, 30000);
+    toggleScrollTopButton();
 </script>
 </body>
 </html>
