@@ -1549,12 +1549,17 @@ Las alertas funcionan incluso si la pestaña está cerrada.</p>
             }
 
             const messagingInstance = window.messaging;
-            if (!messagingInstance || !window.firebaseApi || typeof window.firebaseApi.getToken !== 'function') {
+            const getToken = window.firebaseApi?.getToken;
+            if (!messagingInstance || typeof getToken !== 'function') {
                 if (statusEl) statusEl.textContent = 'No se encontró instancia de Firebase Messaging.';
                 return;
             }
 
-            const token = await window.firebaseApi.getToken(messagingInstance, { vapidKey: 'BEK6Sxqi5zaMCQ8d5_tPpMWCtRsPOXYPy0IIm-RVuheFezBH3dn5W1VHh5fFWTVljxGgFvY7hVhyIjaCvUlsP2s' });
+            const registration = await navigator.serviceWorker.ready;
+            const token = await getToken(messagingInstance, {
+                vapidKey: 'MI_VAPID_KEY',
+                serviceWorkerRegistration: registration
+            });
             if (!token) {
                 if (statusEl) statusEl.textContent = 'No se pudo obtener el token de notificación.';
                 return;
