@@ -180,6 +180,10 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.45);
         }
 
+        #cio-app #mobileClockInline {
+            display: none;
+        }
+
 
         /* CENTRO DE MANDO COMO VISTA PRINCIPAL ÚNICA */
         #cio-app #display-board,
@@ -245,6 +249,7 @@
                 background: radial-gradient(circle at top, #0d1718 0%, #050505 35%, #000 100%) !important;
             }
 
+            #cio-app .main-header,
             #cio-app .kpi-bar,
             #cio-app #ticker-bar,
             #cio-app .main-header .btn-pill,
@@ -291,6 +296,15 @@
                 white-space: nowrap;
                 color: var(--accent) !important;
                 letter-spacing: 0.3px;
+            }
+
+            #cio-app #mobileClockInline {
+                display: block;
+                margin-top: 6px;
+                font-size: 0.82rem;
+                font-weight: 700;
+                color: var(--accent);
+                letter-spacing: 1.2px;
             }
 
             #cio-app #panelMobileDash {
@@ -566,6 +580,7 @@
         <div style="text-align: center; margin-bottom: 25px;">
             <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900; margin: 0;">CENTRO DE MANDO</h2>
             <div id="shift-display" style="font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;">CARGANDO TURNO...</div>
+            <div id="mobileClockInline">00:00:00</div>
         </div>
         
         <div class="mobile-section-header">Performance Actual</div>
@@ -1220,13 +1235,14 @@
         const hour = now.getHours();
         const shiftLabel = getShiftLabelByHour(hour);
         const time24h = now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
         const clockEl = document.getElementById('clockDisplay');
-        if (clockEl) clockEl.textContent = isMobile ? `${time24h} · ${shiftLabel}` : time24h;
+        if (clockEl) clockEl.textContent = time24h;
 
         const shiftEl = document.getElementById('shift-display');
         if (shiftEl) shiftEl.textContent = shiftLabel;
+
+        const mobileClock = document.getElementById('mobileClockInline');
+        if (mobileClock) mobileClock.textContent = time24h;
     }
 
     const panelMobileDash = document.getElementById('panelMobileDash');
