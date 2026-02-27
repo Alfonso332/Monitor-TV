@@ -390,6 +390,41 @@
                 width: 86px;
                 height: 86px;
                 margin: 0 auto;
+                position: relative;
+            }
+            #cio-app .sla-circle-svg {
+                width: 100%;
+                height: 100%;
+                transform: rotate(-90deg);
+            }
+            #cio-app .sla-circle-bg,
+            #cio-app .sla-circle-bar {
+                fill: none;
+                stroke-width: 8;
+                stroke-linecap: round;
+                transition: stroke-dasharray 0.45s ease, stroke 0.3s ease;
+            }
+            #cio-app .sla-circle-bg {
+                stroke: #ff4d4d;
+                opacity: 0.9;
+            }
+            #cio-app .sla-circle-bar {
+                stroke: var(--online);
+            }
+            #cio-app .sla-text-overlay {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
+            #cio-app #m-sla-trend {
+                position: absolute;
+                right: 17px;
+                bottom: 15px;
+                line-height: 1;
+                pointer-events: none;
             }
 
             #cio-app .mobile-puestos-grid {
@@ -1068,19 +1103,24 @@
         const circle = document.getElementById('m-sla-circle');
         const textVal = document.getElementById('m-sla-val');
         const circ = 2 * Math.PI * 45;
-        circle.style.strokeDasharray = `${circ} ${circ}`;
-        circle.style.strokeDashoffset = circ - (val / 100) * circ;
-        let color = val >= 85 ? "#00ff88" : val >= 70 ? "var(--online)" : val >= 60 ? "var(--warning)" : "var(--critico)";
+        const safeVal = Math.max(0, Math.min(100, Number(val) || 0));
+        const covered = (safeVal / 100) * circ;
+
+        circle.style.strokeDasharray = `${covered} ${circ}`;
+
+        let color = safeVal >= 85 ? "#00ff88" : safeVal >= 70 ? "var(--online)" : safeVal >= 60 ? "var(--warning)" : "var(--critico)";
         circle.style.stroke = color;
         textVal.style.color = color;
-        textVal.textContent = val + "%";
+        textVal.textContent = `${safeVal}%`;
+
         const trendEl = document.getElementById('m-sla-trend');
         if (trendEl) {
             const isMobile = window.matchMedia('(max-width: 768px)').matches;
             if (!isMobile || !currentArrow) {
                 trendEl.innerHTML = '';
             } else {
-                trendEl.innerHTML = `<span class="trend-arrow" style="color:${currentColor}; font-size:1rem; font-weight:900;">${currentArrow}</span>`;
+                const trendClass = currentArrow === '▲' ? 'trend-up' : 'trend-down';
+                trendEl.innerHTML = `<span class="trend-arrow ${trendClass}" style="font-size:0.95rem; font-weight:900;">${currentArrow}</span>`;
             }
         }
     }
