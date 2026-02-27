@@ -207,6 +207,46 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.45);
         }
 
+        #cio-app .push-optin-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(8px);
+            z-index: 10200;
+        }
+        #cio-app .push-optin-modal.active { display: flex; }
+        #cio-app .push-optin-card {
+            width: min(94vw, 440px);
+            background: linear-gradient(180deg, #111819 0%, #090d0e 100%);
+            border: 1px solid rgba(0, 100, 101, 0.55);
+            border-radius: 18px;
+            padding: 18px 16px;
+            box-shadow: 0 18px 35px rgba(0,0,0,0.45);
+        }
+        #cio-app .push-optin-title {
+            color: #00d1d1;
+            font-size: 1.05rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        #cio-app .push-optin-text {
+            white-space: pre-line;
+            font-size: 0.78rem;
+            opacity: 0.88;
+            line-height: 1.45;
+            margin-bottom: 12px;
+        }
+        #cio-app #pushOptinStatus {
+            min-height: 18px;
+            margin-bottom: 8px;
+            font-size: 0.72rem;
+            color: #f1c40f;
+        }
+
         #cio-app #mobileClockInline {
             display: none;
         }
@@ -747,6 +787,23 @@
             <input id="serviceCheckInput" class="p-field" style="margin-bottom:10px;" placeholder="Ej: Admin_Libertador">
             <button onclick="checkServiceAvailability()" class="btn-pill" style="border-radius:10px; margin-bottom:8px;">Verificar</button>
             <div id="serviceCheckResult" style="font-size:0.78rem; min-height:28px;"></div>
+        </div>
+    </div>
+
+
+
+    <div id="pushOptinModal" class="push-optin-modal" aria-hidden="true">
+        <div class="push-optin-card" role="dialog" aria-modal="true" aria-labelledby="push-optin-title">
+            <h3 id="push-optin-title" class="push-optin-title">🚨 Activar alertas en vivo</h3>
+            <p class="push-optin-text">Este sistema puede enviarte notificaciones cuando:
+• Un servicio quede offline
+• Se detecte caída de cámaras
+• Ocurra una novedad crítica
+Las alertas funcionan incluso si la pestaña está cerrada.</p>
+            <input id="pushOperatorName" type="text" class="p-field" placeholder="Nombre del operador" style="margin-bottom:10px;">
+            <div id="pushOptinStatus"></div>
+            <button id="pushOptinActivate" class="btn-pill" style="margin-bottom:8px; border-radius:10px;">🔔 Activar notificaciones</button>
+            <button id="pushOptinLater" class="btn-pill btn-sec" style="border-radius:10px;">Ahora no</button>
         </div>
     </div>
 
@@ -1421,6 +1478,96 @@
         if (mobileClock) mobileClock.textContent = time24h;
     }
 
+
+    function openPushOptinModal() {
+        const modal = document.getElementById('pushOptinModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        const nameInput = document.getElementById('pushOperatorName');
+        if (nameInput) setTimeout(() => nameInput.focus(), 60);
+    }
+
+    function closePushOptinModal() {
+        const modal = document.getElementById('pushOptinModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function registerPushOperator() {
+        const nameInput = document.getElementById('pushOperatorName');
+        const statusEl = document.getElementById('pushOptinStatus');
+        const operatorName = (nameInput?.value || '').trim();
+
+        if (!operatorName) {
+            if (statusEl) statusEl.textContent = 'Ingresá el nombre del operador.';
+            return;
+        }
+
+        if (!('Notification' in window)) {
+            if (statusEl) statusEl.textContent = 'Este navegador no soporta notificaciones.';
+            return;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                if (statusEl) statusEl.textContent = 'Permiso de notificaciones denegado.';
+                return;
+            }
+
+            const messagingInstance = window.messaging || (window.firebase && typeof window.firebase.messaging === 'function' ? window.firebase.messaging() : null);
+            if (!messagingInstance || typeof messagingInstance.getToken !== 'function') {
+                if (statusEl) statusEl.textContent = 'No se encontró instancia de Firebase Messaging.';
+                return;
+            }
+
+            const token = await messagingInstance.getToken({ vapidKey: 'MI_VAPID_KEY' });
+            if (!token) {
+                if (statusEl) statusEl.textContent = 'No se pudo obtener el token de notificación.';
+                return;
+            }
+
+            const payload = {
+                nombre: operatorName,
+                fecha_registro: (window.firebase && window.firebase.database && window.firebase.database.ServerValue)
+                    ? window.firebase.database.ServerValue.TIMESTAMP
+                    : Date.now(),
+                userAgent: navigator.userAgent
+            };
+
+            if (window.firebase && window.firebase.database && typeof window.firebase.database === 'function') {
+                await window.firebase.database().ref(`tokens/${token}`).set(payload);
+            } else {
+                throw new Error('Firebase Database no disponible en window.firebase.database().');
+            }
+
+            localStorage.setItem('operatorRegistered', 'true');
+            closePushOptinModal();
+        } catch (err) {
+            console.error('Error registrando notificaciones push:', err);
+            if (statusEl) statusEl.textContent = 'Ocurrió un error al activar notificaciones.';
+        }
+    }
+
+    function initPushOptinModal() {
+        const activateBtn = document.getElementById('pushOptinActivate');
+        const laterBtn = document.getElementById('pushOptinLater');
+
+        if (activateBtn) activateBtn.addEventListener('click', registerPushOperator);
+        if (laterBtn) {
+            laterBtn.addEventListener('click', () => {
+                localStorage.setItem('operatorDismissed', 'true');
+                closePushOptinModal();
+            });
+        }
+
+        if (!localStorage.getItem('operatorRegistered')) {
+            openPushOptinModal();
+        }
+    }
+
     const panelMobileDash = document.getElementById('panelMobileDash');
     if (panelMobileDash) panelMobileDash.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('scroll', toggleScrollTopButton, { passive: true });
@@ -1428,6 +1575,7 @@
 
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
+    initPushOptinModal();
     syncData();
     setInterval(syncData, 30000);
     toggleScrollTopButton();
