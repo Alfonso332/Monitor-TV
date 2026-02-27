@@ -180,6 +180,31 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.45);
         }
 
+
+        /* CENTRO DE MANDO COMO VISTA PRINCIPAL ÚNICA */
+        #cio-app #display-board,
+        #cio-app .kpi-bar,
+        #cio-app #ticker-bar { display: none !important; }
+
+        #cio-app #panelMobileDash {
+            position: relative;
+            top: auto;
+            right: auto;
+            width: 100%;
+            height: auto;
+            transform: none !important;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+            padding: 16px 14px 92px;
+            z-index: 2;
+        }
+
+        #cio-app #panelHistory,
+        #cio-app #panelForm,
+        #cio-app #cio-overlay { display: none !important; }
+
         /* === MEJORAS CELULAR === */
 
         #cio-app .off-service-card {
