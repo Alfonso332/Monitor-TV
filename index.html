@@ -772,6 +772,8 @@
 
 
     function openServiceCheckModal() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
         const modal = document.getElementById('serviceCheckModal');
         if (!modal) return;
         modal.classList.add('active');
@@ -793,9 +795,14 @@
     }
 
     function checkServiceAvailability() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const input = document.getElementById('serviceCheckInput');
         const result = document.getElementById('serviceCheckResult');
         if (!input || !result) return;
+        if (!isMobile) {
+            result.innerHTML = '<span style="color:var(--warning);">La consulta de servicio está disponible solo en celulares.</span>';
+            return;
+        }
 
         const raw = (input.value || '').trim();
         if (!raw) {
@@ -805,7 +812,7 @@
 
         const normalizedQuery = normalizeServiceName(raw);
         const exactMatch = LOADED_SERVICES.find(svc => normalizeServiceName(svc) === normalizedQuery);
-        const similarMatches = LOADED_SERVICES.filter(svc => normalizeServiceName(svc).includes(normalizedQuery)).slice(0, 8);
+        const similarMatches = LOADED_SERVICES.filter(svc => normalizeServiceName(svc).includes(normalizedQuery));
 
         if (exactMatch) {
             const historyKey = normalizeServiceName(exactMatch);
