@@ -62,7 +62,7 @@
         /* PUESTOS PC */
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
-        #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
+        #cio-app .puesto-val { font-size: 1.6rem; font-weight: 900; font-family: monospace; }
         #cio-app .puesto-lab { font-size: 1.3rem; opacity: 0.5; font-weight: bold; }
 
         /* ÁREA CENTRAL */
@@ -118,7 +118,7 @@
             color: #00d1d1;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border: 3px solid #006465;
+            border: 4px solid #006465;
         }
 
         #cio-app .ticker-wrapper { 
@@ -439,6 +439,15 @@
                 min-height: 152px;
                 box-shadow: 0 10px 24px rgba(0,0,0,0.2);
             }
+            #cio-app .offline-widget.alert-pulse-dark {
+                border-color: rgba(255, 77, 77, 0.65);
+                background: linear-gradient(160deg, rgba(42, 10, 10, 0.95) 0%, rgba(24, 7, 7, 0.95) 100%);
+                animation: mobileOfflineAlertPulse 1.4s ease-in-out infinite;
+            }
+            @keyframes mobileOfflineAlertPulse {
+                0%, 100% { box-shadow: 0 10px 24px rgba(0,0,0,0.2), 0 0 0 rgba(130, 16, 16, 0.2); }
+                50% { box-shadow: 0 10px 24px rgba(0,0,0,0.25), 0 0 20px rgba(130, 16, 16, 0.55); }
+            }
             #cio-app .offline-widget-title {
                 font-size: 0.66rem;
                 text-transform: uppercase;
@@ -695,12 +704,12 @@
 
         <div class="mobile-section-header">Estado de infraestructura</div>
         <div class="mobile-offline-grid">
-            <div class="offline-widget">
-                <div class="offline-widget-title">Servicios Offline</div>
+            <div class="offline-widget" id="m-offline-services-widget">
+                <div class="offline-widget-title" id="m-offline-services-title">Servicios Offline (0)</div>
                 <div id="m-nvr-list" class="offline-group"></div>
             </div>
-            <div class="offline-widget">
-                <div class="offline-widget-title">Cámaras Offline</div>
+            <div class="offline-widget" id="m-offline-cameras-widget">
+                <div class="offline-widget-title" id="m-offline-cameras-title">Cámaras Offline (0)</div>
                 <div id="m-cam-list" class="offline-group"></div>
             </div>
         </div>
@@ -795,7 +804,7 @@
     let currentColor = "var(--online)";
     const SLIDE_DURATION = 45000;
     const LOADED_SERVICES = [
-        "21s","25 Sing","Admin Libertador","Agra Dorzan","Alamos de Carrasco2","Alamos de Carrasco1","Alhambra","Allegrezza","Alma Brava","Alma Corso","Alms Sing","Aloa","Alpha Place","Alpine","Altos Punta Carreta","Altos de Beldevere","Altos de Brasil","Altos de Pocitos","Altos del Shopping Pocitos","Andalucia","Aquum","ARCA Construcciones","Arcamar","Arcus","Argenta Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av al Parque","Avita Libertador","Avita Parque","Avita Vibra","Bage","Bahia Esmeralda","Baliñas","Barrio Pindó","Belle Place","Berkes","Berro","Biarritz Tower","Block 8 Octubre","Bloque Maldonado","Bomar 3","Born","Brisas Guana","Brusco","Cabo Bella Vista","Caleta del Golf","Canaro 1","Capri","Carmel","Casa de Pons","Cascada","Castell del Rey","Chapalco","Ciriacos Brasil","Complejo Terranova","Consorcio Chucarro","Del Sol","Deposito Leonardi","Doce76","Doclan 1","Domus","Doral Inn","Durandeau","Ebro","Edf Moon","Edif Agustine","Edif Albo Park","Edif Altair","Edif Bulevar","Edif Cap Camarat","Edif Capitello","Edif Carrera","Edif Catare","Edif Cenit","Edif Copacabana","Edif Diagonal","Edif Gala Pop","Edif Harbour Park","Edif Lift Universitat","Edif Marejada","Edif Maribor","Edif Murano","Edif Parque Miramar","Edif Pescador","Edif Planeta","Edif Preciado","Edif Sinja","Edif Solar de Verdi","Edif Uniq","Edif Via 21","Edif Villa Savoia","Edif Vivo Life","Edif la LLum","El Cabo","El Cardal","El Ceibo","El Entrevero","El Molino","El Pais","El Parque Montevideo","Emilio","Eray","Euskaro","Fab Pan de Azucar","Federico Core","First Tower","Fundacion Porsaleu","Galata","Gala Biarritz","Gala Point","Gala Trend","Galería London","Garibaldi Plaza","Giulianova","Godilco","Golf Montevideo","Golino","Greenport","Guaruja","Harbour Bay","Ibirapita","Inmobiliaria Pointer","Irlanda","Isla de las Gaviotas","Ixou Mirlo","Jaime Zudañez","Jambo","Jardines Buschental","Joyería Alianza","Kentaro","Kyoto","La Castellana","La Selva","La Strada","Lancaster","Lars Minas","Lars Rivera","Lazaro Gadea","Le Vieux Paris","Leon","Libertador","Lift Alpha","Lift EME","Lift Paulier","Los Caracoles","Los Olimpicos","Lugano","Luna del Lago","Luzarin","Mar Jonico","Marco Polo","Marcos","Marina de Biarritz","Maria Pita","MAS MIO","Maui","MBC","Met City","Met Tech","Mille Luci","Miramar","Moddo Cavia","Mon Reve","MVD 21","MVD 21 II","MySuit Hotel","Nariño","Necochea","New Park","Nobleza Naviera","Nostrum Malvin","Nostrum Malvin T2","Nostrum Plaza 2","Nuevos Vientos 1 y 2","Nuevos Vientos Biarritz","Nuevos Vientos Golf","Obra HEM","Obra Aprahamian","Obra Barcelona","Obra Ciclades","Obra Cumbre","Obra Garden","Obra HUB","Obra Ixou 21","Obra KIU Rodo","Obra Living Marina","Obra Mercedes","Obra Parking Prado","Obra Press Maua","Obra Randa","Obra Risco","Obra Roosvelt","Obra Torre Alba","Obra UpTown","Omikron","ONN be Hache Colonia","Palatino Flaminio","Palmas de Carrasco","Parma","Parque Esmeralda","Parque Mar","Paseo real","Patria","Patria Golf","Piaro","Playa Oriente","Playa Oriente II","Playas Bavaros","Plaza Libertad","Plaza San Marino","Pocitos","Puerta del Sol","Puerta del Sol 4","Puerto Nautilus","Puerto Pirata","Puerto Vallarta","Punta Brava","Punto Vazquez","Quorum","Rambla","Rambla Luz","Rapallo","Regulus","Renaissance","Residencial Artigas","Residencial Beverly","Residencial Dino","Residencial Malvin","Residencial Setiembre","Riazor","Rocamadour","Rubens","San Francisco","Sarmiento","Sea Side","Shafel","Sigma","Site Italia","Sky Polo","Skylon","Smart Point","Smart Point 2","Solanas del Prado","Solano Antuna","Solano Antuna 2725","Soleil Playa","Soriano","Spazio 4","Strada dei Giardinni","Sun Urquiza","Swing 23","Tempo Rambla","Terrazas de la Loma","The Life","Tiffany","Torre Independencia","Torre Modelo","Torre Plaza","Torre de las Américas","Torre de los Pocitos","Torres García","Toulouse","Tropicana","UCM","UP 1","Valmont","Ventura Tres Cruces","Verde Mora","Villa Romana","Villa di Fiori","Vivo Life Centro","Waterloo","Working Mitre","YES","YES plaza Varela","Ymaguare","Zafiro","Fendi","Vilago","Terraza del Buceo","Movistar las piedras","Movistar Pando"
+        "21s","25 Sing","Admin Libertador","Agra Dorzan","Alamos de Carrasco2","Alamos de Carrasco1","Alhambra","Allegrezza","Alma Brava","Alma Corso","Alms Sing","Aloa","Alpha Place","Alpine","Altos Punta Carreta","Altos de Beldevere","Altos de Brasil","Altos de Pocitos","Altos del Shopping","Andalucia","Aquum","ARCA Construcciones","Arcamar","Arcus","Argenta Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av al Parque","Avita Libertador","Avita Parque","Avita Vibra","Bage","Bahia Esmeralda","Baliñas","Barrio Pindó","Belle Place","Berkes","Berro","Biarritz Tower","Block 8 Octubre","Bloque Maldonado","Bomar 3","Born","Brisas Guana","Brusco","Cabo Bella Vista","Caleta del Golf","Canaro 1","Capri","Carmel","Casa de Pons","Cascada","Castell del Rey","Chapalco","Ciriacos Brasil","Complejo Terranova","Consorcio Chucarro","Del Sol","Deposito Leonardi","Doce76","Doclan 1","Domus","Doral Inn","Durandeau","Ebro","Edf Moon","Edif Agustine","Edif Albo Park","Edif Altair","Edif Bulevar","Edif Cap Camarat","Edif Capitello","Edif Carrera","Edif Catare","Edif Cenit","Edif Copacabana","Edif Diagonal","Edif Gala Pop","Edif Harbour Park","Edif Lift Universitat","Edif Marejada","Edif Maribor","Edif Murano","Edif Parque Miramar","Edif Pescador","Edif Planeta","Edif Preciado","Edif Sinja","Edif Solar de Verdi","Edif Uniq","Edif Via 21","Edif Villa Savoia","Edif Vivo Life","Edif la LLum","El Cabo","El Cardal","El Ceibo","El Entrevero","El Molino","El Pais","El Parque Montevideo","Emilio","Eray","Euskaro","Fab Pan de Azucar","Federico Core","First Tower","Fundacion Porsaleu","Galata","Gala Biarritz","Gala Point","Gala Trend","Galería London","Garibaldi Plaza","Giulianova","Godilco","Golf Montevideo","Golino","Greenport","Guaruja","Harbour Bay","Ibirapita","Inmobiliaria Pointer","Irlanda","Isla de las Gaviotas","Ixou Mirlo","Jaime Zudañez","Jambo","Jardines Buschental","Joyería Alianza","Kentaro","Kyoto","La Castellana","La Selva","La Strada","Lancaster","Lars Minas","Lars Rivera","Lazaro Gadea","Le Vieux Paris","Leon","Libertador","Lift Alpha","Lift EME","Lift Paulier","Los Caracoles","Los Olimpicos","Lugano","Luna del Lago","Luzarin","Mar Jonico","Marco Polo","Marcos","Marina de Biarritz","Maria Pita","MAS MIO","Maui","MBC","Met City","Met Tech","Mille Luci","Miramar","Moddo Cavia","Mon Reve","MVD 21","MVD 21 II","MySuit Hotel","Nariño","Necochea","New Park","Nobleza Naviera","Nostrum Malvin","Nostrum Malvin T2","Nostrum Plaza 2","Nuevos Vientos 1 y 2","Nuevos Vientos Biarritz","Nuevos Vientos Golf","Obra HEM","Obra Aprahamian","Obra Barcelona","Obra Ciclades","Obra Cumbre","Obra Garden","Obra HUB","Obra Ixou 21","Obra KIU Rodo","Obra Living Marina","Obra Mercedes","Obra Parking Prado","Obra Press Maua","Obra Randa","Obra Risco","Obra Roosvelt","Obra Torre Alba","Obra UpTown","Omikron","ONN be Hache Colonia","Palatino Flaminio","Palmas de Carrasco","Parma","Parque Esmeralda","Parque Mar","Paseo real","Patria","Patria Golf","Piaro","Playa Oriente","Playa Oriente II","Playas Bavaros","Plaza Libertad","Plaza San Marino","Pocitos","Puerta del Sol","Puerta del Sol 4","Puerto Nautilus","Puerto Pirata","Puerto Vallarta","Punta Brava","Punto Vazquez","Quorum","Rambla","Rambla Luz","Rapallo","Regulus","Renaissance","Residencial Artigas","Residencial Beverly","Residencial Dino","Residencial Malvin","Residencial Setiembre","Riazor","Rocamadour","Rubens","San Francisco","Sarmiento","Sea Side","Shafel","Sigma","Site Italia","Sky Polo","Skylon","Smart Point","Smart Point 2","Solanas del Prado","Solano Antuna","Solano Antuna 2725","Soleil Playa","Soriano","Spazio 4","Strada dei Giardinni","Sun Urquiza","Swing 23","Tempo Rambla","Terrazas de la Loma","The Life","Tiffany","Torre Independencia","Torre Modelo","Torre Plaza","Torre de las Américas","Torre de los Pocitos","Torres García","Toulouse","Tropicana","UCM","UP 1","Valmont","Ventura Tres Cruces","Verde Mora","Villa Romana","Villa di Fiori","Vivo Life Centro","Waterloo","Working Mitre","YES","YES plaza Varela","Ymaguare","Zafiro"
     ];
     const UNAVAILABLE_SERVICES_FIXED = [
         "Rincon del lago","Naciones Unidas","18 de diciembre","farmaco","Galielo","picasso","Palazzo Pitti","Exselsior","Arenal Grande","Ombu","Obra Ziel","Lazar","coopephi"
@@ -1045,8 +1054,14 @@
             const tickerCam = document.getElementById('ticker-cameras');
             const mNvrList = document.getElementById('m-nvr-list');
             const mCamList = document.getElementById('m-cam-list');
+            const mOfflineServicesTitle = document.getElementById('m-offline-services-title');
+            const mOfflineCamerasTitle = document.getElementById('m-offline-cameras-title');
+            const mOfflineServicesWidget = document.getElementById('m-offline-services-widget');
+            const mOfflineCamerasWidget = document.getElementById('m-offline-cameras-widget');
             
             let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "";
+            let offlineServicesCount = 0;
+            let cameraAffectedServicesCount = 0;
             
             if(dR) {
                 const loaded = [];
@@ -1067,6 +1082,7 @@
                     else unavailable.push({ service: name, reason: `offline desde ${offlineStamp.date} ${offlineStamp.time}` });
                     
                     if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
+                        cameraAffectedServicesCount++;
                         // LIMPIEZA TOTAL: Solo el contenido puro de Firebase
                         let cleanData = v.alerta_camaras.toUpperCase()
                                         .replace(id.toUpperCase(), "")
@@ -1084,7 +1100,7 @@
                                 <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Cámaras Offline</div>
+                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Cámaras Offline · ${offlineStamp.time}</div>
                                 </div>
                                 <div id="arr-cam${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
@@ -1097,6 +1113,7 @@
                     }
                     
                     if(v.estado === "offline") {
+                        offlineServicesCount++;
                         srvHtml += `<div class="capsula-off">${name}: Off</div>`;
                         nvrHtml += `
                         <div class="acc-wrapper">
@@ -1124,6 +1141,10 @@
             tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:0.85rem;">CÁMARAS: SIN INCIDENTES</span>`;
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
+            if (mOfflineServicesTitle) mOfflineServicesTitle.textContent = `Servicios Offline (${offlineServicesCount})`;
+            if (mOfflineCamerasTitle) mOfflineCamerasTitle.textContent = `Cámaras Offline (${cameraAffectedServicesCount})`;
+            if (mOfflineServicesWidget) mOfflineServicesWidget.classList.toggle('alert-pulse-dark', offlineServicesCount > 5);
+            if (mOfflineCamerasWidget) mOfflineCamerasWidget.classList.toggle('alert-pulse-dark', cameraAffectedServicesCount > 5);
             renderServiceInfoWidget();
             
         } catch(e) { console.error(e); }
