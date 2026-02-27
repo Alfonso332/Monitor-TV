@@ -173,7 +173,7 @@
         #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         #cio-app .trend-up { color: #2ecc71 !important; }
         #cio-app .trend-down { color: #ff4d4d !important; }
-        @keyframes arrowMove { from { transform: translateY(3px); } to { transform: translateY(-3px); } }
+        @keyframes arrowMove { from { transform: translateY(1px); } to { transform: translateY(-1px); } }
 
         #cio-app .history-card { 
             background: #111111 !important; 
@@ -685,6 +685,8 @@
             <div class="mobile-stat-box">
                 <div id="m-calls" style="font-size: 2.8rem; font-weight: 900; color: #fff;">0</div>
                 <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase;">Llamadas</div>
+                <div id="m-agents" style="margin-top:10px; font-size:1.2rem; font-weight:900; color:var(--accent);">0</div>
+                <div style="font-size: 0.58rem; opacity: 0.55; text-transform: uppercase; letter-spacing:0.8px;">Agentes activos</div>
             </div>
         </div>
 
@@ -746,6 +748,7 @@
             <div style="display:flex; gap:10px; margin:10px 0;">
                 <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
                 <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
+                <input type="number" id="in-agents" class="p-field" placeholder="Agentes activos">
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
@@ -995,7 +998,6 @@
 
 
     function getTrendArrowMarkup() {
-        if (!currentArrow) return '';
         const trendClass = currentArrow === '▲' ? 'trend-up' : 'trend-down';
         return `<span class="trend-arrow ${trendClass}" style="font-size:1rem; margin-left:6px;">${currentArrow}</span>`;
     }
@@ -1007,10 +1009,7 @@
             const dK = await rK.json();
             if(dK) {
                 const sla = parseFloat(dK.sla) || 0;
-                if (prevSLA === null || sla === prevSLA) {
-                    currentArrow = '';
-                    currentColor = 'transparent';
-                } else {
+                if (prevSLA !== null && sla !== prevSLA) {
                     currentArrow = (sla < prevSLA) ? '▼' : '▲';
                     currentColor = (sla < prevSLA) ? '#ff4d4d' : '#2ecc71';
                 }
@@ -1018,12 +1017,14 @@
                 document.getElementById('v-calls').textContent = dK.calls;
                 updateMobileSLA(sla);
                 document.getElementById('m-calls').textContent = dK.calls;
+                document.getElementById('m-agents').textContent = parseInt(dK.agents) || 0;
                 renderPuestos(dK.puestos);
                 prevSLA = sla;
                 
                 if(document.getElementById('panelHistory').classList.contains('active')) {
                      if(!document.getElementById('in-sla').value) document.getElementById('in-sla').value = dK.sla;
                      if(!document.getElementById('in-calls').value) document.getElementById('in-calls').value = dK.calls;
+                     if(!document.getElementById('in-agents').value) document.getElementById('in-agents').value = dK.agents || 0;
                      for(let i=1; i<=9; i++) {
                          let pInp = document.getElementById(`inp-p${i}`);
                          if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
@@ -1132,6 +1133,7 @@
         const kpiData = {
             sla: document.getElementById('in-sla').value || 0,
             calls: document.getElementById('in-calls').value || 0,
+            agents: document.getElementById('in-agents').value || 0,
             puestos: {}
         };
         for(let i=1; i<=9; i++) {
@@ -1160,7 +1162,7 @@
         const trendEl = document.getElementById('m-sla-trend');
         if (trendEl) {
             const isMobile = window.matchMedia('(max-width: 768px)').matches;
-            if (!isMobile || !currentArrow) {
+            if (!isMobile) {
                 trendEl.innerHTML = '';
             } else {
                 const trendClass = currentArrow === '▲' ? 'trend-up' : 'trend-down';
