@@ -75,10 +75,20 @@
             background: rgba(255,255,255,0.05);
             color: #d9ffff;
             line-height: 1.2;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        #cio-app .puesto-sla-chip-label { opacity: 0.82; }
+        #cio-app .puesto-sla-chip-value {
+            font-weight: 900;
+            color: var(--online);
         }
         #cio-app .puesto-sla-chip.low {
             border-color: rgba(255, 77, 77, 0.8);
             background: rgba(84, 15, 15, 0.7);
+        }
+        #cio-app .puesto-sla-chip.low .puesto-sla-chip-value {
             color: #ffd8d8;
             animation: puestoSlaPulse 1.25s ease-in-out infinite;
         }
@@ -760,9 +770,17 @@
             #cio-app.mobile-light #serviceInfoBox,
             #cio-app.mobile-light #serviceCheckResult,
             #cio-app.mobile-light #panelMobileDash .mobile-stat-box > div,
-            #cio-app.mobile-light .puesto-val {
+            #cio-app.mobile-light .puesto-val,
+            #cio-app.mobile-light .puesto-sla-chip,
+            #cio-app.mobile-light .puesto-sla-chip-label,
+            #cio-app.mobile-light .capsula-off,
+            #cio-app.mobile-light .service-card-title,
+            #cio-app.mobile-light .offline-item-name,
+            #cio-app.mobile-light .offline-item-meta {
                 color: #1d2f30 !important;
             }
+            #cio-app.mobile-light .puesto-sla-chip-value { color: #117d36 !important; }
+            #cio-app.mobile-light .puesto-sla-chip.low .puesto-sla-chip-value { color: #b42318 !important; }
             #cio-app.mobile-light .mobile-theme-toggle {
                 background: linear-gradient(160deg, rgba(245,245,245,0.95), rgba(225,225,225,0.95));
                 color: #111111;
@@ -924,7 +942,7 @@
                 <input type="number" id="in-agents" class="p-field" placeholder="Agentes activos">
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
-            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y SLA &lt;5s (%) por puesto.</div>
+            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y tiempo de respuesta &lt;5s por puesto.</div>
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
         </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
@@ -1041,8 +1059,14 @@
             <div style="background:#141414; border:1px solid #2a2a2a; border-radius:10px; padding:8px;">
                 <div style="font-size:0.6rem; opacity:0.72; margin-bottom:6px; text-align:center;">P${i}</div>
                 <input type="number" id="inp-p${i}" class="p-field" placeholder="Llamadas" style="margin-bottom:6px; padding:8px;">
-                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="SLA <5s %" style="margin-bottom:0; padding:8px;">
+                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="Tiempo (segundos)" style="margin-bottom:0; padding:8px;">
             </div>`;
+    }
+
+    function formatPuestoSeconds(value) {
+        const safeValue = Math.max(0, Number(value) || 0);
+        const trimmed = Number.isInteger(safeValue) ? safeValue : safeValue.toFixed(1);
+        return `${trimmed}s`;
     }
 
     function updateShift() {
@@ -1403,11 +1427,12 @@
         for(let i=1; i<=9; i++) {
             const v = parseInt(data[`p${i}`]) || 0;
             if(v > 0) {
-                const puestoSla = Math.max(0, Math.min(100, Number(slaData[`p${i}`]) || 0));
+                const puestoSlaSeconds = Math.max(0, Number(slaData[`p${i}`]) || 0);
                 let color = (maxVal === minVal || v === maxVal) ? "var(--online)" : v === minVal ? "var(--critico)" : "var(--warning)";
                 const lowClass = (isDesktop && maxVal !== minVal && v === minVal) ? ' puesto-item-lowest' : '';
-                const slaLowClass = puestoSla < 5 ? ' low' : '';
-                html += `<div class="puesto-item${lowClass}"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span><span class="puesto-sla-chip${slaLowClass}">SLA&lt;5s ${puestoSla}%</span></div>`;
+                const slaLowClass = puestoSlaSeconds > 5 ? ' low' : '';
+                const actualValue = puestoSlaSeconds <= 5 ? `&lt;${formatPuestoSeconds(puestoSlaSeconds)}` : formatPuestoSeconds(puestoSlaSeconds);
+                html += `<div class="puesto-item${lowClass}"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span><span class="puesto-sla-chip${slaLowClass}"><span class="puesto-sla-chip-label">&lt;5s</span><span class="puesto-sla-chip-value">${actualValue}</span></span></div>`;
             }
         }
         pcCont.innerHTML = html;
