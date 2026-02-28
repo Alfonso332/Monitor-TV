@@ -7,26 +7,42 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCKR5EpLkks03M3aVFf5_UPRg0vXdLAUh0",
-  authDomain: "monitor-tv-3745c.firebaseapp.com",
-  databaseURL: "https://monitor-tv-3745c-default-rtdb.firebaseio.com",
-  projectId: "monitor-tv-3745c",
-  storageBucket: "monitor-tv-3745c.firebasestorage.app",
-  messagingSenderId: "636551515459",
-  appId: "1:636551515459:web:4edbfe729783f7daa533f6"
-};
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getDatabase, ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-messaging.js";
 
-firebase.initializeApp(firebaseConfig);
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKR5EpLkks03M3aVFf5_UPRg0vXdLAUh0",
+            authDomain: "monitor-tv-3745c.firebaseapp.com",
+            databaseURL: "https://monitor-tv-3745c-default-rtdb.firebaseio.com",
+            projectId: "monitor-tv-3745c",
+            storageBucket: "monitor-tv-3745c.firebasestorage.app",
+            messagingSenderId: "636551515459",
+            appId: "1:636551515459:web:4edbfe729783f7daa533f6"
+        };
 
-const messaging = firebase.messaging();
-window.messaging = messaging;
-</script>
+        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const messaging = getMessaging(app);
+
+        window.messaging = messaging;
+        window.firebaseApi = { database, ref, set, serverTimestamp, getToken };
+
+        if ('serviceWorker' in navigator) {
+            window.firebaseSwRegistrationPromise = new Promise((resolve, reject) => {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/Monitor-TV/firebase-messaging-sw.js')
+                        .then(resolve)
+                        .catch((err) => {
+                            console.error('Error registrando firebase-messaging-sw.js:', err);
+                            reject(err);
+                        });
+                });
+            });
+        }
+    </script>
 
     <style>
         /* === ESTRUCTURA Y RESET === */
@@ -1537,13 +1553,19 @@ Las alertas funcionan incluso si la pestaña está cerrada.</p>
                 return;
             }
 
-            const messagingInstance = window.messaging || (window.firebase && typeof window.firebase.messaging === 'function' ? window.firebase.messaging() : null);
-            if (!messagingInstance || typeof messagingInstance.getToken !== 'function') {
+            const getToken = window.firebaseApi?.getToken;
+            if (!window.messaging || typeof getToken !== 'function') {
                 if (statusEl) statusEl.textContent = 'No se encontró instancia de Firebase Messaging.';
                 return;
             }
 
-            const token = await messagingInstance.getToken({ vapidKey: 'BEK6Sxqi5zaMCQ8d5_tPpMWCtRsPOXYPy0IIm-RVuheFezBH3dn5W1VHh5fFWTVljxGgFvY7hVhyIjaCvUlsP2s' });
+            const registration = window.firebaseSwRegistrationPromise
+                ? await window.firebaseSwRegistrationPromise
+                : await navigator.serviceWorker.ready;
+            const token = await getToken(window.messaging, {
+                vapidKey: "BEK6Sxqi5zaMCQ8d5_tPpMWCtRsPOXYPy0IIm-RVuheFezBH3dn5W1VHh5fFWTVljxGgFvY7hVhyIjaCvUlsP2s",
+                serviceWorkerRegistration: registration
+            });
             if (!token) {
                 if (statusEl) statusEl.textContent = 'No se pudo obtener el token de notificación.';
                 return;
@@ -1551,17 +1573,11 @@ Las alertas funcionan incluso si la pestaña está cerrada.</p>
 
             const payload = {
                 nombre: operatorName,
-                fecha_registro: (window.firebase && window.firebase.database && window.firebase.database.ServerValue)
-                    ? window.firebase.database.ServerValue.TIMESTAMP
-                    : Date.now(),
+                fecha_registro: window.firebaseApi.serverTimestamp(),
                 userAgent: navigator.userAgent
             };
 
-            if (window.firebase && window.firebase.database && typeof window.firebase.database === 'function') {
-                await window.firebase.database().ref(`tokens/${token}`).set(payload);
-            } else {
-                throw new Error('Firebase Database no disponible en window.firebase.database().');
-            }
+            await window.firebaseApi.set(window.firebaseApi.ref(window.firebaseApi.database, `tokens/${token}`), payload);
 
             localStorage.setItem('operatorRegistered', 'true');
             closePushOptinModal();
@@ -1602,5 +1618,4 @@ Las alertas funcionan incluso si la pestaña está cerrada.</p>
 </script>
 </body>
 </html>
-
 
