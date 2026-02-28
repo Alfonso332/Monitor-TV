@@ -336,34 +336,46 @@
 
         #cio-app .service-offline-alert {
             position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%) scale(0.95);
-            min-width: min(86vw, 680px);
-            max-width: 88vw;
-            background: linear-gradient(170deg, rgba(66, 9, 9, 0.98), rgba(20, 5, 5, 0.98));
-            border: 1px solid rgba(255, 77, 77, 0.9);
-            border-radius: 20px;
-            padding: 16px 18px;
+            left: 0;
+            right: 0;
+            top: 168px;
+            bottom: 88px;
             z-index: 10170;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            background: radial-gradient(140% 120% at 50% 50%, rgba(179, 0, 0, 0.92) 0%, rgba(122, 0, 0, 0.96) 45%, rgba(52, 0, 0, 0.99) 100%);
             opacity: 0;
             pointer-events: none;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.15);
             transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+        }
+        #cio-app:fullscreen .service-offline-alert,
+        #cio-app:-webkit-full-screen .service-offline-alert {
+            top: 98px;
+        }
+        #cio-app .service-offline-alert-card {
+            width: min(92vw, 980px);
+            border: 1px solid #ff7a7a;
+            border-radius: 24px;
+            padding: 26px 28px;
+            background: linear-gradient(170deg, rgba(179, 0, 0, 0.95) 0%, rgba(122, 0, 0, 0.92) 100%);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.25);
+            transform: scale(0.95);
         }
         #cio-app .service-offline-alert.active {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
             animation: offlineAlertPulse 1s ease-in-out infinite;
         }
+        #cio-app .service-offline-alert.active .service-offline-alert-card { transform: scale(1); }
         #cio-app .service-offline-alert.exiting {
             opacity: 0.16;
-            transform: translate(-50%, 38vh) scale(0.84);
+            transform: translateY(46vh) scale(0.9);
             filter: blur(2px);
             animation: none;
         }
         #cio-app .service-offline-alert .alert-title {
-            font-size: 0.82rem;
+            font-size: 1rem;
             letter-spacing: 1.4px;
             text-transform: uppercase;
             color: #ffb6b6;
@@ -371,7 +383,7 @@
             font-weight: 900;
         }
         #cio-app .service-offline-alert .alert-service {
-            font-size: clamp(24px, 3.5vw, 42px);
+            font-size: clamp(30px, 4.8vw, 62px);
             font-weight: 900;
             color: #ffffff;
             line-height: 1.05;
@@ -379,14 +391,14 @@
         }
         #cio-app .service-offline-alert .alert-sub {
             margin-top: 5px;
-            font-size: 0.84rem;
+            font-size: 0.95rem;
             color: #ffd6d6;
             opacity: 0.9;
             letter-spacing: 0.4px;
         }
         @keyframes offlineAlertPulse {
             0%, 100% { box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.15); }
-            50% { box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 26px rgba(255,77,77,0.5); }
+            50% { box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 38px rgba(255,77,77,0.65); }
         }
 
         #cio-app #mobileClockInline {
@@ -694,9 +706,9 @@
             }
             #cio-app .sla-circle-bg {
                 stroke: #ff4d4d;
-                opacity: 0.9;
+                opacity: 0.95;
             }
-            #cio-app .sla-circle-bar { stroke: var(--online); }
+            #cio-app .sla-circle-bar { stroke: #00d66d; }
             #cio-app .sla-text-overlay {
                 position: absolute;
                 inset: 0;
@@ -1094,9 +1106,11 @@
     </div>
 
     <div id="serviceOfflineAlert" class="service-offline-alert" aria-live="assertive" aria-hidden="true">
-        <div class="alert-title">Alerta de servicio</div>
-        <div class="alert-service" id="serviceOfflineAlertName">SERVICIO OFFLINE</div>
-        <div class="alert-sub">El estado cambió a offline. Revisá detalle en ticker y panel.</div>
+        <div class="service-offline-alert-card">
+            <div class="alert-title">Alerta de servicio</div>
+            <div class="alert-service" id="serviceOfflineAlertName">SERVICIO OFFLINE</div>
+            <div class="alert-sub">El estado cambió a offline. Revisá detalle en ticker y panel.</div>
+        </div>
     </div>
 
     <div id="ticker-bar">
@@ -1625,7 +1639,7 @@
                 offlineAlertRunning = false;
                 runOfflineServiceAlertQueue();
             }, 900);
-        }, 7000);
+        }, 10000);
     }
 
 
@@ -1869,15 +1883,18 @@
     function updateMobileSLA(val) {
         const circle = document.getElementById('m-sla-circle');
         const textVal = document.getElementById('m-sla-val');
+        if (!circle || !textVal) return;
         const circ = 2 * Math.PI * 45;
         const safeVal = Math.max(0, Math.min(100, Number(val) || 0));
         const covered = (safeVal / 100) * circ;
+        const remaining = Math.max(circ - covered, 0);
 
-        circle.style.strokeDasharray = `${covered} ${circ}`;
+        circle.style.strokeDasharray = `${covered} ${remaining}`;
+        circle.style.strokeDashoffset = '0';
 
-        let color = safeVal >= 85 ? "#00ff88" : safeVal >= 70 ? "var(--online)" : safeVal >= 60 ? "var(--warning)" : "var(--critico)";
-        circle.style.stroke = color;
-        textVal.style.color = color;
+        const fillColor = '#00d66d';
+        circle.style.stroke = fillColor;
+        textVal.style.color = fillColor;
         textVal.textContent = `${safeVal}%`;
 
         const trendEl = document.getElementById('m-sla-trend');
