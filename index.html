@@ -2309,9 +2309,20 @@
     setMobileSectionFilter(currentMobileFilter);
     toggleScrollTopButton();
 </script>
+<div id="push-consent-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:1000001;padding:16px;">
+    <div style="width:min(520px,96vw);background:#071112;border:1px solid #1d6667;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:20px;color:#fff;">
+        <h3 style="font-size:1.1rem;margin-bottom:10px;color:#7ef8f9;">Notificaciones en vivo</h3>
+        <p style="font-size:.92rem;line-height:1.45;opacity:.92;margin-bottom:14px;">¿Quieres recibir alertas en vivo cuando haya servicios offline, cámaras fuera de línea o novedades críticas?</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+            <button id="push-consent-later" style="padding:10px 14px;border-radius:10px;border:1px solid #3c4545;background:#131717;color:#ddd;cursor:pointer;">Ahora no</button>
+            <button id="push-consent-allow" style="padding:10px 14px;border-radius:10px;border:1px solid #00d1d1;background:#00d1d1;color:#001717;font-weight:700;cursor:pointer;">Sí, activar</button>
+        </div>
+    </div>
+</div>
 <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
     import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging.js';
+    import { getDatabase, ref, set, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js';
 
     const firebaseConfig = {
         apiKey: 'AIzaSyCKR5EpLkks03M3aVFf5_UPRg0vXdLAUh0',
@@ -2322,8 +2333,43 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
     const messaging = getMessaging(app);
     const vapidKey = 'BIUdD6_38OQioheMsywxZBEn-foJmOXS5L4O3vCKQOGwy5GuTV4JElnOiNxvz9xlbT5IOKm0_CVULORY9abxvZI';
+    const PUSH_MODAL_KEY = 'push_consent_modal_dismissed_v1';
+
+    const pushModalEl = document.getElementById('push-consent-modal');
+    const pushLaterBtn = document.getElementById('push-consent-later');
+    const pushAllowBtn = document.getElementById('push-consent-allow');
+
+    function openPushConsentModal() {
+        if (!pushModalEl) return;
+        pushModalEl.style.display = 'flex';
+    }
+
+    function closePushConsentModal() {
+        if (!pushModalEl) return;
+        pushModalEl.style.display = 'none';
+    }
+
+    async function saveFcmToken(token) {
+        try {
+            await set(ref(db, `fcm_tokens/${token}`), {
+                token,
+                updatedAt: serverTimestamp(),
+                userAgent: navigator.userAgent || 'unknown',
+                language: navigator.language || 'es',
+                alerts: {
+                    offlineServices: true,
+                    offlineCameras: true,
+                    criticalNews: true
+                }
+            });
+            console.log('Token guardado en RTDB para envíos push.');
+        } catch (error) {
+            console.error('No se pudo guardar el token en RTDB:', error);
+        }
+    }
 
     async function solicitarPermisoYToken() {
         try {
@@ -2343,6 +2389,7 @@
 
             if (token) {
                 console.log('MI_TOKEN:', token);
+                await saveFcmToken(token);
             } else {
                 console.log('No se pudo obtener un token de registro de FCM.');
             }
@@ -2358,7 +2405,22 @@
         alert(`${title}\n${body}`.trim());
     });
 
-    solicitarPermisoYToken();
+    pushAllowBtn?.addEventListener('click', async () => {
+        closePushConsentModal();
+        localStorage.setItem(PUSH_MODAL_KEY, 'granted');
+        await solicitarPermisoYToken();
+    });
+
+    pushLaterBtn?.addEventListener('click', () => {
+        closePushConsentModal();
+        localStorage.setItem(PUSH_MODAL_KEY, 'later');
+    });
+
+    if (Notification.permission === 'granted') {
+        solicitarPermisoYToken();
+    } else if (Notification.permission === 'default' && localStorage.getItem(PUSH_MODAL_KEY) !== 'later') {
+        setTimeout(openPushConsentModal, 1500);
+    }
 </script>
 </body>
 </html>
