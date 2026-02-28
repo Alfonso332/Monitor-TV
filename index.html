@@ -1883,16 +1883,21 @@
     function updateMobileSLA(val) {
         const circle = document.getElementById('m-sla-circle');
         const textVal = document.getElementById('m-sla-val');
+        const bgCircle = document.querySelector('#panelMobileDash .sla-circle-bg');
         if (!circle || !textVal) return;
         const circ = 2 * Math.PI * 45;
         const safeVal = Math.max(0, Math.min(100, Number(val) || 0));
         const covered = (safeVal / 100) * circ;
         const remaining = Math.max(circ - covered, 0);
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
         circle.style.strokeDasharray = `${covered} ${remaining}`;
         circle.style.strokeDashoffset = '0';
 
-        const fillColor = '#00d66d';
+        const fillColor = isMobile
+            ? '#00d66d'
+            : safeVal >= 85 ? '#00ff88' : safeVal >= 70 ? 'var(--online)' : safeVal >= 60 ? 'var(--warning)' : 'var(--critico)';
+        if (bgCircle && isMobile) bgCircle.style.stroke = '#ff3b30';
         circle.style.stroke = fillColor;
         textVal.style.color = fillColor;
         textVal.textContent = `${safeVal}%`;
