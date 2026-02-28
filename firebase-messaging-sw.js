@@ -1,5 +1,5 @@
-importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.10.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.10.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyCKR5EpLkks03M3aVFf5_UPRg0vXdLAUh0",
@@ -13,19 +13,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  const notificationTitle = payload?.notification?.title || 'Monitor TV';
+messaging.onBackgroundMessage(function(payload) {
+  const notificationTitle = payload.notification?.title || "Monitor TV";
   const notificationOptions = {
-    body: payload?.notification?.body || 'Nueva alerta recibida.',
-    icon: payload?.notification?.icon || '/favicon.ico',
-    data: payload?.data || {}
+    body: payload.notification?.body || "Nueva alerta operativa.",
+    icon: "/favicon.ico"
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const targetUrl = event.notification?.data?.click_action || '/';
-  event.waitUntil(clients.openWindow(targetUrl));
 });
