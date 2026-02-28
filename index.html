@@ -146,26 +146,29 @@
         }
         #cio-app .ticker-label {
             position: absolute;
-            left: 8px;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 0;
+            top: 0;
+            bottom: 0;
             z-index: 10;
-            min-width: 130px;
+            width: 158px;
             text-align: center;
-            background: linear-gradient(180deg, rgba(12,34,35,0.98), rgba(7,21,22,0.98));
-            padding: 11px 12px;
-            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0b2f30;
+            padding: 0 12px;
+            border-radius: 0;
             font-size: 0.98rem;
             font-weight: 900;
             color: #7ef8f9;
             text-transform: uppercase;
             letter-spacing: 1.4px;
-            border: 1px solid rgba(0, 209, 209, 0.42);
-            box-shadow: 0 8px 14px rgba(0,0,0,0.28);
+            border-right: 2px solid #1d6667;
+            box-shadow: inset -1px 0 0 rgba(255,255,255,0.08);
         }
         #cio-app .ticker-section:nth-child(2) .ticker-label {
-            background: linear-gradient(180deg, rgba(48,33,13,0.95), rgba(27,19,8,0.95));
-            border-color: rgba(230, 166, 52, 0.45);
+            background: #4b3210;
+            border-right-color: #a06f23;
             color: #ffd68a;
         }
 
@@ -177,7 +180,7 @@
             position: absolute;
             left: 0;
             animation: scroll-ticker 26s linear infinite;
-            padding-left: 154px;
+            padding-left: 172px;
             padding-right: 24px;
             min-width: 100%;
         }
@@ -226,7 +229,7 @@
         }
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
 
-        #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
+        #cio-app #progressLine { position: fixed; bottom: 96px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
         #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         #cio-app .trend-up { color: #2ecc71 !important; }
@@ -340,14 +343,23 @@
 
         @media (min-width: 769px) {
             #cio-app .kpi-bar {
+                align-items: center;
+                min-height: 84px;
+                height: 84px;
                 padding-top: 6px;
                 padding-bottom: 6px;
             }
             #cio-app .puestos-container {
                 height: auto;
                 min-height: 100%;
-                align-items: center;
+                align-items: flex-end;
+                padding-top: 0;
+                padding-bottom: 2px;
             }
+            #cio-app .puesto-item { transform: none; }
+            #cio-app .puesto-val { font-size: 1.1rem; }
+            #cio-app .puesto-lab { font-size: 0.75rem; }
+            #cio-app .puesto-sla-chip { font-size: 0.54rem; margin-top: 2px; }
             #cio-app .puesto-item-lowest {
                 background: rgba(90, 0, 0, 0.36);
                 border: 1px solid rgba(255, 77, 77, 0.5);
