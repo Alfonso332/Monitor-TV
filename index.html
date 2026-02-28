@@ -226,7 +226,7 @@
         }
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
 
-        #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
+        #cio-app #progressLine { position: fixed; bottom: 96px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
         #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         #cio-app .trend-up { color: #2ecc71 !important; }
@@ -340,14 +340,17 @@
 
         @media (min-width: 769px) {
             #cio-app .kpi-bar {
-                padding-top: 6px;
-                padding-bottom: 6px;
+                align-items: flex-end;
+                padding-top: 4px;
+                padding-bottom: 10px;
             }
             #cio-app .puestos-container {
                 height: auto;
                 min-height: 100%;
-                align-items: center;
+                align-items: flex-end;
+                padding-top: 6px;
             }
+            #cio-app .puesto-item { transform: translateY(3px); }
             #cio-app .puesto-item-lowest {
                 background: rgba(90, 0, 0, 0.36);
                 border: 1px solid rgba(255, 77, 77, 0.5);
