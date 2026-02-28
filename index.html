@@ -673,12 +673,73 @@
             }
 
             #cio-app .service-check-modal { padding: 12px; }
-            #cio-app .service-check-card {
-                width: 100%;
-                max-width: 370px;
-                border-radius: 18px;
-                border: 1px solid rgba(0,100,101,0.45);
-                background: linear-gradient(180deg, #111819 0%, #080d0e 100%);
+            #cio-app .mobile-theme-toggle {
+                margin-top: 11px;
+                border: 1px solid rgba(255,255,255,0.24);
+                background: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+                color: #111;
+                border-radius: 999px;
+                padding: 7px 14px;
+                font-size: 0.74rem;
+                font-weight: 900;
+                letter-spacing: 0.5px;
+                box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            #cio-app.mobile-light {
+                background: #BFBFBF !important;
+                color: #111111 !important;
+            }
+            #cio-app.mobile-light #panelMobileDash > div:first-child,
+            #cio-app.mobile-light .mobile-stat-box,
+            #cio-app.mobile-light .mobile-puestos-grid,
+            #cio-app.mobile-light .offline-widget,
+            #cio-app.mobile-light #historyMobileWindow,
+            #cio-app.mobile-light .service-widget,
+            #cio-app.mobile-light .service-grid-card,
+            #cio-app.mobile-light .off-service-card,
+            #cio-app.mobile-light .generic-details,
+            #cio-app.mobile-light #panelMobileDash .btn-pill,
+            #cio-app.mobile-light #panelMobileDash .service-widget-toggle {
+                background: linear-gradient(160deg, rgba(255,255,255,0.95), rgba(234,234,234,0.95)) !important;
+                border-color: rgba(0,0,0,0.18) !important;
+                color: #111111 !important;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+            }
+            #cio-app.mobile-light #historyMobileWindow .history-card {
+                background: linear-gradient(155deg, rgba(255,255,255,0.98), rgba(236,236,236,0.97)) !important;
+                color: #111111 !important;
+            }
+            #cio-app.mobile-light #historyMobileWindow::before,
+            #cio-app.mobile-light .offline-widget-title,
+            #cio-app.mobile-light .mobile-section-header,
+            #cio-app.mobile-light #mobileClockInline,
+            #cio-app.mobile-light #shift-display {
+                color: #222222 !important;
+            }
+            #cio-app.mobile-light .mobile-section-header::after {
+                background: linear-gradient(90deg, rgba(0,0,0,0.5), rgba(0,0,0,0.1));
+            }
+            #cio-app.mobile-light .history-empty {
+                border-color: rgba(0,0,0,0.25) !important;
+                color: #222 !important;
+                background: rgba(255,255,255,0.45) !important;
+            }
+            #cio-app.mobile-light .off-service-card .detail-value,
+            #cio-app.mobile-light .detail-row,
+            #cio-app.mobile-light .service-grid,
+            #cio-app.mobile-light #serviceInfoBox,
+            #cio-app.mobile-light #serviceCheckResult {
+                color: #111 !important;
+            }
+            #cio-app.mobile-light .mobile-theme-toggle {
+                background: linear-gradient(160deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+                color: #f1f1f1;
+                border-color: rgba(0,0,0,0.35);
             }
         }
 
@@ -750,6 +811,7 @@
             <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900; margin: 0;">CENTRO DE MANDO</h2>
             <div id="shift-display" style="font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;">CARGANDO TURNO...</div>
             <div id="mobileClockInline">00:00:00</div>
+            <button id="mobileThemeToggle" class="mobile-theme-toggle" onclick="toggleMobileTheme()" aria-label="Cambiar modo visual móvil">☾ Oscuro</button>
         </div>
         
         <div class="mobile-section-header">Performance Actual</div>
@@ -1517,6 +1579,31 @@
         if (mobileClock) mobileClock.textContent = time24h;
     }
 
+    const MOBILE_THEME_KEY = 'cio-mobile-theme';
+
+    function applyMobileTheme(mode) {
+        const app = document.getElementById('cio-app');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const toggleBtn = document.getElementById('mobileThemeToggle');
+        if (!app) return;
+
+        const effectiveMode = (mode === 'light' && isMobile) ? 'light' : 'dark';
+        app.classList.toggle('mobile-light', effectiveMode === 'light');
+
+        if (toggleBtn) {
+            toggleBtn.textContent = effectiveMode === 'light' ? '☀ Claro' : '☾ Oscuro';
+            toggleBtn.setAttribute('aria-label', effectiveMode === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+        }
+    }
+
+    function toggleMobileTheme() {
+        const app = document.getElementById('cio-app');
+        if (!app) return;
+        const nextMode = app.classList.contains('mobile-light') ? 'dark' : 'light';
+        localStorage.setItem(MOBILE_THEME_KEY, nextMode);
+        applyMobileTheme(nextMode);
+    }
+
     const serviceCheckModalEl = document.getElementById('serviceCheckModal');
     if (serviceCheckModalEl) {
         serviceCheckModalEl.addEventListener('click', (event) => {
@@ -1534,6 +1621,12 @@
     if (panelMobileDash) panelMobileDash.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('resize', toggleScrollTopButton);
+
+    applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
+
+    window.addEventListener('resize', () => {
+        applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
+    });
 
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
