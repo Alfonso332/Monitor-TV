@@ -364,22 +364,29 @@
         @media (min-width: 769px) {
             #cio-app .kpi-bar {
                 align-items: center;
-                min-height: 84px;
-                height: 84px;
+                min-height: 98px;
+                height: 98px;
                 padding-top: 6px;
-                padding-bottom: 6px;
+                padding-bottom: 8px;
             }
             #cio-app .puestos-container {
                 height: auto;
                 min-height: 100%;
                 align-items: flex-end;
                 padding-top: 0;
-                padding-bottom: 2px;
+                padding-bottom: 4px;
             }
-            #cio-app .puesto-item { transform: none; }
-            #cio-app .puesto-val { font-size: 1.1rem; }
-            #cio-app .puesto-lab { font-size: 0.75rem; }
-            #cio-app .puesto-sla-chip { font-size: 0.54rem; margin-top: 2px; }
+            #cio-app .puesto-item {
+                transform: none;
+                min-width: 84px;
+                padding: 6px 8px;
+                border-radius: 12px;
+                border: 1px solid rgba(255,255,255,0.12);
+                background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            }
+            #cio-app .puesto-val { font-size: 1.45rem; }
+            #cio-app .puesto-lab { font-size: 0.95rem; }
+            #cio-app .puesto-sla-chip { font-size: 0.72rem; margin-top: 4px; padding: 3px 8px; }
             #cio-app .puesto-item-lowest {
                 background: rgba(90, 0, 0, 0.36);
                 border: 1px solid rgba(255, 77, 77, 0.5);
