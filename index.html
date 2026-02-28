@@ -501,6 +501,43 @@
                 box-shadow: 0 8px 16px rgba(0,0,0,0.24);
             }
             #cio-app .mobile-filter-target.hidden-by-filter { display: none !important; }
+            #cio-app.mobile-focus-ops .mobile-stat-container {
+                grid-template-columns: 1fr;
+            }
+            #cio-app.mobile-focus-ops .mobile-puestos-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            #cio-app.mobile-focus-infra .mobile-offline-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            #cio-app.mobile-focus-infra .offline-widget {
+                min-height: 210px;
+            }
+            #cio-app.mobile-focus-infra .offline-group {
+                max-height: 42vh;
+                overflow-y: auto;
+                padding-right: 4px;
+            }
+            #cio-app.mobile-focus-news #historyMobileWindow {
+                max-height: 58vh;
+                overflow-y: auto;
+                padding-right: 4px;
+            }
+            #cio-app.mobile-focus-news #historyMobileSlide {
+                transition: none;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            #cio-app.mobile-focus-news #historyMobileSlide.oculto {
+                opacity: 1;
+                transform: none;
+                filter: none;
+            }
+            #cio-app.mobile-focus-news #historyMobileWindow .history-card {
+                margin-bottom: 0 !important;
+            }
             #cio-app .mobile-section-header::after {
                 content: "";
                 flex: 1;
@@ -963,7 +1000,7 @@
         <div class="mobile-filter-bar mobile-only-section" id="mobileFilterBar">
             <button class="mobile-filter-chip active" data-filter="all" onclick="setMobileSectionFilter('all')">Todo</button>
             <button class="mobile-filter-chip" data-filter="ops" onclick="setMobileSectionFilter('ops')">Operación</button>
-            <button class="mobile-filter-chip" data-filter="infra" onclick="setMobileSectionFilter('infra')">Infra</button>
+            <button class="mobile-filter-chip" data-filter="infra" onclick="setMobileSectionFilter('infra')">Servicios</button>
             <button class="mobile-filter-chip" data-filter="news" onclick="setMobileSectionFilter('news')">Novedades</button>
         </div>
 
@@ -1604,6 +1641,50 @@
         mobileHistoryIdx = (mobileHistoryIdx + 1) % cio_logs.length;
     }
 
+    function renderMobileHistoryFullList() {
+        const slideEl = document.getElementById('historyMobileSlide');
+        if (!slideEl) return;
+
+        if (!cio_logs.length) {
+            slideEl.innerHTML = '<div class="history-empty">Sin novedades recientes por el momento.</div>';
+            return;
+        }
+
+        const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
+        slideEl.innerHTML = cio_logs.map((item) => {
+            const color = colors[item.priority] || "var(--accent)";
+            return `
+            <div class="history-card" style="border-left-color:${color} !important; margin-bottom:0 !important;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
+                    <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
+                </div>
+                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px;">${item.title}</div>
+                <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
+            </div>`;
+        }).join('');
+    }
+
+    function syncMobileHistoryMode() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) {
+            if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
+            mobileHistoryTimer = null;
+            return;
+        }
+
+        if (currentMobileFilter === 'news') {
+            if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
+            mobileHistoryTimer = null;
+            renderMobileHistoryFullList();
+            return;
+        }
+
+        renderMobileHistorySlide();
+        if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
+        mobileHistoryTimer = cio_logs.length ? setInterval(renderMobileHistorySlide, 20000) : null;
+    }
+
     function renderHistory() {
         const historyHtml = cio_logs.map((it, i) => {
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
@@ -1626,15 +1707,7 @@
         const historyDesktop = document.getElementById('historyList');
         if (historyDesktop) historyDesktop.innerHTML = historyHtml;
 
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        if (isMobile) {
-            renderMobileHistorySlide();
-            if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
-            mobileHistoryTimer = cio_logs.length ? setInterval(renderMobileHistorySlide, 20000) : null;
-        } else if (mobileHistoryTimer) {
-            clearInterval(mobileHistoryTimer);
-            mobileHistoryTimer = null;
-        }
+        syncMobileHistoryMode();
     }
 
     function openPanel(id) {
@@ -1792,6 +1865,7 @@
     function setMobileSectionFilter(filterKey = 'all') {
         currentMobileFilter = filterKey;
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const app = document.getElementById('cio-app');
         const chips = document.querySelectorAll('#mobileFilterBar .mobile-filter-chip');
         const targets = document.querySelectorAll('.mobile-filter-target[data-mobile-group]');
         if (!chips.length || !targets.length) return;
@@ -1799,8 +1873,15 @@
         chips.forEach(chip => chip.classList.toggle('active', chip.dataset.filter === filterKey));
 
         if (!isMobile || filterKey === 'all') {
+            if (app) app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news');
             targets.forEach(node => node.classList.remove('hidden-by-filter'));
+            syncMobileHistoryMode();
             return;
+        }
+
+        if (app) {
+            app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news');
+            app.classList.add(`mobile-focus-${filterKey}`);
         }
 
         const visibleGroups = {
@@ -1812,6 +1893,7 @@
         targets.forEach(node => {
             node.classList.toggle('hidden-by-filter', !allowed.includes(node.dataset.mobileGroup));
         });
+        syncMobileHistoryMode();
     }
 
     const serviceCheckModalEl = document.getElementById('serviceCheckModal');
