@@ -336,16 +336,23 @@
 
         #cio-app .service-offline-alert {
             position: fixed;
-            inset: 0;
+            left: 0;
+            right: 0;
+            top: 168px;
+            bottom: 88px;
             z-index: 10170;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 18px;
             background: radial-gradient(140% 120% at 50% 50%, rgba(179, 0, 0, 0.92) 0%, rgba(122, 0, 0, 0.96) 45%, rgba(52, 0, 0, 0.99) 100%);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+        }
+        #cio-app:fullscreen .service-offline-alert,
+        #cio-app:-webkit-full-screen .service-offline-alert {
+            top: 98px;
         }
         #cio-app .service-offline-alert-card {
             width: min(92vw, 980px);
