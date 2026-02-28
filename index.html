@@ -64,6 +64,28 @@
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
         #cio-app .puesto-val { font-size: 1.4rem; font-weight: 900; font-family: monospace; }
         #cio-app .puesto-lab { font-size: 1.4rem; opacity: 0.5; font-weight: bold; }
+        #cio-app .puesto-sla-chip {
+            margin-top: 4px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.05);
+            color: #d9ffff;
+            line-height: 1.2;
+        }
+        #cio-app .puesto-sla-chip.low {
+            border-color: rgba(255, 77, 77, 0.8);
+            background: rgba(84, 15, 15, 0.7);
+            color: #ffd8d8;
+            animation: puestoSlaPulse 1.25s ease-in-out infinite;
+        }
+        @keyframes puestoSlaPulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(255, 77, 77, 0.2); }
+            50% { box-shadow: 0 0 16px rgba(255, 77, 77, 0.45); }
+        }
 
         /* ÁREA CENTRAL */
         #cio-app #display-board { 
@@ -205,6 +227,43 @@
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+        }
+
+        #cio-app .sync-indicator {
+            position: fixed;
+            top: 84px;
+            right: 14px;
+            z-index: 10140;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            color: #d5ffff;
+            background: rgba(8, 21, 22, 0.92);
+            border: 1px solid rgba(0, 209, 209, 0.35);
+            border-radius: 999px;
+            padding: 7px 11px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        #cio-app .sync-indicator.active { opacity: 1; transform: translateY(0); }
+        #cio-app .sync-indicator-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 14px var(--accent);
+            animation: syncPulse 0.95s ease-in-out infinite;
+        }
+        @keyframes syncPulse {
+            0%, 100% { opacity: 0.35; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.08); }
         }
 
         #cio-app #mobileClockInline {
@@ -356,14 +415,19 @@
                 margin-bottom: 14px;
             }
             #cio-app .mobile-stat-box {
-                background: linear-gradient(160deg, #12191a 0%, #0a0f10 100%);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 20px;
-                padding: 14px 12px;
-                min-height: 130px;
+                background: linear-gradient(145deg, rgba(22, 37, 40, 0.94) 0%, rgba(8, 14, 16, 0.98) 100%);
+                border: 1px solid rgba(115, 255, 255, 0.18);
+                border-radius: 22px;
+                padding: 16px 14px;
+                min-height: 136px;
                 text-align: center;
                 overflow: hidden;
-                box-shadow: 0 12px 26px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.05);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                box-shadow: 0 18px 36px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.09);
             }
 
             #cio-app .sla-circle-container {
@@ -408,36 +472,40 @@
             #cio-app .mobile-puestos-grid {
                 display: grid;
                 grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 8px;
-                background: linear-gradient(160deg, #111819 0%, #090d0e 100%);
-                border: 1px solid rgba(255,255,255,0.09);
-                border-radius: 20px;
-                padding: 12px;
-                box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+                gap: 10px;
+                background: linear-gradient(145deg, rgba(20, 36, 38, 0.95) 0%, rgba(6, 11, 12, 0.98) 100%);
+                border: 1px solid rgba(115, 255, 255, 0.16);
+                border-radius: 24px;
+                padding: 14px;
+                box-shadow: 0 16px 36px rgba(0,0,0,0.3);
             }
             #cio-app .puesto-item {
                 gap: 4px;
-                padding: 8px 4px;
-                border-radius: 12px;
-                border: 1px solid rgba(255,255,255,0.07);
-                background: rgba(255,255,255,0.03);
+                padding: 10px 6px;
+                border-radius: 14px;
+                border: 1px solid rgba(255,255,255,0.1);
+                background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+                text-align: center;
+                align-items: center;
+                justify-content: center;
             }
             #cio-app .puesto-val { font-size: 1.45rem !important; }
             #cio-app .puesto-lab { font-size: 0.65rem !important; }
+            #cio-app .puesto-sla-chip { font-size: 0.58rem; padding: 2px 5px; margin-top: 3px; }
 
             #cio-app .mobile-offline-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-                margin-top: 8px;
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin-top: 10px;
             }
             #cio-app .offline-widget {
-                background: linear-gradient(160deg, #111819 0%, #090d0e 100%);
-                border: 1px solid rgba(255,255,255,0.09);
-                border-radius: 20px;
-                padding: 10px;
-                min-height: 152px;
-                box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+                background: linear-gradient(145deg, rgba(22, 34, 36, 0.95) 0%, rgba(8, 12, 14, 0.99) 100%);
+                border: 1px solid rgba(115, 255, 255, 0.14);
+                border-radius: 22px;
+                padding: 12px;
+                min-height: 170px;
+                box-shadow: 0 16px 34px rgba(0,0,0,0.28);
             }
             #cio-app .offline-widget.alert-pulse-dark {
                 border-color: rgba(255, 77, 77, 0.65);
@@ -449,74 +517,97 @@
                 50% { box-shadow: 0 10px 24px rgba(0,0,0,0.25), 0 0 20px rgba(130, 16, 16, 0.55); }
             }
             #cio-app .offline-widget-title {
-                font-size: 0.66rem;
+                font-size: 0.68rem;
                 text-transform: uppercase;
-                letter-spacing: 1.2px;
-                color: #006465;
-                margin-bottom: 8px;
-                font-weight: 800;
+                letter-spacing: 1.35px;
+                color: #7df2f2;
+                margin-bottom: 10px;
+                font-weight: 900;
+                text-align: center;
             }
             #cio-app .offline-widget .offline-group { max-height: 126px; overflow: auto; }
 
             #cio-app .off-service-card {
-                border-radius: 12px;
-                padding: 10px;
-                gap: 8px;
-                border: 1px solid rgba(255,255,255,0.08);
-                background: rgba(255,255,255,0.025);
-                margin-bottom: 6px;
+                border-radius: 14px;
+                padding: 11px 12px;
+                gap: 10px;
+                border: 1px solid rgba(255,255,255,0.12);
+                background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+                margin-bottom: 8px;
+                align-items: center;
+            }
+            #cio-app .off-service-card > div:nth-child(2) {
+                text-align: center;
             }
             #cio-app .off-service-card .detail-value { font-size: 0.78rem; }
             #cio-app .generic-details {
-                background: #0b0f10;
-                border-color: rgba(255,255,255,0.08);
-                border-bottom-left-radius: 10px;
-                border-bottom-right-radius: 10px;
-                padding-left: 10px;
-                padding-right: 10px;
+                background: linear-gradient(180deg, rgba(12,19,20,0.98), rgba(7,11,12,0.98));
+                border-color: rgba(115, 255, 255, 0.14);
+                border-bottom-left-radius: 12px;
+                border-bottom-right-radius: 12px;
+                padding-left: 12px;
+                padding-right: 12px;
             }
 
             #cio-app #historyMobileWindow {
-                background: linear-gradient(170deg, #11191a 0%, #090d0e 100%);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 20px;
-                padding: 12px;
+                background: linear-gradient(145deg, rgba(18, 34, 36, 0.95) 0%, rgba(7, 13, 14, 0.98) 100%);
+                border: 1px solid rgba(115, 255, 255, 0.16);
+                border-radius: 24px;
+                padding: 14px;
                 max-height: min(42vh, 330px);
                 overflow-y: auto;
-                box-shadow: 0 14px 30px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.06);
+                box-shadow: 0 18px 36px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08);
             }
             #cio-app #historyMobileWindow::before {
                 content: "MODO VISTA";
                 display: block;
-                font-size: 0.58rem;
-                letter-spacing: 2.2px;
-                color: #7a7a7a;
-                margin-bottom: 8px;
+                font-size: 0.6rem;
+                letter-spacing: 2.4px;
+                color: rgba(160, 255, 255, 0.72);
+                margin-bottom: 10px;
+                text-align: center;
             }
             #cio-app #historyMobileSlide { transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease; }
             #cio-app #historyMobileSlide.oculto { opacity: 0; transform: translateY(6px) scale(0.985); filter: blur(4px); }
             #cio-app #historyMobileWindow .history-card {
-                border-radius: 16px !important;
+                border-radius: 18px !important;
                 margin-bottom: 0 !important;
                 padding: 14px !important;
-                background: radial-gradient(circle at top, #161f20 0%, #0d1213 100%) !important;
-                border-left-width: 4px !important;
+                background: linear-gradient(155deg, rgba(23, 39, 41, 0.96), rgba(9, 13, 14, 0.98)) !important;
+                border-left-width: 3px !important;
+                box-shadow: 0 16px 30px rgba(0,0,0,0.3);
+            }
+            #cio-app #historyMobileWindow .history-card > div:first-child {
+                margin-bottom: 7px !important;
+                padding-bottom: 6px;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            #cio-app #historyMobileWindow .history-empty {
+                border: 1px dashed rgba(0, 209, 209, 0.32);
+                border-radius: 14px;
+                padding: 16px 12px;
+                text-align: center;
+                font-size: 0.74rem;
+                letter-spacing: 0.4px;
+                color: rgba(227, 255, 255, 0.78);
+                background: rgba(255,255,255,0.02);
             }
 
             #cio-app .service-widget {
-                border: 1px solid rgba(255,255,255,0.1);
-                background: linear-gradient(160deg, #121a1b 0%, #0a0f10 100%);
-                border-radius: 20px;
-                padding: 12px;
+                border: 1px solid rgba(115, 255, 255, 0.16);
+                background: linear-gradient(145deg, rgba(21, 37, 39, 0.95) 0%, rgba(8, 13, 15, 0.98) 100%);
+                border-radius: 24px;
+                padding: 14px;
                 margin-top: 12px;
-                box-shadow: 0 14px 30px rgba(0,0,0,0.22);
+                box-shadow: 0 18px 36px rgba(0,0,0,0.3);
             }
             #cio-app .service-widget-header {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                gap: 8px;
-                margin-bottom: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 12px;
             }
             #cio-app .service-widget-toggle {
                 border: 1px solid rgba(255,255,255,0.18);
@@ -532,6 +623,8 @@
             #cio-app .service-widget-actions {
                 display: flex;
                 gap: 8px;
+                justify-content: center;
+                width: 100%;
             }
 
             #cio-app #panelMobileDash h2,
@@ -566,11 +659,12 @@
                 gap: 10px;
             }
             #cio-app .service-grid-card {
-                background: rgba(255,255,255,0.03);
-                border: 1px solid rgba(255,255,255,0.08);
-                border-radius: 14px;
-                padding: 10px;
+                background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+                border: 1px solid rgba(255,255,255,0.12);
+                border-radius: 16px;
+                padding: 12px;
                 min-height: 120px;
+                text-align: center;
             }
 
             #cio-app #scrollTopMobile {
@@ -602,12 +696,77 @@
             }
 
             #cio-app .service-check-modal { padding: 12px; }
-            #cio-app .service-check-card {
-                width: 100%;
-                max-width: 370px;
-                border-radius: 18px;
-                border: 1px solid rgba(0,100,101,0.45);
-                background: linear-gradient(180deg, #111819 0%, #080d0e 100%);
+            #cio-app .mobile-theme-toggle {
+                margin-top: 11px;
+                border: 1px solid rgba(255,255,255,0.24);
+                background: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+                color: #111;
+                border-radius: 999px;
+                padding: 7px 14px;
+                font-size: 0.74rem;
+                font-weight: 900;
+                letter-spacing: 0.5px;
+                box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            #cio-app.mobile-light {
+                background: #BFBFBF !important;
+                color: #111111 !important;
+            }
+            #cio-app.mobile-light #panelMobileDash > div:first-child,
+            #cio-app.mobile-light .mobile-stat-box,
+            #cio-app.mobile-light .mobile-puestos-grid,
+            #cio-app.mobile-light .offline-widget,
+            #cio-app.mobile-light #historyMobileWindow,
+            #cio-app.mobile-light .service-widget,
+            #cio-app.mobile-light .service-grid-card,
+            #cio-app.mobile-light .off-service-card,
+            #cio-app.mobile-light .generic-details,
+            #cio-app.mobile-light #panelMobileDash .btn-pill,
+            #cio-app.mobile-light #panelMobileDash .service-widget-toggle {
+                background: linear-gradient(160deg, rgba(246,246,246,0.95), rgba(222,222,222,0.95)) !important;
+                border-color: rgba(0,73,74,0.22) !important;
+                color: #1a2c2d !important;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.08) !important;
+            }
+            #cio-app.mobile-light #historyMobileWindow .history-card {
+                background: linear-gradient(155deg, rgba(248,248,248,0.98), rgba(228,228,228,0.97)) !important;
+                color: #1a2c2d !important;
+            }
+            #cio-app.mobile-light #panelMobileDash h2,
+            #cio-app.mobile-light #historyMobileWindow::before,
+            #cio-app.mobile-light .offline-widget-title,
+            #cio-app.mobile-light .mobile-section-header,
+            #cio-app.mobile-light #mobileClockInline,
+            #cio-app.mobile-light #shift-display,
+            #cio-app.mobile-light .puesto-lab {
+                color: #0d5758 !important;
+            }
+            #cio-app.mobile-light .mobile-section-header::after {
+                background: linear-gradient(90deg, rgba(13,87,88,0.55), rgba(13,87,88,0.1));
+            }
+            #cio-app.mobile-light .history-empty {
+                border-color: rgba(0,0,0,0.25) !important;
+                color: #222 !important;
+                background: rgba(255,255,255,0.45) !important;
+            }
+            #cio-app.mobile-light .off-service-card .detail-value,
+            #cio-app.mobile-light .detail-row,
+            #cio-app.mobile-light .service-grid,
+            #cio-app.mobile-light #serviceInfoBox,
+            #cio-app.mobile-light #serviceCheckResult,
+            #cio-app.mobile-light #panelMobileDash .mobile-stat-box > div,
+            #cio-app.mobile-light .puesto-val {
+                color: #1d2f30 !important;
+            }
+            #cio-app.mobile-light .mobile-theme-toggle {
+                background: linear-gradient(160deg, rgba(245,245,245,0.95), rgba(225,225,225,0.95));
+                color: #111111;
+                border-color: rgba(0,0,0,0.24);
             }
         }
 
@@ -658,6 +817,10 @@
     </main>
 
     <div id="progressLine"></div>
+    <div id="syncIndicator" class="sync-indicator" aria-live="polite" aria-hidden="true">
+        <span class="sync-indicator-dot"></span>
+        <span>Sincronizando datos...</span>
+    </div>
 
     <div id="ticker-bar">
         <div class="ticker-section">
@@ -675,6 +838,7 @@
             <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900; margin: 0;">CENTRO DE MANDO</h2>
             <div id="shift-display" style="font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;">CARGANDO TURNO...</div>
             <div id="mobileClockInline">00:00:00</div>
+            <button id="mobileThemeToggle" class="mobile-theme-toggle" onclick="toggleMobileTheme()" aria-label="Cambiar modo visual móvil">☾ Oscuro</button>
         </div>
         
         <div class="mobile-section-header">Performance Actual</div>
@@ -760,6 +924,7 @@
                 <input type="number" id="in-agents" class="p-field" placeholder="Agentes activos">
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
+            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y SLA &lt;5s (%) por puesto.</div>
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
         </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
@@ -802,6 +967,8 @@
     let prevSLA = null;
     let currentArrow = "▲";
     let currentColor = "var(--online)";
+    let syncInProgress = false;
+    let puestoSlaData = {};
     const SLIDE_DURATION = 45000;
     const LOADED_SERVICES = [
         "21s","25 Sing","Admin Libertador","Agra Dorzan","Alamos de Carrasco2","Alamos de Carrasco1","Alhambra","Allegrezza","Alma Brava","Alma Corso","Alms Sing","Aloa","Alpha Place","Alpine","Altos Punta Carreta","Altos de Beldevere","Altos de Brasil","Altos de Pocitos","Altos del Shopping","Andalucia","Aquum","ARCA Construcciones","Arcamar","Arcus","Argenta Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av al Parque","Avita Libertador","Avita Parque","Avita Vibra","Bage","Bahia Esmeralda","Baliñas","Barrio Pindó","Belle Place","Berkes","Berro","Biarritz Tower","Block 8 Octubre","Bloque Maldonado","Bomar 3","Born","Brisas Guana","Brusco","Cabo Bella Vista","Caleta del Golf","Canaro 1","Capri","Carmel","Casa de Pons","Cascada","Castell del Rey","Chapalco","Ciriacos Brasil","Complejo Terranova","Consorcio Chucarro","Del Sol","Deposito Leonardi","Doce76","Doclan 1","Domus","Doral Inn","Durandeau","Ebro","Edf Moon","Edif Agustine","Edif Albo Park","Edif Altair","Edif Bulevar","Edif Cap Camarat","Edif Capitello","Edif Carrera","Edif Catare","Edif Cenit","Edif Copacabana","Edif Diagonal","Edif Gala Pop","Edif Harbour Park","Edif Lift Universitat","Edif Marejada","Edif Maribor","Edif Murano","Edif Parque Miramar","Edif Pescador","Edif Planeta","Edif Preciado","Edif Sinja","Edif Solar de Verdi","Edif Uniq","Edif Via 21","Edif Villa Savoia","Edif Vivo Life","Edif la LLum","El Cabo","El Cardal","El Ceibo","El Entrevero","El Molino","El Pais","El Parque Montevideo","Emilio","Eray","Euskaro","Fab Pan de Azucar","Federico Core","First Tower","Fundacion Porsaleu","Galata","Gala Biarritz","Gala Point","Gala Trend","Galería London","Garibaldi Plaza","Giulianova","Godilco","Golf Montevideo","Golino","Greenport","Guaruja","Harbour Bay","Ibirapita","Inmobiliaria Pointer","Irlanda","Isla de las Gaviotas","Ixou Mirlo","Jaime Zudañez","Jambo","Jardines Buschental","Joyería Alianza","Kentaro","Kyoto","La Castellana","La Selva","La Strada","Lancaster","Lars Minas","Lars Rivera","Lazaro Gadea","Le Vieux Paris","Leon","Libertador","Lift Alpha","Lift EME","Lift Paulier","Los Caracoles","Los Olimpicos","Lugano","Luna del Lago","Luzarin","Mar Jonico","Marco Polo","Marcos","Marina de Biarritz","Maria Pita","MAS MIO","Maui","MBC","Met City","Met Tech","Mille Luci","Miramar","Moddo Cavia","Mon Reve","MVD 21","MVD 21 II","MySuit Hotel","Nariño","Necochea","New Park","Nobleza Naviera","Nostrum Malvin","Nostrum Malvin T2","Nostrum Plaza 2","Nuevos Vientos 1 y 2","Nuevos Vientos Biarritz","Nuevos Vientos Golf","Obra HEM","Obra Aprahamian","Obra Barcelona","Obra Ciclades","Obra Cumbre","Obra Garden","Obra HUB","Obra Ixou 21","Obra KIU Rodo","Obra Living Marina","Obra Mercedes","Obra Parking Prado","Obra Press Maua","Obra Randa","Obra Risco","Obra Roosvelt","Obra Torre Alba","Obra UpTown","Omikron","ONN be Hache Colonia","Palatino Flaminio","Palmas de Carrasco","Parma","Parque Esmeralda","Parque Mar","Paseo real","Patria","Patria Golf","Piaro","Playa Oriente","Playa Oriente II","Playas Bavaros","Plaza Libertad","Plaza San Marino","Pocitos","Puerta del Sol","Puerta del Sol 4","Puerto Nautilus","Puerto Pirata","Puerto Vallarta","Punta Brava","Punto Vazquez","Quorum","Rambla","Rambla Luz","Rapallo","Regulus","Renaissance","Residencial Artigas","Residencial Beverly","Residencial Dino","Residencial Malvin","Residencial Setiembre","Riazor","Rocamadour","Rubens","San Francisco","Sarmiento","Sea Side","Shafel","Sigma","Site Italia","Sky Polo","Skylon","Smart Point","Smart Point 2","Solanas del Prado","Solano Antuna","Solano Antuna 2725","Soleil Playa","Soriano","Spazio 4","Strada dei Giardinni","Sun Urquiza","Swing 23","Tempo Rambla","Terrazas de la Loma","The Life","Tiffany","Torre Independencia","Torre Modelo","Torre Plaza","Torre de las Américas","Torre de los Pocitos","Torres García","Toulouse","Tropicana","UCM","UP 1","Valmont","Ventura Tres Cruces","Verde Mora","Villa Romana","Villa di Fiori","Vivo Life Centro","Waterloo","Working Mitre","YES","YES plaza Varela","Ymaguare","Zafiro"
@@ -869,7 +1036,14 @@
     });
 
     const pGrid = document.getElementById('p-inputs-grid');
-    for(let i=1; i<=9; i++) pGrid.innerHTML += `<input type="number" id="inp-p${i}" class="p-field" placeholder="P${i}" style="margin-bottom:5px; padding:8px;">`;
+    for(let i=1; i<=9; i++) {
+        pGrid.innerHTML += `
+            <div style="background:#141414; border:1px solid #2a2a2a; border-radius:10px; padding:8px;">
+                <div style="font-size:0.6rem; opacity:0.72; margin-bottom:6px; text-align:center;">P${i}</div>
+                <input type="number" id="inp-p${i}" class="p-field" placeholder="Llamadas" style="margin-bottom:6px; padding:8px;">
+                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="SLA <5s %" style="margin-bottom:0; padding:8px;">
+            </div>`;
+    }
 
     function updateShift() {
         const hour = new Date().getHours();
@@ -950,6 +1124,13 @@
         modal.setAttribute('aria-hidden', 'true');
     }
 
+    function setSyncIndicator(visible) {
+        const indicator = document.getElementById('syncIndicator');
+        if (!indicator) return;
+        indicator.classList.toggle('active', visible);
+        indicator.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    }
+
 
     function selectSimilarService(serviceName) {
         const input = document.getElementById('serviceCheckInput');
@@ -1012,6 +1193,9 @@
     }
 
     async function syncData() {
+        if (syncInProgress) return;
+        syncInProgress = true;
+        setSyncIndicator(true);
         try {
             updateShift();
             const rK = await fetch(KPI_URL);
@@ -1027,7 +1211,8 @@
                 updateMobileSLA(sla);
                 document.getElementById('m-calls').textContent = dK.calls;
                 document.getElementById('m-agents').textContent = parseInt(dK.agents) || 0;
-                renderPuestos(dK.puestos);
+                puestoSlaData = dK.puestosSla || dK.puestos_sla || {};
+                renderPuestos(dK.puestos, puestoSlaData);
                 prevSLA = sla;
                 
                 if(document.getElementById('panelHistory').classList.contains('active')) {
@@ -1037,6 +1222,8 @@
                      for(let i=1; i<=9; i++) {
                          let pInp = document.getElementById(`inp-p${i}`);
                          if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
+                         let slaInp = document.getElementById(`inp-sla-p${i}`);
+                         if(slaInp && !slaInp.value) slaInp.value = puestoSlaData[`p${i}`] || 0;
                      }
                 }
             }
@@ -1147,7 +1334,12 @@
             if (mOfflineCamerasWidget) mOfflineCamerasWidget.classList.toggle('alert-pulse-dark', cameraAffectedServicesCount > 5);
             renderServiceInfoWidget();
             
-        } catch(e) { console.error(e); }
+        } catch(e) {
+            console.error(e);
+        } finally {
+            syncInProgress = false;
+            setSyncIndicator(false);
+        }
     }
 
     async function saveKPIs() {
@@ -1155,10 +1347,12 @@
             sla: document.getElementById('in-sla').value || 0,
             calls: document.getElementById('in-calls').value || 0,
             agents: document.getElementById('in-agents').value || 0,
-            puestos: {}
+            puestos: {},
+            puestosSla: {}
         };
         for(let i=1; i<=9; i++) {
             kpiData.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
+            kpiData.puestosSla[`p${i}`] = document.getElementById(`inp-sla-p${i}`).value || 0;
         }
         try {
             await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(kpiData) });
@@ -1192,7 +1386,7 @@
         }
     }
 
-    function renderPuestos(data) {
+    function renderPuestos(data, slaData = {}) {
         const pcCont = document.getElementById('puestos-display');
         const mbCont = document.getElementById('m-puestos');
         if(!data) return;
@@ -1209,9 +1403,11 @@
         for(let i=1; i<=9; i++) {
             const v = parseInt(data[`p${i}`]) || 0;
             if(v > 0) {
+                const puestoSla = Math.max(0, Math.min(100, Number(slaData[`p${i}`]) || 0));
                 let color = (maxVal === minVal || v === maxVal) ? "var(--online)" : v === minVal ? "var(--critico)" : "var(--warning)";
                 const lowClass = (isDesktop && maxVal !== minVal && v === minVal) ? ' puesto-item-lowest' : '';
-                html += `<div class="puesto-item${lowClass}"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span></div>`;
+                const slaLowClass = puestoSla < 5 ? ' low' : '';
+                html += `<div class="puesto-item${lowClass}"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span><span class="puesto-sla-chip${slaLowClass}">SLA&lt;5s ${puestoSla}%</span></div>`;
             }
         }
         pcCont.innerHTML = html;
@@ -1246,7 +1442,12 @@
 
     function renderMobileHistorySlide() {
         const slideEl = document.getElementById('historyMobileSlide');
-        if (!slideEl || !cio_logs.length) return;
+        if (!slideEl) return;
+
+        if (!cio_logs.length) {
+            slideEl.innerHTML = '<div class="history-empty">Sin novedades recientes por el momento.</div>';
+            return;
+        }
 
         const item = cio_logs[mobileHistoryIdx % cio_logs.length];
         const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
@@ -1295,7 +1496,7 @@
         if (isMobile) {
             renderMobileHistorySlide();
             if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
-            mobileHistoryTimer = setInterval(renderMobileHistorySlide, 20000);
+            mobileHistoryTimer = cio_logs.length ? setInterval(renderMobileHistorySlide, 20000) : null;
         } else if (mobileHistoryTimer) {
             clearInterval(mobileHistoryTimer);
             mobileHistoryTimer = null;
@@ -1421,10 +1622,54 @@
         if (mobileClock) mobileClock.textContent = time24h;
     }
 
+    const MOBILE_THEME_KEY = 'cio-mobile-theme';
+
+    function applyMobileTheme(mode) {
+        const app = document.getElementById('cio-app');
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const toggleBtn = document.getElementById('mobileThemeToggle');
+        if (!app) return;
+
+        const effectiveMode = (mode === 'light' && isMobile) ? 'light' : 'dark';
+        app.classList.toggle('mobile-light', effectiveMode === 'light');
+
+        if (toggleBtn) {
+            toggleBtn.textContent = effectiveMode === 'light' ? '☀ Claro' : '☾ Oscuro';
+            toggleBtn.setAttribute('aria-label', effectiveMode === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+        }
+    }
+
+    function toggleMobileTheme() {
+        const app = document.getElementById('cio-app');
+        if (!app) return;
+        const nextMode = app.classList.contains('mobile-light') ? 'dark' : 'light';
+        localStorage.setItem(MOBILE_THEME_KEY, nextMode);
+        applyMobileTheme(nextMode);
+    }
+
+    const serviceCheckModalEl = document.getElementById('serviceCheckModal');
+    if (serviceCheckModalEl) {
+        serviceCheckModalEl.addEventListener('click', (event) => {
+            if (event.target === serviceCheckModalEl) closeServiceCheckModal();
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && serviceCheckModalEl && serviceCheckModalEl.classList.contains('active')) {
+            closeServiceCheckModal();
+        }
+    });
+
     const panelMobileDash = document.getElementById('panelMobileDash');
     if (panelMobileDash) panelMobileDash.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('resize', toggleScrollTopButton);
+
+    applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
+
+    window.addEventListener('resize', () => {
+        applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
+    });
 
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
