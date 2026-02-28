@@ -334,6 +334,61 @@
             50% { opacity: 1; transform: scale(1.08); }
         }
 
+        #cio-app .service-offline-alert {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            min-width: min(86vw, 680px);
+            max-width: 88vw;
+            background: linear-gradient(170deg, rgba(66, 9, 9, 0.98), rgba(20, 5, 5, 0.98));
+            border: 1px solid rgba(255, 77, 77, 0.9);
+            border-radius: 20px;
+            padding: 16px 18px;
+            z-index: 10170;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.15);
+            transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
+        }
+        #cio-app .service-offline-alert.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            animation: offlineAlertPulse 1s ease-in-out infinite;
+        }
+        #cio-app .service-offline-alert.exiting {
+            opacity: 0.16;
+            transform: translate(-50%, 38vh) scale(0.84);
+            filter: blur(2px);
+            animation: none;
+        }
+        #cio-app .service-offline-alert .alert-title {
+            font-size: 0.82rem;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: #ffb6b6;
+            margin-bottom: 6px;
+            font-weight: 900;
+        }
+        #cio-app .service-offline-alert .alert-service {
+            font-size: clamp(24px, 3.5vw, 42px);
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1.05;
+            text-transform: uppercase;
+        }
+        #cio-app .service-offline-alert .alert-sub {
+            margin-top: 5px;
+            font-size: 0.84rem;
+            color: #ffd6d6;
+            opacity: 0.9;
+            letter-spacing: 0.4px;
+        }
+        @keyframes offlineAlertPulse {
+            0%, 100% { box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.15); }
+            50% { box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 26px rgba(255,77,77,0.5); }
+        }
+
         #cio-app #mobileClockInline {
             display: none;
         }
@@ -1038,6 +1093,12 @@
         <span>Sincronizando datos...</span>
     </div>
 
+    <div id="serviceOfflineAlert" class="service-offline-alert" aria-live="assertive" aria-hidden="true">
+        <div class="alert-title">Alerta de servicio</div>
+        <div class="alert-service" id="serviceOfflineAlertName">SERVICIO OFFLINE</div>
+        <div class="alert-sub">El estado cambió a offline. Revisá la nube.</div>
+    </div>
+
     <div id="ticker-bar">
         <div class="ticker-section">
             <span class="ticker-label">Servicios</span>
@@ -1236,6 +1297,9 @@
     let currentMobileFilter = 'all';
     let feedbackEntries = [];
     let feedbackAuthorized = false;
+    let previousServiceStatuses = {};
+    let offlineAlertQueue = [];
+    let offlineAlertRunning = false;
     const SLIDE_DURATION = 45000;
     const LOADED_SERVICES = [
         "21s","25 Sing","Admin Libertador","Agra Dorzan","Alamos de Carrasco2","Alamos de Carrasco1","Alhambra","Allegrezza","Alma Brava","Alma Corso","Alms Sing","Aloa","Alpha Place","Alpine","Altos Punta Carreta","Altos de Beldevere","Altos de Brasil","Altos de Pocitos","Altos del Shopping","Andalucia","Aquum","ARCA Construcciones","Arcamar","Arcus","Argenta Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av al Parque","Avita Libertador","Avita Parque","Avita Vibra","Bage","Bahia Esmeralda","Baliñas","Barrio Pindó","Belle Place","Berkes","Berro","Biarritz Tower","Block 8 Octubre","Bloque Maldonado","Bomar 3","Born","Brisas Guana","Brusco","Cabo Bella Vista","Caleta del Golf","Canaro 1","Capri","Carmel","Casa de Pons","Cascada","Castell del Rey","Chapalco","Ciriacos Brasil","Complejo Terranova","Consorcio Chucarro","Del Sol","Deposito Leonardi","Doce76","Doclan 1","Domus","Doral Inn","Durandeau","Ebro","Edf Moon","Edif Agustine","Edif Albo Park","Edif Altair","Edif Bulevar","Edif Cap Camarat","Edif Capitello","Edif Carrera","Edif Catare","Edif Cenit","Edif Copacabana","Edif Diagonal","Edif Gala Pop","Edif Harbour Park","Edif Lift Universitat","Edif Marejada","Edif Maribor","Edif Murano","Edif Parque Miramar","Edif Pescador","Edif Planeta","Edif Preciado","Edif Sinja","Edif Solar de Verdi","Edif Uniq","Edif Via 21","Edif Villa Savoia","Edif Vivo Life","Edif la LLum","El Cabo","El Cardal","El Ceibo","El Entrevero","El Molino","El Pais","El Parque Montevideo","Emilio","Eray","Euskaro","Fab Pan de Azucar","Federico Core","First Tower","Fundacion Porsaleu","Galata","Gala Biarritz","Gala Point","Gala Trend","Galería London","Garibaldi Plaza","Giulianova","Godilco","Golf Montevideo","Golino","Greenport","Guaruja","Harbour Bay","Ibirapita","Inmobiliaria Pointer","Irlanda","Isla de las Gaviotas","Ixou Mirlo","Jaime Zudañez","Jambo","Jardines Buschental","Joyería Alianza","Kentaro","Kyoto","La Castellana","La Selva","La Strada","Lancaster","Lars Minas","Lars Rivera","Lazaro Gadea","Le Vieux Paris","Leon","Libertador","Lift Alpha","Lift EME","Lift Paulier","Los Caracoles","Los Olimpicos","Lugano","Luna del Lago","Luzarin","Mar Jonico","Marco Polo","Marcos","Marina de Biarritz","Maria Pita","MAS MIO","Maui","MBC","Met City","Met Tech","Mille Luci","Miramar","Moddo Cavia","Mon Reve","MVD 21","MVD 21 II","MySuit Hotel","Nariño","Necochea","New Park","Nobleza Naviera","Nostrum Malvin","Nostrum Malvin T2","Nostrum Plaza 2","Nuevos Vientos 1 y 2","Nuevos Vientos Biarritz","Nuevos Vientos Golf","Obra HEM","Obra Aprahamian","Obra Barcelona","Obra Ciclades","Obra Cumbre","Obra Garden","Obra HUB","Obra Ixou 21","Obra KIU Rodo","Obra Living Marina","Obra Mercedes","Obra Parking Prado","Obra Press Maua","Obra Randa","Obra Risco","Obra Roosvelt","Obra Torre Alba","Obra UpTown","Omikron","ONN be Hache Colonia","Palatino Flaminio","Palmas de Carrasco","Parma","Parque Esmeralda","Parque Mar","Paseo real","Patria","Patria Golf","Piaro","Playa Oriente","Playa Oriente II","Playas Bavaros","Plaza Libertad","Plaza San Marino","Pocitos","Puerta del Sol","Puerta del Sol 4","Puerto Nautilus","Puerto Pirata","Puerto Vallarta","Punta Brava","Punto Vazquez","Quorum","Rambla","Rambla Luz","Rapallo","Regulus","Renaissance","Residencial Artigas","Residencial Beverly","Residencial Dino","Residencial Malvin","Residencial Setiembre","Riazor","Rocamadour","Rubens","San Francisco","Sarmiento","Sea Side","Shafel","Sigma","Site Italia","Sky Polo","Skylon","Smart Point","Smart Point 2","Solanas del Prado","Solano Antuna","Solano Antuna 2725","Soleil Playa","Soriano","Spazio 4","Strada dei Giardinni","Sun Urquiza","Swing 23","Tempo Rambla","Terrazas de la Loma","The Life","Tiffany","Torre Independencia","Torre Modelo","Torre Plaza","Torre de las Américas","Torre de los Pocitos","Torres García","Toulouse","Tropicana","UCM","UP 1","Valmont","Ventura Tres Cruces","Verde Mora","Villa Romana","Villa di Fiori","Vivo Life Centro","Waterloo","Working Mitre","YES","YES plaza Varela","Ymaguare","Zafiro"
@@ -1530,6 +1594,40 @@
         indicator.setAttribute('aria-hidden', visible ? 'false' : 'true');
     }
 
+    function enqueueOfflineServiceAlert(serviceName) {
+        if (!serviceName) return;
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (isMobile) return;
+        offlineAlertQueue.push(serviceName);
+        runOfflineServiceAlertQueue();
+    }
+
+    function runOfflineServiceAlertQueue() {
+        if (offlineAlertRunning || !offlineAlertQueue.length) return;
+        const app = document.getElementById('cio-app');
+        const alertBox = document.getElementById('serviceOfflineAlert');
+        const alertName = document.getElementById('serviceOfflineAlertName');
+        if (!app || !alertBox || !alertName) return;
+
+        offlineAlertRunning = true;
+        const name = offlineAlertQueue.shift();
+        alertName.textContent = `${name} OFFLINE`;
+        alertBox.classList.remove('exiting');
+        alertBox.classList.add('active');
+        alertBox.setAttribute('aria-hidden', 'false');
+
+        setTimeout(() => {
+            alertBox.classList.add('exiting');
+            alertBox.classList.remove('active');
+            setTimeout(() => {
+                alertBox.classList.remove('exiting');
+                alertBox.setAttribute('aria-hidden', 'true');
+                offlineAlertRunning = false;
+                runOfflineServiceAlertQueue();
+            }, 900);
+        }, 7000);
+    }
+
 
     function selectSimilarService(serviceName) {
         const input = document.getElementById('serviceCheckInput');
@@ -1648,13 +1746,20 @@
             let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "";
             let offlineServicesCount = 0;
             let cameraAffectedServicesCount = 0;
-            
+            const currentServiceStatuses = {};
+            const newOfflineServices = [];
+
             if(dR) {
                 const loaded = [];
                 const unavailable = [];
                 Object.keys(serviceLiveHistory).forEach(k => delete serviceLiveHistory[k]);
                 Object.entries(dR).forEach(([id, v], index) => {
                     let name = id.replace(/_/g,' ').toUpperCase();
+                    currentServiceStatuses[id] = (v.estado || '').toLowerCase();
+                    const prevStatus = (previousServiceStatuses[id] || '').toLowerCase();
+                    if (currentServiceStatuses[id] === 'offline' && prevStatus && prevStatus !== 'offline') {
+                        newOfflineServices.push(name);
+                    }
                     let lastDown = v.hora_caida || "Desconocida";
                     const offlineStamp = parseDateTimeLabel(lastDown);
                     const cameraInfo = (v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras';
@@ -1719,6 +1824,8 @@
                     }
                 });
                 serviceWidgetData = { loaded, unavailable };
+                previousServiceStatuses = currentServiceStatuses;
+                newOfflineServices.forEach(serviceName => enqueueOfflineServiceAlert(serviceName));
             } else {
                 serviceWidgetData = { loaded: [], unavailable: [] };
             }
