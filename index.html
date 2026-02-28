@@ -75,10 +75,20 @@
             background: rgba(255,255,255,0.05);
             color: #d9ffff;
             line-height: 1.2;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        #cio-app .puesto-sla-chip-label { opacity: 0.82; }
+        #cio-app .puesto-sla-chip-value {
+            font-weight: 900;
+            color: var(--online);
         }
         #cio-app .puesto-sla-chip.low {
             border-color: rgba(255, 77, 77, 0.8);
             background: rgba(84, 15, 15, 0.7);
+        }
+        #cio-app .puesto-sla-chip.low .puesto-sla-chip-value {
             color: #ffd8d8;
             animation: puestoSlaPulse 1.25s ease-in-out infinite;
         }
@@ -106,17 +116,18 @@
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
-        /* TICKER TV/PC (VISUAL SIMPLE Y LEGIBLE) */
-        #cio-app #ticker-bar { 
-            height: 68px;
-            background: #030607;
-            border-top: 1px solid #1b2a2b;
+        /* TICKER TV/PC (REDISEÑADO: ALTO CONTRASTE Y LECTURA LEJANA) */
+        #cio-app #ticker-bar {
+            height: 88px;
+            background: linear-gradient(180deg, #010405 0%, #071112 100%);
+            border-top: 1px solid #1e3536;
             display: flex;
             overflow: hidden;
             position: relative;
             flex-shrink: 0;
-            padding: 8px 12px;
-            gap: 12px;
+            padding: 10px 14px;
+            gap: 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 -8px 28px rgba(0,0,0,0.35);
         }
         #cio-app .ticker-section {
             flex: 1;
@@ -124,49 +135,74 @@
             overflow: hidden;
             display: flex;
             align-items: center;
-            background: #0a0f10;
-            border: 1px solid #1f3031;
-            border-radius: 10px;
+            border-radius: 14px;
+            border: 1px solid rgba(76, 126, 128, 0.58);
+            background: linear-gradient(145deg, rgba(11,22,23,0.95), rgba(5,10,11,0.95));
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 18px rgba(0,0,0,0.26);
+        }
+        #cio-app .ticker-section:nth-child(2) {
+            border-color: rgba(140, 104, 34, 0.55);
+            background: linear-gradient(145deg, rgba(21,16,9,0.94), rgba(10,8,5,0.94));
         }
         #cio-app .ticker-label {
             position: absolute;
-            left: 0px;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
             z-index: 10;
-            background: #0f1819;
-            padding: 15px 10px;
-            border-radius: 6px;
-            font-size: 0.86rem;
+            min-width: 130px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(12,34,35,0.98), rgba(7,21,22,0.98));
+            padding: 11px 12px;
+            border-radius: 10px;
+            font-size: 0.98rem;
             font-weight: 900;
-            color: #00d1d1;
+            color: #7ef8f9;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid #006465;
+            letter-spacing: 1.4px;
+            border: 1px solid rgba(0, 209, 209, 0.42);
+            box-shadow: 0 8px 14px rgba(0,0,0,0.28);
+        }
+        #cio-app .ticker-section:nth-child(2) .ticker-label {
+            background: linear-gradient(180deg, rgba(48,33,13,0.95), rgba(27,19,8,0.95));
+            border-color: rgba(230, 166, 52, 0.45);
+            color: #ffd68a;
         }
 
-        #cio-app .ticker-wrapper { 
+        #cio-app .ticker-wrapper {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 14px;
             white-space: nowrap;
             position: absolute;
             left: 0;
-            animation: scroll-ticker 22s linear infinite;
-            padding-left: 118px; 
+            animation: scroll-ticker 26s linear infinite;
+            padding-left: 154px;
+            padding-right: 24px;
+            min-width: 100%;
         }
-        @keyframes scroll-ticker { 0% { transform: translateX(50vw); } 100% { transform: translateX(-100%); } }
+        @keyframes scroll-ticker { 0% { transform: translateX(38vw); } 100% { transform: translateX(-100%); } }
 
         #cio-app .capsula-off {
-            background: #18090a;
-            border: 1px solid #ff4d4d;
-            color: #ffd6d6;
-            padding: 7px 14px;
+            background: linear-gradient(150deg, rgba(62, 16, 16, 0.95), rgba(25, 8, 8, 0.95));
+            border: 1px solid rgba(255, 77, 77, 0.85);
+            color: #ffe2e2;
+            padding: 10px 16px;
             border-radius: 999px;
-            font-weight: 800;
-            font-size: 1.4rem;
-            display: flex;
+            font-weight: 900;
+            font-size: 1.05rem;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
-            letter-spacing: 0.3px;
+            gap: 8px;
+            letter-spacing: 0.45px;
+            text-transform: uppercase;
+            box-shadow: 0 0 0 rgba(255,77,77,0.15);
+        }
+        #cio-app .capsula-off::before {
+            content: "●";
+            color: #ff6d6d;
+            font-size: 0.84rem;
+            text-shadow: 0 0 8px rgba(255,109,109,0.65);
         }
 
         /* PANELES LATERALES */
@@ -190,7 +226,7 @@
         }
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
 
-        #cio-app #progressLine { position: fixed; bottom: 60px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
+        #cio-app #progressLine { position: fixed; bottom: 96px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
 
         #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         #cio-app .trend-up { color: #2ecc71 !important; }
@@ -304,14 +340,23 @@
 
         @media (min-width: 769px) {
             #cio-app .kpi-bar {
+                align-items: center;
+                min-height: 84px;
+                height: 84px;
                 padding-top: 6px;
                 padding-bottom: 6px;
             }
             #cio-app .puestos-container {
                 height: auto;
                 min-height: 100%;
-                align-items: center;
+                align-items: flex-end;
+                padding-top: 0;
+                padding-bottom: 2px;
             }
+            #cio-app .puesto-item { transform: none; }
+            #cio-app .puesto-val { font-size: 1.1rem; }
+            #cio-app .puesto-lab { font-size: 0.75rem; }
+            #cio-app .puesto-sla-chip { font-size: 0.54rem; margin-top: 2px; }
             #cio-app .puesto-item-lowest {
                 background: rgba(90, 0, 0, 0.36);
                 border: 1px solid rgba(255, 77, 77, 0.5);
@@ -717,6 +762,9 @@
                 background: #BFBFBF !important;
                 color: #111111 !important;
             }
+            #cio-app.mobile-light * {
+                color: #1d2f30 !important;
+            }
             #cio-app.mobile-light #panelMobileDash > div:first-child,
             #cio-app.mobile-light .mobile-stat-box,
             #cio-app.mobile-light .mobile-puestos-grid,
@@ -760,7 +808,13 @@
             #cio-app.mobile-light #serviceInfoBox,
             #cio-app.mobile-light #serviceCheckResult,
             #cio-app.mobile-light #panelMobileDash .mobile-stat-box > div,
-            #cio-app.mobile-light .puesto-val {
+            #cio-app.mobile-light .puesto-val,
+            #cio-app.mobile-light .puesto-sla-chip,
+            #cio-app.mobile-light .puesto-sla-chip-label,
+            #cio-app.mobile-light .capsula-off,
+            #cio-app.mobile-light .service-card-title,
+            #cio-app.mobile-light .offline-item-name,
+            #cio-app.mobile-light .offline-item-meta {
                 color: #1d2f30 !important;
             }
             #cio-app.mobile-light .mobile-theme-toggle {
@@ -924,7 +978,7 @@
                 <input type="number" id="in-agents" class="p-field" placeholder="Agentes activos">
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
-            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y SLA &lt;5s (%) por puesto.</div>
+            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y tiempo de respuesta &lt;5s por puesto.</div>
             <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
         </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
@@ -1041,8 +1095,14 @@
             <div style="background:#141414; border:1px solid #2a2a2a; border-radius:10px; padding:8px;">
                 <div style="font-size:0.6rem; opacity:0.72; margin-bottom:6px; text-align:center;">P${i}</div>
                 <input type="number" id="inp-p${i}" class="p-field" placeholder="Llamadas" style="margin-bottom:6px; padding:8px;">
-                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="SLA <5s %" style="margin-bottom:0; padding:8px;">
+                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="Tiempo (segundos)" style="margin-bottom:0; padding:8px;">
             </div>`;
+    }
+
+    function formatPuestoSeconds(value) {
+        const safeValue = Math.max(0, Number(value) || 0);
+        const trimmed = Number.isInteger(safeValue) ? safeValue : safeValue.toFixed(1);
+        return `${trimmed}s`;
     }
 
     function updateShift() {
@@ -1324,8 +1384,8 @@
                 serviceWidgetData = { loaded: [], unavailable: [] };
             }
             
-            tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:0.85rem;">SERVICIOS: SIN INCIDENTES</span>`;
-            tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:0.85rem;">CÁMARAS: SIN INCIDENTES</span>`;
+            tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">SERVICIOS: SIN INCIDENTES</span>`;
+            tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">CÁMARAS: SIN INCIDENTES</span>`;
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
             if (mOfflineServicesTitle) mOfflineServicesTitle.textContent = `Servicios Offline (${offlineServicesCount})`;
@@ -1403,11 +1463,12 @@
         for(let i=1; i<=9; i++) {
             const v = parseInt(data[`p${i}`]) || 0;
             if(v > 0) {
-                const puestoSla = Math.max(0, Math.min(100, Number(slaData[`p${i}`]) || 0));
+                const puestoSlaSeconds = Math.max(0, Number(slaData[`p${i}`]) || 0);
                 let color = (maxVal === minVal || v === maxVal) ? "var(--online)" : v === minVal ? "var(--critico)" : "var(--warning)";
                 const lowClass = (isDesktop && maxVal !== minVal && v === minVal) ? ' puesto-item-lowest' : '';
-                const slaLowClass = puestoSla < 5 ? ' low' : '';
-                html += `<div class="puesto-item${lowClass}"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span><span class="puesto-sla-chip${slaLowClass}">SLA&lt;5s ${puestoSla}%</span></div>`;
+                const slaLowClass = puestoSlaSeconds > 5 ? ' low' : '';
+                const actualValue = puestoSlaSeconds <= 5 ? `&lt;${formatPuestoSeconds(puestoSlaSeconds)}` : formatPuestoSeconds(puestoSlaSeconds);
+                html += `<div class="puesto-item${lowClass}"><span class="puesto-val" style="color:${color}">${v}</span><span class="puesto-lab">P${i}</span><span class="puesto-sla-chip${slaLowClass}"><span class="puesto-sla-chip-label">&lt;5s</span><span class="puesto-sla-chip-value">${actualValue}</span></span></div>`;
             }
         }
         pcCont.innerHTML = html;
