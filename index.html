@@ -478,7 +478,7 @@
             }
             #cio-app .mobile-filter-bar {
                 display: grid;
-                grid-template-columns: repeat(4, minmax(0, 1fr));
+                grid-template-columns: repeat(5, minmax(0, 1fr));
                 gap: 8px;
                 margin: 12px 0 8px;
             }
@@ -523,6 +523,39 @@
                 max-height: 58vh;
                 overflow-y: auto;
                 padding-right: 4px;
+            }
+            #cio-app.mobile-focus-feedback .feedback-history-window {
+                max-height: 54vh;
+                overflow-y: auto;
+                padding-right: 4px;
+            }
+            #cio-app .feedback-card {
+                border: 1px solid rgba(255,255,255,0.14);
+                border-radius: 14px;
+                padding: 10px;
+                margin-bottom: 8px;
+                background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            }
+            #cio-app .feedback-toast {
+                position: fixed;
+                left: 50%;
+                transform: translateX(-50%) translateY(12px);
+                bottom: calc(72px + env(safe-area-inset-bottom));
+                background: #0d6b6d;
+                color: #fff;
+                border-radius: 999px;
+                padding: 9px 14px;
+                font-size: 0.72rem;
+                font-weight: 800;
+                letter-spacing: 0.4px;
+                z-index: 10160;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease, transform 0.25s ease;
+            }
+            #cio-app .feedback-toast.visible {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
             }
             #cio-app.mobile-focus-news #historyMobileSlide {
                 transition: none;
@@ -1002,6 +1035,7 @@
             <button class="mobile-filter-chip" data-filter="ops" onclick="setMobileSectionFilter('ops')">Operación</button>
             <button class="mobile-filter-chip" data-filter="infra" onclick="setMobileSectionFilter('infra')">Servicios</button>
             <button class="mobile-filter-chip" data-filter="news" onclick="setMobileSectionFilter('news')">Novedades</button>
+            <button class="mobile-filter-chip" data-filter="feedback" onclick="setMobileSectionFilter('feedback')">Feedback</button>
         </div>
 
         <div class="mobile-section-header mobile-filter-target" data-mobile-group="ops">Performance Actual</div>
@@ -1060,6 +1094,17 @@
                 <div id="serviceInfoBox" style="display:none;"></div>
             </div>
         </div>
+
+        <div class="mobile-only-section mobile-filter-target" data-mobile-group="feedback">
+            <div class="mobile-section-header">Feedback</div>
+            <div class="service-widget">
+                <div class="service-widget-actions" style="margin-bottom:10px;">
+                    <button class="btn-pill" style="width:100%; border-radius:12px;" onclick="openFeedbackModal()">Agregar feedback</button>
+                    <button class="btn-pill btn-sec" style="width:100%; border-radius:12px;" onclick="openFeedbackAuthModal()">Historial (credenciales)</button>
+                </div>
+                <div class="feedback-history-window" id="feedbackHistoryWindow" style="display:none;"></div>
+            </div>
+        </div>
     </aside>
 
     <button id="scrollTopMobile" class="mobile-only-section" onclick="scrollToTopMobile()" aria-label="Volver arriba">↑</button>
@@ -1076,6 +1121,34 @@
             <div id="serviceCheckResult" style="font-size:0.78rem; min-height:28px;"></div>
         </div>
     </div>
+
+    <div id="feedbackModal" class="service-check-modal" aria-hidden="true">
+        <div class="service-check-card" role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 id="feedback-modal-title" style="font-size:0.9rem; color:var(--accent);">Agregar feedback</h3>
+                <button onclick="closeFeedbackModal()" style="background:none; border:none; color:#9f9f9f; font-size:1.1rem;">✕</button>
+            </div>
+            <div style="font-size:0.74rem; opacity:0.8; margin-bottom:10px;">Tu idea o aviso ayuda a mejorar el sistema.</div>
+            <input id="feedbackUserInput" class="p-field" style="margin-bottom:8px;" placeholder="Tu nombre (opcional)">
+            <textarea id="feedbackTextInput" class="p-field" rows="5" style="text-align:left;" placeholder="Escribe tu feedback..."></textarea>
+            <button onclick="submitFeedback()" class="btn-pill" style="border-radius:10px; margin-bottom:8px;">Enviar</button>
+        </div>
+    </div>
+
+    <div id="feedbackAuthModal" class="service-check-modal" aria-hidden="true">
+        <div class="service-check-card" role="dialog" aria-modal="true" aria-labelledby="feedback-auth-title">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 id="feedback-auth-title" style="font-size:0.9rem; color:var(--accent);">Acceso historial feedback</h3>
+                <button onclick="closeFeedbackAuthModal()" style="background:none; border:none; color:#9f9f9f; font-size:1.1rem;">✕</button>
+            </div>
+            <input id="feedbackAuthUser" class="p-field" style="margin-bottom:8px;" placeholder="Usuario">
+            <input id="feedbackAuthPass" type="password" class="p-field" style="margin-bottom:10px;" placeholder="Clave">
+            <button onclick="validateFeedbackAccess()" class="btn-pill" style="border-radius:10px; margin-bottom:8px;">Ingresar</button>
+            <div id="feedbackAuthResult" style="font-size:0.74rem; min-height:24px;"></div>
+        </div>
+    </div>
+
+    <div id="feedbackToast" class="feedback-toast mobile-only-section" aria-live="polite"></div>
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
@@ -1121,6 +1194,7 @@
     const DB_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/eventos.json";
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
+    const FEEDBACK_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/feedback_mobile.json";
 
     let cio_logs = [], currentIdx = 0, startTime = null;
     let serviceWidgetExpanded = false;
@@ -1133,6 +1207,7 @@
     let syncInProgress = false;
     let puestoSlaData = {};
     let currentMobileFilter = 'all';
+    let feedbackEntries = [];
     const SLIDE_DURATION = 45000;
     const LOADED_SERVICES = [
         "21s","25 Sing","Admin Libertador","Agra Dorzan","Alamos de Carrasco2","Alamos de Carrasco1","Alhambra","Allegrezza","Alma Brava","Alma Corso","Alms Sing","Aloa","Alpha Place","Alpine","Altos Punta Carreta","Altos de Beldevere","Altos de Brasil","Altos de Pocitos","Altos del Shopping","Andalucia","Aquum","ARCA Construcciones","Arcamar","Arcus","Argenta Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av al Parque","Avita Libertador","Avita Parque","Avita Vibra","Bage","Bahia Esmeralda","Baliñas","Barrio Pindó","Belle Place","Berkes","Berro","Biarritz Tower","Block 8 Octubre","Bloque Maldonado","Bomar 3","Born","Brisas Guana","Brusco","Cabo Bella Vista","Caleta del Golf","Canaro 1","Capri","Carmel","Casa de Pons","Cascada","Castell del Rey","Chapalco","Ciriacos Brasil","Complejo Terranova","Consorcio Chucarro","Del Sol","Deposito Leonardi","Doce76","Doclan 1","Domus","Doral Inn","Durandeau","Ebro","Edf Moon","Edif Agustine","Edif Albo Park","Edif Altair","Edif Bulevar","Edif Cap Camarat","Edif Capitello","Edif Carrera","Edif Catare","Edif Cenit","Edif Copacabana","Edif Diagonal","Edif Gala Pop","Edif Harbour Park","Edif Lift Universitat","Edif Marejada","Edif Maribor","Edif Murano","Edif Parque Miramar","Edif Pescador","Edif Planeta","Edif Preciado","Edif Sinja","Edif Solar de Verdi","Edif Uniq","Edif Via 21","Edif Villa Savoia","Edif Vivo Life","Edif la LLum","El Cabo","El Cardal","El Ceibo","El Entrevero","El Molino","El Pais","El Parque Montevideo","Emilio","Eray","Euskaro","Fab Pan de Azucar","Federico Core","First Tower","Fundacion Porsaleu","Galata","Gala Biarritz","Gala Point","Gala Trend","Galería London","Garibaldi Plaza","Giulianova","Godilco","Golf Montevideo","Golino","Greenport","Guaruja","Harbour Bay","Ibirapita","Inmobiliaria Pointer","Irlanda","Isla de las Gaviotas","Ixou Mirlo","Jaime Zudañez","Jambo","Jardines Buschental","Joyería Alianza","Kentaro","Kyoto","La Castellana","La Selva","La Strada","Lancaster","Lars Minas","Lars Rivera","Lazaro Gadea","Le Vieux Paris","Leon","Libertador","Lift Alpha","Lift EME","Lift Paulier","Los Caracoles","Los Olimpicos","Lugano","Luna del Lago","Luzarin","Mar Jonico","Marco Polo","Marcos","Marina de Biarritz","Maria Pita","MAS MIO","Maui","MBC","Met City","Met Tech","Mille Luci","Miramar","Moddo Cavia","Mon Reve","MVD 21","MVD 21 II","MySuit Hotel","Nariño","Necochea","New Park","Nobleza Naviera","Nostrum Malvin","Nostrum Malvin T2","Nostrum Plaza 2","Nuevos Vientos 1 y 2","Nuevos Vientos Biarritz","Nuevos Vientos Golf","Obra HEM","Obra Aprahamian","Obra Barcelona","Obra Ciclades","Obra Cumbre","Obra Garden","Obra HUB","Obra Ixou 21","Obra KIU Rodo","Obra Living Marina","Obra Mercedes","Obra Parking Prado","Obra Press Maua","Obra Randa","Obra Risco","Obra Roosvelt","Obra Torre Alba","Obra UpTown","Omikron","ONN be Hache Colonia","Palatino Flaminio","Palmas de Carrasco","Parma","Parque Esmeralda","Parque Mar","Paseo real","Patria","Patria Golf","Piaro","Playa Oriente","Playa Oriente II","Playas Bavaros","Plaza Libertad","Plaza San Marino","Pocitos","Puerta del Sol","Puerta del Sol 4","Puerto Nautilus","Puerto Pirata","Puerto Vallarta","Punta Brava","Punto Vazquez","Quorum","Rambla","Rambla Luz","Rapallo","Regulus","Renaissance","Residencial Artigas","Residencial Beverly","Residencial Dino","Residencial Malvin","Residencial Setiembre","Riazor","Rocamadour","Rubens","San Francisco","Sarmiento","Sea Side","Shafel","Sigma","Site Italia","Sky Polo","Skylon","Smart Point","Smart Point 2","Solanas del Prado","Solano Antuna","Solano Antuna 2725","Soleil Playa","Soriano","Spazio 4","Strada dei Giardinni","Sun Urquiza","Swing 23","Tempo Rambla","Terrazas de la Loma","The Life","Tiffany","Torre Independencia","Torre Modelo","Torre Plaza","Torre de las Américas","Torre de los Pocitos","Torres García","Toulouse","Tropicana","UCM","UP 1","Valmont","Ventura Tres Cruces","Verde Mora","Villa Romana","Villa di Fiori","Vivo Life Centro","Waterloo","Working Mitre","YES","YES plaza Varela","Ymaguare","Zafiro"
@@ -1292,6 +1367,130 @@
         if (!modal) return;
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openFeedbackModal() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        const modal = document.getElementById('feedbackModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        const text = document.getElementById('feedbackTextInput');
+        if (text) {
+            text.value = '';
+            setTimeout(() => text.focus(), 60);
+        }
+    }
+
+    function closeFeedbackModal() {
+        const modal = document.getElementById('feedbackModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openFeedbackAuthModal() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        const modal = document.getElementById('feedbackAuthModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        const result = document.getElementById('feedbackAuthResult');
+        if (result) result.textContent = '';
+    }
+
+    function closeFeedbackAuthModal() {
+        const modal = document.getElementById('feedbackAuthModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function showFeedbackToast(message) {
+        const toast = document.getElementById('feedbackToast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 1900);
+    }
+
+    async function submitFeedback() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        const userInput = document.getElementById('feedbackUserInput');
+        const textInput = document.getElementById('feedbackTextInput');
+        const message = (textInput?.value || '').trim();
+        if (!message) {
+            showFeedbackToast('Escribí un mensaje antes de enviar.');
+            return;
+        }
+        const author = (userInput?.value || '').trim() || 'Usuario';
+        const now = new Date();
+        const payload = {
+            author,
+            message,
+            date: formatDateDDMM(now),
+            time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+            createdAt: now.toISOString()
+        };
+        try {
+            await fetch(FEEDBACK_URL, { method: 'POST', body: JSON.stringify(payload) });
+            closeFeedbackModal();
+            showFeedbackToast('¡Gracias por tu ayuda!');
+            await loadFeedbackEntries();
+            renderFeedbackHistory();
+        } catch (e) {
+            console.error(e);
+            showFeedbackToast('No se pudo enviar. Intentá nuevamente.');
+        }
+    }
+
+    async function loadFeedbackEntries() {
+        try {
+            const res = await fetch(FEEDBACK_URL);
+            const data = await res.json();
+            const entries = data ? Object.values(data) : [];
+            feedbackEntries = entries.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+        } catch (e) {
+            console.error('Feedback load error:', e);
+            feedbackEntries = [];
+        }
+    }
+
+    function renderFeedbackHistory() {
+        const box = document.getElementById('feedbackHistoryWindow');
+        if (!box) return;
+        if (!feedbackEntries.length) {
+            box.innerHTML = '<div class="history-empty">Sin feedback enviado por el momento.</div>';
+            box.style.display = 'block';
+            return;
+        }
+        box.innerHTML = feedbackEntries.map(item => `
+            <div class="feedback-card">
+                <div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:6px;">
+                    <strong style="font-size:0.72rem; color:var(--accent);">${item.author || 'Usuario'}</strong>
+                    <span style="font-size:0.62rem; opacity:0.7;">${item.date || '--/--'} · ${item.time || '--:--'}</span>
+                </div>
+                <div style="font-size:0.74rem; line-height:1.4;">${item.message || ''}</div>
+            </div>
+        `).join('');
+        box.style.display = 'block';
+    }
+
+    async function validateFeedbackAccess() {
+        const user = (document.getElementById('feedbackAuthUser')?.value || '').trim();
+        const pass = (document.getElementById('feedbackAuthPass')?.value || '').trim();
+        const result = document.getElementById('feedbackAuthResult');
+        if (user !== 'Alfonso' || pass !== '332112') {
+            if (result) result.innerHTML = '<span style="color:var(--critico);">Credenciales inválidas.</span>';
+            return;
+        }
+        if (result) result.innerHTML = '<span style="color:var(--online);">Acceso concedido.</span>';
+        await loadFeedbackEntries();
+        renderFeedbackHistory();
+        closeFeedbackAuthModal();
     }
 
     function setSyncIndicator(visible) {
@@ -1873,23 +2072,24 @@
         chips.forEach(chip => chip.classList.toggle('active', chip.dataset.filter === filterKey));
 
         if (!isMobile || filterKey === 'all') {
-            if (app) app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news');
+            if (app) app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news', 'mobile-focus-feedback');
             targets.forEach(node => node.classList.remove('hidden-by-filter'));
             syncMobileHistoryMode();
             return;
         }
 
         if (app) {
-            app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news');
+            app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news', 'mobile-focus-feedback');
             app.classList.add(`mobile-focus-${filterKey}`);
         }
 
         const visibleGroups = {
             ops: ['ops'],
             infra: ['infra'],
-            news: ['news']
+            news: ['news'],
+            feedback: ['feedback']
         };
-        const allowed = visibleGroups[filterKey] || ['ops', 'infra', 'news'];
+        const allowed = visibleGroups[filterKey] || ['ops', 'infra', 'news', 'feedback'];
         targets.forEach(node => {
             node.classList.toggle('hidden-by-filter', !allowed.includes(node.dataset.mobileGroup));
         });
@@ -1897,15 +2097,33 @@
     }
 
     const serviceCheckModalEl = document.getElementById('serviceCheckModal');
+    const feedbackModalEl = document.getElementById('feedbackModal');
+    const feedbackAuthModalEl = document.getElementById('feedbackAuthModal');
     if (serviceCheckModalEl) {
         serviceCheckModalEl.addEventListener('click', (event) => {
             if (event.target === serviceCheckModalEl) closeServiceCheckModal();
+        });
+    }
+    if (feedbackModalEl) {
+        feedbackModalEl.addEventListener('click', (event) => {
+            if (event.target === feedbackModalEl) closeFeedbackModal();
+        });
+    }
+    if (feedbackAuthModalEl) {
+        feedbackAuthModalEl.addEventListener('click', (event) => {
+            if (event.target === feedbackAuthModalEl) closeFeedbackAuthModal();
         });
     }
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && serviceCheckModalEl && serviceCheckModalEl.classList.contains('active')) {
             closeServiceCheckModal();
+        }
+        if (event.key === 'Escape' && feedbackModalEl && feedbackModalEl.classList.contains('active')) {
+            closeFeedbackModal();
+        }
+        if (event.key === 'Escape' && feedbackAuthModalEl && feedbackAuthModalEl.classList.contains('active')) {
+            closeFeedbackAuthModal();
         }
     });
 
