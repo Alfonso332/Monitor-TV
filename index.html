@@ -62,11 +62,11 @@
         /* PUESTOS PC */
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
-        #cio-app .puesto-val { font-size: 1.4rem; font-weight: 900; font-family: monospace; }
-        #cio-app .puesto-lab { font-size: 1.4rem; opacity: 0.5; font-weight: bold; }
+        #cio-app .puesto-val { font-size: 2rem; font-weight: 900; font-family: monospace; }
+        #cio-app .puesto-lab { font-size: 2rem; opacity: 0.5; font-weight: bold; }
         #cio-app .puesto-sla-chip {
             margin-top: 4px;
-            font-size: 0.62rem;
+            font-size: 1rem;
             font-weight: 800;
             letter-spacing: 0.4px;
             padding: 2px 6px;
@@ -115,6 +115,26 @@
         
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+
+        /* MODO TV ESTABLE (evita tirones/congelamientos en hardware limitado) */
+        #cio-app.tv-performance .oculto {
+            transform: none;
+            filter: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #cio-app.tv-performance .trend-arrow,
+        #cio-app.tv-performance .sync-indicator-dot,
+        #cio-app.tv-performance .off-status-dot,
+        #cio-app.tv-performance .puesto-item-lowest,
+        #cio-app.tv-performance .puesto-sla-chip.low .puesto-sla-chip-value,
+        #cio-app.tv-performance .capsula-off::before {
+            animation: none !important;
+        }
+        #cio-app.tv-performance .service-check-modal,
+        #cio-app.tv-performance #cio-overlay {
+            backdrop-filter: none !important;
+        }
 
         /* TICKER TV/PC (REDISEÑADO: ALTO CONTRASTE Y LECTURA LEJANA) */
         #cio-app #ticker-bar {
@@ -344,22 +364,29 @@
         @media (min-width: 769px) {
             #cio-app .kpi-bar {
                 align-items: center;
-                min-height: 84px;
-                height: 84px;
+                min-height: 98px;
+                height: 98px;
                 padding-top: 6px;
-                padding-bottom: 6px;
+                padding-bottom: 8px;
             }
             #cio-app .puestos-container {
                 height: auto;
                 min-height: 100%;
                 align-items: flex-end;
                 padding-top: 0;
-                padding-bottom: 2px;
+                padding-bottom: 4px;
             }
-            #cio-app .puesto-item { transform: none; }
-            #cio-app .puesto-val { font-size: 1.1rem; }
-            #cio-app .puesto-lab { font-size: 0.75rem; }
-            #cio-app .puesto-sla-chip { font-size: 0.54rem; margin-top: 2px; }
+            #cio-app .puesto-item {
+                transform: none;
+                min-width: 84px;
+                padding: 6px 8px;
+                border-radius: 12px;
+                border: 1px solid rgba(255,255,255,0.12);
+                background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            }
+            #cio-app .puesto-val { font-size: 1.45rem; }
+            #cio-app .puesto-lab { font-size: 0.95rem; }
+            #cio-app .puesto-sla-chip { font-size: 0.72rem; margin-top: 4px; padding: 3px 8px; }
             #cio-app .puesto-item-lowest {
                 background: rgba(90, 0, 0, 0.36);
                 border: 1px solid rgba(255, 77, 77, 0.5);
@@ -1607,6 +1634,14 @@
         }
     }
 
+    function updateTvPerformanceMode() {
+        const app = document.getElementById('cio-app');
+        if (!app) return;
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        const isFullscreenTV = document.fullscreenElement === app;
+        app.classList.toggle('tv-performance', !isMobile && isFullscreenTV);
+    }
+
     function openForm(index) {
         const isNew = index === null;
         document.getElementById('formTitle').textContent = isNew ? "NUEVA NOVEDAD" : "EDITAR NOVEDAD";
@@ -1733,12 +1768,15 @@
 
     window.addEventListener('resize', () => {
         applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
+        updateTvPerformanceMode();
     });
+    document.addEventListener('fullscreenchange', updateTvPerformanceMode);
 
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
     syncData();
     setInterval(syncData, 30000);
+    updateTvPerformanceMode();
     toggleScrollTopButton();
 </script>
 </body>
