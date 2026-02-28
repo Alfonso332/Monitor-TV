@@ -31,6 +31,15 @@
 
         #cio-app.pantalla-critica { background: var(--bg-emergencia) !important; }
         #cio-app * { box-sizing: border-box !important; margin: 0; padding: 0; }
+        #cio-app * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        #cio-app *::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+        }
 
         /* CABECERA PC */
         #cio-app .main-header {
