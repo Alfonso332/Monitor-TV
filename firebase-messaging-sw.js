@@ -14,10 +14,10 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  const notificationTitle = payload?.notification?.title || 'Monitor TV';
+  const notificationTitle = payload?.notification?.title || payload?.data?.title || 'Monitor TV';
   const notificationOptions = {
-    body: payload?.notification?.body || 'Nueva alerta recibida.',
-    icon: payload?.notification?.icon || '/favicon.ico',
+    body: payload?.notification?.body || payload?.data?.body || payload?.data?.message || 'Nueva alerta recibida.',
+    icon: payload?.notification?.icon || payload?.data?.icon || '/favicon.ico',
     data: payload?.data || {}
   };
 

@@ -2333,7 +2333,9 @@
                 return;
             }
 
-            const serviceWorkerRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            const serviceWorkerRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                scope: '/firebase-cloud-messaging-push-scope'
+            });
             const token = await getToken(messaging, {
                 vapidKey,
                 serviceWorkerRegistration
@@ -2351,9 +2353,9 @@
 
     onMessage(messaging, (payload) => {
         console.log('Mensaje recibido en primer plano:', payload);
-        if (payload?.notification) {
-            alert(`${payload.notification.title || 'Notificación'}\n${payload.notification.body || ''}`.trim());
-        }
+        const title = payload?.notification?.title || payload?.data?.title || 'Notificación';
+        const body = payload?.notification?.body || payload?.data?.body || payload?.data?.message || '';
+        alert(`${title}\n${body}`.trim());
     });
 
     solicitarPermisoYToken();
