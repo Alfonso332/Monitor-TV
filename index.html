@@ -8,42 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
-    <script type="module">
-        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getDatabase, ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
-        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-messaging.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCKR5EpLkks03M3aVFf5_UPRg0vXdLAUh0",
-            authDomain: "monitor-tv-3745c.firebaseapp.com",
-            databaseURL: "https://monitor-tv-3745c-default-rtdb.firebaseio.com",
-            projectId: "monitor-tv-3745c",
-            storageBucket: "monitor-tv-3745c.firebasestorage.app",
-            messagingSenderId: "636551515459",
-            appId: "1:636551515459:web:4edbfe729783f7daa533f6"
-        };
-
-        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const messaging = getMessaging(app);
-
-        window.messaging = messaging;
-        window.firebaseApi = { database, ref, set, serverTimestamp, getToken };
-
-        if ('serviceWorker' in navigator) {
-            window.firebaseSwRegistrationPromise = new Promise((resolve, reject) => {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/Monitor-TV/firebase-messaging-sw.js')
-                        .then(resolve)
-                        .catch((err) => {
-                            console.error('Error registrando firebase-messaging-sw.js:', err);
-                            reject(err);
-                        });
-                });
-            });
-        }
-    </script>
-
     <style>
         /* === ESTRUCTURA Y RESET === */
         #cio-app {
@@ -98,8 +62,8 @@
         /* PUESTOS PC */
         #cio-app .puestos-container { display: flex; gap: 20px; align-items: center; border-left: 2px solid #222; padding-left: 30px; height: 100%; }
         #cio-app .puesto-item { display: flex; flex-direction: column; align-items: center; }
-        #cio-app .puesto-val { font-size: 1.5rem; font-weight: 900; font-family: monospace; }
-        #cio-app .puesto-lab { font-size: 1.3rem; opacity: 0.5; font-weight: bold; }
+        #cio-app .puesto-val { font-size: 1.4rem; font-weight: 900; font-family: monospace; }
+        #cio-app .puesto-lab { font-size: 1.4rem; opacity: 0.5; font-weight: bold; }
 
         /* ÁREA CENTRAL */
         #cio-app #display-board { 
@@ -147,9 +111,9 @@
             left: 0px;
             z-index: 10;
             background: #0f1819;
-            padding: 14px 10px;
+            padding: 15px 10px;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.86rem;
             font-weight: 900;
             color: #00d1d1;
             text-transform: uppercase;
@@ -241,46 +205,6 @@
             border-radius: 16px;
             padding: 16px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.45);
-        }
-
-        #cio-app .push-optin-modal {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
-            background: rgba(0, 0, 0, 0.78);
-            backdrop-filter: blur(8px);
-            z-index: 10200;
-        }
-        #cio-app .push-optin-modal.active { display: flex; }
-        #cio-app .push-optin-card {
-            width: min(94vw, 440px);
-            background: linear-gradient(180deg, #111819 0%, #090d0e 100%);
-            border: 1px solid rgba(0, 100, 101, 0.55);
-            border-radius: 18px;
-            padding: 18px 16px;
-            box-shadow: 0 18px 35px rgba(0,0,0,0.45);
-        }
-        #cio-app .push-optin-title {
-            color: #00d1d1;
-            font-size: 1.05rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-        }
-        #cio-app .push-optin-text {
-            white-space: pre-line;
-            font-size: 0.78rem;
-            opacity: 0.88;
-            line-height: 1.45;
-            margin-bottom: 12px;
-        }
-        #cio-app #pushOptinStatus {
-            min-height: 18px;
-            margin-bottom: 8px;
-            font-size: 0.72rem;
-            color: #f1c40f;
         }
 
         #cio-app #mobileClockInline {
@@ -823,23 +747,6 @@
             <input id="serviceCheckInput" class="p-field" style="margin-bottom:10px;" placeholder="Ej: Admin_Libertador">
             <button onclick="checkServiceAvailability()" class="btn-pill" style="border-radius:10px; margin-bottom:8px;">Verificar</button>
             <div id="serviceCheckResult" style="font-size:0.78rem; min-height:28px;"></div>
-        </div>
-    </div>
-
-
-
-    <div id="pushOptinModal" class="push-optin-modal" aria-hidden="true">
-        <div class="push-optin-card" role="dialog" aria-modal="true" aria-labelledby="push-optin-title">
-            <h3 id="push-optin-title" class="push-optin-title">🚨 Activar alertas en vivo</h3>
-            <p class="push-optin-text">Este sistema puede enviarte notificaciones cuando:
-• Un servicio quede offline
-• Se detecte caída de cámaras
-• Ocurra una novedad crítica
-Las alertas funcionan incluso si la pestaña está cerrada.</p>
-            <input id="pushOperatorName" type="text" class="p-field" placeholder="Nombre del operador" style="margin-bottom:10px;">
-            <div id="pushOptinStatus"></div>
-            <button id="pushOptinActivate" class="btn-pill" style="margin-bottom:8px; border-radius:10px;">🔔 Activar notificaciones</button>
-            <button id="pushOptinLater" class="btn-pill btn-sec" style="border-radius:10px;">Ahora no</button>
         </div>
     </div>
 
@@ -1514,96 +1421,6 @@ Las alertas funcionan incluso si la pestaña está cerrada.</p>
         if (mobileClock) mobileClock.textContent = time24h;
     }
 
-
-    function openPushOptinModal() {
-        const modal = document.getElementById('pushOptinModal');
-        if (!modal) return;
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        const nameInput = document.getElementById('pushOperatorName');
-        if (nameInput) setTimeout(() => nameInput.focus(), 60);
-    }
-
-    function closePushOptinModal() {
-        const modal = document.getElementById('pushOptinModal');
-        if (!modal) return;
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
-    }
-
-    async function registerPushOperator() {
-        const nameInput = document.getElementById('pushOperatorName');
-        const statusEl = document.getElementById('pushOptinStatus');
-        const operatorName = (nameInput?.value || '').trim();
-
-        if (!operatorName) {
-            if (statusEl) statusEl.textContent = 'Ingresá el nombre del operador.';
-            return;
-        }
-
-        if (!('Notification' in window)) {
-            if (statusEl) statusEl.textContent = 'Este navegador no soporta notificaciones.';
-            return;
-        }
-
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-                if (statusEl) statusEl.textContent = 'Permiso de notificaciones denegado.';
-                return;
-            }
-
-            const getToken = window.firebaseApi?.getToken;
-            if (!window.messaging || typeof getToken !== 'function') {
-                if (statusEl) statusEl.textContent = 'No se encontró instancia de Firebase Messaging.';
-                return;
-            }
-
-            const registration = window.firebaseSwRegistrationPromise
-                ? await window.firebaseSwRegistrationPromise
-                : await navigator.serviceWorker.ready;
-            const token = await getToken(window.messaging, {
-                vapidKey: "BEK6Sxqi5zaMCQ8d5_tPpMWCtRsPOXYPy0IIm-RVuheFezBH3dn5W1VHh5fFWTVljxGgFvY7hVhyIjaCvUlsP2s",
-                serviceWorkerRegistration: registration
-            });
-            if (!token) {
-                if (statusEl) statusEl.textContent = 'No se pudo obtener el token de notificación.';
-                return;
-            }
-
-            const payload = {
-                nombre: operatorName,
-                fecha_registro: window.firebaseApi.serverTimestamp(),
-                userAgent: navigator.userAgent
-            };
-
-            await window.firebaseApi.set(window.firebaseApi.ref(window.firebaseApi.database, `tokens/${token}`), payload);
-
-            localStorage.setItem('operatorRegistered', 'true');
-            closePushOptinModal();
-        } catch (err) {
-            console.error('Error registrando notificaciones push:', err);
-            if (statusEl) statusEl.textContent = 'Ocurrió un error al activar notificaciones.';
-        }
-    }
-
-    function initPushOptinModal() {
-        const activateBtn = document.getElementById('pushOptinActivate');
-        const laterBtn = document.getElementById('pushOptinLater');
-
-        if (activateBtn) activateBtn.addEventListener('click', registerPushOperator);
-        if (laterBtn) {
-            laterBtn.addEventListener('click', () => {
-                localStorage.setItem('operatorDismissed', 'true');
-                closePushOptinModal();
-            });
-        }
-
-        if (!localStorage.getItem('operatorRegistered')) {
-            openPushOptinModal();
-        }
-    }
-
     const panelMobileDash = document.getElementById('panelMobileDash');
     if (panelMobileDash) panelMobileDash.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('scroll', toggleScrollTopButton, { passive: true });
@@ -1611,13 +1428,9 @@ Las alertas funcionan incluso si la pestaña está cerrada.</p>
 
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
-    initPushOptinModal();
     syncData();
     setInterval(syncData, 30000);
     toggleScrollTopButton();
 </script>
 </body>
 </html>
-
-
-
