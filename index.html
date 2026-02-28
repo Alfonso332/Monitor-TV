@@ -339,16 +339,16 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%) scale(0.95);
-            min-width: min(86vw, 680px);
-            max-width: 88vw;
-            background: linear-gradient(170deg, rgba(66, 9, 9, 0.98), rgba(20, 5, 5, 0.98));
-            border: 1px solid rgba(255, 77, 77, 0.9);
-            border-radius: 20px;
-            padding: 16px 18px;
+            min-width: min(92vw, 840px);
+            max-width: 94vw;
+            background: linear-gradient(170deg, #b30000 0%, #7a0000 100%);
+            border: 1px solid #ff7a7a;
+            border-radius: 24px;
+            padding: 22px 24px;
             z-index: 10170;
             opacity: 0;
             pointer-events: none;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.15);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.45), 0 0 0 rgba(255,77,77,0.25);
             transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease;
         }
         #cio-app .service-offline-alert.active {
@@ -363,7 +363,7 @@
             animation: none;
         }
         #cio-app .service-offline-alert .alert-title {
-            font-size: 0.82rem;
+            font-size: 1rem;
             letter-spacing: 1.4px;
             text-transform: uppercase;
             color: #ffb6b6;
@@ -371,7 +371,7 @@
             font-weight: 900;
         }
         #cio-app .service-offline-alert .alert-service {
-            font-size: clamp(24px, 3.5vw, 42px);
+            font-size: clamp(30px, 4.8vw, 62px);
             font-weight: 900;
             color: #ffffff;
             line-height: 1.05;
@@ -379,7 +379,7 @@
         }
         #cio-app .service-offline-alert .alert-sub {
             margin-top: 5px;
-            font-size: 0.84rem;
+            font-size: 0.95rem;
             color: #ffd6d6;
             opacity: 0.9;
             letter-spacing: 0.4px;
@@ -693,10 +693,10 @@
                 transition: stroke-dasharray 0.45s ease, stroke 0.3s ease;
             }
             #cio-app .sla-circle-bg {
-                stroke: #ff4d4d;
-                opacity: 0.9;
+                stroke: rgba(255,255,255,0.18);
+                opacity: 1;
             }
-            #cio-app .sla-circle-bar { stroke: var(--online); }
+            #cio-app .sla-circle-bar { stroke: #00d66d; }
             #cio-app .sla-text-overlay {
                 position: absolute;
                 inset: 0;
@@ -1869,15 +1869,18 @@
     function updateMobileSLA(val) {
         const circle = document.getElementById('m-sla-circle');
         const textVal = document.getElementById('m-sla-val');
+        if (!circle || !textVal) return;
         const circ = 2 * Math.PI * 45;
         const safeVal = Math.max(0, Math.min(100, Number(val) || 0));
         const covered = (safeVal / 100) * circ;
+        const remaining = Math.max(circ - covered, 0);
 
-        circle.style.strokeDasharray = `${covered} ${circ}`;
+        circle.style.strokeDasharray = `${covered} ${remaining}`;
+        circle.style.strokeDashoffset = '0';
 
-        let color = safeVal >= 85 ? "#00ff88" : safeVal >= 70 ? "var(--online)" : safeVal >= 60 ? "var(--warning)" : "var(--critico)";
-        circle.style.stroke = color;
-        textVal.style.color = color;
+        const fillColor = '#00d66d';
+        circle.style.stroke = fillColor;
+        textVal.style.color = fillColor;
         textVal.textContent = `${safeVal}%`;
 
         const trendEl = document.getElementById('m-sla-trend');
