@@ -477,12 +477,19 @@
                 gap: 10px;
             }
             #cio-app .mobile-filter-bar {
-                display: grid;
-                grid-template-columns: repeat(5, minmax(0, 1fr));
+                display: flex;
+                align-items: center;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
                 gap: 8px;
                 margin: 12px 0 8px;
+                padding: 2px 0 6px;
+                scrollbar-width: thin;
             }
             #cio-app .mobile-filter-chip {
+                flex: 0 0 auto;
+                min-width: 94px;
                 border: 1px solid rgba(115, 255, 255, 0.25);
                 background: rgba(11, 28, 30, 0.85);
                 color: #c6f6f7;
@@ -990,6 +997,7 @@
         <div style="display:flex; gap:8px;">
             <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
+            <button onclick="openFeedbackModal()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">✉ Feedback</button>
         </div>
         <img class="mobile-bottom-icon" src="https://i.postimg.cc/8zKZJGHs/Chat-GPT-Image-21-feb-2026-06-45-24-p-m.png" alt="Monitor">
         <div id="clockDisplay" style="font-family:monospace; font-weight:900; color:var(--primary); font-size: 1.1rem;">00:00:00</div>
@@ -1381,8 +1389,6 @@
     }
 
     function openFeedbackModal() {
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        if (!isMobile) return;
         const modal = document.getElementById('feedbackModal');
         if (!modal) return;
         modal.classList.add('active');
