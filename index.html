@@ -1197,6 +1197,10 @@
                 <div class="offline-widget-title" id="m-offline-cameras-title">Cámaras Offline (0)</div>
                 <div id="m-cam-list" class="offline-group"></div>
             </div>
+            <div class="offline-widget" id="m-offline-alarms-widget">
+                <div class="offline-widget-title" id="m-offline-alarms-title">Alarmas Offline (0)</div>
+                <div id="m-alarm-list" class="offline-group"></div>
+            </div>
         </div>
 
         <div class="mobile-only-section mobile-filter-target" data-mobile-group="news">
@@ -1793,12 +1797,16 @@
             const mCamList = document.getElementById('m-cam-list');
             const mOfflineServicesTitle = document.getElementById('m-offline-services-title');
             const mOfflineCamerasTitle = document.getElementById('m-offline-cameras-title');
+            const mOfflineAlarmsTitle = document.getElementById('m-offline-alarms-title');
             const mOfflineServicesWidget = document.getElementById('m-offline-services-widget');
             const mOfflineCamerasWidget = document.getElementById('m-offline-cameras-widget');
+            const mOfflineAlarmsWidget = document.getElementById('m-offline-alarms-widget');
+            const mAlarmList = document.getElementById('m-alarm-list');
             
-            let srvHtml = "", camTickerHtml = "", alarmTickerHtml = "", nvrHtml = "", camHtml = "";
+            let srvHtml = "", camTickerHtml = "", alarmTickerHtml = "", nvrHtml = "", camHtml = "", alarmHtml = "";
             let offlineServicesCount = 0;
             let cameraAffectedServicesCount = 0;
+            let offlineAlarmsCount = 0;
             const currentServiceStatuses = {};
             const newOfflineServices = [];
 
@@ -1806,6 +1814,33 @@
                 const loaded = [];
                 const unavailable = [];
                 Object.keys(serviceLiveHistory).forEach(k => delete serviceLiveHistory[k]);
+
+                Object.entries(dR).forEach(([id, value], alarmIndex) => {
+                    if (!id.startsWith('ALARMA_') || !value) return;
+                    const estado = (value.estado || value.status || '').toString().toLowerCase();
+                    if (!['offline', 'critical', 'critico', 'crítico'].includes(estado)) return;
+
+                    offlineAlarmsCount++;
+                    const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
+                    const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
+                    const fallaStamp = parseDateTimeLabel(fallaDateTime);
+                    alarmHtml += `
+                    <div class="acc-wrapper">
+                        <div class="off-service-card" id="head-alm${alarmIndex}" onclick="toggleAccordion('alm${alarmIndex}')">
+                            <div class="off-status-dot" style="background:var(--critico); box-shadow:0 0 10px var(--critico)"></div>
+                            <div style="flex:1">
+                                <div style="font-size:0.9rem; font-weight:900; color:#fff;">${serviceName} - Falla</div>
+                                <div style="font-size:0.6rem; color:#ff9999; opacity:0.9;">Alarma crítica</div>
+                            </div>
+                            <div id="arr-alm${alarmIndex}" style="font-size:0.8rem; opacity:0.5;">▼</div>
+                        </div>
+                        <div id="acc-alm${alarmIndex}" class="generic-details">
+                            <div class="detail-row" style="justify-content:space-between"><span style="font-size:0.7rem; opacity:0.5">FECHA</span><span class="detail-value">${fallaStamp.date}</span></div>
+                            <div class="detail-row" style="justify-content:space-between"><span style="font-size:0.7rem; opacity:0.5">HORA</span><span class="detail-value">${fallaStamp.time}</span></div>
+                        </div>
+                    </div>`;
+                });
+
                 Object.entries(dR).forEach(([id, v], index) => {
                     if (id.startsWith('ALARMA_')) return;
                     let name = id.replace(/_/g,' ').toUpperCase();
@@ -1892,10 +1927,13 @@
             }
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
+            if (mAlarmList) mAlarmList.innerHTML = alarmHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las alarmas online</div>`;
             if (mOfflineServicesTitle) mOfflineServicesTitle.textContent = `Servicios Offline (${offlineServicesCount})`;
             if (mOfflineCamerasTitle) mOfflineCamerasTitle.textContent = `Cámaras Offline (${cameraAffectedServicesCount})`;
+            if (mOfflineAlarmsTitle) mOfflineAlarmsTitle.textContent = `Alarmas Offline (${offlineAlarmsCount})`;
             if (mOfflineServicesWidget) mOfflineServicesWidget.classList.toggle('alert-pulse-dark', offlineServicesCount > 5);
             if (mOfflineCamerasWidget) mOfflineCamerasWidget.classList.toggle('alert-pulse-dark', cameraAffectedServicesCount > 5);
+            if (mOfflineAlarmsWidget) mOfflineAlarmsWidget.classList.toggle('alert-pulse-dark', offlineAlarmsCount > 0);
             renderServiceInfoWidget();
             
         } catch(e) {
