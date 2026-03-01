@@ -1203,6 +1203,13 @@
             <button id="mobileThemeToggle" class="mobile-theme-toggle" onclick="toggleMobileTheme()" aria-label="Cambiar modo visual móvil">☾ Oscuro</button>
         </div>
 
+        <div class="mobile-only-section" id="mobileQuickSearch" style="margin-bottom:12px;">
+            <div style="display:flex; gap:8px;">
+                <input id="mobileServiceQuickInput" list="service-options" class="p-field" style="margin:0; text-align:left;" placeholder="Buscar servicio...">
+                <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:0 14px; border-radius:10px;" onclick="openServiceDetailFromQuickSearch()">Ver</button>
+            </div>
+        </div>
+
         <div class="mobile-filter-bar mobile-only-section" id="mobileFilterBar">
             <button class="mobile-filter-chip active" data-filter="all" onclick="setMobileSectionFilter('all')">Todo</button>
             <button class="mobile-filter-chip" data-filter="ops" onclick="setMobileSectionFilter('ops')">Operación</button>
@@ -1411,6 +1418,7 @@
     ];
     const serviceLiveHistory = {};
     const serviceDetailSnapshot = {};
+    const alarmDetailSnapshot = {};
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
 
     function normalizeServiceName(value) {
@@ -1472,7 +1480,7 @@
         modal.setAttribute('aria-hidden', 'true');
     }
 
-    function openServiceDetailModalByName(rawName) {
+    function openServiceDetailModalByName(rawName, detailType = 'service') {
         const modal = document.getElementById('serviceDetailModal');
         const body = document.getElementById('serviceDetailBody');
         const title = document.getElementById('service-detail-title');
@@ -1480,11 +1488,12 @@
 
         const decodedName = decodeURIComponent(rawName || '').replace(/\+/g, ' ');
         const normalized = normalizeServiceName(decodedName);
-        const detail = serviceDetailSnapshot[normalized] || {};
-        const history = serviceLiveHistory[normalized] || [];
+        const detailSource = detailType === 'alarm' ? alarmDetailSnapshot : serviceDetailSnapshot;
+        const detail = detailSource[normalized] || {};
+        const history = detailType === 'alarm' ? [] : (serviceLiveHistory[normalized] || []);
         const novedades = cio_logs.filter(it => normalizeServiceName(it.service || it.title) === normalized);
 
-        title.textContent = decodedName || 'Detalle de servicio';
+        title.textContent = detailType === 'alarm' ? `Detalle de alarma: ${decodedName || ''}` : (decodedName || 'Detalle de servicio');
         body.innerHTML = `
             <div style="margin-bottom:10px;"><strong>Estado NVR:</strong> ${detail.estado || 'Sin datos'}</div>
             <div style="margin-bottom:10px;"><strong>Alarmas:</strong> ${detail.alarmas || 'Sin datos'}</div>
@@ -1500,10 +1509,21 @@
         modal.setAttribute('aria-hidden', 'false');
     }
 
-    function handleOfflineCardAction(accordionId, encodedName) {
+    function openServiceDetailFromQuickSearch() {
+        const input = document.getElementById('mobileServiceQuickInput');
+        if (!input) return;
+        const raw = (input.value || '').trim();
+        if (!raw) return;
+        const normalized = normalizeServiceName(raw);
+        const exact = Array.from(serviceNamePool).find(name => normalizeServiceName(name) === normalized);
+        const selected = exact || raw.toUpperCase();
+        openServiceDetailModalByName(encodeURIComponent(selected), 'service');
+    }
+
+    function handleOfflineCardAction(accordionId, encodedName, detailType = 'service') {
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         if (isMobile) {
-            openServiceDetailModalByName(encodedName);
+            openServiceDetailModalByName(encodedName, detailType);
             return;
         }
         toggleAccordion(accordionId);
@@ -1915,6 +1935,7 @@
                 const unavailable = [];
                 Object.keys(serviceLiveHistory).forEach(k => delete serviceLiveHistory[k]);
                 Object.keys(serviceDetailSnapshot).forEach(k => delete serviceDetailSnapshot[k]);
+                Object.keys(alarmDetailSnapshot).forEach(k => delete alarmDetailSnapshot[k]);
 
                 Object.entries(dR).forEach(([id, value], alarmIndex) => {
                     if (!id.startsWith('ALARMA_') || !value) return;
@@ -1931,7 +1952,7 @@
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
                     alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla</div>`;
-                    serviceDetailSnapshot[alarmNormalizedKey] = {
+                    alarmDetailSnapshot[alarmNormalizedKey] = {
                         estado: 'Offline',
                         alarmas: 'ALARMA ACTIVA (OFFLINE)',
                         camaras: 'No aplica',
@@ -1939,7 +1960,7 @@
                     };
                     alarmHtml += `
                     <div class="acc-wrapper">
-                        <div class="off-service-card" id="head-alm${alarmIndex}" onclick="handleOfflineCardAction('alm${alarmIndex}', '${encodeURIComponent(serviceName)}')">
+                        <div class="off-service-card" id="head-alm${alarmIndex}" onclick="handleOfflineCardAction('alm${alarmIndex}', '${encodeURIComponent(serviceName)}', 'alarm')">
                             <div class="off-status-dot" style="background:var(--critico); box-shadow:0 0 10px var(--critico)"></div>
                             <div style="flex:1">
                                 <div style="font-size:0.9rem; font-weight:900; color:#fff;">${serviceName} - Falla</div>
@@ -1975,10 +1996,9 @@
                     if (!historyItems.length) historyItems.push('Sin novedades críticas recientes');
                     serviceLiveHistory[historyKey] = historyItems;
                     serviceNamePool.add(name);
-                    const prevDetail = serviceDetailSnapshot[historyKey] || {};
                     serviceDetailSnapshot[historyKey] = {
                         estado: (v.estado || 'Sin datos').toUpperCase(),
-                        alarmas: prevDetail.alarmas || 'Sin alarma activa',
+                        alarmas: 'No aplica en widget NVR',
                         camaras: cameraInfo,
                         horaCaida: `${offlineStamp.date} ${offlineStamp.time}`
                     };
@@ -2003,7 +2023,7 @@
                         camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6;">${name}: ${cleanData || 'CÁMARAS OFFLINE'}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
-                            <div class="off-service-card" id="head-cam${index}" onclick="handleOfflineCardAction('cam${index}', '${encodeURIComponent(name)}')">
+                            <div class="off-service-card" id="head-cam${index}" onclick="handleOfflineCardAction('cam${index}', '${encodeURIComponent(name)}', 'service')">
                                 <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
@@ -2024,7 +2044,7 @@
                         srvHtml += `<div class="capsula-off">${name}: Off</div>`;
                         nvrHtml += `
                         <div class="acc-wrapper">
-                            <div class="off-service-card" id="head-srv${index}" onclick="handleOfflineCardAction('srv${index}', '${encodeURIComponent(name)}')">
+                            <div class="off-service-card" id="head-srv${index}" onclick="handleOfflineCardAction('srv${index}', '${encodeURIComponent(name)}', 'service')">
                                 <div class="off-status-dot"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
@@ -2500,6 +2520,10 @@
     }
 
     document.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && document.activeElement && document.activeElement.id === 'mobileServiceQuickInput') {
+            event.preventDefault();
+            openServiceDetailFromQuickSearch();
+        }
         if (event.key === 'Escape' && serviceCheckModalEl && serviceCheckModalEl.classList.contains('active')) {
             closeServiceCheckModal();
         }
