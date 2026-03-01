@@ -173,6 +173,10 @@
             border-color: rgba(140, 104, 34, 0.55);
             background: linear-gradient(145deg, rgba(21,16,9,0.94), rgba(10,8,5,0.94));
         }
+        #cio-app .ticker-section:nth-child(3) {
+            border-color: rgba(173, 22, 22, 0.68);
+            background: linear-gradient(145deg, rgba(38,10,10,0.95), rgba(17,5,5,0.95));
+        }
         #cio-app .ticker-label {
             position: absolute;
             left: 0;
@@ -199,6 +203,12 @@
             background: #4b3210;
             border-right-color: #a06f23;
             color: #ffd68a;
+        }
+        #cio-app .ticker-section:nth-child(3) .ticker-label {
+            background: #5a1111;
+            border-right-color: #9f2b2b;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(255, 77, 77, 0.45);
         }
 
         #cio-app .ticker-wrapper {
@@ -235,6 +245,14 @@
             color: #ff6d6d;
             font-size: 0.84rem;
             text-shadow: 0 0 8px rgba(255,109,109,0.65);
+        }
+        #cio-app .capsula-alarma {
+            background: linear-gradient(140deg, rgba(0, 100, 101, 0.95), rgba(11, 24, 25, 0.95));
+            border: 1px solid rgba(255, 77, 77, 0.82);
+            color: #ffffff;
+            font-weight: 900;
+            text-shadow: 0 0 5px rgba(255, 77, 77, 0.35);
+            box-shadow: 0 0 12px rgba(255, 77, 77, 0.15);
         }
 
         /* PANELES LATERALES */
@@ -1122,6 +1140,10 @@
             <span class="ticker-label">Cámaras</span>
             <div id="ticker-cameras" class="ticker-wrapper"></div>
         </div>
+        <div class="ticker-section">
+            <span class="ticker-label">Alarmas</span>
+            <div id="ticker-alarms" class="ticker-wrapper"></div>
+        </div>
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
@@ -1703,6 +1725,22 @@
         return `<span class="trend-arrow ${trendClass}" style="font-size:1rem; margin-left:6px;">${currentArrow}</span>`;
     }
 
+    function renderAlarmasTicker(redStatuses) {
+        if (!redStatuses) return "";
+
+        return Object.entries(redStatuses)
+            .filter(([id, value]) => id.startsWith('ALARMA_') && value)
+            .filter(([, value]) => {
+                const estado = (value.estado || value.status || '').toString().toLowerCase();
+                return ['offline', 'critical', 'critico', 'crítico'].includes(estado);
+            })
+            .map(([id]) => {
+                const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
+                return `<div class="capsula-off capsula-alarma">${serviceName} - Falla</div>`;
+            })
+            .join('');
+    }
+
     async function syncData() {
         if (syncInProgress) return;
         syncInProgress = true;
@@ -1750,6 +1788,7 @@
             
             const tickerSrv = document.getElementById('ticker-services');
             const tickerCam = document.getElementById('ticker-cameras');
+            const tickerAlarms = document.getElementById('ticker-alarms');
             const mNvrList = document.getElementById('m-nvr-list');
             const mCamList = document.getElementById('m-cam-list');
             const mOfflineServicesTitle = document.getElementById('m-offline-services-title');
@@ -1757,7 +1796,7 @@
             const mOfflineServicesWidget = document.getElementById('m-offline-services-widget');
             const mOfflineCamerasWidget = document.getElementById('m-offline-cameras-widget');
             
-            let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "";
+            let srvHtml = "", camTickerHtml = "", alarmTickerHtml = "", nvrHtml = "", camHtml = "";
             let offlineServicesCount = 0;
             let cameraAffectedServicesCount = 0;
             const currentServiceStatuses = {};
@@ -1768,6 +1807,7 @@
                 const unavailable = [];
                 Object.keys(serviceLiveHistory).forEach(k => delete serviceLiveHistory[k]);
                 Object.entries(dR).forEach(([id, v], index) => {
+                    if (id.startsWith('ALARMA_')) return;
                     let name = id.replace(/_/g,' ').toUpperCase();
                     currentServiceStatuses[id] = (v.estado || '').toLowerCase();
                     const prevStatus = (previousServiceStatuses[id] || '').toLowerCase();
@@ -1837,6 +1877,7 @@
                         </div>`;
                     }
                 });
+                alarmTickerHtml = renderAlarmasTicker(dR);
                 serviceWidgetData = { loaded, unavailable };
                 previousServiceStatuses = currentServiceStatuses;
                 newOfflineServices.forEach(serviceName => enqueueOfflineServiceAlert(serviceName));
@@ -1846,6 +1887,9 @@
             
             tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">SERVICIOS: SIN INCIDENTES</span>`;
             tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">CÁMARAS: SIN INCIDENTES</span>`;
+            if (tickerAlarms) {
+                tickerAlarms.innerHTML = alarmTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">ALARMAS: SIN INCIDENTES</span>`;
+            }
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
             if (mOfflineServicesTitle) mOfflineServicesTitle.textContent = `Servicios Offline (${offlineServicesCount})`;
@@ -2311,3 +2355,4 @@
 </script>
 </body>
 </html>
+
