@@ -286,7 +286,38 @@
         }
         #cio-app .btn-sec { background: #222; border: 1px solid #444; }
 
-        #cio-app #progressLine { position: fixed; bottom: 96px; height: 4px; width: 0%; background: var(--accent); z-index: 10; transition: width 0.1s linear; }
+        #cio-app #progressLine {
+            --progress: 0deg;
+            position: fixed;
+            right: 22px;
+            bottom: 138px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--accent) var(--progress), rgba(255,255,255,0.08) 0deg);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35), 0 0 16px rgba(0,209,209,0.18);
+            transition: background 0.12s linear, box-shadow 0.2s ease;
+        }
+        #cio-app #progressLine::before {
+            content: "";
+            position: absolute;
+            inset: 6px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(3,8,9,0.97), rgba(8,17,18,0.96));
+            border: 1px solid rgba(255,255,255,0.09);
+        }
+        #cio-app #progressCountdown {
+            position: relative;
+            z-index: 1;
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
 
         #cio-app .trend-arrow { display: inline-block; animation: arrowMove 0.8s infinite alternate; font-weight: 900; }
         #cio-app .trend-up { color: #2ecc71 !important; }
@@ -531,7 +562,9 @@
             }
 
             #cio-app .mobile-only-section { display: block; }
-            #cio-app #progressLine { bottom: 0; }
+            #cio-app #progressLine { bottom: 14px; right: 14px; width: 52px; height: 52px; }
+            #cio-app #progressLine::before { inset: 5px; }
+            #cio-app #progressCountdown { font-size: 0.78rem; }
 
             #cio-app #mobileClockInline {
                 display: block;
@@ -1127,7 +1160,7 @@
         </div>
     </main>
 
-    <div id="progressLine"></div>
+    <div id="progressLine" aria-live="polite" aria-label="Tiempo restante para próxima novedad"><span id="progressCountdown">45s</span></div>
     <div id="syncIndicator" class="sync-indicator" aria-live="polite" aria-hidden="true">
         <span class="sync-indicator-dot"></span>
         <span>Sincronizando datos...</span>
@@ -2034,13 +2067,24 @@
             document.getElementById('areaLabel').style.color = color;
             document.getElementById('titleDisplay').textContent = item.title;
             document.getElementById('messageDisplay').textContent = item.message;
-            document.getElementById('progressLine').style.background = color;
+            const progressLineEl = document.getElementById('progressLine');
+            const progressCountdownEl = document.getElementById('progressCountdown');
+            if (progressLineEl) {
+                progressLineEl.style.setProperty('--progress', '0deg');
+                progressLineEl.style.background = `conic-gradient(${color} var(--progress), rgba(255,255,255,0.08) 0deg)`;
+                progressLineEl.style.boxShadow = `0 8px 20px rgba(0,0,0,0.35), 0 0 16px ${color}33`;
+            }
+            if (progressCountdownEl) progressCountdownEl.textContent = `${Math.ceil(SLIDE_DURATION / 1000)}s`;
             cont.classList.remove('oculto');
             
             let p = 0; if(startTime) clearInterval(startTime);
             startTime = setInterval(() => {
                 p += 100 / (SLIDE_DURATION / 100);
-                document.getElementById('progressLine').style.width = p + "%";
+                if (progressLineEl) progressLineEl.style.setProperty('--progress', `${Math.min(360, (p / 100) * 360)}deg`);
+                if (progressCountdownEl) {
+                    const remaining = Math.max(0, Math.ceil((SLIDE_DURATION * (1 - (p / 100))) / 1000));
+                    progressCountdownEl.textContent = `${remaining}s`;
+                }
                 if(p >= 100) { clearInterval(startTime); renderSlide(); }
             }, 100);
             currentIdx++;
