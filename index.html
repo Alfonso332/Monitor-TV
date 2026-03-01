@@ -1885,28 +1885,34 @@
                     }
                     let lastDown = v.hora_caida || "Desconocida";
                     const offlineStamp = parseDateTimeLabel(lastDown);
-                    const cameraInfo = (v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras';
+                    const cameraOfflineList = Array.isArray(v.camaras_offline) ? v.camaras_offline : [];
+                    const cameraInfo = cameraOfflineList.length
+                        ? cameraOfflineList.join(', ')
+                        : ((v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras');
                     const historyKey = normalizeServiceName(id);
                     const historyItems = [];
                     if (v.estado === 'offline') historyItems.push(`Sistema offline desde ${lastDown}`);
-                    if (v.alerta_camaras && v.alerta_camaras.trim() !== '') historyItems.push(`Cámaras offline: ${cameraInfo}`);
+                    if (cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== '')) historyItems.push(`Cámaras offline: ${cameraInfo}`);
                     if (!historyItems.length) historyItems.push('Sin novedades críticas recientes');
                     serviceLiveHistory[historyKey] = historyItems;
                     if(v.estado === "online") loaded.push({ service: name, cameras: cameraInfo });
                     else unavailable.push({ service: name, reason: `offline desde ${offlineStamp.date} ${offlineStamp.time}` });
                     
-                    if(v.alerta_camaras && v.alerta_camaras.trim() !== "") {
+                    if(cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== "")) {
                         cameraAffectedServicesCount++;
-                        // LIMPIEZA TOTAL: Solo el contenido puro de Firebase
-                        let cleanData = v.alerta_camaras.toUpperCase()
-                                        .replace(id.toUpperCase(), "")
-                                        .replace("ALERTA:", "")
-                                        .replace("CÁMARAS FUERA DE LÍNEA", "")
-                                        .replace("DISPOSITIVOS:", "")
-                                        .replace("DISPOSITIVOS", "")
-                                        .replace("CÁMARAS", "")
-                                        .trim();
-                                        
+                        let cleanData = cameraOfflineList.length
+                            ? cameraOfflineList.join(', ').toUpperCase()
+                            : v.alerta_camaras.toUpperCase()
+                                .replace(id.toUpperCase(), "")
+                                .replace("ALERTA:", "")
+                                .replace("CÁMARAS FUERA DE LÍNEA", "")
+                                .replace("DISPOSITIVOS:", "")
+                                .replace("DISPOSITIVOS", "")
+                                .replace("CÁMARAS", "")
+                                .replace("CAMS OFF", "")
+                                .replace("⚠️", "")
+                                .trim();
+
                         camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6;">${name}: ${cleanData || 'CÁMARAS OFFLINE'}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
