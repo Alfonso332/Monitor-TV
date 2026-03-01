@@ -145,19 +145,29 @@
             backdrop-filter: none !important;
         }
 
-        /* TICKER TV/PC (REDISEÑADO: ALTO CONTRASTE Y LECTURA LEJANA) */
+        /* TICKER TV/PC (DOBLE BANDA PARA TV 50") */
         #cio-app #ticker-bar {
-            height: 88px;
+            height: 124px;
             background: linear-gradient(180deg, #010405 0%, #071112 100%);
             border-top: 1px solid #1e3536;
             display: flex;
+            flex-direction: column;
             overflow: hidden;
             position: relative;
             flex-shrink: 0;
             padding: 10px 14px;
-            gap: 14px;
+            gap: 10px;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 -8px 28px rgba(0,0,0,0.35);
         }
+        #cio-app .ticker-row {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            min-height: 0;
+        }
+        #cio-app .ticker-row-top .ticker-section { flex: 1; }
+        #cio-app .ticker-row-bottom .ticker-section { flex: 1; }
+
         #cio-app .ticker-section {
             flex: 1;
             position: relative;
@@ -169,9 +179,13 @@
             background: linear-gradient(145deg, rgba(11,22,23,0.95), rgba(5,10,11,0.95));
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 18px rgba(0,0,0,0.26);
         }
-        #cio-app .ticker-section:nth-child(2) {
+        #cio-app .ticker-section.cameras {
             border-color: rgba(140, 104, 34, 0.55);
             background: linear-gradient(145deg, rgba(21,16,9,0.94), rgba(10,8,5,0.94));
+        }
+        #cio-app .ticker-section.alarms {
+            border-color: rgba(170, 34, 34, 0.62);
+            background: linear-gradient(145deg, rgba(27,9,9,0.95), rgba(12,5,5,0.95));
         }
         #cio-app .ticker-label {
             position: absolute;
@@ -179,7 +193,7 @@
             top: 0;
             bottom: 0;
             z-index: 10;
-            width: 158px;
+            width: 168px;
             text-align: center;
             display: flex;
             align-items: center;
@@ -187,7 +201,7 @@
             background: #0b2f30;
             padding: 0 12px;
             border-radius: 0;
-            font-size: 0.98rem;
+            font-size: 1.04rem;
             font-weight: 900;
             color: #7ef8f9;
             text-transform: uppercase;
@@ -195,10 +209,15 @@
             border-right: 2px solid #1d6667;
             box-shadow: inset -1px 0 0 rgba(255,255,255,0.08);
         }
-        #cio-app .ticker-section:nth-child(2) .ticker-label {
+        #cio-app .ticker-section.cameras .ticker-label {
             background: #4b3210;
             border-right-color: #a06f23;
             color: #ffd68a;
+        }
+        #cio-app .ticker-section.alarms .ticker-label {
+            background: #4f1212;
+            border-right-color: #a02c2c;
+            color: #ffd2d2;
         }
 
         #cio-app .ticker-wrapper {
@@ -208,12 +227,13 @@
             white-space: nowrap;
             position: absolute;
             left: 0;
-            animation: scroll-ticker 26s linear infinite;
-            padding-left: 172px;
+            animation: scroll-ticker 30s linear infinite;
+            padding-left: 184px;
             padding-right: 24px;
             min-width: 100%;
         }
-        @keyframes scroll-ticker { 0% { transform: translateX(38vw); } 100% { transform: translateX(-100%); } }
+        #cio-app .ticker-row-bottom .ticker-wrapper { animation-duration: 34s; }
+        @keyframes scroll-ticker { 0% { transform: translateX(30vw); } 100% { transform: translateX(-100%); } }
 
         #cio-app .capsula-off {
             background: linear-gradient(150deg, rgba(62, 16, 16, 0.95), rgba(25, 8, 8, 0.95));
@@ -235,6 +255,14 @@
             color: #ff6d6d;
             font-size: 0.84rem;
             text-shadow: 0 0 8px rgba(255,109,109,0.65);
+        }
+        #cio-app .capsula-alarma {
+            background: linear-gradient(140deg, rgba(0, 100, 101, 0.95), rgba(11, 24, 25, 0.95));
+            border: 1px solid rgba(255, 77, 77, 0.82);
+            color: #ffffff;
+            font-weight: 900;
+            text-shadow: 0 0 5px rgba(255, 77, 77, 0.35);
+            box-shadow: 0 0 12px rgba(255, 77, 77, 0.15);
         }
 
         /* PANELES LATERALES */
@@ -1114,13 +1142,21 @@
     </div>
 
     <div id="ticker-bar">
-        <div class="ticker-section">
-            <span class="ticker-label">Servicios</span>
-            <div id="ticker-services" class="ticker-wrapper"></div>
+        <div class="ticker-row ticker-row-top">
+            <div class="ticker-section services">
+                <span class="ticker-label">Servicios</span>
+                <div id="ticker-services" class="ticker-wrapper"></div>
+            </div>
         </div>
-        <div class="ticker-section">
-            <span class="ticker-label">Cámaras</span>
-            <div id="ticker-cameras" class="ticker-wrapper"></div>
+        <div class="ticker-row ticker-row-bottom">
+            <div class="ticker-section cameras">
+                <span class="ticker-label">Cámaras</span>
+                <div id="ticker-cameras" class="ticker-wrapper"></div>
+            </div>
+            <div class="ticker-section alarms">
+                <span class="ticker-label">Alarmas</span>
+                <div id="ticker-alarms" class="ticker-wrapper"></div>
+            </div>
         </div>
     </div>
 
@@ -1754,6 +1790,7 @@
             
             const tickerSrv = document.getElementById('ticker-services');
             const tickerCam = document.getElementById('ticker-cameras');
+            const tickerAlarms = document.getElementById('ticker-alarms');
             const mNvrList = document.getElementById('m-nvr-list');
             const mCamList = document.getElementById('m-cam-list');
             const mOfflineServicesTitle = document.getElementById('m-offline-services-title');
@@ -1764,7 +1801,7 @@
             const mOfflineAlarmsWidget = document.getElementById('m-offline-alarms-widget');
             const mAlarmList = document.getElementById('m-alarm-list');
             
-            let srvHtml = "", camTickerHtml = "", nvrHtml = "", camHtml = "", alarmHtml = "";
+            let srvHtml = "", camTickerHtml = "", alarmTickerHtml = "", nvrHtml = "", camHtml = "", alarmHtml = "";
             let offlineServicesCount = 0;
             let cameraAffectedServicesCount = 0;
             let offlineAlarmsCount = 0;
@@ -1785,6 +1822,7 @@
                     const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
+                    alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla</div>`;
                     alarmHtml += `
                     <div class="acc-wrapper">
                         <div class="off-service-card" id="head-alm${alarmIndex}" onclick="toggleAccordion('alm${alarmIndex}')">
@@ -1882,6 +1920,7 @@
             
             tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">SERVICIOS: SIN INCIDENTES</span>`;
             tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">CÁMARAS: SIN INCIDENTES</span>`;
+            if (tickerAlarms) tickerAlarms.innerHTML = alarmTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">ALARMAS: SIN INCIDENTES</span>`;
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
             if (mAlarmList) mAlarmList.innerHTML = alarmHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las alarmas online</div>`;
