@@ -1851,7 +1851,10 @@
                 Object.entries(dR).forEach(([id, value], alarmIndex) => {
                     if (!id.startsWith('ALARMA_') || !value) return;
                     const estado = (value.estado || value.status || '').toString().toLowerCase();
-                    if (!['offline', 'critical', 'critico', 'crítico'].includes(estado)) return;
+                    const fallos = Number(value.fallos || 0);
+                    // Filtro estricto para evitar falsos positivos por redes inestables:
+                    // solo mostramos alarma cuando ya está offline y acumuló tolerancia real.
+                    if (estado !== 'offline' || fallos < 8) return;
 
                     offlineAlarmsCount++;
                     const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
