@@ -2310,9 +2310,12 @@
     toggleScrollTopButton();
 </script>
 <div id="push-consent-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:1000001;padding:16px;">
-    <div style="width:min(520px,96vw);background:#071112;border:1px solid #1d6667;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:20px;color:#fff;">
+    <div style="width:min(540px,96vw);background:#071112;border:1px solid #1d6667;border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:20px;color:#fff;">
         <h3 style="font-size:1.1rem;margin-bottom:10px;color:#7ef8f9;">Notificaciones en vivo</h3>
-        <p style="font-size:.92rem;line-height:1.45;opacity:.92;margin-bottom:14px;">¿Quieres recibir alertas en vivo cuando haya servicios offline, cámaras fuera de línea o novedades críticas?</p>
+        <p style="font-size:.92rem;line-height:1.45;opacity:.92;margin-bottom:12px;">¿Quieres recibir alertas en vivo cuando haya servicios offline, cámaras fuera de línea o novedades críticas?</p>
+        <label for="push-fullname" style="display:block;font-size:.82rem;opacity:.84;margin-bottom:6px;">Nombre completo (para asociar el dispositivo)</label>
+        <input id="push-fullname" type="text" autocomplete="name" placeholder="Ej: Juan Pérez" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #255455;background:#0f1a1b;color:#fff;outline:none;margin-bottom:8px;">
+        <div id="push-consent-status" style="min-height:18px;font-size:.78rem;opacity:.85;color:#ffd68a;margin-bottom:10px;"></div>
         <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
             <button id="push-consent-later" style="padding:10px 14px;border-radius:10px;border:1px solid #3c4545;background:#131717;color:#ddd;cursor:pointer;">Ahora no</button>
             <button id="push-consent-allow" style="padding:10px 14px;border-radius:10px;border:1px solid #00d1d1;background:#00d1d1;color:#001717;font-weight:700;cursor:pointer;">Sí, activar</button>
@@ -2337,13 +2340,25 @@
     const messaging = getMessaging(app);
     const vapidKey = 'BIUdD6_38OQioheMsywxZBEn-foJmOXS5L4O3vCKQOGwy5GuTV4JElnOiNxvz9xlbT5IOKm0_CVULORY9abxvZI';
     const PUSH_MODAL_KEY = 'push_consent_modal_dismissed_v1';
+    const PUSH_USER_KEY = 'push_user_fullname_v1';
 
     const pushModalEl = document.getElementById('push-consent-modal');
     const pushLaterBtn = document.getElementById('push-consent-later');
     const pushAllowBtn = document.getElementById('push-consent-allow');
+    const pushFullNameInput = document.getElementById('push-fullname');
+    const pushStatusEl = document.getElementById('push-consent-status');
+
+    function setPushStatus(message, isError = false) {
+        if (!pushStatusEl) return;
+        pushStatusEl.textContent = message || '';
+        pushStatusEl.style.color = isError ? '#ff9b9b' : '#ffd68a';
+    }
 
     function openPushConsentModal() {
         if (!pushModalEl) return;
+        const savedName = localStorage.getItem(PUSH_USER_KEY) || '';
+        if (pushFullNameInput && !pushFullNameInput.value) pushFullNameInput.value = savedName;
+        setPushStatus('');
         pushModalEl.style.display = 'flex';
     }
 
@@ -2352,10 +2367,16 @@
         pushModalEl.style.display = 'none';
     }
 
-    async function saveFcmToken(token) {
+    function getSafeTokenId(token) {
+        return encodeURIComponent(token);
+    }
+
+    async function saveFcmToken(token, fullName) {
         try {
-            await set(ref(db, `fcm_tokens/${token}`), {
+            const tokenId = getSafeTokenId(token);
+            await set(ref(db, `fcm_tokens/${tokenId}`), {
                 token,
+                fullName,
                 updatedAt: serverTimestamp(),
                 userAgent: navigator.userAgent || 'unknown',
                 language: navigator.language || 'es',
@@ -2366,16 +2387,32 @@
                 }
             });
             console.log('Token guardado en RTDB para envíos push.');
+            return true;
         } catch (error) {
             console.error('No se pudo guardar el token en RTDB:', error);
+            return false;
         }
     }
 
-    async function solicitarPermisoYToken() {
+    async function solicitarPermisoYToken(fullName) {
         try {
+            if (!window.isSecureContext) {
+                setPushStatus('Debes abrir la web con HTTPS para registrar notificaciones.', true);
+                return;
+            }
+            if (!('serviceWorker' in navigator)) {
+                setPushStatus('Este navegador no soporta Service Worker.', true);
+                return;
+            }
+            if (!('Notification' in window)) {
+                setPushStatus('Este navegador no soporta notificaciones.', true);
+                return;
+            }
+
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
                 console.log('Permiso de notificaciones no concedido:', permission);
+                setPushStatus('Permiso no concedido. Puedes habilitarlo luego en el navegador.', true);
                 return;
             }
 
@@ -2387,14 +2424,26 @@
                 serviceWorkerRegistration
             });
 
-            if (token) {
-                console.log('MI_TOKEN:', token);
-                await saveFcmToken(token);
-            } else {
+            if (!token) {
                 console.log('No se pudo obtener un token de registro de FCM.');
+                setPushStatus('No se obtuvo token. Revisa consola y configuración de Firebase.', true);
+                return;
             }
+
+            console.log('MI_TOKEN:', token);
+            const saved = await saveFcmToken(token, fullName);
+            if (!saved) {
+                setPushStatus('Se obtuvo token, pero falló guardarlo en RTDB. Revisa reglas de la base.', true);
+                return;
+            }
+
+            setPushStatus('¡Listo! Tu dispositivo quedó asociado para recibir alertas.');
+            localStorage.setItem(PUSH_MODAL_KEY, 'granted');
+            if (fullName) localStorage.setItem(PUSH_USER_KEY, fullName);
+            setTimeout(closePushConsentModal, 900);
         } catch (error) {
             console.error('Error al solicitar permisos/token de Firebase Messaging:', error);
+            setPushStatus('Error general al activar notificaciones. Revisa consola.', true);
         }
     }
 
@@ -2406,9 +2455,14 @@
     });
 
     pushAllowBtn?.addEventListener('click', async () => {
-        closePushConsentModal();
-        localStorage.setItem(PUSH_MODAL_KEY, 'granted');
-        await solicitarPermisoYToken();
+        const fullName = (pushFullNameInput?.value || '').trim();
+        if (!fullName || fullName.length < 5) {
+            setPushStatus('Escribe el nombre completo para asociar este dispositivo.', true);
+            pushFullNameInput?.focus();
+            return;
+        }
+        setPushStatus('Activando notificaciones...');
+        await solicitarPermisoYToken(fullName);
     });
 
     pushLaterBtn?.addEventListener('click', () => {
@@ -2417,7 +2471,8 @@
     });
 
     if (Notification.permission === 'granted') {
-        solicitarPermisoYToken();
+        const savedName = (localStorage.getItem(PUSH_USER_KEY) || '').trim();
+        solicitarPermisoYToken(savedName || 'Usuario sin nombre');
     } else if (Notification.permission === 'default' && localStorage.getItem(PUSH_MODAL_KEY) !== 'later') {
         setTimeout(openPushConsentModal, 1500);
     }
