@@ -1325,6 +1325,17 @@
         </div>
     </div>
 
+
+    <div id="serviceDetailModal" class="service-check-modal" aria-hidden="true">
+        <div class="service-check-card" role="dialog" aria-modal="true" aria-labelledby="service-detail-title">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 id="service-detail-title" style="font-size:0.9rem; color:var(--accent);">Detalle de servicio</h3>
+                <button onclick="closeServiceDetailModal()" style="background:none; border:none; color:#9f9f9f; font-size:1.1rem;">✕</button>
+            </div>
+            <div id="serviceDetailBody" style="font-size:0.78rem; line-height:1.45; max-height:60vh; overflow:auto;"></div>
+        </div>
+    </div>
+
     <div id="feedbackToast" class="feedback-toast mobile-only-section" aria-live="polite"></div>
 
     <aside id="panelHistory" class="side-panel">
@@ -1359,7 +1370,9 @@
             <select id="f-prio" class="p-field">
                 <option>Baja</option><option>Media</option><option>Alta</option><option>Crítica</option>
             </select>
-            <input type="text" id="f-title" placeholder="Título" required class="p-field">
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-bottom:5px;">SERVICIO</label>
+            <input type="text" id="f-service" list="service-options" placeholder="Seleccioná o buscá servicio" required class="p-field">
+            <datalist id="service-options"></datalist>
             <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
             <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICAR AHORA</button>
             <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="border-radius: 8px;">CANCELAR</button>
@@ -1397,6 +1410,8 @@
         "Rincon del lago","Naciones Unidas","18 de diciembre","farmaco","Galielo","picasso","Palazzo Pitti","Exselsior","Arenal Grande","Ombu","Obra Ziel","Lazar","coopephi"
     ];
     const serviceLiveHistory = {};
+    const serviceDetailSnapshot = {};
+    const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
 
     function normalizeServiceName(value) {
         return (value || '')
@@ -1441,6 +1456,57 @@
 
     function getEntryDateLabel(entry) {
         return (entry && entry.date) ? entry.date : formatDateDDMM();
+    }
+
+    function refreshServiceOptions() {
+        const dataList = document.getElementById('service-options');
+        if (!dataList) return;
+        const ordered = Array.from(serviceNamePool).filter(Boolean).sort((a, b) => a.localeCompare(b, 'es'));
+        dataList.innerHTML = ordered.map(name => `<option value="${name}"></option>`).join('');
+    }
+
+    function closeServiceDetailModal() {
+        const modal = document.getElementById('serviceDetailModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openServiceDetailModalByName(rawName) {
+        const modal = document.getElementById('serviceDetailModal');
+        const body = document.getElementById('serviceDetailBody');
+        const title = document.getElementById('service-detail-title');
+        if (!modal || !body || !title) return;
+
+        const decodedName = decodeURIComponent(rawName || '').replace(/\+/g, ' ');
+        const normalized = normalizeServiceName(decodedName);
+        const detail = serviceDetailSnapshot[normalized] || {};
+        const history = serviceLiveHistory[normalized] || [];
+        const novedades = cio_logs.filter(it => normalizeServiceName(it.service || it.title) === normalized);
+
+        title.textContent = decodedName || 'Detalle de servicio';
+        body.innerHTML = `
+            <div style="margin-bottom:10px;"><strong>Estado NVR:</strong> ${detail.estado || 'Sin datos'}</div>
+            <div style="margin-bottom:10px;"><strong>Alarmas:</strong> ${detail.alarmas || 'Sin datos'}</div>
+            <div style="margin-bottom:10px;"><strong>Cámaras:</strong> ${detail.camaras || 'Sin datos'}</div>
+            <div style="margin-bottom:10px;"><strong>Última caída:</strong> ${detail.horaCaida || 'Sin datos'}</div>
+            <div style="margin-bottom:8px;"><strong>Historial técnico:</strong></div>
+            <ul style="padding-left:16px; margin:0 0 10px;">${history.length ? history.map(item => `<li style="margin-bottom:4px;">${item}</li>`).join('') : '<li>Sin historial técnico.</li>'}</ul>
+            <div style="margin-bottom:8px;"><strong>Novedades cargadas:</strong></div>
+            <ul style="padding-left:16px; margin:0;">${novedades.length ? novedades.slice(-8).reverse().map(item => `<li style="margin-bottom:4px;"><span style="opacity:0.75;">${item.date || '--/--'} ${item.time || '--:--'}</span> · ${item.message || ''}</li>`).join('') : '<li>Sin novedades asociadas.</li>'}</ul>
+        `;
+
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function handleOfflineCardAction(accordionId, encodedName) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (isMobile) {
+            openServiceDetailModalByName(encodedName);
+            return;
+        }
+        toggleAccordion(accordionId);
     }
 
 
@@ -1523,7 +1589,8 @@
 
     function toggleServiceInfo() {
         serviceWidgetExpanded = !serviceWidgetExpanded;
-        renderServiceInfoWidget();
+        refreshServiceOptions();
+            renderServiceInfoWidget();
     }
 
 
@@ -1847,6 +1914,7 @@
                 const loaded = [];
                 const unavailable = [];
                 Object.keys(serviceLiveHistory).forEach(k => delete serviceLiveHistory[k]);
+                Object.keys(serviceDetailSnapshot).forEach(k => delete serviceDetailSnapshot[k]);
 
                 Object.entries(dR).forEach(([id, value], alarmIndex) => {
                     if (!id.startsWith('ALARMA_') || !value) return;
@@ -1858,12 +1926,20 @@
 
                     offlineAlarmsCount++;
                     const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
+                    const alarmNormalizedKey = normalizeServiceName(serviceName);
+                    serviceNamePool.add(serviceName.toUpperCase());
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
                     alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla</div>`;
+                    serviceDetailSnapshot[alarmNormalizedKey] = {
+                        estado: 'Offline',
+                        alarmas: 'ALARMA ACTIVA (OFFLINE)',
+                        camaras: 'No aplica',
+                        horaCaida: `${fallaStamp.date} ${fallaStamp.time}`
+                    };
                     alarmHtml += `
                     <div class="acc-wrapper">
-                        <div class="off-service-card" id="head-alm${alarmIndex}" onclick="toggleAccordion('alm${alarmIndex}')">
+                        <div class="off-service-card" id="head-alm${alarmIndex}" onclick="handleOfflineCardAction('alm${alarmIndex}', '${encodeURIComponent(serviceName)}')">
                             <div class="off-status-dot" style="background:var(--critico); box-shadow:0 0 10px var(--critico)"></div>
                             <div style="flex:1">
                                 <div style="font-size:0.9rem; font-weight:900; color:#fff;">${serviceName} - Falla</div>
@@ -1898,6 +1974,14 @@
                     if (cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== '')) historyItems.push(`Cámaras offline: ${cameraInfo}`);
                     if (!historyItems.length) historyItems.push('Sin novedades críticas recientes');
                     serviceLiveHistory[historyKey] = historyItems;
+                    serviceNamePool.add(name);
+                    const prevDetail = serviceDetailSnapshot[historyKey] || {};
+                    serviceDetailSnapshot[historyKey] = {
+                        estado: (v.estado || 'Sin datos').toUpperCase(),
+                        alarmas: prevDetail.alarmas || 'Sin alarma activa',
+                        camaras: cameraInfo,
+                        horaCaida: `${offlineStamp.date} ${offlineStamp.time}`
+                    };
                     if(v.estado === "online") loaded.push({ service: name, cameras: cameraInfo });
                     else unavailable.push({ service: name, reason: `offline desde ${offlineStamp.date} ${offlineStamp.time}` });
                     
@@ -1919,7 +2003,7 @@
                         camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6;">${name}: ${cleanData || 'CÁMARAS OFFLINE'}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
-                            <div class="off-service-card" id="head-cam${index}" onclick="toggleAccordion('cam${index}')">
+                            <div class="off-service-card" id="head-cam${index}" onclick="handleOfflineCardAction('cam${index}', '${encodeURIComponent(name)}')">
                                 <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
@@ -1940,7 +2024,7 @@
                         srvHtml += `<div class="capsula-off">${name}: Off</div>`;
                         nvrHtml += `
                         <div class="acc-wrapper">
-                            <div class="off-service-card" id="head-srv${index}" onclick="toggleAccordion('srv${index}')">
+                            <div class="off-service-card" id="head-srv${index}" onclick="handleOfflineCardAction('srv${index}', '${encodeURIComponent(name)}')">
                                 <div class="off-status-dot"></div>
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
@@ -2257,7 +2341,7 @@
             document.getElementById('f-id').value = index;
             document.getElementById('f-area').value = it.area;
             document.getElementById('f-prio').value = it.priority;
-            document.getElementById('f-title').value = it.title;
+            document.getElementById('f-service').value = it.service || it.title;
             document.getElementById('f-msg').value = it.message;
         } else {
             document.getElementById('mainForm').reset();
@@ -2272,7 +2356,8 @@
         const entry = {
             area: document.getElementById('f-area').value,
             priority: document.getElementById('f-prio').value,
-            title: document.getElementById('f-title').value,
+            service: (document.getElementById('f-service').value || '').toUpperCase(),
+            title: (document.getElementById('f-service').value || '').toUpperCase(),
             message: document.getElementById('f-msg').value,
             date: formatDateDDMM(),
             time: new Date().toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
@@ -2296,7 +2381,7 @@
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.text("REPORTE OPERATIVO - MASTERSON", 14, 20);
-        const rows = cio_logs.map(it => [getEntryDateLabel(it), it.time || '--:--', it.area, it.priority, it.title, it.message]);
+        const rows = cio_logs.map(it => [getEntryDateLabel(it), it.time || '--:--', it.area, it.priority, (it.service || it.title), it.message]);
         doc.autoTable({
             startY: 35,
             head: [['Fecha', 'Hora', 'Área', 'Prioridad', 'Título', 'Mensaje']],
@@ -2397,6 +2482,12 @@
             if (event.target === serviceCheckModalEl) closeServiceCheckModal();
         });
     }
+    const serviceDetailModalEl = document.getElementById('serviceDetailModal');
+    if (serviceDetailModalEl) {
+        serviceDetailModalEl.addEventListener('click', (event) => {
+            if (event.target === serviceDetailModalEl) closeServiceDetailModal();
+        });
+    }
     if (feedbackModalEl) {
         feedbackModalEl.addEventListener('click', (event) => {
             if (event.target === feedbackModalEl) closeFeedbackModal();
@@ -2411,6 +2502,10 @@
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && serviceCheckModalEl && serviceCheckModalEl.classList.contains('active')) {
             closeServiceCheckModal();
+        }
+        const serviceDetailModalEl = document.getElementById('serviceDetailModal');
+        if (event.key === 'Escape' && serviceDetailModalEl && serviceDetailModalEl.classList.contains('active')) {
+            closeServiceDetailModal();
         }
         if (event.key === 'Escape' && feedbackModalEl && feedbackModalEl.classList.contains('active')) {
             closeFeedbackModal();
@@ -2430,7 +2525,8 @@
     window.addEventListener('resize', () => {
         applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
         updateTvPerformanceMode();
-        setMobileSectionFilter(currentMobileFilter);
+        refreshServiceOptions();
+    setMobileSectionFilter(currentMobileFilter);
     });
     document.addEventListener('fullscreenchange', updateTvPerformanceMode);
 
@@ -2439,6 +2535,7 @@
     syncData();
     setInterval(syncData, 30000);
     updateTvPerformanceMode();
+    refreshServiceOptions();
     setMobileSectionFilter(currentMobileFilter);
     toggleScrollTopButton();
 </script>
