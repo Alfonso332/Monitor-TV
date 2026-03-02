@@ -33,9 +33,15 @@
     }
 
     .modal p {
-        margin: 0;
+        margin: 10px 0;
         font-size: 15px;
         opacity: 0.9;
+    }
+
+    .contador {
+        font-size: 28px;
+        font-weight: bold;
+        margin-top: 15px;
     }
 </style>
 
@@ -46,7 +52,37 @@
     <h1>🔧 En mantenimiento</h1>
     <p>El programa se encuentra en mantenimiento.<br>
     Estará siendo acondicionado en el correr del día.</p>
+    <div class="contador" id="contador">--:--:--</div>
 </div>
+
+<script>
+function actualizarContador() {
+    const ahora = new Date();
+
+    // Hora objetivo: hoy a las 12:10 en Uruguay
+    const objetivo = new Date();
+    objetivo.setHours(12, 10, 0, 0);
+
+    const diferencia = objetivo - ahora;
+
+    if (diferencia <= 0) {
+        document.getElementById("contador").innerText = "Finalizado";
+        return;
+    }
+
+    const horas = Math.floor(diferencia / (1000 * 60 * 60));
+    const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+    document.getElementById("contador").innerText =
+        String(horas).padStart(2, '0') + ":" +
+        String(minutos).padStart(2, '0') + ":" +
+        String(segundos).padStart(2, '0');
+}
+
+setInterval(actualizarContador, 1000);
+actualizarContador();
+</script>
 
 </body>
 </html>
