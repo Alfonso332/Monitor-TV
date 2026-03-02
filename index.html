@@ -827,9 +827,9 @@
             }
             #cio-app.mobile-focus-ops .mobile-puestos-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
-                max-height: 44vh;
-                overflow-y: auto;
-                padding-right: 4px;
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
             }
             #cio-app.mobile-focus-infra .mobile-offline-grid {
                 grid-template-columns: 1fr;
@@ -973,17 +973,18 @@
 
             #cio-app .mobile-puestos-grid {
                 display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 10px;
+                grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+                gap: 12px;
                 background: linear-gradient(145deg, rgba(20, 36, 38, 0.95) 0%, rgba(6, 11, 12, 0.98) 100%);
                 border: 1px solid rgba(115, 255, 255, 0.16);
                 border-radius: 24px;
-                padding: 14px;
+                padding: 16px;
                 box-shadow: 0 16px 36px rgba(0,0,0,0.3);
             }
             #cio-app .puesto-item {
-                gap: 4px;
-                padding: 10px 6px;
+                gap: 6px;
+                min-height: 102px;
+                padding: 12px 8px;
                 border-radius: 14px;
                 border: 1px solid rgba(255,255,255,0.1);
                 background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
@@ -991,9 +992,9 @@
                 align-items: center;
                 justify-content: center;
             }
-            #cio-app .puesto-val { font-size: 1.45rem !important; }
-            #cio-app .puesto-lab { font-size: 0.65rem !important; }
-            #cio-app .puesto-sla-chip { font-size: 0.58rem; padding: 2px 5px; margin-top: 3px; }
+            #cio-app .puesto-val { font-size: 1.62rem !important; }
+            #cio-app .puesto-lab { font-size: 0.72rem !important; }
+            #cio-app .puesto-sla-chip { font-size: 0.62rem; padding: 3px 7px; margin-top: 4px; }
 
             #cio-app .mobile-offline-grid {
                 display: grid;
@@ -1544,8 +1545,12 @@
             #cio-app .mobile-stat-container,
             #cio-app .mobile-offline-grid { gap: 12px; }
             #cio-app .mobile-stat-box { min-height: 188px; }
-            #cio-app .mobile-puestos-grid { padding: 14px; }
+            #cio-app .mobile-puestos-grid {
+                padding: 16px;
+                grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+            }
             #cio-app .puesto-item {
+                min-height: 104px;
                 border-radius: 14px;
                 border: 1px solid rgba(0, 100, 101, 0.4);
                 background: rgba(2, 20, 21, 0.76);
@@ -1777,6 +1782,7 @@
 
             #cio-app .mobile-puestos-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
             }
         }
     </style>
