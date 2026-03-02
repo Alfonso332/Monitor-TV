@@ -2672,13 +2672,15 @@ Euskaro
                     const name = id.replace(/_/g,' ').toUpperCase();
                     const normalizedName = normalizeServiceName(name);
                     const currentStatus = (v.estado || '').toLowerCase();
-                    currentServiceStatuses[id] = currentStatus;
+                    const fallos = Number(v.fallos || 0);
+                    const effectiveOffline = currentStatus === 'offline' || fallos >= 8;
+                    const effectiveStatus = effectiveOffline ? 'offline' : (currentStatus || 'online');
+                    currentServiceStatuses[id] = effectiveStatus;
                     const prevStatus = (previousServiceStatuses[id] || '').toLowerCase();
-                    if (currentStatus === 'offline' && prevStatus && prevStatus !== 'offline') {
+                    if (effectiveOffline && prevStatus && prevStatus !== 'offline') {
                         newOfflineServices.push(name);
                     }
 
-                    const fallos = Number(v.fallos || 0);
                     const lastDown = v.hora_caida || 'Desconocida';
                     const offlineStamp = parseDateTimeLabel(lastDown);
                     const cameraOfflineList = Array.isArray(v.camaras_offline) ? v.camaras_offline : [];
@@ -2688,36 +2690,36 @@ Euskaro
                         : ((v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras');
                     const priorityMeta = getServicePriorityMeta({
                         fallos,
-                        isOffline: currentStatus === 'offline',
+                        isOffline: effectiveOffline,
                         hasCameraOffline: Boolean(hasCameraIssue)
                     });
 
-                    const entersTotalFailure = currentStatus === 'offline' && prevStatus && prevStatus !== 'offline';
+                    const entersTotalFailure = effectiveOffline && prevStatus && prevStatus !== 'offline';
                     if (entersTotalFailure) {
                         const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey }));
                     }
 
-                    if (Number(fallos) >= 5 && currentStatus !== 'offline') showPreventiveMobileAlert(name);
+                    if (Number(fallos) >= 5 && !effectiveOffline) showPreventiveMobileAlert(name);
 
                     const historyKey = normalizeServiceName(id);
                     const historyItems = [];
-                    if (currentStatus === 'offline') historyItems.push(`Sistema offline desde ${lastDown}`);
+                    if (effectiveOffline) historyItems.push(`Sistema offline desde ${lastDown}`);
                     if (hasCameraIssue) historyItems.push(`Cámaras offline: ${cameraInfo}`);
                     historyItems.push(`Prioridad inteligente: ${priorityMeta.label} (fallos: ${fallos})`);
                     serviceLiveHistory[historyKey] = historyItems;
                     serviceNamePool.add(name);
                     serviceDetailSnapshot[historyKey] = {
-                        estado: (v.estado || 'Sin datos').toUpperCase(),
+                        estado: effectiveOffline ? 'OFFLINE' : (v.estado || 'Sin datos').toUpperCase(),
                         alarmas: 'No aplica en widget NVR',
                         camaras: cameraInfo,
                         horaCaida: `${offlineStamp.date} ${offlineStamp.time}`,
                         fallos,
                         priorityMeta
                     };
-                    serviceStatusLayer[historyKey] = { name, priority: priorityMeta, status: currentStatus };
+                    serviceStatusLayer[historyKey] = { name, priority: priorityMeta, status: effectiveStatus };
 
-                    if(currentStatus === 'online') loaded.push({ service: name, cameras: cameraInfo });
+                    if(!effectiveOffline) loaded.push({ service: name, cameras: cameraInfo });
                     else unavailable.push({ service: name, reason: `offline desde ${offlineStamp.date} ${offlineStamp.time}` });
 
                     const isFav = mobileFavorites.has(normalizedName);
@@ -2761,7 +2763,7 @@ Euskaro
                         </div>`;
                     }
 
-                    if(currentStatus === 'offline') {
+                    if(effectiveOffline) {
                         offlineServicesCount++;
                         srvHtml += `<div class="capsula-off" style="${favGlow}">${name}: Off ${priorityChipMarkup(priorityMeta)}</div>`;
                         nvrHtml += `
@@ -2784,8 +2786,9 @@ Euskaro
                         </div>`;
                     }
 
-                    if (currentStatus !== 'offline' && fallos >= 3) {
-                        srvHtml += `<div class="capsula-off" style="background:#1f1a06; border-color:${priorityMeta.color}; color:#ffefb0; ${favGlow}">${name}: ${priorityMeta.label} (${fallos}) ${priorityChipMarkup(priorityMeta)}</div>`;
+                    if (!effectiveOffline && fallos >= 5) {
+                        const tickerInestableMeta = { key: 'inestable', label: 'INESTABLE', color: '#f1c40f' };
+                        srvHtml += `<div class="capsula-off" style="background:#1f1a06; border-color:${tickerInestableMeta.color}; color:#ffefb0; ${favGlow}">${name}: INESTABLE (${fallos}) ${priorityChipMarkup(tickerInestableMeta)}</div>`;
                     }
                 });
 
