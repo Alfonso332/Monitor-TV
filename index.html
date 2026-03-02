@@ -854,6 +854,14 @@
                 overflow-y: auto;
                 padding-right: 4px;
             }
+            #cio-app.mobile-focus-favorites #mobileFavoritesSection {
+                display:block !important;
+            }
+            #cio-app.mobile-focus-favorites #mobileFavoritesList {
+                max-height: 58vh;
+                overflow-y: auto;
+                padding-right: 4px;
+            }
             #cio-app .feedback-card {
                 border: 1px solid rgba(255,255,255,0.14);
                 border-radius: 14px;
@@ -1391,6 +1399,7 @@
 
         <div class="mobile-filter-bar mobile-only-section" id="mobileFilterBar">
             <button class="mobile-filter-chip active" data-filter="all" onclick="setMobileSectionFilter('all')">Todo</button>
+            <button class="mobile-filter-chip" data-filter="favorites" onclick="setMobileSectionFilter('favorites')">Favoritos</button>
             <button class="mobile-filter-chip" data-filter="ops" onclick="setMobileSectionFilter('ops')">Operación</button>
             <button class="mobile-filter-chip" data-filter="infra" onclick="setMobileSectionFilter('infra')">Servicios</button>
             <button class="mobile-filter-chip" data-filter="news" onclick="setMobileSectionFilter('news')">Novedades</button>
@@ -1422,7 +1431,7 @@
         <div class="mobile-section-header mobile-filter-target" data-mobile-group="ops">Puestos en Operación</div>
         <div id="m-puestos" class="mobile-puestos-grid mobile-filter-target" data-mobile-group="ops"></div>
 
-        <div class="mobile-only-section mobile-filter-target" data-mobile-group="infra" id="mobileFavoritesSection" style="display:none;">
+        <div class="mobile-only-section mobile-filter-target" data-mobile-group="favorites" id="mobileFavoritesSection" style="display:none;">
             <div class="mobile-section-header">⭐ Favoritos</div>
             <div id="mobileFavoritesList" class="offline-group"></div>
         </div>
@@ -1630,7 +1639,6 @@
             service: serviceName,
             title: serviceName,
             message,
-            intelligentState,
             date: formatDateDDMM(now),
             time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
         };
@@ -2081,7 +2089,6 @@
         const payload = {
             author,
             message,
-            intelligentState,
             date: formatDateDDMM(now),
             time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' }),
             createdAt: now.toISOString()
@@ -2224,8 +2231,15 @@
                 ? history.map(item => `<li style="margin-bottom:4px;">${item}</li>`).join('')
                 : '<li style="opacity:0.75;">Sin incidentes recientes reportados para este servicio.</li>';
 
+            const isFav = mobileFavorites.has(historyKey);
             result.innerHTML = `
-                <div style="color:var(--online); font-weight:900; margin-bottom:6px;">✅ ${exactMatch} está cargado en el sistema.</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
+                    <div style="color:var(--online); font-weight:900;">✅ ${exactMatch} está cargado en el sistema.</div>
+                    <button class="favorite-btn ${isFav ? 'active' : ''}" style="border:1px solid rgba(255,255,255,0.24); border-radius:10px; padding:5px 9px;" onclick="toggleServiceFavorite(decodeURIComponent('${encodeURIComponent(exactMatch)}')); checkServiceAvailability();">☆</button>
+                </div>
+                <div style="display:flex; gap:6px; margin-bottom:8px;">
+                    <button type="button" class="btn-pill btn-sec" style="padding:5px 9px; width:auto; margin:0; border-radius:10px;" onclick="openServiceDetailModalByName('${encodeURIComponent(exactMatch)}','service')">Ver detalle</button>
+                </div>
                 <div style="font-size:0.72rem; opacity:0.8; margin-bottom:4px;">Último historial breve:</div>
                 <ul style="padding-left:16px; margin-bottom:0; max-height:120px; overflow:auto;">${historyHtml}</ul>
             `;
@@ -2906,24 +2920,25 @@
         chips.forEach(chip => chip.classList.toggle('active', chip.dataset.filter === filterKey));
 
         if (!isMobile || filterKey === 'all') {
-            if (app) app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news', 'mobile-focus-feedback');
+            if (app) app.classList.remove('mobile-focus-favorites', 'mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news', 'mobile-focus-feedback');
             targets.forEach(node => node.classList.remove('hidden-by-filter'));
             syncMobileHistoryMode();
             return;
         }
 
         if (app) {
-            app.classList.remove('mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news', 'mobile-focus-feedback');
+            app.classList.remove('mobile-focus-favorites', 'mobile-focus-ops', 'mobile-focus-infra', 'mobile-focus-news', 'mobile-focus-feedback');
             app.classList.add(`mobile-focus-${filterKey}`);
         }
 
         const visibleGroups = {
+            favorites: ['favorites'],
             ops: ['ops'],
             infra: ['infra'],
             news: ['news'],
             feedback: ['feedback']
         };
-        const allowed = visibleGroups[filterKey] || ['ops', 'infra', 'news', 'feedback'];
+        const allowed = visibleGroups[filterKey] || ['favorites', 'ops', 'infra', 'news', 'feedback'];
         targets.forEach(node => {
             node.classList.toggle('hidden-by-filter', !allowed.includes(node.dataset.mobileGroup));
         });
