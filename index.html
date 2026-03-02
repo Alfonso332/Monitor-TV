@@ -266,6 +266,64 @@
             text-shadow: 0 0 5px rgba(255, 77, 77, 0.35);
             box-shadow: 0 0 12px rgba(255, 77, 77, 0.15);
         }
+        #cio-app .priority-chip {
+            display:inline-flex;
+            align-items:center;
+            gap:5px;
+            font-size:0.58rem;
+            font-weight:900;
+            letter-spacing:0.45px;
+            text-transform:uppercase;
+            border-radius:999px;
+            padding:3px 8px;
+            border:1px solid rgba(255,255,255,0.24);
+            background:rgba(255,255,255,0.06);
+            color:#d8ffff;
+            white-space:nowrap;
+        }
+        #cio-app .priority-chip.estable { color:#8fe6ff; border-color:rgba(0,209,209,0.35); }
+        #cio-app .priority-chip.degradado { color:#ffd9a6; border-color:rgba(230,126,34,0.55); }
+        #cio-app .priority-chip.inestable { color:#fff2a1; border-color:rgba(241,196,15,0.6); }
+        #cio-app .priority-chip.critico {
+            color:#ffd0d0;
+            border-color:rgba(255,77,77,0.72);
+            background:rgba(95,16,16,0.55);
+            animation: priorityPulse 1.15s ease-in-out infinite;
+        }
+        #cio-app .favorite-btn {
+            border:none;
+            background:transparent;
+            color:#7c7c7c;
+            font-size:1.05rem;
+            cursor:pointer;
+            padding:2px 6px;
+        }
+        #cio-app .favorite-btn.active { color:#f1c40f; text-shadow:0 0 10px rgba(241,196,15,0.55); }
+        #cio-app .favorite-chip { color:#f1c40f; text-shadow:0 0 8px rgba(241,196,15,0.45); }
+        #cio-app .preventive-mobile-toast {
+            display:none;
+            position:sticky;
+            top:8px;
+            z-index:12;
+            margin-bottom:10px;
+            padding:10px 12px;
+            border-radius:12px;
+            border:1px solid rgba(241,196,15,0.65);
+            background:rgba(46,37,4,0.94);
+            color:#ffeaa7;
+            font-size:0.72rem;
+            font-weight:800;
+            line-height:1.35;
+            box-shadow:0 10px 24px rgba(0,0,0,0.35);
+            opacity:0;
+            transform:translateY(-6px);
+            transition:opacity .25s ease, transform .25s ease;
+        }
+        #cio-app .preventive-mobile-toast.active { display:block; opacity:1; transform:translateY(0); }
+        @keyframes priorityPulse {
+            0%,100% { box-shadow:0 0 0 rgba(255,77,77,0.2); }
+            50% { box-shadow:0 0 14px rgba(255,77,77,0.45); }
+        }
 
         /* PANELES LATERALES */
         #cio-app .side-panel {
@@ -1233,6 +1291,8 @@
             </div>
         </div>
 
+        <div id="preventiveMobileToast" class="preventive-mobile-toast mobile-only-section" aria-live="polite"></div>
+
         <div class="mobile-filter-bar mobile-only-section" id="mobileFilterBar">
             <button class="mobile-filter-chip active" data-filter="all" onclick="setMobileSectionFilter('all')">Todo</button>
             <button class="mobile-filter-chip" data-filter="ops" onclick="setMobileSectionFilter('ops')">Operación</button>
@@ -1265,6 +1325,11 @@
 
         <div class="mobile-section-header mobile-filter-target" data-mobile-group="ops">Puestos en Operación</div>
         <div id="m-puestos" class="mobile-puestos-grid mobile-filter-target" data-mobile-group="ops"></div>
+
+        <div class="mobile-only-section mobile-filter-target" data-mobile-group="infra" id="mobileFavoritesSection" style="display:none;">
+            <div class="mobile-section-header">⭐ Favoritos</div>
+            <div id="mobileFavoritesList" class="offline-group"></div>
+        </div>
 
         <div class="mobile-section-header mobile-filter-target" data-mobile-group="infra">Estado de infraestructura</div>
         <div class="mobile-offline-grid mobile-filter-target" data-mobile-group="infra">
@@ -1442,7 +1507,104 @@
     const serviceLiveHistory = {};
     const serviceDetailSnapshot = {};
     const alarmDetailSnapshot = {};
+    const serviceStatusLayer = {};
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
+    const AUTO_LOG_SEEN_STATE = {};
+    const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
+    const preventiveAlertTracker = {};
+    const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
+    let mobileFavorites = new Set(JSON.parse(localStorage.getItem(MOBILE_FAVORITES_KEY) || '[]'));
+
+    function getServicePriorityMeta({ fallos = 0, isOffline = false, hasCameraOffline = false }) {
+        if (isOffline || Number(fallos) >= 5) return { key: 'critico', label: 'CRÍTICO', color: '#ff4d4d' };
+        if (Number(fallos) >= 3) return { key: 'inestable', label: 'INESTABLE', color: '#f1c40f' };
+        if (hasCameraOffline) return { key: 'degradado', label: 'DEGRADADO', color: '#e67e22' };
+        return { key: 'estable', label: 'ESTABLE', color: '#2ecc71' };
+    }
+
+    function priorityChipMarkup(meta) {
+        if (!meta || !meta.label) return '';
+        return `<span class="priority-chip ${meta.key}">${meta.label}</span>`;
+    }
+
+    function getServiceStateKey(serviceName, suffix) {
+        return `${normalizeServiceName(serviceName)}::${suffix}`;
+    }
+
+    function makeAutoLogEntry(serviceName, priority, message, intelligentState = "") {
+        const now = new Date();
+        return {
+            area: 'Monitoreo',
+            priority,
+            service: serviceName,
+            title: serviceName,
+            message,
+            intelligentState,
+            date: formatDateDDMM(now),
+            time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
+        };
+    }
+
+    function queueAutoLog(serviceName, eventKey, isActive, priority, message, collector, intelligentState = "") {
+        const stateKey = getServiceStateKey(serviceName, eventKey);
+        const wasActive = Boolean(AUTO_LOG_SEEN_STATE[stateKey]);
+        if (isActive && !wasActive) collector.push(makeAutoLogEntry(serviceName, priority, message, intelligentState));
+        AUTO_LOG_SEEN_STATE[stateKey] = Boolean(isActive);
+    }
+
+    function showPreventiveMobileAlert(serviceName) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        const toast = document.getElementById('preventiveMobileToast');
+        if (!toast) return;
+        const now = Date.now();
+        if (preventiveAlertTracker[serviceName] && now - preventiveAlertTracker[serviceName] < PREVENTIVE_ALERT_COOLDOWN_MS) return;
+        preventiveAlertTracker[serviceName] = now;
+        toast.textContent = `⚠️ ${serviceName} presenta inestabilidad (5 fallos detectados)`;
+        toast.classList.add('active');
+        clearTimeout(showPreventiveMobileAlert._timer);
+        showPreventiveMobileAlert._timer = setTimeout(() => toast.classList.remove('active'), 7000);
+    }
+
+    function persistMobileFavorites() {
+        localStorage.setItem(MOBILE_FAVORITES_KEY, JSON.stringify(Array.from(mobileFavorites)));
+    }
+
+    function toggleServiceFavorite(rawName) {
+        const normalized = normalizeServiceName(rawName);
+        if (!normalized) return;
+        if (mobileFavorites.has(normalized)) mobileFavorites.delete(normalized);
+        else mobileFavorites.add(normalized);
+        persistMobileFavorites();
+        renderMobileFavorites();
+        syncData();
+    }
+
+    function renderMobileFavorites() {
+        const section = document.getElementById('mobileFavoritesSection');
+        const list = document.getElementById('mobileFavoritesList');
+        if (!section || !list) return;
+        const favorites = Object.values(serviceStatusLayer)
+            .filter(item => mobileFavorites.has(normalizeServiceName(item.name)))
+            .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+        if (!favorites.length) {
+            section.style.display = 'none';
+            list.innerHTML = '';
+            return;
+        }
+        section.style.display = 'block';
+        list.innerHTML = favorites.map(item => `
+            <div class="acc-wrapper">
+                <div class="off-service-card" onclick="openServiceDetailModalByName('${encodeURIComponent(item.name)}','service')">
+                    <div class="off-status-dot" style="background:${item.priority.color}; box-shadow:0 0 10px ${item.priority.color}"></div>
+                    <div style="flex:1">
+                        <div style="font-size:0.85rem; font-weight:900; color:#fff;"><span class="favorite-chip">★</span> ${item.name}</div>
+                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">${priorityChipMarkup(item.priority)}</div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
 
     function normalizeServiceName(value) {
         return (value || '')
@@ -1536,8 +1698,17 @@
         const alarmOffline = alarmRaw.includes('ACTIVA') || alarmRaw.includes('OFFLINE') || alarmRaw.includes('FALLA');
         const alarmClass = !alarmHasInfo ? 'status-unknown' : (alarmOffline ? 'status-offline' : 'status-online');
         const alarmText = !alarmHasInfo ? 'Sin información' : (alarmDetail.alarmas || 'Sin alarmas activas');
+        const priorityMeta = serviceDetail.priorityMeta || getServicePriorityMeta({
+            fallos: Number(serviceDetail.fallos || 0),
+            isOffline: nvrOffline,
+            hasCameraOffline: (serviceDetail.camaras || '').toUpperCase() !== 'SIN ALERTA DE CÁMARAS'
+        });
 
         body.innerHTML = `
+            <div class="service-detail-row">
+                <strong>Prioridad Inteligente</strong>
+                <span>${priorityChipMarkup(priorityMeta)}</span>
+            </div>
             <div class="service-detail-row">
                 <strong>Estado NVR</strong>
                 <span class="${nvrClass}"><span class="status-dot"></span>${nvrText}</span>
@@ -1549,6 +1720,7 @@
             <div class="service-detail-row" style="display:block;">
                 <div style="margin-bottom:6px;"><strong>Cámaras</strong></div>
                 <div>${serviceDetail.camaras || 'Sin datos'}</div>
+                <div style="margin-top:6px; font-size:0.66rem; opacity:0.65;">Fallos consecutivos: ${serviceDetail.fallos ?? '0'}</div>
             </div>
             <div class="service-detail-row" style="display:block;">
                 <div style="margin-bottom:6px;"><strong>Última caída</strong></div>
@@ -1773,6 +1945,7 @@
         const payload = {
             author,
             message,
+            intelligentState,
             date: formatDateDDMM(now),
             time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' }),
             createdAt: now.toISOString()
@@ -1963,17 +2136,17 @@
                 puestoSlaData = dK.puestosSla || dK.puestos_sla || {};
                 renderPuestos(dK.puestos, puestoSlaData);
                 prevSLA = sla;
-                
+
                 if(document.getElementById('panelHistory').classList.contains('active')) {
-                     if(!document.getElementById('in-sla').value) document.getElementById('in-sla').value = dK.sla;
-                     if(!document.getElementById('in-calls').value) document.getElementById('in-calls').value = dK.calls;
-                     if(!document.getElementById('in-agents').value) document.getElementById('in-agents').value = dK.agents || 0;
-                     for(let i=1; i<=9; i++) {
-                         let pInp = document.getElementById(`inp-p${i}`);
-                         if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
-                         let slaInp = document.getElementById(`inp-sla-p${i}`);
-                         if(slaInp && !slaInp.value) slaInp.value = puestoSlaData[`p${i}`] || 0;
-                     }
+                    if(!document.getElementById('in-sla').value) document.getElementById('in-sla').value = dK.sla;
+                    if(!document.getElementById('in-calls').value) document.getElementById('in-calls').value = dK.calls;
+                    if(!document.getElementById('in-agents').value) document.getElementById('in-agents').value = dK.agents || 0;
+                    for(let i=1; i<=9; i++) {
+                        let pInp = document.getElementById(`inp-p${i}`);
+                        if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
+                        let slaInp = document.getElementById(`inp-sla-p${i}`);
+                        if(slaInp && !slaInp.value) slaInp.value = puestoSlaData[`p${i}`] || 0;
+                    }
                 }
             }
 
@@ -1985,7 +2158,7 @@
 
             const rR = await fetch(RED_URL);
             const dR = await rR.json();
-            
+
             const tickerSrv = document.getElementById('ticker-services');
             const tickerCam = document.getElementById('ticker-cameras');
             const tickerAlarms = document.getElementById('ticker-alarms');
@@ -1998,13 +2171,16 @@
             const mOfflineCamerasWidget = document.getElementById('m-offline-cameras-widget');
             const mOfflineAlarmsWidget = document.getElementById('m-offline-alarms-widget');
             const mAlarmList = document.getElementById('m-alarm-list');
-            
-            let srvHtml = "", camTickerHtml = "", alarmTickerHtml = "", nvrHtml = "", camHtml = "", alarmHtml = "";
+
+            let srvHtml = '', camTickerHtml = '', alarmTickerHtml = '', nvrHtml = '', camHtml = '', alarmHtml = '';
             let offlineServicesCount = 0;
             let cameraAffectedServicesCount = 0;
             let offlineAlarmsCount = 0;
             const currentServiceStatuses = {};
             const newOfflineServices = [];
+            const autoLogsToAdd = [];
+
+            Object.keys(serviceStatusLayer).forEach(k => delete serviceStatusLayer[k]);
 
             if(dR) {
                 const loaded = [];
@@ -2015,95 +2191,128 @@
 
                 Object.entries(dR).forEach(([id, value], alarmIndex) => {
                     if (!id.startsWith('ALARMA_') || !value) return;
-                    const estado = (value.estado || value.status || '').toString().toLowerCase();
-                    const fallos = Number(value.fallos || 0);
-                    // Filtro estricto para evitar falsos positivos por redes inestables:
-                    // solo mostramos alarma cuando ya está offline y acumuló tolerancia real.
-                    if (estado !== 'offline' || fallos < 8) return;
-
-                    offlineAlarmsCount++;
                     const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
                     const alarmNormalizedKey = normalizeServiceName(serviceName);
-                    serviceNamePool.add(serviceName.toUpperCase());
+                    const estado = (value.estado || value.status || '').toString().toLowerCase();
+                    const fallos = Number(value.fallos || 0);
+                    const alarmActive = estado === 'offline' || (value.alarmas || '').toString().toUpperCase().includes('ACTIVA');
+                    const priorityMeta = getServicePriorityMeta({ fallos, isOffline: alarmActive, hasCameraOffline: false });
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
-                    alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla</div>`;
+                    serviceNamePool.add(serviceName.toUpperCase());
+
                     alarmDetailSnapshot[alarmNormalizedKey] = {
-                        estado: 'Offline',
-                        alarmas: 'ALARMA ACTIVA (OFFLINE)',
+                        estado: alarmActive ? 'Offline' : 'Online',
+                        alarmas: alarmActive ? 'ALARMA ACTIVA (OFFLINE)' : 'Sin alarmas activas',
                         camaras: 'No aplica',
-                        horaCaida: `${fallaStamp.date} ${fallaStamp.time}`
+                        horaCaida: `${fallaStamp.date} ${fallaStamp.time}`,
+                        fallos,
+                        priorityMeta
                     };
+
+                    queueAutoLog(serviceName.toUpperCase(), 'alarm-active', alarmActive, 'Crítica', `${serviceName.toUpperCase()} presenta alarma activa`, autoLogsToAdd, priorityMeta.label);
+
+                    if (!alarmActive || fallos < 8) return;
+                    offlineAlarmsCount++;
+                    alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla ${priorityChipMarkup(priorityMeta)}</div>`;
                     alarmHtml += `
                     <div class="acc-wrapper">
                         <div class="off-service-card" id="head-alm${alarmIndex}" onclick="handleOfflineCardAction('alm${alarmIndex}', '${encodeURIComponent(serviceName)}', 'alarm')">
-                            <div class="off-status-dot" style="background:var(--critico); box-shadow:0 0 10px var(--critico)"></div>
+                            <div class="off-status-dot" style="background:${priorityMeta.color}; box-shadow:0 0 10px ${priorityMeta.color}"></div>
                             <div style="flex:1">
                                 <div style="font-size:0.9rem; font-weight:900; color:#fff;">${serviceName} - Falla</div>
-                                <div style="font-size:0.6rem; color:#ff9999; opacity:0.9;">Alarma crítica</div>
+                                <div style="font-size:0.6rem; color:#ff9999; opacity:0.9; display:flex; gap:6px; align-items:center;">Alarma crítica ${priorityChipMarkup(priorityMeta)}</div>
                             </div>
                             <div id="arr-alm${alarmIndex}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                         </div>
                         <div id="acc-alm${alarmIndex}" class="generic-details">
                             <div class="detail-row" style="justify-content:space-between"><span style="font-size:0.7rem; opacity:0.5">FECHA</span><span class="detail-value">${fallaStamp.date}</span></div>
                             <div class="detail-row" style="justify-content:space-between"><span style="font-size:0.7rem; opacity:0.5">HORA</span><span class="detail-value">${fallaStamp.time}</span></div>
+                            <div class="detail-row"><span>${priorityChipMarkup(priorityMeta)}</span></div>
                         </div>
                     </div>`;
                 });
 
                 Object.entries(dR).forEach(([id, v], index) => {
                     if (id.startsWith('ALARMA_')) return;
-                    let name = id.replace(/_/g,' ').toUpperCase();
-                    currentServiceStatuses[id] = (v.estado || '').toLowerCase();
+                    const name = id.replace(/_/g,' ').toUpperCase();
+                    const normalizedName = normalizeServiceName(name);
+                    const currentStatus = (v.estado || '').toLowerCase();
+                    currentServiceStatuses[id] = currentStatus;
                     const prevStatus = (previousServiceStatuses[id] || '').toLowerCase();
-                    if (currentServiceStatuses[id] === 'offline' && prevStatus && prevStatus !== 'offline') {
+                    if (currentStatus === 'offline' && prevStatus && prevStatus !== 'offline') {
                         newOfflineServices.push(name);
                     }
-                    let lastDown = v.hora_caida || "Desconocida";
+
+                    const fallos = Number(v.fallos || 0);
+                    const lastDown = v.hora_caida || 'Desconocida';
                     const offlineStamp = parseDateTimeLabel(lastDown);
                     const cameraOfflineList = Array.isArray(v.camaras_offline) ? v.camaras_offline : [];
+                    const hasCameraIssue = cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== '');
                     const cameraInfo = cameraOfflineList.length
                         ? cameraOfflineList.join(', ')
                         : ((v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras');
+                    const priorityMeta = getServicePriorityMeta({
+                        fallos,
+                        isOffline: currentStatus === 'offline',
+                        hasCameraOffline: Boolean(hasCameraIssue)
+                    });
+
+                    queueAutoLog(name, 'service-offline', currentStatus === 'offline', 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, autoLogsToAdd, priorityMeta.label);
+                    queueAutoLog(name, 'camera-offline', Boolean(hasCameraIssue), 'Alta', `${name} con cámaras offline detectadas`, autoLogsToAdd, priorityMeta.label);
+
+                    if (Number(fallos) >= 5 && currentStatus !== 'offline') showPreventiveMobileAlert(name);
+
                     const historyKey = normalizeServiceName(id);
                     const historyItems = [];
-                    if (v.estado === 'offline') historyItems.push(`Sistema offline desde ${lastDown}`);
-                    if (cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== '')) historyItems.push(`Cámaras offline: ${cameraInfo}`);
-                    if (!historyItems.length) historyItems.push('Sin novedades críticas recientes');
+                    if (currentStatus === 'offline') historyItems.push(`Sistema offline desde ${lastDown}`);
+                    if (hasCameraIssue) historyItems.push(`Cámaras offline: ${cameraInfo}`);
+                    historyItems.push(`Prioridad inteligente: ${priorityMeta.label} (fallos: ${fallos})`);
                     serviceLiveHistory[historyKey] = historyItems;
                     serviceNamePool.add(name);
                     serviceDetailSnapshot[historyKey] = {
                         estado: (v.estado || 'Sin datos').toUpperCase(),
                         alarmas: 'No aplica en widget NVR',
                         camaras: cameraInfo,
-                        horaCaida: `${offlineStamp.date} ${offlineStamp.time}`
+                        horaCaida: `${offlineStamp.date} ${offlineStamp.time}`,
+                        fallos,
+                        priorityMeta
                     };
-                    if(v.estado === "online") loaded.push({ service: name, cameras: cameraInfo });
+                    serviceStatusLayer[historyKey] = { name, priority: priorityMeta, status: currentStatus };
+
+                    if(currentStatus === 'online') loaded.push({ service: name, cameras: cameraInfo });
                     else unavailable.push({ service: name, reason: `offline desde ${offlineStamp.date} ${offlineStamp.time}` });
-                    
-                    if(cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== "")) {
+
+                    const isFav = mobileFavorites.has(normalizedName);
+                    const starClass = isFav ? 'favorite-btn active' : 'favorite-btn';
+                    const favGlow = isFav ? 'box-shadow:0 0 16px rgba(241,196,15,0.2);' : '';
+
+                    if(hasCameraIssue) {
                         cameraAffectedServicesCount++;
                         let cleanData = cameraOfflineList.length
                             ? cameraOfflineList.join(', ').toUpperCase()
                             : v.alerta_camaras.toUpperCase()
-                                .replace(id.toUpperCase(), "")
-                                .replace("ALERTA:", "")
-                                .replace("CÁMARAS FUERA DE LÍNEA", "")
-                                .replace("DISPOSITIVOS:", "")
-                                .replace("DISPOSITIVOS", "")
-                                .replace("CÁMARAS", "")
-                                .replace("CAMS OFF", "")
-                                .replace("⚠️", "")
+                                .replace(id.toUpperCase(), '')
+                                .replace('ALERTA:', '')
+                                .replace('CÁMARAS FUERA DE LÍNEA', '')
+                                .replace('DISPOSITIVOS:', '')
+                                .replace('DISPOSITIVOS', '')
+                                .replace('CÁMARAS', '')
+                                .replace('CAMS OFF', '')
+                                .replace('⚠️', '')
                                 .trim();
 
-                        camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6;">${name}: ${cleanData || 'CÁMARAS OFFLINE'}</div>`;
+                        camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6; ${favGlow}">${name}: ${cleanData || 'CÁMARAS OFFLINE'} ${priorityChipMarkup(priorityMeta)}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-cam${index}" onclick="handleOfflineCardAction('cam${index}', '${encodeURIComponent(name)}', 'service')">
-                                <div class="off-status-dot" style="background:var(--orange); box-shadow:0 0 10px var(--orange)"></div>
+                                <div class="off-status-dot" style="background:${priorityMeta.color}; box-shadow:0 0 10px ${priorityMeta.color}"></div>
                                 <div style="flex:1">
-                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8;">Cámaras Offline · ${offlineStamp.time}</div>
+                                    <div style="font-size:0.9rem; font-weight:900; color:#fff; display:flex; justify-content:space-between; align-items:center;">
+                                        <span>${name}</span>
+                                        <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">★</button>
+                                    </div>
+                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8; display:flex; gap:6px; align-items:center;">Cámaras Offline · ${offlineStamp.time} ${priorityChipMarkup(priorityMeta)}</div>
                                 </div>
                                 <div id="arr-cam${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
@@ -2114,17 +2323,20 @@
                             </div>
                         </div>`;
                     }
-                    
-                    if(v.estado === "offline") {
+
+                    if(currentStatus === 'offline') {
                         offlineServicesCount++;
-                        srvHtml += `<div class="capsula-off">${name}: Off</div>`;
+                        srvHtml += `<div class="capsula-off" style="${favGlow}">${name}: Off ${priorityChipMarkup(priorityMeta)}</div>`;
                         nvrHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-srv${index}" onclick="handleOfflineCardAction('srv${index}', '${encodeURIComponent(name)}', 'service')">
-                                <div class="off-status-dot"></div>
+                                <div class="off-status-dot" style="background:${priorityMeta.color}; box-shadow:0 0 10px ${priorityMeta.color}"></div>
                                 <div style="flex:1">
-                                    <div style="font-size:0.9rem; font-weight:900; color:#fff;">${name}</div>
-                                    <div style="font-size:0.6rem; color:var(--critico); font-weight:bold;">SISTEMA CAÍDO</div>
+                                    <div style="font-size:0.9rem; font-weight:900; color:#fff; display:flex; justify-content:space-between; align-items:center;">
+                                        <span>${name}</span>
+                                        <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">★</button>
+                                    </div>
+                                    <div style="font-size:0.6rem; color:var(--critico); font-weight:bold; display:flex; gap:6px; align-items:center;">SISTEMA CAÍDO ${priorityChipMarkup(priorityMeta)}</div>
                                 </div>
                                 <div id="arr-srv${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
@@ -2134,14 +2346,25 @@
                             </div>
                         </div>`;
                     }
+
+                    if (currentStatus !== 'offline' && fallos >= 3) {
+                        srvHtml += `<div class="capsula-off" style="background:#1f1a06; border-color:${priorityMeta.color}; color:#ffefb0; ${favGlow}">${name}: ${priorityMeta.label} (${fallos}) ${priorityChipMarkup(priorityMeta)}</div>`;
+                    }
                 });
+
                 serviceWidgetData = { loaded, unavailable };
                 previousServiceStatuses = currentServiceStatuses;
                 newOfflineServices.forEach(serviceName => enqueueOfflineServiceAlert(serviceName));
             } else {
                 serviceWidgetData = { loaded: [], unavailable: [] };
             }
-            
+
+            if (autoLogsToAdd.length) {
+                cio_logs = [...autoLogsToAdd, ...cio_logs].slice(0, 300);
+                await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
+                renderHistory();
+            }
+
             tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">SERVICIOS: SIN INCIDENTES</span>`;
             tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">CÁMARAS: SIN INCIDENTES</span>`;
             if (tickerAlarms) tickerAlarms.innerHTML = alarmTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">ALARMAS: SIN INCIDENTES</span>`;
@@ -2155,7 +2378,8 @@
             if (mOfflineCamerasWidget) mOfflineCamerasWidget.classList.toggle('alert-pulse-dark', cameraAffectedServicesCount > 5);
             if (mOfflineAlarmsWidget) mOfflineAlarmsWidget.classList.toggle('alert-pulse-dark', offlineAlarmsCount > 0);
             renderServiceInfoWidget();
-            
+            renderMobileFavorites();
+
         } catch(e) {
             console.error(e);
         } finally {
@@ -2303,7 +2527,7 @@
                     <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
                     <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
                 </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px;">${item.title}</div>
+                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
                 <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
             </div>`;
             slideEl.classList.remove('oculto');
@@ -2330,7 +2554,7 @@
                     <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
                     <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
                 </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px;">${item.title}</div>
+                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
                 <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
             </div>`;
         }).join('');
@@ -2366,7 +2590,7 @@
                     <span style="font-size:0.6rem; font-weight:900; color:${color}">${it.area.toUpperCase()}</span>
                     <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(it)} · ${it.time || '--:--'}</span>
                 </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px;">${it.title}</div>
+                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${it.title} ${it.intelligentState ? priorityChipMarkup({ key: it.intelligentState.toLowerCase(), label: it.intelligentState, color: 'var(--accent)' }) : ''}</div>
                 <div style="font-size:0.7rem; opacity:0.7; line-height:1.4;">${it.message}</div>
                 <div style="display:flex; gap:10px; margin-top:15px;">
                     <button onclick="openForm(${i})" style="background:none; border:none; color:var(--accent); font-size:0.7rem; font-weight:bold; cursor:pointer;">EDITAR</button>
