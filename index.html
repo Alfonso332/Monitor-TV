@@ -2732,7 +2732,7 @@ Euskaro
                     const normalizedName = normalizeServiceName(name);
                     const currentStatus = (v.estado || '').toLowerCase();
                     const fallos = Number(v.fallos || 0);
-                    const effectiveOffline = currentStatus === 'offline' || fallos >= 8;
+                    const effectiveOffline = fallos >= 8;
                     const effectiveStatus = effectiveOffline ? 'offline' : (currentStatus || 'online');
                     currentServiceStatuses[id] = effectiveStatus;
                     const prevStatus = (previousServiceStatuses[id] || '').toLowerCase();
@@ -2800,7 +2800,8 @@ Euskaro
                                 .replace('⚠️', '')
                                 .trim();
 
-                        camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6; ${favGlow}">${name}: ${cleanData || 'CÁMARAS OFFLINE'} ${priorityChipMarkup(priorityMeta)}</div>`;
+                        const cameraTickerChip = priorityMeta.key === 'degradado' ? '' : priorityChipMarkup(priorityMeta);
+                        camTickerHtml += `<div class="capsula-off" style="background:#1a1308; border-color:var(--orange); color:#ffd9a6; ${favGlow}">${name}: ${cleanData || 'CÁMARAS OFFLINE'} ${cameraTickerChip}</div>`;
                         camHtml += `
                         <div class="acc-wrapper">
                             <div class="off-service-card" id="head-cam${index}" onclick="handleOfflineCardAction('cam${index}', '${encodeURIComponent(name)}', 'service')">
@@ -2810,7 +2811,7 @@ Euskaro
                                         <span>${name}</span>
                                         <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">☆</button>
                                     </div>
-                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8; display:flex; gap:6px; align-items:center;">Cámaras Offline · ${offlineStamp.time} ${priorityChipMarkup(priorityMeta)}</div>
+                                    <div style="font-size:0.6rem; color:var(--orange); opacity:0.8; display:flex; gap:6px; align-items:center;">Cámaras Offline · ${offlineStamp.time}</div>
                                 </div>
                                 <div id="arr-cam${index}" style="font-size:0.8rem; opacity:0.5;">▼</div>
                             </div>
