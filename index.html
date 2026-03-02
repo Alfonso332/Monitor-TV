@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CIO Monitor Elite | Masterson</title>
-   
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
@@ -52,7 +52,7 @@
         #cio-app .mobile-only-section { display: none; }
 
         /* REGLA FULLSCREEN: Ocultar botones e historial */
-        #cio-app:fullscreen .main-header,
+        #cio-app:fullscreen .main-header, 
         #cio-app:-webkit-full-screen .main-header { display: none !important; }
 
         /* KPI BAR PC */
@@ -62,8 +62,8 @@
             height: 70px; min-height: 70px; flex-shrink: 0; gap: 10px;
         }
         #cio-app .kpi-card { text-align: center; }
-        #cio-app .kpi-value {
-            font-size: 2rem; font-weight: 900; color: var(--accent);
+        #cio-app .kpi-value { 
+            font-size: 2rem; font-weight: 900; color: var(--accent); 
             line-height: 1; display: flex; align-items: center; gap: 8px;
         }
         #cio-app .kpi-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; margin-top: 2px; }
@@ -107,21 +107,21 @@
         }
 
         /* ÁREA CENTRAL */
-        #cio-app #display-board {
-            flex: 1; display: flex; flex-direction: column; justify-content: center;
+        #cio-app #display-board { 
+            flex: 1; display: flex; flex-direction: column; justify-content: center; 
             align-items: center; text-align: center; padding: 20px;
             overflow: hidden;
         }
-        #cio-app #titleDisplay {
-            font-size: clamp(32px, 7vw, 75px);
-            font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.95;
+        #cio-app #titleDisplay { 
+            font-size: clamp(32px, 7vw, 75px); 
+            font-weight: 900; margin: 10px 0; text-transform: uppercase; line-height: 0.95; 
         }
-        #cio-app #messageDisplay {
-            font-size: clamp(18px, 2.5vw, 40px);
-            opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300;
+        #cio-app #messageDisplay { 
+            font-size: clamp(18px, 2.5vw, 40px); 
+            opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300; 
         }
         #cio-app .area-tag { letter-spacing: 8px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; color: var(--accent); }
-       
+        
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
         #cio-app .oculto { opacity: 0; transform: scale(0.95); filter: blur(10px); }
 
@@ -336,10 +336,10 @@
             overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
-       
+        
         /* FORMULARIOS Y BOTONES CENTRADOS */
-        #cio-app .p-field {
-            background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white;
+        #cio-app .p-field { 
+            background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white; 
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
             text-align: center; display: block; margin-left: auto; margin-right: auto;
         }
@@ -387,11 +387,11 @@
         #cio-app .trend-down { color: #ff4d4d !important; }
         @keyframes arrowMove { from { transform: translateY(1px); } to { transform: translateY(-1px); } }
 
-        #cio-app .history-card {
-            background: #111111 !important;
-            padding: 20px !important;
-            border-radius: 12px !important;
-            margin-bottom: 30px !important;
+        #cio-app .history-card { 
+            background: #111111 !important; 
+            padding: 20px !important; 
+            border-radius: 12px !important; 
+            margin-bottom: 30px !important; 
             border: 1px solid #222 !important;
             border-left: 5px solid var(--primary) !important;
             display: block !important;
@@ -562,12 +562,12 @@
         }
         #cio-app .off-service-card:active { transform: scale(0.98); background: #151515; }
         #cio-app .off-service-card.expanded-header { border-bottom-left-radius: 10; border-bottom-right-radius: 10; border-color: var(--primary); }
-       
+        
         #cio-app .off-status-dot {
             width: 12px; height: 12px; background: var(--critico); border-radius: 50%;
             box-shadow: 0 0 10px var(--critico); animation: pulse-red 1s infinite;
         }
-       
+        
         #cio-app .generic-details {
             max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s, padding 0.3s;
             opacity: 0; background: #111; border: 1px solid #111; border-top: 2;
@@ -575,7 +575,7 @@
             margin-bottom: 15px; padding: 0 20px;
         }
         #cio-app .generic-details.expanded { max-height: 400px; opacity: 1; padding: 20px; }
-       
+        
         #cio-app .detail-row { display: flex; justify-content: center; align-items: center; padding: 8px 0; border-bottom: 1px solid #111; }
         #cio-app .detail-row:last-child { border-bottom: none; }
         #cio-app .detail-value { color: #FFF; font-size: 1rem; font-weight: 700; text-align: center; }
@@ -1416,6 +1416,191 @@
                 margin-bottom: 8px !important;
             }
 
+
+            /* Native app mobile redesign (visual only) */
+            #cio-app #panelMobileDash {
+                max-width: 430px;
+                min-height: 100vh;
+                padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px calc(env(safe-area-inset-bottom, 0px) + 88px);
+                background:
+                    radial-gradient(1200px 420px at 20% -10%, rgba(0, 209, 209, 0.14), transparent 55%),
+                    radial-gradient(900px 360px at 100% 0%, rgba(94, 114, 228, 0.18), transparent 60%),
+                    linear-gradient(180deg, #05090d 0%, #070d15 42%, #050709 100%);
+            }
+            #cio-app #panelMobileDash > div:first-child {
+                position: sticky;
+                top: calc(env(safe-area-inset-top, 0px) + 8px);
+                z-index: 9;
+                margin-bottom: 14px !important;
+                padding: 14px 14px 12px;
+                border-radius: 24px;
+                border: 1px solid rgba(130, 171, 255, 0.24);
+                background: linear-gradient(145deg, rgba(10, 19, 33, 0.94), rgba(7, 12, 23, 0.92));
+                box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+                backdrop-filter: blur(14px);
+            }
+            #cio-app #panelMobileDash h2 {
+                font-size: 1.06rem !important;
+                letter-spacing: 1.5px !important;
+                color: #9ed0ff !important;
+            }
+            #cio-app #shift-display {
+                margin-top: 3px !important;
+                font-size: 0.6rem !important;
+                letter-spacing: 1.8px !important;
+                color: #82f2f0 !important;
+            }
+            #cio-app #mobileClockInline {
+                margin-top: 8px;
+                font-size: 1rem;
+                letter-spacing: 1.1px;
+                color: #ffffff;
+                text-shadow: 0 0 18px rgba(120, 200, 255, 0.45);
+            }
+            #cio-app .mobile-theme-toggle {
+                margin-top: 9px;
+                border-radius: 999px;
+                padding: 7px 12px;
+                font-weight: 700;
+                border: 1px solid rgba(126, 183, 255, 0.35);
+                background: rgba(13, 21, 35, 0.86);
+            }
+            #cio-app #mobileQuickSearch {
+                padding: 10px;
+                border-radius: 18px;
+                border: 1px solid rgba(130, 171, 255, 0.2);
+                background: rgba(8, 16, 27, 0.82);
+                box-shadow: 0 8px 24px rgba(0,0,0,0.26);
+            }
+            #cio-app #mobileQuickSearch .p-field {
+                height: 42px;
+                border-radius: 13px;
+                border: 1px solid rgba(129, 164, 255, 0.22);
+                background: rgba(5, 13, 22, 0.82);
+                font-size: 0.83rem;
+                padding: 0 12px;
+            }
+            #cio-app #panelMobileDash .btn-pill,
+            #cio-app #panelMobileDash .service-widget-toggle {
+                min-height: 40px;
+                border-radius: 12px;
+                border: 1px solid rgba(126, 183, 255, 0.28);
+                background: linear-gradient(150deg, rgba(13, 23, 35, 0.92), rgba(8, 14, 24, 0.92));
+            }
+            #cio-app #mobileFilterBar {
+                position: sticky;
+                top: calc(env(safe-area-inset-top, 0px) + 165px);
+                z-index: 8;
+                padding: 6px;
+                border-radius: 16px;
+                border: 1px solid rgba(127, 170, 255, 0.2);
+                background: rgba(8, 15, 24, 0.85);
+                backdrop-filter: blur(10px);
+            }
+            #cio-app .mobile-filter-chip {
+                border-radius: 999px;
+                min-height: 34px;
+                font-size: 0.67rem;
+                letter-spacing: 0.45px;
+                border: 1px solid rgba(138, 177, 255, 0.32);
+                background: rgba(10, 19, 30, 0.8);
+            }
+            #cio-app .mobile-filter-chip.active {
+                background: linear-gradient(130deg, #4f7cff, #34b6ff);
+                color: #fff;
+                border-color: rgba(255,255,255,0.35);
+                box-shadow: 0 8px 22px rgba(52, 152, 255, 0.35);
+            }
+            #cio-app .mobile-section-header {
+                margin-top: 14px;
+                margin-bottom: 8px;
+                padding-left: 4px;
+                font-size: 0.72rem;
+                font-weight: 800;
+                letter-spacing: 1.1px;
+                color: #acd7ff;
+            }
+            #cio-app .mobile-section-header::after { display: none; }
+            #cio-app .mobile-stat-box,
+            #cio-app .mobile-puestos-grid,
+            #cio-app .offline-widget,
+            #cio-app #historyMobileWindow,
+            #cio-app .service-widget,
+            #cio-app #mobileFavoritesSection .off-service-card,
+            #cio-app .feedback-history-window {
+                border-radius: 20px;
+                border: 1px solid rgba(128, 168, 255, 0.2);
+                background: linear-gradient(160deg, rgba(8, 16, 28, 0.92), rgba(6, 12, 22, 0.9));
+                box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+            }
+            #cio-app .mobile-stat-container,
+            #cio-app .mobile-offline-grid { gap: 12px; }
+            #cio-app .mobile-stat-box { min-height: 164px; }
+            #cio-app .mobile-puestos-grid { padding: 12px; }
+            #cio-app .puesto-item {
+                border-radius: 14px;
+                border: 1px solid rgba(127, 171, 255, 0.2);
+                background: rgba(10, 18, 30, 0.74);
+            }
+            #cio-app .offline-widget { padding: 12px; }
+            #cio-app .offline-widget-title {
+                color: #ffffff;
+                font-size: 0.75rem;
+                letter-spacing: 0.7px;
+            }
+            #cio-app .off-service-card {
+                border-radius: 14px;
+                border: 1px solid rgba(255, 123, 123, 0.34);
+                background: linear-gradient(160deg, rgba(44, 10, 14, 0.65), rgba(22, 7, 10, 0.65));
+            }
+            #cio-app .generic-details {
+                border-radius: 0 0 12px 12px;
+                border: 1px solid rgba(255,255,255,0.07);
+                border-top: 0;
+            }
+            #cio-app #historyMobileWindow {
+                padding: 12px;
+                min-height: 148px;
+            }
+            #cio-app #historyMobileWindow .history-card {
+                border-radius: 14px;
+                border: 1px solid rgba(127, 170, 255, 0.2);
+                background: linear-gradient(150deg, rgba(10, 18, 30, 0.95), rgba(6, 12, 22, 0.94));
+            }
+            #cio-app #scrollTopMobile {
+                right: 14px;
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+                border: 1px solid rgba(125, 185, 255, 0.4);
+                background: linear-gradient(145deg, rgba(12, 22, 35, 0.92), rgba(8, 14, 24, 0.92));
+                box-shadow: 0 10px 24px rgba(0,0,0,0.32);
+            }
+            #cio-app.mobile-light #panelMobileDash {
+                background: linear-gradient(180deg, #edf3fb 0%, #e8eff9 100%) !important;
+            }
+            #cio-app.mobile-light #panelMobileDash > div:first-child,
+            #cio-app.mobile-light #mobileQuickSearch,
+            #cio-app.mobile-light #mobileFilterBar,
+            #cio-app.mobile-light .mobile-stat-box,
+            #cio-app.mobile-light .mobile-puestos-grid,
+            #cio-app.mobile-light .offline-widget,
+            #cio-app.mobile-light #historyMobileWindow,
+            #cio-app.mobile-light .service-widget,
+            #cio-app.mobile-light .feedback-history-window {
+                background: linear-gradient(160deg, rgba(255,255,255,0.95), rgba(239,245,255,0.95)) !important;
+                border-color: rgba(78, 121, 185, 0.25) !important;
+                box-shadow: 0 10px 24px rgba(32, 73, 126, 0.12) !important;
+            }
+            #cio-app.mobile-light .mobile-filter-chip {
+                background: rgba(255,255,255,0.85);
+                border-color: rgba(73,118,182,0.3);
+            }
+            #cio-app.mobile-light .mobile-filter-chip.active {
+                background: linear-gradient(130deg, #4f7cff, #28a6ec);
+                color: #fff !important;
+            }
             #cio-app.mobile-light {
                 background: #BFBFBF !important;
                 color: #111111 !important;
@@ -1797,6 +1982,7 @@
     let feedbackEntries = [];
     let feedbackAuthorized = false;
     let previousServiceStatuses = {};
+    let previousAlarmStatuses = {};
     let offlineAlertQueue = [];
     let offlineAlertRunning = false;
     const shownAutoFailureSlides = new Set();
@@ -1959,6 +2145,12 @@ Euskaro
             autoFailure: Boolean(meta.autoFailure),
             autoFailureKey: meta.autoFailureKey || ''
         };
+    }
+
+    function buildAutoOfflineMessage(entityLabel, entityName, stamp) {
+        const safeDate = stamp?.date || 'fecha desconocida';
+        const safeTime = stamp?.time || 'hora desconocida';
+        return `${entityLabel} ${entityName} offline detectado automaticamente a la hora ${safeTime} de ${safeDate}`;
     }
 
     function showPreventiveMobileAlert(serviceName) {
@@ -2671,8 +2863,10 @@ Euskaro
             let cameraAffectedServicesCount = 0;
             let offlineAlarmsCount = 0;
             const currentServiceStatuses = {};
+            const currentAlarmStatuses = {};
             const newOfflineServices = [];
             const autoLogsToAdd = [];
+            const existingAutoFailureKeys = new Set(cio_logs.filter(item => item && item.autoFailureKey).map(item => item.autoFailureKey));
 
             Object.keys(serviceStatusLayer).forEach(k => delete serviceStatusLayer[k]);
 
@@ -2693,7 +2887,20 @@ Euskaro
                     const priorityMeta = getServicePriorityMeta({ fallos, isOffline: alarmActive, hasCameraOffline: false });
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
+                    const effectiveAlarmOffline = alarmActive && fallos >= 8;
+                    const alarmStatus = effectiveAlarmOffline ? 'offline' : 'online';
+                    currentAlarmStatuses[id] = alarmStatus;
+                    const prevAlarmStatus = (previousAlarmStatuses[id] || '').toLowerCase();
                     serviceNamePool.add(serviceName.toUpperCase());
+
+                    const entersAlarmTotalFailure = effectiveAlarmOffline && prevAlarmStatus !== 'offline';
+                    if (entersAlarmTotalFailure) {
+                        const autoFailureKey = `alarm::${alarmNormalizedKey}::${fallaStamp.date}::${fallaStamp.time}`;
+                        if (!existingAutoFailureKeys.has(autoFailureKey)) {
+                            autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', buildAutoOfflineMessage('Alarma', serviceName, fallaStamp), priorityMeta.label, { autoFailure: true, autoFailureKey }));
+                            existingAutoFailureKeys.add(autoFailureKey);
+                        }
+                    }
 
                     alarmDetailSnapshot[alarmNormalizedKey] = {
                         estado: alarmActive ? 'Offline' : 'Online',
@@ -2705,7 +2912,7 @@ Euskaro
                     };
 
 
-                    if (!alarmActive || fallos < 8) return;
+                    if (!effectiveAlarmOffline) return;
                     offlineAlarmsCount++;
                     alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla ${priorityChipMarkup(priorityMeta)}</div>`;
                     alarmHtml += `
@@ -2753,10 +2960,16 @@ Euskaro
                         hasCameraOffline: Boolean(hasCameraIssue)
                     });
 
-                    const entersTotalFailure = effectiveOffline && prevStatus && prevStatus !== 'offline';
+                    const entersTotalFailure = effectiveOffline && prevStatus !== 'offline';
                     if (entersTotalFailure) {
-                        const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
-                        autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey }));
+                        const isCameraEntity = CAMERA_CATALOG_SET.has(normalizedName);
+                        const entityLabel = isCameraEntity ? 'Cámara' : 'Servicio';
+                        const autoFailurePrefix = isCameraEntity ? 'camera' : 'service';
+                        const autoFailureKey = `${autoFailurePrefix}::${normalizedName}::${offlineStamp.date}::${offlineStamp.time}`;
+                        if (!existingAutoFailureKeys.has(autoFailureKey)) {
+                            autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', buildAutoOfflineMessage(entityLabel, name, offlineStamp), priorityMeta.label, { autoFailure: true, autoFailureKey }));
+                            existingAutoFailureKeys.add(autoFailureKey);
+                        }
                     }
 
                     if (Number(fallos) >= 5 && !effectiveOffline) showPreventiveMobileAlert(name);
@@ -2854,6 +3067,7 @@ Euskaro
 
                 serviceWidgetData = { loaded, unavailable };
                 previousServiceStatuses = currentServiceStatuses;
+                previousAlarmStatuses = currentAlarmStatuses;
                 newOfflineServices.forEach(serviceName => enqueueOfflineServiceAlert(serviceName));
             } else {
                 serviceWidgetData = { loaded: [], unavailable: [] };
@@ -3014,7 +3228,7 @@ Euskaro
             }
             if (progressCountdownEl) progressCountdownEl.textContent = `${Math.ceil(SLIDE_DURATION / 1000)}s`;
             cont.classList.remove('oculto');
-           
+            
             let p = 0; if(startTime) clearInterval(startTime);
             startTime = setInterval(() => {
                 p += 100 / (SLIDE_DURATION / 100);
