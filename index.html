@@ -1489,16 +1489,19 @@
                 top: calc(env(safe-area-inset-top, 0px) + 165px);
                 z-index: 8;
                 display: flex;
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
                 align-items: center;
                 gap: 10px;
                 padding: 12px 10px;
-                min-height: 72px;
+                min-height: 76px;
                 border-radius: 20px;
                 border: 1px solid rgba(0, 100, 101, 0.48);
                 background: rgba(3, 26, 27, 0.92);
                 backdrop-filter: blur(10px);
-                overflow: visible;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
             }
             #cio-app .mobile-filter-chip {
                 flex: 0 0 auto;
