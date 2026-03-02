@@ -358,6 +358,28 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.45);
         }
 
+        #cio-app .service-detail-row {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            padding:8px 10px;
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:10px;
+            background:rgba(255,255,255,0.02);
+            margin-bottom:8px;
+        }
+        #cio-app .status-dot {
+            width:10px;
+            height:10px;
+            border-radius:50%;
+            display:inline-block;
+            margin-right:8px;
+            box-shadow:0 0 10px currentColor;
+        }
+        #cio-app .status-offline { color:#ff5252; }
+        #cio-app .status-online { color:#2ecc71; }
+
         #cio-app .sync-indicator {
             position: fixed;
             top: 84px;
@@ -1205,7 +1227,7 @@
 
         <div class="mobile-only-section" id="mobileQuickSearch" style="margin-bottom:12px;">
             <div style="display:flex; gap:8px;">
-                <input id="mobileServiceQuickInput" list="service-options" class="p-field" style="margin:0; text-align:left;" placeholder="Buscar servicio...">
+                <input id="mobileServiceQuickInput" class="p-field" style="margin:0; text-align:left;" placeholder="Buscar servicio...">
                 <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:0 14px; border-radius:10px;" onclick="openServiceDetailFromQuickSearch()">Ver</button>
             </div>
         </div>
@@ -1502,14 +1524,31 @@
         const novedades = cio_logs.filter(it => normalizeServiceName(it.service || it.title) === normalized);
 
         title.textContent = detailType === 'alarm' ? `Detalle de alarma: ${decodedName || ''}` : (decodedName || 'Detalle de servicio');
+        const nvrStatusRaw = (serviceDetail.estado || '').toUpperCase();
+        const nvrOffline = nvrStatusRaw.includes('OFFLINE');
+        const alarmRaw = (alarmDetail.alarmas || 'Sin alarmas activas').toUpperCase();
+        const alarmOffline = alarmRaw.includes('ACTIVA') || alarmRaw.includes('OFFLINE') || alarmRaw.includes('FALLA');
+
         body.innerHTML = `
-            <div style="margin-bottom:10px;"><strong>Estado NVR:</strong> ${serviceDetail.estado || 'Sin datos'}</div>
-            <div style="margin-bottom:10px;"><strong>Alarmas:</strong> ${alarmDetail.alarmas || 'Sin alarmas activas'}</div>
-            <div style="margin-bottom:10px;"><strong>Cámaras:</strong> ${serviceDetail.camaras || 'Sin datos'}</div>
-            <div style="margin-bottom:10px;"><strong>Última caída:</strong> ${alarmDetail.horaCaida || serviceDetail.horaCaida || 'Sin datos'}</div>
-            <div style="margin-bottom:8px;"><strong>Historial técnico:</strong></div>
+            <div class="service-detail-row">
+                <strong>Estado NVR</strong>
+                <span class="${nvrOffline ? 'status-offline' : 'status-online'}"><span class="status-dot"></span>${serviceDetail.estado || 'Sin datos'}</span>
+            </div>
+            <div class="service-detail-row">
+                <strong>Alarmas</strong>
+                <span class="${alarmOffline ? 'status-offline' : 'status-online'}"><span class="status-dot"></span>${alarmDetail.alarmas || 'Sin alarmas activas'}</span>
+            </div>
+            <div class="service-detail-row" style="display:block;">
+                <div style="margin-bottom:6px;"><strong>Cámaras</strong></div>
+                <div>${serviceDetail.camaras || 'Sin datos'}</div>
+            </div>
+            <div class="service-detail-row" style="display:block;">
+                <div style="margin-bottom:6px;"><strong>Última caída</strong></div>
+                <div>${alarmDetail.horaCaida || serviceDetail.horaCaida || 'Sin datos'}</div>
+            </div>
+            <div style="margin:10px 0 8px;"><strong>Historial técnico</strong></div>
             <ul style="padding-left:16px; margin:0 0 10px;">${history.length ? history.map(item => `<li style="margin-bottom:4px;">${item}</li>`).join('') : '<li>Sin historial técnico.</li>'}</ul>
-            <div style="margin-bottom:8px;"><strong>Novedades cargadas:</strong></div>
+            <div style="margin-bottom:8px;"><strong>Novedades cargadas</strong></div>
             <ul style="padding-left:16px; margin:0;">${novedades.length ? novedades.slice(-8).reverse().map(item => `<li style="margin-bottom:4px;"><span style="opacity:0.75;">${item.date || '--/--'} ${item.time || '--:--'}</span> · ${item.message || ''}</li>`).join('') : '<li>Sin novedades asociadas.</li>'}</ul>
         `;
 
