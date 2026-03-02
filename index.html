@@ -1509,7 +1509,6 @@
     const alarmDetailSnapshot = {};
     const serviceStatusLayer = {};
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
-    const AUTO_LOG_SEEN_STATE = {};
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
     const preventiveAlertTracker = {};
     const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
@@ -1527,10 +1526,6 @@
         return `<span class="priority-chip ${meta.key}">${meta.label}</span>`;
     }
 
-    function getServiceStateKey(serviceName, suffix) {
-        return `${normalizeServiceName(serviceName)}::${suffix}`;
-    }
-
     function makeAutoLogEntry(serviceName, priority, message, intelligentState = "") {
         const now = new Date();
         return {
@@ -1543,13 +1538,6 @@
             date: formatDateDDMM(now),
             time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
         };
-    }
-
-    function queueAutoLog(serviceName, eventKey, isActive, priority, message, collector, intelligentState = "") {
-        const stateKey = getServiceStateKey(serviceName, eventKey);
-        const wasActive = Boolean(AUTO_LOG_SEEN_STATE[stateKey]);
-        if (isActive && !wasActive) collector.push(makeAutoLogEntry(serviceName, priority, message, intelligentState));
-        AUTO_LOG_SEEN_STATE[stateKey] = Boolean(isActive);
     }
 
     function showPreventiveMobileAlert(serviceName) {
@@ -2210,7 +2198,6 @@
                         priorityMeta
                     };
 
-                    queueAutoLog(serviceName.toUpperCase(), 'alarm-active', alarmActive, 'Crítica', `${serviceName.toUpperCase()} presenta alarma activa`, autoLogsToAdd, priorityMeta.label);
 
                     if (!alarmActive || fallos < 8) return;
                     offlineAlarmsCount++;
@@ -2258,8 +2245,10 @@
                         hasCameraOffline: Boolean(hasCameraIssue)
                     });
 
-                    queueAutoLog(name, 'service-offline', currentStatus === 'offline', 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, autoLogsToAdd, priorityMeta.label);
-                    queueAutoLog(name, 'camera-offline', Boolean(hasCameraIssue), 'Alta', `${name} con cámaras offline detectadas`, autoLogsToAdd, priorityMeta.label);
+                    const entersTotalFailure = currentStatus === 'offline' && prevStatus && prevStatus !== 'offline';
+                    if (entersTotalFailure) {
+                        autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label));
+                    }
 
                     if (Number(fallos) >= 5 && currentStatus !== 'offline') showPreventiveMobileAlert(name);
 
