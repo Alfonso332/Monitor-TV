@@ -1499,17 +1499,19 @@
             }
             #cio-app .mobile-filter-chip {
                 border-radius: 999px;
-                min-height: 34px;
-                font-size: 0.67rem;
-                letter-spacing: 0.45px;
-                border: 1px solid rgba(0, 100, 101, 0.5);
-                background: rgba(3, 24, 25, 0.82);
+                min-height: 42px;
+                padding: 0 14px;
+                font-size: 0.74rem;
+                font-weight: 800;
+                letter-spacing: 0.5px;
+                border: 1px solid rgba(0, 100, 101, 0.56);
+                background: rgba(3, 24, 25, 0.88);
             }
             #cio-app .mobile-filter-chip.active {
                 background: linear-gradient(130deg, #006465, #00a6a8);
                 color: #fff;
                 border-color: rgba(255,255,255,0.35);
-                box-shadow: 0 8px 22px rgba(52, 152, 255, 0.35);
+                box-shadow: 0 10px 26px rgba(0, 166, 168, 0.38);
             }
             #cio-app .mobile-section-header {
                 margin-top: 14px;
@@ -1847,7 +1849,6 @@
             <div id="shift-display" style="font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;">CARGANDO TURNO...</div>
             <div id="mobileClockInline">00:00:00</div>
             <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:9px;">
-                <button id="mobileThemeToggle" class="mobile-theme-toggle" onclick="toggleMobileTheme()" aria-label="Cambiar modo visual móvil">☾ Oscuro</button>
                 <button id="mobileNotificationsBtn" class="mobile-notif-btn mobile-only-section" onclick="toggleMobileNotifications(event)" aria-label="Ver notificaciones móviles">
                     🔔 <span id="mobileNotificationsCount" class="mobile-notif-count">0</span>
                 </button>
@@ -3634,71 +3635,6 @@ Euskaro
         if (mobileClock) mobileClock.textContent = time24h;
     }
 
-    const MOBILE_THEME_KEY = 'cio-mobile-theme';
-
-    function applyMobileTheme(mode) {
-        const app = document.getElementById('cio-app');
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        const toggleBtn = document.getElementById('mobileThemeToggle');
-        if (!app) return;
-
-        const effectiveMode = (mode === 'light' && isMobile) ? 'light' : 'dark';
-        app.classList.toggle('mobile-light', effectiveMode === 'light');
-
-        if (toggleBtn) {
-            toggleBtn.textContent = effectiveMode === 'light' ? '☀ Claro' : '☾ Oscuro';
-            toggleBtn.setAttribute('aria-label', effectiveMode === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
-        }
-    }
-
-    function toggleMobileTheme() {
-        const app = document.getElementById('cio-app');
-        if (!app) return;
-        const nextMode = app.classList.contains('mobile-light') ? 'dark' : 'light';
-        localStorage.setItem(MOBILE_THEME_KEY, nextMode);
-        applyMobileTheme(nextMode);
-    }
-
-    function renderMobileNotifications() {
-        const listEl = document.getElementById('mobileNotificationsList');
-        const countEl = document.getElementById('mobileNotificationsCount');
-        if (!listEl || !countEl) return;
-
-        const entries = (mobileNotificationFeed || []).slice(0, 8);
-        countEl.textContent = entries.length;
-
-        if (!entries.length) {
-            listEl.innerHTML = '<div class="mobile-notif-empty">Sin alertas críticas recientes.</div>';
-            return;
-        }
-
-        listEl.innerHTML = entries.map(item => `
-            <div class="mobile-notif-item ${item.level || 'info'}">
-                <div class="mobile-notif-item-head">
-                    <span>${item.icon || 'ℹ️'} ${item.title || 'Evento'}</span>
-                    <span>${item.time || '--:--'}</span>
-                </div>
-                <div class="mobile-notif-item-msg">${item.message || ''}</div>
-            </div>
-        `).join('');
-    }
-
-    function toggleMobileNotifications(event) {
-        if (event) event.stopPropagation();
-        const panel = document.getElementById('mobileNotificationsPanel');
-        if (!panel) return;
-        const next = !panel.classList.contains('active');
-        panel.classList.toggle('active', next);
-        panel.setAttribute('aria-hidden', next ? 'false' : 'true');
-    }
-
-    function closeMobileNotifications() {
-        const panel = document.getElementById('mobileNotificationsPanel');
-        if (!panel) return;
-        panel.classList.remove('active');
-        panel.setAttribute('aria-hidden', 'true');
-    }
-
     function setMobileSectionFilter(filterKey = 'all') {
         currentMobileFilter = filterKey;
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -3793,15 +3729,16 @@ Euskaro
     const quickInputEl = document.getElementById('mobileServiceQuickInput');
     if (quickInputEl) quickInputEl.addEventListener('input', updateQuickFavoriteButtonState);
 
+    const appEl = document.getElementById('cio-app');
+    if (appEl) appEl.classList.remove('mobile-light');
+
     const panelMobileDash = document.getElementById('panelMobileDash');
     if (panelMobileDash) panelMobileDash.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('scroll', toggleScrollTopButton, { passive: true });
     window.addEventListener('resize', toggleScrollTopButton);
 
-    applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
 
     window.addEventListener('resize', () => {
-        applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
         updateTvPerformanceMode();
         refreshServiceOptions();
     setMobileSectionFilter(currentMobileFilter);
