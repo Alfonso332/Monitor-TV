@@ -1359,6 +1359,63 @@
                 gap: 6px;
             }
 
+            /* Mobile wash-up pass: centered, cleaner rhythm, safer spacing */
+            #cio-app #panelMobileDash {
+                max-width: 560px;
+                margin: 0 auto;
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            #cio-app #panelMobileDash > * {
+                width: 100%;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+            #cio-app .mobile-stat-container {
+                align-items: stretch;
+                gap: 10px;
+            }
+            #cio-app .mobile-stat-box {
+                min-height: 158px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            #cio-app .mobile-puestos-grid {
+                gap: 9px;
+            }
+            #cio-app .mobile-offline-grid,
+            #cio-app .service-grid {
+                gap: 10px;
+            }
+            #cio-app .offline-widget,
+            #cio-app .service-widget,
+            #cio-app #historyMobileWindow,
+            #cio-app #feedbackHistoryWindow {
+                padding: 10px;
+            }
+            #cio-app .off-service-card {
+                gap: 8px;
+            }
+            #cio-app .service-detail-row {
+                border-radius: 12px;
+            }
+            #cio-app .service-check-card {
+                width: min(94vw, 460px);
+                padding: 14px;
+            }
+            #cio-app #mobileQuickSearch {
+                margin-bottom: 10px !important;
+            }
+            #cio-app #mobileFilterBar {
+                margin-bottom: 10px;
+            }
+            #cio-app #historyMobileSlide .history-card {
+                margin-bottom: 8px !important;
+            }
+
             #cio-app.mobile-light {
                 background: #BFBFBF !important;
                 color: #111111 !important;
@@ -1931,6 +1988,8 @@ Euskaro
         else mobileFavorites.add(normalized);
         persistMobileFavorites();
         renderMobileFavorites();
+        updateQuickFavoriteButtonState();
+        if (currentMobileFilter === 'favorites') setMobileSectionFilter('favorites');
         syncData();
     }
 
@@ -3302,6 +3361,7 @@ Euskaro
         });
         syncMobileHistoryMode();
         if (filterKey === 'feedback') renderFeedbackHistory();
+        if (filterKey === 'favorites') renderMobileFavorites();
     }
 
     const serviceCheckModalEl = document.getElementById('serviceCheckModal');
