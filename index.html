@@ -1526,7 +1526,10 @@
 
         title.textContent = detailType === 'alarm' ? `Detalle de alarma: ${decodedName || ''}` : (decodedName || 'Detalle de servicio');
         const nvrStatusRaw = (serviceDetail.estado || '').toUpperCase();
+        const nvrHasInfo = Boolean(serviceDetail && Object.keys(serviceDetail).length && serviceDetail.estado);
         const nvrOffline = nvrStatusRaw.includes('OFFLINE');
+        const nvrClass = !nvrHasInfo ? 'status-unknown' : (nvrOffline ? 'status-offline' : 'status-online');
+        const nvrText = !nvrHasInfo ? 'Sin información' : (serviceDetail.estado || 'Sin datos');
 
         const alarmHasInfo = Boolean(alarmDetail && Object.keys(alarmDetail).length);
         const alarmRaw = (alarmDetail.alarmas || '').toUpperCase();
@@ -1537,7 +1540,7 @@
         body.innerHTML = `
             <div class="service-detail-row">
                 <strong>Estado NVR</strong>
-                <span class="${nvrOffline ? 'status-offline' : 'status-online'}"><span class="status-dot"></span>${serviceDetail.estado || 'Sin datos'}</span>
+                <span class="${nvrClass}"><span class="status-dot"></span>${nvrText}</span>
             </div>
             <div class="service-detail-row">
                 <strong>Alarmas</strong>
