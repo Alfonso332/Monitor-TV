@@ -1488,21 +1488,29 @@
                 position: sticky;
                 top: calc(env(safe-area-inset-top, 0px) + 165px);
                 z-index: 8;
-                padding: 6px;
-                border-radius: 16px;
-                border: 1px solid rgba(0, 100, 101, 0.42);
-                background: rgba(3, 26, 27, 0.88);
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 10px;
+                min-height: 72px;
+                border-radius: 20px;
+                border: 1px solid rgba(0, 100, 101, 0.48);
+                background: rgba(3, 26, 27, 0.92);
                 backdrop-filter: blur(10px);
+                overflow: visible;
             }
             #cio-app .mobile-filter-chip {
+                flex: 0 0 auto;
                 border-radius: 999px;
-                min-height: 48px;
-                padding: 0 18px;
-                font-size: 0.82rem;
-                font-weight: 800;
-                letter-spacing: 0.55px;
-                border: 1px solid rgba(0, 100, 101, 0.56);
-                background: rgba(3, 24, 25, 0.88);
+                min-height: 52px;
+                padding: 0 20px;
+                font-size: 0.84rem;
+                font-weight: 900;
+                letter-spacing: 0.58px;
+                border: 1px solid rgba(0, 100, 101, 0.6);
+                background: rgba(3, 24, 25, 0.9);
+                white-space: nowrap;
             }
             #cio-app .mobile-filter-chip.active {
                 background: linear-gradient(130deg, #006465, #00a6a8);
