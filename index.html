@@ -1573,6 +1573,10 @@
             <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-bottom:5px;">SERVICIO</label>
             <input type="text" id="f-service" list="service-options" placeholder="Seleccioná o buscá servicio" required class="p-field">
             <datalist id="service-options"></datalist>
+            <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin:-6px 0 10px; font-size:0.72rem; color:#b7d8d8; font-weight:700;">
+                <input type="checkbox" id="f-service-other-toggle" onchange="toggleOtherServiceField()" style="width:16px; height:16px; accent-color: var(--accent);"> OTRO (especificar manualmente)
+            </label>
+            <input type="text" id="f-service-other" placeholder="Especificar otro servicio" class="p-field" style="display:none;" maxlength="80">
             <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
             <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICAR AHORA</button>
             <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="border-radius: 8px;">CANCELAR</button>
@@ -2804,6 +2808,38 @@
         app.classList.toggle('tv-performance', !isMobile && isFullscreenTV);
     }
 
+    function toggleOtherServiceField(forceState = null) {
+        const toggle = document.getElementById('f-service-other-toggle');
+        const mainInput = document.getElementById('f-service');
+        const otherInput = document.getElementById('f-service-other');
+        if (!toggle || !mainInput || !otherInput) return;
+
+        if (forceState !== null) toggle.checked = Boolean(forceState);
+        const isOther = toggle.checked;
+        otherInput.style.display = isOther ? 'block' : 'none';
+        otherInput.required = isOther;
+        mainInput.required = !isOther;
+        mainInput.disabled = isOther;
+        if (!isOther) otherInput.value = '';
+    }
+
+    function resolveFormServiceValue() {
+        const toggle = document.getElementById('f-service-other-toggle');
+        const mainInput = document.getElementById('f-service');
+        const otherInput = document.getElementById('f-service-other');
+        const isOther = Boolean(toggle && toggle.checked);
+
+        if (isOther) {
+            const otherValue = (otherInput?.value || '').trim();
+            if (!otherValue) return { valid: false, value: '', isOther };
+            return { valid: true, value: `OTRO · ${otherValue.toUpperCase()}`, isOther };
+        }
+
+        const serviceValue = (mainInput?.value || '').trim();
+        if (!serviceValue) return { valid: false, value: '', isOther };
+        return { valid: true, value: serviceValue.toUpperCase(), isOther };
+    }
+
     function openForm(index) {
         const isNew = index === null;
         document.getElementById('formTitle').textContent = isNew ? "NUEVA NOVEDAD" : "EDITAR NOVEDAD";
@@ -2812,11 +2848,21 @@
             document.getElementById('f-id').value = index;
             document.getElementById('f-area').value = it.area;
             document.getElementById('f-prio').value = it.priority;
-            document.getElementById('f-service').value = it.service || it.title;
+            const currentService = (it.service || it.title || '').toString();
+            if (currentService.toUpperCase().startsWith('OTRO · ')) {
+                document.getElementById('f-service-other').value = currentService.replace(/^OTRO\s·\s/i, '');
+                document.getElementById('f-service').value = '';
+                toggleOtherServiceField(true);
+            } else {
+                document.getElementById('f-service').value = currentService;
+                document.getElementById('f-service-other').value = '';
+                toggleOtherServiceField(false);
+            }
             document.getElementById('f-msg').value = it.message;
         } else {
             document.getElementById('mainForm').reset();
             document.getElementById('f-id').value = "";
+            toggleOtherServiceField(false);
         }
         openPanel('panelForm');
     }
@@ -2824,11 +2870,16 @@
     async function saveEntry(e) {
         e.preventDefault();
         const id = document.getElementById('f-id').value;
+        const resolved = resolveFormServiceValue();
+        if (!resolved.valid) {
+            alert('Completá el servicio antes de guardar la novedad.');
+            return;
+        }
         const entry = {
             area: document.getElementById('f-area').value,
             priority: document.getElementById('f-prio').value,
-            service: (document.getElementById('f-service').value || '').toUpperCase(),
-            title: (document.getElementById('f-service').value || '').toUpperCase(),
+            service: resolved.value,
+            title: resolved.value,
             message: document.getElementById('f-msg').value,
             date: formatDateDDMM(),
             time: new Date().toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
