@@ -1473,6 +1473,14 @@
         dataList.innerHTML = ordered.map(name => `<option value="${name}"></option>`).join('');
     }
 
+    function findServiceMatch(rawName) {
+        const query = normalizeServiceName(rawName);
+        const allNames = Array.from(serviceNamePool);
+        const exact = allNames.find(name => normalizeServiceName(name) === query);
+        const similars = allNames.filter(name => normalizeServiceName(name).includes(query));
+        return { query, exact, similars };
+    }
+
     function closeServiceDetailModal() {
         const modal = document.getElementById('serviceDetailModal');
         if (!modal) return;
@@ -1488,17 +1496,17 @@
 
         const decodedName = decodeURIComponent(rawName || '').replace(/\+/g, ' ');
         const normalized = normalizeServiceName(decodedName);
-        const detailSource = detailType === 'alarm' ? alarmDetailSnapshot : serviceDetailSnapshot;
-        const detail = detailSource[normalized] || {};
-        const history = detailType === 'alarm' ? [] : (serviceLiveHistory[normalized] || []);
+        const serviceDetail = serviceDetailSnapshot[normalized] || {};
+        const alarmDetail = alarmDetailSnapshot[normalized] || {};
+        const history = serviceLiveHistory[normalized] || [];
         const novedades = cio_logs.filter(it => normalizeServiceName(it.service || it.title) === normalized);
 
         title.textContent = detailType === 'alarm' ? `Detalle de alarma: ${decodedName || ''}` : (decodedName || 'Detalle de servicio');
         body.innerHTML = `
-            <div style="margin-bottom:10px;"><strong>Estado NVR:</strong> ${detail.estado || 'Sin datos'}</div>
-            <div style="margin-bottom:10px;"><strong>Alarmas:</strong> ${detail.alarmas || 'Sin datos'}</div>
-            <div style="margin-bottom:10px;"><strong>Cámaras:</strong> ${detail.camaras || 'Sin datos'}</div>
-            <div style="margin-bottom:10px;"><strong>Última caída:</strong> ${detail.horaCaida || 'Sin datos'}</div>
+            <div style="margin-bottom:10px;"><strong>Estado NVR:</strong> ${serviceDetail.estado || 'Sin datos'}</div>
+            <div style="margin-bottom:10px;"><strong>Alarmas:</strong> ${alarmDetail.alarmas || 'Sin alarmas activas'}</div>
+            <div style="margin-bottom:10px;"><strong>Cámaras:</strong> ${serviceDetail.camaras || 'Sin datos'}</div>
+            <div style="margin-bottom:10px;"><strong>Última caída:</strong> ${alarmDetail.horaCaida || serviceDetail.horaCaida || 'Sin datos'}</div>
             <div style="margin-bottom:8px;"><strong>Historial técnico:</strong></div>
             <ul style="padding-left:16px; margin:0 0 10px;">${history.length ? history.map(item => `<li style="margin-bottom:4px;">${item}</li>`).join('') : '<li>Sin historial técnico.</li>'}</ul>
             <div style="margin-bottom:8px;"><strong>Novedades cargadas:</strong></div>
@@ -1509,15 +1517,36 @@
         modal.setAttribute('aria-hidden', 'false');
     }
 
+    function openSimilarServiceFromModal(button) {
+        const name = button && button.dataset ? button.dataset.svc : '';
+        if (!name) return;
+        openServiceDetailModalByName(encodeURIComponent(name), 'service');
+    }
+
     function openServiceDetailFromQuickSearch() {
         const input = document.getElementById('mobileServiceQuickInput');
-        if (!input) return;
+        const modal = document.getElementById('serviceDetailModal');
+        const body = document.getElementById('serviceDetailBody');
+        const title = document.getElementById('service-detail-title');
+        if (!input || !modal || !body || !title) return;
+
         const raw = (input.value || '').trim();
         if (!raw) return;
-        const normalized = normalizeServiceName(raw);
-        const exact = Array.from(serviceNamePool).find(name => normalizeServiceName(name) === normalized);
-        const selected = exact || raw.toUpperCase();
-        openServiceDetailModalByName(encodeURIComponent(selected), 'service');
+        const { exact, similars } = findServiceMatch(raw);
+
+        if (!exact) {
+            title.textContent = 'Servicio no encontrado';
+            body.innerHTML = `
+                <div style="color:var(--critico); font-weight:900; margin-bottom:8px;">No encontramos "${raw}" en la base de servicios.</div>
+                <div style="margin-bottom:6px;"><strong>Similares:</strong></div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">${similars.length ? similars.slice(0, 12).map(name => `<button type="button" data-svc="${name.replace(/"/g, '&quot;')}" onclick="openSimilarServiceFromModal(this)" style="border:1px solid #2a2a2a; border-radius:999px; padding:3px 8px; font-size:0.68rem; background:#101010; color:#fff;">${name}</button>`).join('') : '<span style="opacity:0.75;">Sin coincidencias similares.</span>'}</div>
+            `;
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+            return;
+        }
+
+        openServiceDetailModalByName(encodeURIComponent(exact), 'service');
     }
 
     function handleOfflineCardAction(accordionId, encodedName, detailType = 'service') {
