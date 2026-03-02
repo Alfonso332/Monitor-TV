@@ -629,9 +629,7 @@
                 overflow-y: auto;
                 overscroll-behavior-y: contain;
                 -webkit-overflow-scrolling: touch;
-                background:
-                    radial-gradient(120% 65% at 50% -10%, rgba(0, 100, 101, 0.32) 0%, rgba(0, 0, 0, 0) 60%),
-                    linear-gradient(180deg, #070a0b 0%, #040606 45%, #020303 100%) !important;
+                background: #23282B !important;
             }
 
             #cio-app * { -webkit-tap-highlight-color: transparent; }
@@ -648,9 +646,7 @@
             }
 
             #cio-app .mobile-only-section { display: block; }
-            #cio-app #progressLine { bottom: 14px; right: 14px; width: 52px; height: 52px; }
-            #cio-app #progressLine::before { inset: 5px; }
-            #cio-app #progressCountdown { font-size: 0.78rem; }
+            #cio-app #progressLine { display: none !important; }
 
             #cio-app #mobileClockInline {
                 display: block;
@@ -1419,8 +1415,10 @@
 
             /* Native app mobile redesign (visual only) */
             #cio-app #panelMobileDash {
-                max-width: 430px;
+                width: 100vw;
+                max-width: none;
                 min-height: 100vh;
+                margin: 0;
                 padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px calc(env(safe-area-inset-bottom, 0px) + 88px);
                 background: #23282B;
             }
