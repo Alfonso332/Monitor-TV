@@ -379,6 +379,7 @@
         }
         #cio-app .status-offline { color:#ff5252; }
         #cio-app .status-online { color:#2ecc71; }
+        #cio-app .status-unknown { color:#f1c40f; }
 
         #cio-app .sync-indicator {
             position: fixed;
@@ -1526,8 +1527,12 @@
         title.textContent = detailType === 'alarm' ? `Detalle de alarma: ${decodedName || ''}` : (decodedName || 'Detalle de servicio');
         const nvrStatusRaw = (serviceDetail.estado || '').toUpperCase();
         const nvrOffline = nvrStatusRaw.includes('OFFLINE');
-        const alarmRaw = (alarmDetail.alarmas || 'Sin alarmas activas').toUpperCase();
+
+        const alarmHasInfo = Boolean(alarmDetail && Object.keys(alarmDetail).length);
+        const alarmRaw = (alarmDetail.alarmas || '').toUpperCase();
         const alarmOffline = alarmRaw.includes('ACTIVA') || alarmRaw.includes('OFFLINE') || alarmRaw.includes('FALLA');
+        const alarmClass = !alarmHasInfo ? 'status-unknown' : (alarmOffline ? 'status-offline' : 'status-online');
+        const alarmText = !alarmHasInfo ? 'Sin información' : (alarmDetail.alarmas || 'Sin alarmas activas');
 
         body.innerHTML = `
             <div class="service-detail-row">
@@ -1536,7 +1541,7 @@
             </div>
             <div class="service-detail-row">
                 <strong>Alarmas</strong>
-                <span class="${alarmOffline ? 'status-offline' : 'status-online'}"><span class="status-dot"></span>${alarmDetail.alarmas || 'Sin alarmas activas'}</span>
+                <span class="${alarmClass}"><span class="status-dot"></span>${alarmText}</span>
             </div>
             <div class="service-detail-row" style="display:block;">
                 <div style="margin-bottom:6px;"><strong>Cámaras</strong></div>
