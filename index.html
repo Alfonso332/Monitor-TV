@@ -298,8 +298,8 @@
             cursor:pointer;
             padding:2px 6px;
         }
-        #cio-app .favorite-btn.active { color:#f1c40f; text-shadow:0 0 10px rgba(241,196,15,0.55); }
-        #cio-app .favorite-chip { color:#f1c40f; text-shadow:0 0 8px rgba(241,196,15,0.45); }
+        #cio-app .favorite-btn.active { color:#ffffff; text-shadow:0 0 8px rgba(255,255,255,0.35); }
+        #cio-app .favorite-chip { color:#ffffff; opacity:0.9; }
         #cio-app .preventive-mobile-toast {
             display:none;
             position:sticky;
@@ -1288,6 +1288,7 @@
             <div style="display:flex; gap:8px;">
                 <input id="mobileServiceQuickInput" class="p-field" style="margin:0; text-align:left;" placeholder="Buscar servicio...">
                 <button class="btn-pill btn-sec" style="width:auto; margin:0; padding:0 14px; border-radius:10px;" onclick="openServiceDetailFromQuickSearch()">Ver</button>
+                <button class="btn-pill btn-sec mobile-only-section" style="width:auto; margin:0; padding:0 10px; border-radius:10px; min-width:42px;" aria-label="Agregar o quitar favorito" onclick="toggleFavoriteFromQuickSearch()">☆</button>
             </div>
         </div>
 
@@ -1559,6 +1560,8 @@
     }
 
     function toggleServiceFavorite(rawName) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
         const normalized = normalizeServiceName(rawName);
         if (!normalized) return;
         if (mobileFavorites.has(normalized)) mobileFavorites.delete(normalized);
@@ -1568,12 +1571,36 @@
         syncData();
     }
 
+    function getServiceDisplayNameByNormalized(normalizedName) {
+        const allNames = Array.from(serviceNamePool);
+        const exact = allNames.find(name => normalizeServiceName(name) === normalizedName);
+        return exact || normalizedName.toUpperCase();
+    }
+
+    function toggleFavoriteFromQuickSearch() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        const input = document.getElementById('mobileServiceQuickInput');
+        if (!input) return;
+        const raw = (input.value || '').trim();
+        if (!raw) return;
+        const { exact } = findServiceMatch(raw);
+        const targetName = exact || raw;
+        serviceNamePool.add(targetName.toUpperCase());
+        toggleServiceFavorite(targetName);
+    }
+
     function renderMobileFavorites() {
         const section = document.getElementById('mobileFavoritesSection');
         const list = document.getElementById('mobileFavoritesList');
         if (!section || !list) return;
-        const favorites = Object.values(serviceStatusLayer)
-            .filter(item => mobileFavorites.has(normalizeServiceName(item.name)))
+        const favorites = Array.from(mobileFavorites)
+            .map(normalized => {
+                const name = getServiceDisplayNameByNormalized(normalized);
+                const layer = serviceStatusLayer[normalizeServiceName(name)] || null;
+                const priority = layer?.priority || getServicePriorityMeta({ fallos: 0, isOffline: false, hasCameraOffline: false });
+                return { name, priority };
+            })
             .sort((a, b) => a.name.localeCompare(b.name, 'es'));
         if (!favorites.length) {
             section.style.display = 'none';
@@ -1585,9 +1612,12 @@
             <div class="acc-wrapper">
                 <div class="off-service-card" onclick="openServiceDetailModalByName('${encodeURIComponent(item.name)}','service')">
                     <div class="off-status-dot" style="background:${item.priority.color}; box-shadow:0 0 10px ${item.priority.color}"></div>
-                    <div style="flex:1">
-                        <div style="font-size:0.85rem; font-weight:900; color:#fff;"><span class="favorite-chip">★</span> ${item.name}</div>
-                        <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">${priorityChipMarkup(item.priority)}</div>
+                    <div style="flex:1; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                        <div>
+                            <div style="font-size:0.85rem; font-weight:900; color:#fff;"><span class="favorite-chip">☆</span> ${item.name}</div>
+                            <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">${priorityChipMarkup(item.priority)}</div>
+                        </div>
+                        <button class="favorite-btn active" onclick="event.stopPropagation(); toggleServiceFavorite(decodeURIComponent('${encodeURIComponent(item.name)}'))">☆</button>
                     </div>
                 </div>
             </div>
@@ -1692,7 +1722,12 @@
             hasCameraOffline: (serviceDetail.camaras || '').toUpperCase() !== 'SIN ALERTA DE CÁMARAS'
         });
 
+        const isFav = mobileFavorites.has(normalized);
         body.innerHTML = `
+            <div class="service-detail-row mobile-only-section" style="justify-content:space-between;">
+                <strong>Favorito</strong>
+                <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleServiceFavorite(decodeURIComponent('${encodeURIComponent(decodedName || '')}'))">☆</button>
+            </div>
             <div class="service-detail-row">
                 <strong>Prioridad Inteligente</strong>
                 <span>${priorityChipMarkup(priorityMeta)}</span>
@@ -2299,7 +2334,7 @@
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff; display:flex; justify-content:space-between; align-items:center;">
                                         <span>${name}</span>
-                                        <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">★</button>
+                                        <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">☆</button>
                                     </div>
                                     <div style="font-size:0.6rem; color:var(--orange); opacity:0.8; display:flex; gap:6px; align-items:center;">Cámaras Offline · ${offlineStamp.time} ${priorityChipMarkup(priorityMeta)}</div>
                                 </div>
@@ -2323,7 +2358,7 @@
                                 <div style="flex:1">
                                     <div style="font-size:0.9rem; font-weight:900; color:#fff; display:flex; justify-content:space-between; align-items:center;">
                                         <span>${name}</span>
-                                        <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">★</button>
+                                        <button class="${starClass}" onclick="event.stopPropagation(); toggleServiceFavorite('${name.replace(/'/g, "\\'")}')">☆</button>
                                     </div>
                                     <div style="font-size:0.6rem; color:var(--critico); font-weight:bold; display:flex; gap:6px; align-items:center;">SISTEMA CAÍDO ${priorityChipMarkup(priorityMeta)}</div>
                                 </div>
