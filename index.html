@@ -1749,6 +1749,123 @@
     const UNAVAILABLE_SERVICES_FIXED = [
         "Rincon del lago","Naciones Unidas","18 de diciembre","farmaco","Galielo","picasso","Palazzo Pitti","Exselsior","Arenal Grande","Ombu","Obra Ziel","Lazar","coopephi"
     ];
+    const ALARM_CATALOG_SERVICES = `
+21S
+AGRA DORZAN
+ALMS SING
+Alma Brava
+Andalucía
+Arcamar
+Arcus
+Asencio Leonardi
+Avita Vibra
+Avita Zero
+Bage
+Beverly I
+Bloque Residencial Maldonado
+Brisas de Guana
+Brusco
+Cabo Bella Vista
+Castel Forte
+Domus
+Don Antonio
+El Entrevero
+El Molino
+El Parque Montevideo
+Emilio I
+Galata
+Galería London
+Galileo
+Harbour Bay
+Infinity 26
+Inmobiliaria Lars Rivera
+Jardines de Barradas
+La Castellana
+Lift Alpha
+Lift Beta
+Lift Gaucho
+Lift Paullier
+Live Centro
+MILLE LUCI
+MVD 21 II
+Mas Mio
+Meridien II
+Miramar
+Moon
+More Buceo
+Movistar Pando
+Nariño
+Necochea
+Nobleza Naviera Colonia
+Nostrum Malvin ll
+Novus
+Nuevos Vientos 1 y 2
+Nuevos Vientos Biarritz
+Onn Be Hache Colonia
+Palazzo Pitti
+Panama
+Parma
+Paseo Real
+Piaro
+Picasso
+Playa Oriente II
+Plaza España
+Plaza Mayor
+Pocitos Inn
+Press Maua
+Puerto Nautilus
+Pulse
+Punto Vazquez
+Quorum
+ROOSEVELT HOME
+Rambla Luz
+Renaissance
+Riazor
+Rubens Renoir
+SUN URQUIZA
+Sibils
+Site Italia
+Slavonia
+Solar de Verdi
+Strada Di Jardin
+Tasch
+Tempo Rambla
+Terrazas de la Loma
+Terrazas del Golf
+The Life
+Tiffany
+Topaz Zephir
+Torre de las Américas
+Torres Garcia
+Uptown
+Velvet
+Villa del Fiori
+Vivo Life Cordón
+Working Mitre
+Yes Plaza Varela
+`.split('\n').map(v => v.trim()).filter(Boolean);
+    const CAMERA_CATALOG_SERVICES = `
+Nariño
+Galería_London
+Federico_Core
+25_Sing
+21s
+Alamos_de_Carrasco2
+Alamos_de_Carrasco1
+Alhambra
+Allegrezza
+Alma_Brava
+Alma_Corso
+Agra_Dorzan
+Berkes
+Complejo_Terranova2
+Complejo_Terranova1
+Fabrica_de_Canabis
+Euskaro
+`.split('\n').map(v => v.trim()).filter(Boolean);
+    const ALARM_CATALOG_SET = new Set(ALARM_CATALOG_SERVICES.map(normalizeServiceName));
+    const CAMERA_CATALOG_SET = new Set(CAMERA_CATALOG_SERVICES.map(normalizeServiceName));
+    const NVR_CATALOG_SET = new Set(LOADED_SERVICES.map(normalizeServiceName));
     const serviceLiveHistory = {};
     const serviceDetailSnapshot = {};
     const alarmDetailSnapshot = {};
@@ -1944,6 +2061,15 @@
         return { query, exact, similars };
     }
 
+    function getCatalogAvailability(serviceName) {
+        const normalized = normalizeServiceName(serviceName);
+        return {
+            cameras: CAMERA_CATALOG_SET.has(normalized),
+            alarms: ALARM_CATALOG_SET.has(normalized),
+            nvr: NVR_CATALOG_SET.has(normalized)
+        };
+    }
+
     function closeServiceDetailModal() {
         const modal = document.getElementById('serviceDetailModal');
         if (!modal) return;
@@ -1991,6 +2117,14 @@
             <div class="service-detail-row">
                 <strong>Prioridad Inteligente</strong>
                 <span>${priorityChipMarkup(priorityMeta)}</span>
+            </div>
+            <div class="service-detail-row" style="display:block;">
+                <div style="margin-bottom:6px;"><strong>Disponibilidad de carga</strong></div>
+                <div style="display:grid; grid-template-columns:1fr; gap:6px;">
+                    <div>Cámaras: <strong>${getCatalogAvailability(decodedName).cameras ? 'Cargado' : 'No cargado'}</strong></div>
+                    <div>Alarmas: <strong>${getCatalogAvailability(decodedName).alarms ? 'Cargada' : 'No cargada'}</strong></div>
+                    <div>NVR: <strong>${getCatalogAvailability(decodedName).nvr ? 'Cargado' : 'No cargado'}</strong></div>
+                </div>
             </div>
             <div class="service-detail-row">
                 <strong>Estado NVR</strong>
@@ -2118,20 +2252,28 @@
             ? UNAVAILABLE_SERVICES_FIXED.map(name => `<li style="margin-bottom:6px; color:var(--critico);">${name}</li>`).join('')
             : '<li style="opacity:0.7;">Sin servicios no cargables configurados.</li>';
 
-        const totalLoaded = LOADED_SERVICES.length;
-        const loadedBadge = `<span style="color:var(--online); font-weight:900;">${totalLoaded}</span>`;
+        const nvrCount = NVR_CATALOG_SET.size;
+        const cameraCount = CAMERA_CATALOG_SET.size;
+        const alarmCount = ALARM_CATALOG_SET.size;
 
         box.innerHTML = `
             <div style="font-size:0.72rem; opacity:0.75; margin-bottom:8px;">Actualizado: ${new Date().toLocaleString('es-AR')}</div>
             <div class="service-grid">
                 <div class="service-grid-card">
-                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--accent);">Base oficial de servicios cargados</div>
-                    <div style="font-size:0.72rem; opacity:0.78; margin-bottom:8px;">Servicios registrados: ${loadedBadge}</div>
-                    <div style="max-height:170px; overflow:auto; font-size:0.7rem; line-height:1.35; border:1px solid #1a1a1a; border-radius:10px; padding:8px; background:#090909;">${LOADED_SERVICES.join(' · ')}</div>
+                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--accent);">Disponibles NVR (${nvrCount})</div>
+                    <div style="max-height:150px; overflow:auto; font-size:0.7rem; line-height:1.35; border:1px solid #1a1a1a; border-radius:10px; padding:8px; background:#090909;">${LOADED_SERVICES.join(' · ')}</div>
+                </div>
+                <div class="service-grid-card">
+                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--orange);">Disponibles Cámaras (${cameraCount})</div>
+                    <div style="max-height:150px; overflow:auto; font-size:0.7rem; line-height:1.35; border:1px solid #1a1a1a; border-radius:10px; padding:8px; background:#090909;">${CAMERA_CATALOG_SERVICES.join(' · ')}</div>
+                </div>
+                <div class="service-grid-card">
+                    <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--warning);">Disponibles Alarmas (${alarmCount})</div>
+                    <div style="max-height:150px; overflow:auto; font-size:0.7rem; line-height:1.35; border:1px solid #1a1a1a; border-radius:10px; padding:8px; background:#090909;">${ALARM_CATALOG_SERVICES.join(' · ')}</div>
                 </div>
                 <div class="service-grid-card">
                     <div style="font-size:0.78rem; font-weight:700; margin-bottom:6px; color:var(--critico);">Servicios no cargables</div>
-                    <ul style="padding-left:16px; margin-bottom:0; max-height:220px; overflow:auto;">${unavailableHtml}</ul>
+                    <ul style="padding-left:16px; margin-bottom:0; max-height:150px; overflow:auto;">${unavailableHtml}</ul>
                 </div>
             </div>
         `;
