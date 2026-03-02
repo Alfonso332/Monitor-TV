@@ -235,7 +235,10 @@
             min-width: 100%;
         }
         #cio-app .ticker-row-bottom .ticker-wrapper { animation-duration: 34s; }
-        @keyframes scroll-ticker { 0% { transform: translateX(30vw); } 100% { transform: translateX(-100%); } }
+        @keyframes scroll-ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
 
         #cio-app .capsula-off {
             background: linear-gradient(150deg, rgba(62, 16, 16, 0.95), rgba(25, 8, 8, 0.95));
