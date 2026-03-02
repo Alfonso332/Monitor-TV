@@ -1797,6 +1797,7 @@
     let feedbackEntries = [];
     let feedbackAuthorized = false;
     let previousServiceStatuses = {};
+    let previousAlarmStatuses = {};
     let offlineAlertQueue = [];
     let offlineAlertRunning = false;
     const shownAutoFailureSlides = new Set();
@@ -1959,6 +1960,12 @@ Euskaro
             autoFailure: Boolean(meta.autoFailure),
             autoFailureKey: meta.autoFailureKey || ''
         };
+    }
+
+    function buildAutoOfflineMessage(entityLabel, entityName, stamp) {
+        const safeDate = stamp?.date || 'fecha desconocida';
+        const safeTime = stamp?.time || 'hora desconocida';
+        return `${entityLabel} ${entityName} offline detectado automaticamente a la hora ${safeTime} de ${safeDate}`;
     }
 
     function showPreventiveMobileAlert(serviceName) {
@@ -2671,8 +2678,10 @@ Euskaro
             let cameraAffectedServicesCount = 0;
             let offlineAlarmsCount = 0;
             const currentServiceStatuses = {};
+            const currentAlarmStatuses = {};
             const newOfflineServices = [];
             const autoLogsToAdd = [];
+            const existingAutoFailureKeys = new Set(cio_logs.filter(item => item && item.autoFailureKey).map(item => item.autoFailureKey));
 
             Object.keys(serviceStatusLayer).forEach(k => delete serviceStatusLayer[k]);
 
@@ -2693,7 +2702,20 @@ Euskaro
                     const priorityMeta = getServicePriorityMeta({ fallos, isOffline: alarmActive, hasCameraOffline: false });
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
+                    const effectiveAlarmOffline = alarmActive && fallos >= 8;
+                    const alarmStatus = effectiveAlarmOffline ? 'offline' : 'online';
+                    currentAlarmStatuses[id] = alarmStatus;
+                    const prevAlarmStatus = (previousAlarmStatuses[id] || '').toLowerCase();
                     serviceNamePool.add(serviceName.toUpperCase());
+
+                    const entersAlarmTotalFailure = effectiveAlarmOffline && prevAlarmStatus !== 'offline';
+                    if (entersAlarmTotalFailure) {
+                        const autoFailureKey = `alarm::${alarmNormalizedKey}::${fallaStamp.date}::${fallaStamp.time}`;
+                        if (!existingAutoFailureKeys.has(autoFailureKey)) {
+                            autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', buildAutoOfflineMessage('Alarma', serviceName, fallaStamp), priorityMeta.label, { autoFailure: true, autoFailureKey }));
+                            existingAutoFailureKeys.add(autoFailureKey);
+                        }
+                    }
 
                     alarmDetailSnapshot[alarmNormalizedKey] = {
                         estado: alarmActive ? 'Offline' : 'Online',
@@ -2705,7 +2727,7 @@ Euskaro
                     };
 
 
-                    if (!alarmActive || fallos < 8) return;
+                    if (!effectiveAlarmOffline) return;
                     offlineAlarmsCount++;
                     alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla ${priorityChipMarkup(priorityMeta)}</div>`;
                     alarmHtml += `
@@ -2753,10 +2775,16 @@ Euskaro
                         hasCameraOffline: Boolean(hasCameraIssue)
                     });
 
-                    const entersTotalFailure = effectiveOffline && prevStatus && prevStatus !== 'offline';
+                    const entersTotalFailure = effectiveOffline && prevStatus !== 'offline';
                     if (entersTotalFailure) {
-                        const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
-                        autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey }));
+                        const isCameraEntity = CAMERA_CATALOG_SET.has(normalizedName);
+                        const entityLabel = isCameraEntity ? 'Cámara' : 'Servicio';
+                        const autoFailurePrefix = isCameraEntity ? 'camera' : 'service';
+                        const autoFailureKey = `${autoFailurePrefix}::${normalizedName}::${offlineStamp.date}::${offlineStamp.time}`;
+                        if (!existingAutoFailureKeys.has(autoFailureKey)) {
+                            autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', buildAutoOfflineMessage(entityLabel, name, offlineStamp), priorityMeta.label, { autoFailure: true, autoFailureKey }));
+                            existingAutoFailureKeys.add(autoFailureKey);
+                        }
                     }
 
                     if (Number(fallos) >= 5 && !effectiveOffline) showPreventiveMobileAlert(name);
@@ -2854,6 +2882,7 @@ Euskaro
 
                 serviceWidgetData = { loaded, unavailable };
                 previousServiceStatuses = currentServiceStatuses;
+                previousAlarmStatuses = currentAlarmStatuses;
                 newOfflineServices.forEach(serviceName => enqueueOfflineServiceAlert(serviceName));
             } else {
                 serviceWidgetData = { loaded: [], unavailable: [] };
