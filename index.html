@@ -1941,6 +1941,7 @@ Euskaro
     const serviceStatusLayer = {};
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
     const AUTO_NOVELTY_COOLDOWN_MS = 5 * 60 * 60 * 1000;
+    const AUTO_NOVELTY_BLOCKS_KEY = 'cio-auto-novedad-blocks-v1';
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
     const preventiveAlertTracker = {};
     const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
@@ -1973,6 +1974,44 @@ Euskaro
             autoFailure: Boolean(meta.autoFailure),
             autoFailureKey: meta.autoFailureKey || ''
         };
+    }
+
+    function getStoredAutoNovedadBlocks() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(AUTO_NOVELTY_BLOCKS_KEY) || '{}');
+            return (parsed && typeof parsed === 'object') ? parsed : {};
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function persistAutoNovedadBlocks(blocks) {
+        localStorage.setItem(AUTO_NOVELTY_BLOCKS_KEY, JSON.stringify(blocks || {}));
+    }
+
+    function makeAutoNovedadBlockKey(serviceName, issueType) {
+        return `${normalizeServiceName(serviceName)}::${issueType}`;
+    }
+
+    function rememberAutoNovedadBlock(serviceName, issueType, generatedAtMs = Date.now()) {
+        const key = makeAutoNovedadBlockKey(serviceName, issueType);
+        if (!key || key.startsWith('::')) return;
+        const blocks = getStoredAutoNovedadBlocks();
+        const current = Number(blocks[key] || 0);
+        const nextValue = Number(generatedAtMs) || Date.now();
+        blocks[key] = Math.max(current, nextValue);
+        persistAutoNovedadBlocks(blocks);
+    }
+
+    function hasActiveAutoNovedadBlock(serviceName, issueType, nowMs = Date.now()) {
+        const key = makeAutoNovedadBlockKey(serviceName, issueType);
+        const blocks = getStoredAutoNovedadBlocks();
+        const ts = Number(blocks[key] || 0);
+        if (!ts) return false;
+        if ((nowMs - ts) < AUTO_NOVELTY_COOLDOWN_MS) return true;
+        delete blocks[key];
+        persistAutoNovedadBlocks(blocks);
+        return false;
     }
 
     function parseEntryTimestampMs(entry) {
@@ -2009,6 +2048,8 @@ Euskaro
         if (!normalizedService || !issueType) return false;
         const nowMs = Date.now();
 
+        if (hasActiveAutoNovedadBlock(serviceName, issueType, nowMs)) return false;
+
         for (const entry of cio_logs) {
             if (!entry) continue;
             const entryService = normalizeServiceName(entry.service || entry.title || '');
@@ -2019,7 +2060,10 @@ Euskaro
 
             const entryTs = parseEntryTimestampMs(entry);
             if (Number.isNaN(entryTs)) continue;
-            if ((nowMs - entryTs) < AUTO_NOVELTY_COOLDOWN_MS) return false;
+            if ((nowMs - entryTs) < AUTO_NOVELTY_COOLDOWN_MS) {
+                rememberAutoNovedadBlock(serviceName, issueType, entryTs);
+                return false;
+            }
         }
 
         return true;
@@ -2772,6 +2816,7 @@ Euskaro
                     if (!alarmActive || fallos < 8) return;
 
                     if (canGenerateAutoNovedad(serviceName, 'alarm_failure')) {
+                        rememberAutoNovedadBlock(serviceName, 'alarm_failure');
                         autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', `Alarma con falla detectada automáticamente en ${serviceName}`, priorityMeta.label, { autoIssueType: 'alarm_failure' }));
                     }
 
@@ -2823,10 +2868,12 @@ Euskaro
                     });
 
                     if (hasCameraIssue && canGenerateAutoNovedad(name, 'camera_failure')) {
+                        rememberAutoNovedadBlock(name, 'camera_failure');
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Alta', `Cámara con falla detectada automáticamente en ${name}: ${cameraInfo}`, priorityMeta.label, { autoIssueType: 'camera_failure' }));
                     }
 
                     if (effectiveOffline && canGenerateAutoNovedad(name, 'nvr_offline')) {
+                        rememberAutoNovedadBlock(name, 'nvr_offline');
                         const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey, autoIssueType: 'nvr_offline' }));
                     }
