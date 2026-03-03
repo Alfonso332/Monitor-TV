@@ -1980,6 +1980,80 @@ Villa del Fiori
 Vivo Life Cordón
 Working Mitre
 Yes Plaza Varela
+01 Sync
+Solana del Prado
+Obra Urquiza
+Torre Libertad
+Nuevos Vientos Golf
+Luzarin
+Naciones Unidas Rambla
+21 Park
+Puerto Blest
+Grand Prix
+Ombu
+MBC
+Obra Cumbre
+Obra Euskaro
+Mar Jonico
+Obra Mercedes
+Gala Biarritz
+Gala Pop
+Caleta del Golf
+Obra Garden
+Spazio 4
+Block
+Andalucia
+Obra Noir
+Lazaro Gadea
+El Cabo
+Isla de las Gaviotas
+Nostrum Malvin
+Marina de Biarritz
+Altos de Belvedere
+Atenea
+Swing 23
+Albo Park
+Chucarro
+Luna del Lago
+Austral
+Durandeau
+Bulevar
+La Strada
+Ventura Tres Cruces
+Cascada
+Giullianova
+Marco Polo
+Lancaster
+New Park
+La Llum
+Libertador
+Kyoto
+Lift Universitat
+Avita Libertador
+Dimac
+Mansa Inn
+Cenit
+Nobleza Naviera MVD
+Villa Savoia
+Berkes
+Pointer
+Marcos
+Capri
+Arca Construcciones
+Doce 76
+Carmel
+Pescador
+Altos de Pocitos
+Omikron
+MVD 21
+Harbour Park
+Lift Monterroso
+Obra Vivo Life
+Altair
+Obra Ciclades
+Copacabana
+Obra Kiu Rodo
+Lift Colonia
 `.split('\n').map(v => v.trim()).filter(Boolean);
     const CAMERA_CATALOG_SERVICES = `
 Nariño
@@ -2007,6 +2081,24 @@ Euskaro
     const serviceDetailSnapshot = {};
     const alarmDetailSnapshot = {};
     const serviceStatusLayer = {};
+    const SERVICE_NAME_ALIASES = {
+        'solana del prado': 'solanas del prado',
+        'puerto blest': 'puerto blees',
+        'giullianova': 'giulianova',
+        'lift paullier': 'lift paulier',
+        'nobleza naviera mvd': 'nobleza naviera',
+        'doce 76': 'doce76',
+        'obra kiu rodo': 'obra kiu rodo',
+        'la llum': 'edif la llum',
+        'albo park': 'edif albo park',
+        'bulevar': 'edif bulevar',
+        'cenit': 'edif cenit',
+        'copacabana': 'edif copacabana',
+        'harbour park': 'edif harbour park',
+        'lift universitat': 'edif lift universitat',
+        'mansa inn': 'doral inn',
+        'villa savoia': 'edif villa savoia'
+    };
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
     const AUTO_NOVELTY_COOLDOWN_MS = 5 * 60 * 60 * 1000;
     const AUTO_NOVELTY_BLOCKS_KEY = 'cio-auto-novedad-blocks-v1';
@@ -2252,13 +2344,14 @@ Euskaro
     }
 
     function normalizeServiceName(value) {
-        return (value || '')
+        const normalized = (value || '')
             .toString()
             .normalize('NFD')
             .replace(/[̀-ͯ]/g, '')
             .toLowerCase()
             .replace(/[_\s-]+/g, ' ')
             .trim();
+        return SERVICE_NAME_ALIASES[normalized] || normalized;
     }
 
     function formatDateDDMM(dateInput = new Date()) {
