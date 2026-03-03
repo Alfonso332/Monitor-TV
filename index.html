@@ -481,9 +481,9 @@
         /* RESPONSIVE CELULAR */
         @media (max-width: 768px) {
             #cio-app {
-                overflow-y: auto;
+                height: 100dvh;
+                overflow: hidden;
                 overscroll-behavior-y: contain;
-                -webkit-overflow-scrolling: touch;
                 background:
                     radial-gradient(120% 65% at 50% -10%, rgba(0, 100, 101, 0.32) 0%, rgba(0, 0, 0, 0) 60%),
                     linear-gradient(180deg, #070a0b 0%, #040606 45%, #020303 100%) !important;
@@ -518,15 +518,19 @@
                 position: relative;
                 inset: auto;
                 width: 100%;
-                height: auto;
+                height: 100dvh;
                 transform: none !important;
                 border: none;
                 border-radius: 0;
                 box-shadow: none;
-                padding: calc(14px + env(safe-area-inset-top)) 13px calc(95px + env(safe-area-inset-bottom));
+                padding: calc(14px + env(safe-area-inset-top)) 13px calc(115px + env(safe-area-inset-bottom));
                 touch-action: auto;
-                overflow: visible;
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
             }
+
+            #cio-app #panelMobileDash > *:last-child { margin-bottom: 12px; }
 
             #cio-app #panelMobileDash::before,
             #cio-app .side-panel::before { display: none; }
@@ -545,7 +549,7 @@
                 color: #006465;
                 font-size: 0.72rem;
                 font-weight: 900;
-                margin: 24px 0 11px;
+                margin: 20px 0 10px;
                 text-transform: uppercase;
                 letter-spacing: 1.9px;
                 display: flex;
