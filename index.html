@@ -748,7 +748,7 @@
             #cio-app #historyMobileWindow,
             #cio-app .service-widget {
                 border-radius: 16px !important;
-                border: 1px solid rgba(255,255,255,0.1) !important;
+                border: 1px solid #23282c !important;
                 background: linear-gradient(155deg, rgba(14,20,21,0.96), rgba(8,12,13,0.95)) !important;
                 box-shadow: 0 12px 26px rgba(0,0,0,0.28) !important;
             }
@@ -763,7 +763,7 @@
             }
             #cio-app .off-service-card {
                 border-radius: 12px;
-                border: 1px solid rgba(255,255,255,0.08);
+                border: 1px solid #23282c;
                 background: linear-gradient(145deg, rgba(18,18,18,0.96), rgba(10,10,10,0.92));
                 padding: 10px;
             }
@@ -933,7 +933,7 @@
             }
             #cio-app .mobile-stat-box {
                 background: linear-gradient(145deg, rgba(22, 37, 40, 0.94) 0%, rgba(8, 14, 16, 0.98) 100%);
-                border: 1px solid rgba(115, 255, 255, 0.18);
+                border: 1px solid #23282c;
                 border-radius: 22px;
                 padding: 16px 14px;
                 min-height: 136px;
@@ -1194,8 +1194,8 @@
             #cio-app #scrollTopMobile {
                 position: fixed;
                 right: 14px;
-                top: calc(12px + env(safe-area-inset-top));
-                bottom: auto;
+                bottom: calc(14px + env(safe-area-inset-bottom));
+                top: auto;
                 width: 46px;
                 height: 46px;
                 border-radius: 50%;
@@ -1338,12 +1338,24 @@
             }
             #cio-app #scrollTopMobile {
                 background: linear-gradient(150deg, rgba(77,102,120,0.96), rgba(55,77,94,0.95));
-                border: 1px solid rgba(255,255,255,0.25);
+                border: 1px solid #23282c;
                 width: 44px;
                 height: 44px;
                 right: 12px;
-                top: calc(10px + env(safe-area-inset-top));
-                bottom: auto;
+                bottom: calc(12px + env(safe-area-inset-bottom));
+                top: auto;
+            }
+            #cio-app .mobile-notifications-btn {
+                margin-top: 10px;
+                border: 1px solid #23282c;
+                background: linear-gradient(160deg, rgba(36, 45, 55, 0.94), rgba(24, 32, 40, 0.92));
+                color: #d9f6f7;
+                border-radius: 999px;
+                padding: 7px 14px;
+                font-size: 0.72rem;
+                font-weight: 900;
+                letter-spacing: 0.4px;
+                box-shadow: 0 8px 18px rgba(0,0,0,0.22);
             }
             #cio-app .service-check-card {
                 border-radius: 16px;
@@ -1447,7 +1459,8 @@
             #cio-app.mobile-light .off-service-card,
             #cio-app.mobile-light .generic-details,
             #cio-app.mobile-light #panelMobileDash .btn-pill,
-            #cio-app.mobile-light #panelMobileDash .service-widget-toggle {
+            #cio-app.mobile-light #panelMobileDash .service-widget-toggle,
+            #cio-app.mobile-light .mobile-notifications-btn {
                 background: linear-gradient(160deg, rgba(246,246,246,0.95), rgba(222,222,222,0.95)) !important;
                 border-color: rgba(0,73,74,0.22) !important;
                 color: #1a2c2d !important;
@@ -1592,6 +1605,7 @@
             <div id="shift-display" style="font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;">CARGANDO TURNO...</div>
             <div id="mobileClockInline">00:00:00</div>
             <button id="mobileThemeToggle" class="mobile-theme-toggle" onclick="toggleMobileTheme()" aria-label="Cambiar modo visual móvil">☾ Oscuro</button>
+            <button class="mobile-notifications-btn mobile-only-section" onclick="openMobileNotifications()" aria-label="Ir a novedades y notificaciones">🔔 Notificaciones</button>
         </div>
 
         <div class="mobile-only-section" id="mobileQuickSearch" style="margin-bottom:12px;">
@@ -3448,6 +3462,14 @@ Euskaro
         const nextMode = app.classList.contains('mobile-light') ? 'dark' : 'light';
         localStorage.setItem(MOBILE_THEME_KEY, nextMode);
         applyMobileTheme(nextMode);
+    }
+
+    function openMobileNotifications() {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        setMobileSectionFilter('news');
+        const target = document.getElementById('historyMobileWindow');
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function setMobileSectionFilter(filterKey = 'all') {
