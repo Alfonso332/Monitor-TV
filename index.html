@@ -633,6 +633,14 @@
                 overscroll-behavior-y: auto;
                 -webkit-overflow-scrolling: touch;
                 background: #16181b !important;
+                overflow-x: hidden;
+            }
+
+            #cio-app,
+            #cio-app #panelMobileDash {
+                width: 100%;
+                max-width: 100vw;
+                overflow-x: hidden;
             }
 
             #cio-app.pantalla-critica {
@@ -653,9 +661,7 @@
             }
 
             #cio-app .mobile-only-section { display: block; }
-            #cio-app #progressLine { bottom: 14px; right: 14px; width: 52px; height: 52px; }
-            #cio-app #progressLine::before { inset: 5px; }
-            #cio-app #progressCountdown { font-size: 0.78rem; }
+            #cio-app #progressLine { display: none !important; }
 
             #cio-app #mobileClockInline {
                 display: block;
