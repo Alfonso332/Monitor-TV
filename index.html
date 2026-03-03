@@ -1236,12 +1236,12 @@
             #cio-app #panelMobileDash > div:first-child {
                 border-radius: 18px;
                 background: linear-gradient(160deg, rgba(31,39,48,0.92), rgba(20,26,33,0.88));
-                border: 1px solid rgba(255,255,255,0.1);
+                border: 1px solid #23282c;
                 box-shadow: 0 12px 28px rgba(0,0,0,0.32);
             }
             #cio-app #mobileQuickSearch {
                 border-radius: 14px;
-                border: 1px solid rgba(255,255,255,0.12);
+                border: 1px solid #23282c;
                 background: linear-gradient(165deg, rgba(23,29,36,0.95), rgba(16,22,28,0.92));
                 box-shadow: 0 10px 24px rgba(0,0,0,0.28);
             }
@@ -1334,7 +1334,7 @@
             #cio-app #historyMobileWindow .history-card {
                 border-radius: 11px;
                 background: linear-gradient(160deg, rgba(33,42,51,0.95), rgba(21,28,35,0.92)) !important;
-                border: 1px solid rgba(255,255,255,0.1) !important;
+                border: 1px solid #23282c !important;
             }
             #cio-app #scrollTopMobile {
                 background: linear-gradient(150deg, rgba(77,102,120,0.96), rgba(55,77,94,0.95));
@@ -1356,6 +1356,13 @@
                 font-weight: 900;
                 letter-spacing: 0.4px;
                 box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+            }
+            #cio-app .mobile-notification-item {
+                border: 1px solid #23282c;
+                border-radius: 10px;
+                padding: 8px;
+                margin-bottom: 8px;
+                background: linear-gradient(160deg, rgba(27,34,42,0.92), rgba(17,24,31,0.9));
             }
             #cio-app .service-check-card {
                 border-radius: 16px;
@@ -1757,6 +1764,16 @@
         </div>
     </div>
 
+    <div id="mobileNotificationsModal" class="service-check-modal" aria-hidden="true">
+        <div class="service-check-card" role="dialog" aria-modal="true" aria-labelledby="mobile-notifications-title">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 id="mobile-notifications-title" style="font-size:0.9rem; color:var(--accent);">Notificaciones</h3>
+                <button onclick="closeMobileNotifications()" style="background:none; border:none; color:#9f9f9f; font-size:1.1rem;">✕</button>
+            </div>
+            <div id="mobileNotificationsBody" style="font-size:0.76rem; line-height:1.42; max-height:56vh; overflow:auto;"></div>
+        </div>
+    </div>
+
     <div id="feedbackToast" class="feedback-toast mobile-only-section" aria-live="polite"></div>
 
     <aside id="panelHistory" class="side-panel">
@@ -1827,6 +1844,9 @@
     let previousServiceStatuses = {};
     let offlineAlertQueue = [];
     let offlineAlertRunning = false;
+    let mobileNotificationFeed = [];
+    const mobileNotificationTracker = {};
+    const MOBILE_NOTIFICATION_COOLDOWN_MS = 2 * 60 * 1000;
     const shownAutoFailureSlides = new Set();
     const SLIDE_DURATION = 45000;
     const LOADED_SERVICES = [
@@ -2517,6 +2537,43 @@ Euskaro
         modal.setAttribute('aria-hidden', 'true');
     }
 
+    function closeMobileNotifications() {
+        const modal = document.getElementById('mobileNotificationsModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function pushMobileNotification(serviceName, kind, text) {
+        const normalizedService = normalizeServiceName(serviceName || 'general');
+        const key = `${normalizedService}::${kind || 'general'}`;
+        const nowMs = Date.now();
+        if (mobileNotificationTracker[key] && (nowMs - mobileNotificationTracker[key]) < MOBILE_NOTIFICATION_COOLDOWN_MS) return;
+        mobileNotificationTracker[key] = nowMs;
+
+        mobileNotificationFeed.unshift({
+            service: serviceName || 'General',
+            kind: kind || 'info',
+            text: text || 'Nueva notificación',
+            ts: nowMs
+        });
+        mobileNotificationFeed = mobileNotificationFeed.slice(0, 40);
+    }
+
+    function renderMobileNotificationsBody() {
+        const body = document.getElementById('mobileNotificationsBody');
+        if (!body) return;
+        if (!mobileNotificationFeed.length) {
+            body.innerHTML = '<div class="history-empty">Sin notificaciones recientes.</div>';
+            return;
+        }
+        body.innerHTML = mobileNotificationFeed.map(item => {
+            const when = new Date(item.ts || Date.now());
+            const stamp = when.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            return `<div class="mobile-notification-item"><div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:4px;"><strong style="color:var(--accent);">${item.service}</strong><span style="opacity:0.7;">${stamp}</span></div><div style="opacity:0.95;">${item.text}</div></div>`;
+        }).join('');
+    }
+
     function openFeedbackAuthModal() {
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         if (!isMobile) return;
@@ -2832,6 +2889,8 @@ Euskaro
 
                     if (!alarmActive || fallos < 8) return;
 
+                    pushMobileNotification(serviceName, 'alarm_failure', `Falla de alarma detectada en ${serviceName}.`);
+
                     if (canGenerateAutoNovedad(serviceName, 'alarm_failure')) {
                         rememberAutoNovedadBlock(serviceName, 'alarm_failure');
                         autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', `Alarma con falla detectada automáticamente en ${serviceName}`, priorityMeta.label, { autoIssueType: 'alarm_failure' }));
@@ -2889,10 +2948,20 @@ Euskaro
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Alta', `Cámara con falla detectada automáticamente en ${name}: ${cameraInfo}`, priorityMeta.label, { autoIssueType: 'camera_failure' }));
                     }
 
+                    if (hasCameraIssue) {
+                        pushMobileNotification(name, 'camera_failure', `Falla de cámara en ${name}. ${cameraInfo}`);
+                    }
+
                     if (effectiveOffline && canGenerateAutoNovedad(name, 'nvr_offline')) {
                         rememberAutoNovedadBlock(name, 'nvr_offline');
                         const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey, autoIssueType: 'nvr_offline' }));
+                    }
+
+                    if (effectiveOffline) {
+                        pushMobileNotification(name, 'nvr_offline', `Servicio offline: ${name}.`);
+                    } else if (fallos >= 5) {
+                        pushMobileNotification(name, 'critical_state', `Nueva novedad crítica en ${name} (${fallos} fallos).`);
                     }
 
                     if (Number(fallos) >= 5 && !effectiveOffline) showPreventiveMobileAlert(name);
@@ -3467,9 +3536,11 @@ Euskaro
     function openMobileNotifications() {
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         if (!isMobile) return;
-        setMobileSectionFilter('news');
-        const target = document.getElementById('historyMobileWindow');
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const modal = document.getElementById('mobileNotificationsModal');
+        if (!modal) return;
+        renderMobileNotificationsBody();
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
     }
 
     function setMobileSectionFilter(filterKey = 'all') {
@@ -3513,6 +3584,7 @@ Euskaro
     const serviceCheckModalEl = document.getElementById('serviceCheckModal');
     const feedbackModalEl = document.getElementById('feedbackModal');
     const feedbackAuthModalEl = document.getElementById('feedbackAuthModal');
+    const mobileNotificationsModalEl = document.getElementById('mobileNotificationsModal');
     if (serviceCheckModalEl) {
         serviceCheckModalEl.addEventListener('click', (event) => {
             if (event.target === serviceCheckModalEl) closeServiceCheckModal();
@@ -3534,6 +3606,11 @@ Euskaro
             if (event.target === feedbackAuthModalEl) closeFeedbackAuthModal();
         });
     }
+    if (mobileNotificationsModalEl) {
+        mobileNotificationsModalEl.addEventListener('click', (event) => {
+            if (event.target === mobileNotificationsModalEl) closeMobileNotifications();
+        });
+    }
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && document.activeElement && document.activeElement.id === 'mobileServiceQuickInput') {
@@ -3552,6 +3629,9 @@ Euskaro
         }
         if (event.key === 'Escape' && feedbackAuthModalEl && feedbackAuthModalEl.classList.contains('active')) {
             closeFeedbackAuthModal();
+        }
+        if (event.key === 'Escape' && mobileNotificationsModalEl && mobileNotificationsModalEl.classList.contains('active')) {
+            closeMobileNotifications();
         }
     });
 
