@@ -1364,6 +1364,23 @@
                 margin-bottom: 8px;
                 background: linear-gradient(160deg, rgba(27,34,42,0.92), rgba(17,24,31,0.9));
             }
+            #cio-app #panelMobileDash > div:first-child,
+            #cio-app #mobileQuickSearch,
+            #cio-app .mobile-stat-box,
+            #cio-app .mobile-puestos-grid,
+            #cio-app .offline-widget,
+            #cio-app #historyMobileWindow,
+            #cio-app #historyMobileWindow .history-card,
+            #cio-app .service-widget,
+            #cio-app .service-grid-card,
+            #cio-app .off-service-card,
+            #cio-app .generic-details,
+            #cio-app .mobile-notifications-btn,
+            #cio-app .mobile-notification-item,
+            #cio-app #scrollTopMobile,
+            #cio-app .service-check-card {
+                border-color: #23282c !important;
+            }
             #cio-app .service-check-card {
                 border-radius: 16px;
                 border: 1px solid rgba(255,255,255,0.14);
@@ -1611,7 +1628,6 @@
             <h2 style="color:var(--accent); font-size: 1.3rem; letter-spacing: 2px; font-weight: 900; margin: 0;">CENTRO DE MANDO</h2>
             <div id="shift-display" style="font-size: 0.7rem; font-weight: bold; color: var(--primary); text-transform: uppercase; letter-spacing: 3px; margin-top: 5px;">CARGANDO TURNO...</div>
             <div id="mobileClockInline">00:00:00</div>
-            <button id="mobileThemeToggle" class="mobile-theme-toggle" onclick="toggleMobileTheme()" aria-label="Cambiar modo visual móvil">☾ Oscuro</button>
             <button class="mobile-notifications-btn mobile-only-section" onclick="openMobileNotifications()" aria-label="Ir a novedades y notificaciones">🔔 Notificaciones</button>
         </div>
 
@@ -3516,7 +3532,7 @@ Euskaro
         const toggleBtn = document.getElementById('mobileThemeToggle');
         if (!app) return;
 
-        const effectiveMode = (mode === 'light' && isMobile) ? 'light' : 'dark';
+        const effectiveMode = isMobile ? 'dark' : ((mode === 'light') ? 'light' : 'dark');
         app.classList.toggle('mobile-light', effectiveMode === 'light');
 
         if (toggleBtn) {
