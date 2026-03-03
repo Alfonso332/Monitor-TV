@@ -1194,7 +1194,8 @@
             #cio-app #scrollTopMobile {
                 position: fixed;
                 right: 14px;
-                bottom: calc(14px + env(safe-area-inset-bottom));
+                top: calc(12px + env(safe-area-inset-top));
+                bottom: auto;
                 width: 46px;
                 height: 46px;
                 border-radius: 50%;
@@ -1203,7 +1204,7 @@
                 color: #ffffff;
                 font-size: 1.15rem;
                 font-weight: 900;
-                z-index: 10030;
+                z-index: 10190;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
@@ -1341,6 +1342,8 @@
                 width: 44px;
                 height: 44px;
                 right: 12px;
+                top: calc(10px + env(safe-area-inset-top));
+                bottom: auto;
             }
             #cio-app .service-check-card {
                 border-radius: 16px;
@@ -3268,7 +3271,8 @@ Euskaro
         }
         const panelScroll = panel ? panel.scrollTop : 0;
         const windowScroll = window.scrollY || 0;
-        const shouldShow = (panelScroll > 120 || windowScroll > 120);
+        const threshold = Math.max(220, Math.round(window.innerHeight * 0.35));
+        const shouldShow = (panelScroll > threshold || windowScroll > threshold);
         btn.classList.toggle('visible', shouldShow);
     }
 
