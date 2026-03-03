@@ -2096,6 +2096,18 @@ Euskaro
         return Number.isNaN(fallback) ? Number.NaN : fallback;
     }
 
+    function inferAutoIssueType(entry) {
+        if (!entry) return '';
+        if (entry.autoIssueType) return entry.autoIssueType;
+        if (entry.autoFailure) return 'nvr_offline';
+
+        const msg = (entry.message || '').toString().toLowerCase();
+        if (msg.includes('alarma con falla detectada automáticamente')) return 'alarm_failure';
+        if (msg.includes('cámara con falla detectada automáticamente')) return 'camera_failure';
+        if (msg.includes('sin conexión detectada automáticamente')) return 'nvr_offline';
+        return '';
+    }
+
     function canGenerateAutoNovedad(serviceName, issueType) {
         const normalizedService = normalizeServiceName(serviceName);
         if (!normalizedService || !issueType) return false;
@@ -2108,7 +2120,7 @@ Euskaro
             const entryService = normalizeServiceName(entry.service || entry.title || '');
             if (entryService !== normalizedService) continue;
 
-            const entryIssueType = entry.autoIssueType || (entry.autoFailure ? 'nvr_offline' : '');
+            const entryIssueType = inferAutoIssueType(entry);
             if (entryIssueType !== issueType) continue;
 
             const entryTs = parseEntryTimestampMs(entry);
