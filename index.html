@@ -9,6 +9,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            background: #16181b;
+            overflow-x: hidden;
+        }
+
         /* === ESTRUCTURA Y RESET === */
         #cio-app {
             --primary: #006465;
@@ -1252,18 +1261,18 @@
             }
             #cio-app #mobileQuickSearch .p-field {
                 background: rgba(10,13,16,0.72);
-                border: 1px solid rgba(255,255,255,0.13);
+                border: 1px solid #23282c;
                 color: #eaf0f4;
             }
             #cio-app #mobileQuickSearch .btn-pill {
                 background: rgba(66, 87, 103, 0.75);
-                border: 1px solid rgba(167,186,201,0.34);
+                border: 1px solid #23282c;
                 color: #f3f8fb;
                 font-weight: 800;
             }
             #cio-app #quickFavoriteBtn {
                 background: rgba(38,49,61,0.9) !important;
-                border: 1px solid rgba(255,255,255,0.2) !important;
+                border: 1px solid #23282c !important;
             }
             #cio-app #quickFavoriteBtn.active {
                 background: rgba(72,92,109,0.95) !important;
@@ -1366,6 +1375,12 @@
             }
             #cio-app #panelMobileDash > div:first-child,
             #cio-app #mobileQuickSearch,
+            #cio-app #mobileQuickSearch .p-field,
+            #cio-app #mobileQuickSearch .btn-pill,
+            #cio-app #panelMobileDash .btn-pill,
+            #cio-app #panelMobileDash .service-widget-toggle,
+            #cio-app .mobile-filter-chip,
+            #cio-app #quickFavoriteBtn,
             #cio-app .mobile-stat-box,
             #cio-app .mobile-puestos-grid,
             #cio-app .offline-widget,
