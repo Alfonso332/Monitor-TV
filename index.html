@@ -474,6 +474,41 @@
             box-shadow: 0 0 14px var(--accent);
             animation: syncPulse 0.95s ease-in-out infinite;
         }
+        #cio-app .event-brief-toast {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 10170;
+            min-width: 220px;
+            max-width: min(430px, calc(100vw - 30px));
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(12, 18, 19, 0.95);
+            color: #eaffff;
+            padding: 10px 12px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+        #cio-app .event-brief-toast.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #cio-app .event-brief-toast.warning {
+            border-color: rgba(241,196,15,0.45);
+            background: rgba(50, 40, 9, 0.94);
+            color: #fff4bf;
+        }
+        #cio-app .event-brief-toast.critical {
+            border-color: rgba(255,77,77,0.55);
+            background: rgba(70, 14, 14, 0.94);
+            color: #ffd8d8;
+        }
         @keyframes syncPulse {
             0%, 100% { opacity: 0.35; transform: scale(0.85); }
             50% { opacity: 1; transform: scale(1.08); }
@@ -662,6 +697,16 @@
 
             #cio-app .mobile-only-section { display: block; }
             #cio-app #progressLine { display: none !important; }
+            #cio-app .event-brief-toast {
+                left: 10px;
+                right: 10px;
+                bottom: calc(14px + env(safe-area-inset-bottom));
+                max-width: none;
+                min-width: 0;
+                font-size: 0.71rem;
+                border-radius: 12px;
+                padding: 9px 10px;
+            }
 
             #cio-app #mobileClockInline {
                 display: block;
@@ -1555,6 +1600,7 @@
         <span class="sync-indicator-dot"></span>
         <span>Sincronizando datos...</span>
     </div>
+    <div id="eventBriefToast" class="event-brief-toast" aria-live="polite" aria-hidden="true"></div>
 
     <div id="serviceOfflineAlert" class="service-offline-alert" aria-live="assertive" aria-hidden="true">
         <div class="service-offline-alert-card">
@@ -1810,6 +1856,8 @@
     let previousServiceStatuses = {};
     let offlineAlertQueue = [];
     let offlineAlertRunning = false;
+    const eventNotificationTracker = {};
+    const EVENT_NOTIFICATION_COOLDOWN_MS = 90 * 1000;
     const shownAutoFailureSlides = new Set();
     const SLIDE_DURATION = 45000;
     const LOADED_SERVICES = [
@@ -2037,6 +2085,28 @@ Euskaro
         toast.classList.add('active');
         clearTimeout(showPreventiveMobileAlert._timer);
         showPreventiveMobileAlert._timer = setTimeout(() => toast.classList.remove('active'), 7000);
+    }
+
+    function showBriefEventNotification(message, trackerKey = '', tone = 'warning') {
+        const toast = document.getElementById('eventBriefToast');
+        if (!toast || !message) return;
+
+        const key = trackerKey || message;
+        const now = Date.now();
+        if (eventNotificationTracker[key] && (now - eventNotificationTracker[key]) < EVENT_NOTIFICATION_COOLDOWN_MS) return;
+        eventNotificationTracker[key] = now;
+
+        const toneClass = tone === 'critical' ? 'critical' : 'warning';
+        toast.textContent = message;
+        toast.classList.remove('warning', 'critical');
+        toast.classList.add(toneClass, 'visible');
+        toast.setAttribute('aria-hidden', 'false');
+
+        clearTimeout(showBriefEventNotification._timer);
+        showBriefEventNotification._timer = setTimeout(() => {
+            toast.classList.remove('visible');
+            toast.setAttribute('aria-hidden', 'true');
+        }, 4200);
     }
 
     function persistMobileFavorites() {
@@ -2771,6 +2841,8 @@ Euskaro
 
                     if (!alarmActive || fallos < 8) return;
 
+                    showBriefEventNotification(`⚠️ Alarma con falla en ${serviceName}`, `alarm_failure::${alarmNormalizedKey}`, 'critical');
+
                     if (canGenerateAutoNovedad(serviceName, 'alarm_failure')) {
                         autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', `Alarma con falla detectada automáticamente en ${serviceName}`, priorityMeta.label, { autoIssueType: 'alarm_failure' }));
                     }
@@ -2826,9 +2898,19 @@ Euskaro
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Alta', `Cámara con falla detectada automáticamente en ${name}: ${cameraInfo}`, priorityMeta.label, { autoIssueType: 'camera_failure' }));
                     }
 
+                    if (hasCameraIssue) {
+                        showBriefEventNotification(`📷 Cámara con falla en ${name}`, `camera_failure::${normalizedName}`, 'warning');
+                    }
+
                     if (effectiveOffline && canGenerateAutoNovedad(name, 'nvr_offline')) {
                         const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
                         autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey, autoIssueType: 'nvr_offline' }));
+                    }
+
+                    if (effectiveOffline) {
+                        showBriefEventNotification(`🚨 ${name} offline`, `nvr_offline::${normalizedName}`, 'critical');
+                    } else if (fallos >= 5) {
+                        showBriefEventNotification(`⚠️ Estado crítico detectado en ${name} (${fallos} fallos)`, `critical_state::${normalizedName}`, 'warning');
                     }
 
                     if (Number(fallos) >= 5 && !effectiveOffline) showPreventiveMobileAlert(name);
