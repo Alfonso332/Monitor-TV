@@ -1609,6 +1609,36 @@
                 padding-left: 14px;
                 padding-right: 14px;
                 padding-bottom: calc(110px + env(safe-area-inset-bottom));
+                position: relative;
+                isolation: isolate;
+            }
+            #cio-app #panelMobileDash::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: -2;
+                background:
+                    radial-gradient(140% 90% at 0% 0%, rgba(0,100,101,0.18), transparent 56%),
+                    radial-gradient(120% 80% at 100% 12%, rgba(0,209,209,0.1), transparent 50%),
+                    linear-gradient(180deg, #0c1012 0%, #0a0d0f 65%, #090c0d 100%);
+            }
+            #cio-app #panelMobileDash::after {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: -1;
+                background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+                background-size: 26px 26px;
+                opacity: 0.32;
+            }
+            #cio-app #panelMobileDash > * {
+                animation: mobileFadeIn .32s ease both;
+            }
+            @keyframes mobileFadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
             }
             #cio-app #panelMobileDash > div:first-child {
                 padding: 14px;
@@ -1679,6 +1709,94 @@
             #cio-app .service-check-card {
                 width: min(94vw, 500px);
                 padding: 15px;
+            }
+            #cio-app #panelMobileDash > div:first-child {
+                background: linear-gradient(160deg, rgba(8,19,21,0.92), rgba(10,14,16,0.92));
+                border: 1px solid rgba(0,209,209,0.3);
+                box-shadow: 0 16px 34px rgba(0,0,0,0.34);
+            }
+            #cio-app #panelMobileDash h2 {
+                font-size: 1.1rem !important;
+                letter-spacing: 1.3px !important;
+            }
+            #cio-app #shift-display {
+                font-size: 0.66rem !important;
+                letter-spacing: 1.8px !important;
+                opacity: 0.9;
+            }
+            #cio-app #mobileClockInline {
+                font-size: 0.94rem;
+                margin-top: 8px;
+                text-shadow: 0 0 12px rgba(0,209,209,0.3);
+            }
+            #cio-app #mobileFilterBar {
+                border-radius: 16px;
+                border: 1px solid rgba(255,255,255,0.08);
+                padding-left: 8px;
+                padding-right: 8px;
+                overflow-x: auto;
+                white-space: nowrap;
+                display: flex;
+                gap: 8px;
+                scroll-snap-type: x mandatory;
+            }
+            #cio-app #mobileFilterBar::-webkit-scrollbar { display: none; }
+            #cio-app .mobile-filter-chip {
+                scroll-snap-align: start;
+                border: 1px solid rgba(255,255,255,0.16);
+                background: linear-gradient(155deg, rgba(13,18,19,0.9), rgba(9,12,13,0.9));
+                color: #d8efef;
+                transition: transform .2s ease, border-color .2s ease, background .2s ease;
+            }
+            #cio-app .mobile-filter-chip:active {
+                transform: translateY(1px) scale(0.98);
+            }
+            #cio-app .mobile-filter-chip.active {
+                border-color: rgba(0,209,209,0.65);
+                background: linear-gradient(155deg, rgba(0,100,101,0.95), rgba(0,82,83,0.95));
+                color: #ffffff;
+                box-shadow: 0 8px 16px rgba(0,100,101,0.35);
+            }
+            #cio-app .mobile-stat-box,
+            #cio-app .mobile-puestos-grid,
+            #cio-app .offline-widget,
+            #cio-app #historyMobileWindow,
+            #cio-app .service-widget {
+                border: 1px solid rgba(255,255,255,0.09) !important;
+                background: linear-gradient(160deg, rgba(12,17,18,0.96), rgba(7,10,11,0.95)) !important;
+                box-shadow: 0 14px 28px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+            }
+            #cio-app .offline-widget-title {
+                font-size: 0.73rem;
+                letter-spacing: 1.1px;
+                color: #b7dede;
+            }
+            #cio-app .off-service-card {
+                background: linear-gradient(155deg, rgba(16,20,21,0.98), rgba(11,14,15,0.98));
+                border-color: rgba(255,255,255,0.14);
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+            }
+            #cio-app #historyMobileWindow .history-card {
+                border-width: 1px !important;
+                border-color: rgba(255,255,255,0.09) !important;
+            }
+            #cio-app .mobile-notifications-btn,
+            #cio-app #panelMobileDash .btn-pill,
+            #cio-app #panelMobileDash .service-widget-toggle {
+                background: linear-gradient(155deg, rgba(0,100,101,0.9), rgba(0,79,80,0.92));
+                border: 1px solid rgba(0,209,209,0.35);
+                box-shadow: 0 10px 18px rgba(0,0,0,0.3);
+            }
+            #cio-app #quickFavoriteBtn,
+            #cio-app #panelMobileDash .btn-pill.btn-sec {
+                background: linear-gradient(155deg, rgba(22,26,27,0.95), rgba(14,17,18,0.95)) !important;
+                border: 1px solid rgba(255,255,255,0.16) !important;
+                color: #e4f3f3 !important;
+            }
+            #cio-app #panelMobileDash .service-widget-toggle {
+                text-transform: none;
+                letter-spacing: 0.3px;
+                font-size: 0.74rem;
             }
         }
 
