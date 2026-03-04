@@ -1600,6 +1600,88 @@
             }
         }
 
+
+        /* Mobile visual polish: less crowded, app-like spacing */
+        @media (max-width: 768px) {
+            #cio-app #panelMobileDash {
+                max-width: 640px;
+                gap: 14px;
+                padding-left: 14px;
+                padding-right: 14px;
+                padding-bottom: calc(110px + env(safe-area-inset-bottom));
+            }
+            #cio-app #panelMobileDash > div:first-child {
+                padding: 14px;
+                border-radius: 18px;
+            }
+            #cio-app #mobileQuickSearch {
+                padding: 12px;
+                border-radius: 16px;
+                margin-bottom: 12px !important;
+            }
+            #cio-app #mobileFilterBar {
+                margin: 0 0 12px;
+                padding-bottom: 12px;
+            }
+            #cio-app .mobile-filter-chip {
+                min-height: 34px;
+                padding: 7px 12px;
+                font-size: 0.72rem;
+                border-radius: 999px;
+            }
+            #cio-app .mobile-section-header {
+                margin: 18px 2px 10px;
+                font-size: 0.8rem;
+                letter-spacing: 0.55px;
+            }
+            #cio-app .mobile-section-header::after {
+                margin-top: 8px;
+            }
+            #cio-app .mobile-stat-container {
+                gap: 12px;
+            }
+            #cio-app .mobile-stat-box {
+                min-height: 168px;
+                padding: 12px;
+                border-radius: 18px !important;
+            }
+            #cio-app .mobile-puestos-grid {
+                gap: 11px;
+                border-radius: 18px !important;
+                padding: 12px;
+            }
+            #cio-app .mobile-offline-grid,
+            #cio-app .service-grid {
+                gap: 12px;
+            }
+            #cio-app .offline-widget,
+            #cio-app .service-widget,
+            #cio-app #historyMobileWindow,
+            #cio-app #feedbackHistoryWindow {
+                border-radius: 18px !important;
+                padding: 12px;
+            }
+            #cio-app #historyMobileWindow .history-card {
+                border-radius: 14px !important;
+                padding: 12px !important;
+                margin-bottom: 10px !important;
+            }
+            #cio-app .off-service-card {
+                border-radius: 14px;
+                padding: 11px;
+            }
+            #cio-app .mobile-notifications-btn,
+            #cio-app #panelMobileDash .btn-pill,
+            #cio-app #panelMobileDash .service-widget-toggle {
+                min-height: 42px;
+                border-radius: 12px !important;
+            }
+            #cio-app .service-check-card {
+                width: min(94vw, 500px);
+                padding: 15px;
+            }
+        }
+
         @media (max-width: 480px) {
             #cio-app #display-board {
                 padding-left: 14px;
