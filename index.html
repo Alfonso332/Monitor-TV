@@ -1798,6 +1798,36 @@
                 letter-spacing: 0.3px;
                 font-size: 0.74rem;
             }
+            #cio-app .mobile-module {
+                border: 1px solid rgba(255,255,255,0.09);
+                background: linear-gradient(155deg, rgba(11,15,16,0.96), rgba(7,10,11,0.96));
+                border-radius: 20px;
+                padding: 12px;
+                box-shadow: 0 14px 28px rgba(0,0,0,0.30);
+            }
+            #cio-app .mobile-module-head {
+                display: inline-flex;
+                padding: 4px 10px;
+                border-radius: 999px;
+                font-size: 0.62rem;
+                text-transform: uppercase;
+                letter-spacing: 1.1px;
+                font-weight: 800;
+                color: #9ad5d5;
+                border: 1px solid rgba(0,209,209,0.26);
+                background: rgba(0,100,101,0.16);
+                margin-bottom: 8px;
+            }
+            #cio-app .mobile-module .mobile-section-header {
+                margin-top: 10px;
+            }
+            #cio-app .mobile-module .mobile-stat-container,
+            #cio-app .mobile-module .mobile-puestos-grid,
+            #cio-app .mobile-module .mobile-offline-grid,
+            #cio-app .mobile-module #historyMobileWindow,
+            #cio-app .mobile-module .service-widget {
+                margin-top: 8px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1907,60 +1937,31 @@
             <button class="mobile-filter-chip" data-filter="feedback" onclick="setMobileSectionFilter('feedback')">Feedback</button>
         </div>
 
-        <div class="mobile-section-header mobile-filter-target" data-mobile-group="ops">Performance Actual</div>
-        <div class="mobile-stat-container mobile-filter-target" data-mobile-group="ops">
-            <div class="mobile-stat-box">
-                <div class="sla-circle-container">
-                    <svg class="sla-circle-svg" viewBox="0 0 100 100">
-                        <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
-                        <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
-                    </svg>
-                    <div class="sla-text-overlay">
-                        <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900;">--%</div>
-                        <div id="m-sla-trend"></div>
+        <section class="mobile-module mobile-filter-target" data-mobile-group="ops">
+            <div class="mobile-module-head">Operación en vivo</div>
+            <div class="mobile-section-header">Performance Actual</div>
+            <div class="mobile-stat-container">
+                <div class="mobile-stat-box">
+                    <div class="sla-circle-container">
+                        <svg class="sla-circle-svg" viewBox="0 0 100 100">
+                            <circle class="sla-circle-bg" cx="50" cy="50" r="45"></circle>
+                            <circle id="m-sla-circle" class="sla-circle-bar" cx="50" cy="50" r="45" stroke-dasharray="0 283"></circle>
+                        </svg>
+                        <div class="sla-text-overlay">
+                            <div id="m-sla-val" style="font-size: 1.5rem; font-weight: 900;">--%</div>
+                            <div id="m-sla-trend"></div>
+                        </div>
                     </div>
                 </div>
+                <div class="mobile-stat-box">
+                    <div id="m-calls" style="font-size: 2.8rem; font-weight: 900; color: #fff;">0</div>
+                    <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase;">Llamadas</div>
+                    <div id="m-agents" style="margin-top:10px; font-size:1.2rem; font-weight:900; color:var(--accent);">0</div>
+                    <div style="font-size: 0.58rem; opacity: 0.55; text-transform: uppercase; letter-spacing:0.8px;">Agentes activos</div>
+                </div>
             </div>
-            <div class="mobile-stat-box">
-                <div id="m-calls" style="font-size: 2.8rem; font-weight: 900; color: #fff;">0</div>
-                <div style="font-size: 0.6rem; opacity: 0.4; text-transform: uppercase;">Llamadas</div>
-                <div id="m-agents" style="margin-top:10px; font-size:1.2rem; font-weight:900; color:var(--accent);">0</div>
-                <div style="font-size: 0.58rem; opacity: 0.55; text-transform: uppercase; letter-spacing:0.8px;">Agentes activos</div>
-            </div>
-        </div>
-
-        <div class="mobile-section-header mobile-filter-target" data-mobile-group="ops">Puestos en Operación</div>
-        <div id="m-puestos" class="mobile-puestos-grid mobile-filter-target" data-mobile-group="ops"></div>
-
-        <div class="mobile-only-section mobile-filter-target" data-mobile-group="favorites" id="mobileFavoritesSection" style="display:none;">
-            <div class="mobile-section-header">⭐ Favoritos</div>
-            <div id="mobileFavoritesList" class="offline-group"></div>
-        </div>
-
-        <div class="mobile-section-header mobile-filter-target" data-mobile-group="infra">Estado de infraestructura</div>
-        <div class="mobile-offline-grid mobile-filter-target" data-mobile-group="infra">
-            <div class="offline-widget" id="m-offline-services-widget">
-                <div class="offline-widget-title" id="m-offline-services-title">Servicios Offline (0)</div>
-                <div id="m-nvr-list" class="offline-group"></div>
-            </div>
-            <div class="offline-widget" id="m-offline-cameras-widget">
-                <div class="offline-widget-title" id="m-offline-cameras-title">Cámaras Offline (0)</div>
-                <div id="m-cam-list" class="offline-group"></div>
-            </div>
-            <div class="offline-widget" id="m-offline-alarms-widget">
-                <div class="offline-widget-title" id="m-offline-alarms-title">Alarmas Offline (0)</div>
-                <div id="m-alarm-list" class="offline-group"></div>
-            </div>
-        </div>
-
-        <div class="mobile-only-section mobile-filter-target" data-mobile-group="news">
-            <div class="mobile-section-header">Novedades Recientes</div>
-            <div id="historyMobileWindow">
-                <div id="historyMobileSlide"></div>
-            </div>
-        </div>
-
-        <div class="mobile-only-section mobile-filter-target" data-mobile-group="ops">
+            <div class="mobile-section-header">Puestos en Operación</div>
+            <div id="m-puestos" class="mobile-puestos-grid"></div>
             <div class="mobile-section-header">Información disponible</div>
             <div class="service-widget">
                 <div class="service-widget-header">
@@ -1971,9 +1972,43 @@
                 </div>
                 <div id="serviceInfoBox" style="display:none;"></div>
             </div>
-        </div>
+        </section>
 
-        <div class="mobile-only-section mobile-filter-target" data-mobile-group="feedback">
+        <section class="mobile-only-section mobile-module mobile-filter-target" data-mobile-group="favorites" id="mobileFavoritesSection" style="display:none;">
+            <div class="mobile-module-head">Atajos</div>
+            <div class="mobile-section-header">⭐ Favoritos</div>
+            <div id="mobileFavoritesList" class="offline-group"></div>
+        </section>
+
+        <section class="mobile-module mobile-filter-target" data-mobile-group="infra">
+            <div class="mobile-module-head">Infraestructura</div>
+            <div class="mobile-section-header">Estado de infraestructura</div>
+            <div class="mobile-offline-grid">
+                <div class="offline-widget" id="m-offline-services-widget">
+                    <div class="offline-widget-title" id="m-offline-services-title">Servicios Offline (0)</div>
+                    <div id="m-nvr-list" class="offline-group"></div>
+                </div>
+                <div class="offline-widget" id="m-offline-cameras-widget">
+                    <div class="offline-widget-title" id="m-offline-cameras-title">Cámaras Offline (0)</div>
+                    <div id="m-cam-list" class="offline-group"></div>
+                </div>
+                <div class="offline-widget" id="m-offline-alarms-widget">
+                    <div class="offline-widget-title" id="m-offline-alarms-title">Alarmas Offline (0)</div>
+                    <div id="m-alarm-list" class="offline-group"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mobile-only-section mobile-module mobile-filter-target" data-mobile-group="news">
+            <div class="mobile-module-head">Novedades</div>
+            <div class="mobile-section-header">Novedades Recientes</div>
+            <div id="historyMobileWindow">
+                <div id="historyMobileSlide"></div>
+            </div>
+        </section>
+
+        <section class="mobile-only-section mobile-module mobile-filter-target" data-mobile-group="feedback">
+            <div class="mobile-module-head">Colaboración</div>
             <div class="mobile-section-header">Feedback</div>
             <div class="service-widget">
                 <div class="service-widget-actions" style="margin-bottom:10px;">
@@ -1982,7 +2017,7 @@
                 </div>
                 <div class="feedback-history-window" id="feedbackHistoryWindow" style="display:none;"></div>
             </div>
-        </div>
+        </section>
     </aside>
 
     <button id="scrollTopMobile" class="mobile-only-section" onclick="scrollToTopMobile()" aria-label="Volver arriba">↑</button>
