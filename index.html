@@ -352,6 +352,48 @@
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
             text-align: center; display: block; margin-left: auto; margin-right: auto;
         }
+
+        #cio-app .image-dropzone {
+            border: 1px dashed #006465;
+            border-radius: 10px;
+            background: #101616;
+            color: #9ed9d9;
+            padding: 12px;
+            margin: 0 auto 10px;
+            text-align: center;
+            font-size: 0.72rem;
+            transition: border-color .2s ease, background .2s ease;
+            cursor: pointer;
+        }
+        #cio-app .image-dropzone.dragover {
+            border-color: var(--accent);
+            background: #122224;
+        }
+        #cio-app .image-preview-box {
+            display: none;
+            margin: 8px 0 12px;
+            border: 1px solid #23282c;
+            border-radius: 10px;
+            background: #0c0c0c;
+            padding: 10px;
+        }
+        #cio-app .image-preview-box img {
+            width: 100%;
+            max-height: 170px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid #23282c;
+            background: #050505;
+        }
+        #cio-app .entry-media-modal-img {
+            width: 100%;
+            max-height: 54vh;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 1px solid #006465;
+            background: #0b0b0b;
+            margin-top: 10px;
+        }
         #cio-app .btn-pill {
             background: var(--primary); color: #fff; border: none; padding: 14px; border-radius: 50px;
             font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; margin-bottom: 10px; text-align: center;
@@ -1805,6 +1847,19 @@
         </div>
     </div>
 
+
+    <div id="entryMediaModal" class="service-check-modal" aria-hidden="true">
+        <div class="service-check-card" role="dialog" aria-modal="true" aria-labelledby="entry-media-title">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h3 id="entry-media-title" style="font-size:0.9rem; color:var(--accent);">Imagen adjunta</h3>
+                <button onclick="closeEntryMediaModal()" style="background:none; border:none; color:#9f9f9f; font-size:1.1rem;">✕</button>
+            </div>
+            <div id="entryMediaMeta" style="font-size:0.74rem; color:#a8d6d6; line-height:1.35;"></div>
+            <img id="entryMediaImage" class="entry-media-modal-img" alt="Adjunto de novedad" style="display:none;">
+            <div id="entryMediaEmpty" style="display:none; margin-top:12px; color:var(--warning); font-size:0.78rem;">Esta novedad no tiene imagen adjunta.</div>
+        </div>
+    </div>
+
     <div id="feedbackToast" class="feedback-toast mobile-only-section" aria-live="polite"></div>
 
     <aside id="panelHistory" class="side-panel">
@@ -1846,6 +1901,16 @@
                 <input type="checkbox" id="f-service-other-toggle" onchange="toggleOtherServiceField()" style="width:16px; height:16px; accent-color: var(--accent);"> OTRO (especificar manualmente)
             </label>
             <input type="text" id="f-service-other" placeholder="Especificar otro servicio" class="p-field" style="display:none;" maxlength="80">
+            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center; margin-bottom:5px;">IMAGEN ADJUNTA (OPCIONAL)</label>
+            <div id="f-image-dropzone" class="image-dropzone" onclick="document.getElementById('f-image').click()">
+                Arrastrá una imagen aquí o tocá para seleccionar
+            </div>
+            <input type="file" id="f-image" accept="image/*" style="display:none;">
+            <div id="f-image-preview-box" class="image-preview-box">
+                <div id="f-image-name" style="font-size:0.68rem; color:#9ad5d5; margin-bottom:8px;"></div>
+                <img id="f-image-preview" alt="Previsualización de imagen adjunta">
+                <button type="button" class="btn-pill btn-sec" style="margin-top:10px; border-radius:8px;" onclick="clearNovedadImageSelection()">Quitar imagen</button>
+            </div>
             <textarea id="f-msg" rows="6" placeholder="Mensaje descriptivo..." required class="p-field"></textarea>
             <button type="submit" class="btn-pill" style="border-radius: 8px;">PUBLICAR AHORA</button>
             <button type="button" onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="border-radius: 8px;">CANCELAR</button>
@@ -1880,6 +1945,8 @@
     const MOBILE_NOTIFICATION_COOLDOWN_MS = 2 * 60 * 1000;
     const shownAutoFailureSlides = new Set();
     const SLIDE_DURATION = 45000;
+    let pendingNovedadImageData = '';
+    let pendingNovedadImageName = '';
     const LOADED_SERVICES = [
         "21s","25 Sing","Admin Libertador","Agra Dorzan","Alamos de Carrasco2","Alamos de Carrasco1","Alhambra","Allegrezza","Alma Brava","Alma Corso","Alms Sing","Aloa","Alpha Place","Alpine","Altos Punta Carreta","Altos de Beldevere","Altos de Brasil","Altos de Pocitos","Altos del Shopping","Andalucia","Aquum","ARCA Construcciones","Arcamar","Arcus","Argenta Tower","Arlo","Arrayan","Atahualpa","Atenea","Araucho","Austral","Av al Parque","Avita Libertador","Avita Parque","Avita Vibra","Bage","Bahia Esmeralda","Baliñas","Barrio Pindó","Belle Place","Berkes","Berro","Biarritz Tower","Block 8 Octubre","Bloque Maldonado","Bomar 3","Born","Brisas Guana","Brusco","Cabo Bella Vista","Caleta del Golf","Canaro 1","Capri","Carmel","Casa de Pons","Cascada","Castell del Rey","Chapalco","Ciriacos Brasil","Complejo Terranova","Consorcio Chucarro","Del Sol","Deposito Leonardi","Doce76","Doclan 1","Domus","Doral Inn","Durandeau","Ebro","Edf Moon","Edif Agustine","Edif Albo Park","Edif Altair","Edif Bulevar","Edif Cap Camarat","Edif Capitello","Edif Carrera","Edif Catare","Edif Cenit","Edif Copacabana","Edif Diagonal","Edif Gala Pop","Edif Harbour Park","Edif Lift Universitat","Edif Marejada","Edif Maribor","Edif Murano","Edif Parque Miramar","Edif Pescador","Edif Planeta","Edif Preciado","Edif Sinja","Edif Solar de Verdi","Edif Uniq","Edif Via 21","Edif Villa Savoia","Edif Vivo Life","Edif la LLum","El Cabo","El Cardal","El Ceibo","El Entrevero","El Molino","El Pais","El Parque Montevideo","Emilio","Eray","Euskaro","Fab Pan de Azucar","Federico Core","First Tower","Fundacion Porsaleu","Galata","Gala Biarritz","Gala Point","Gala Trend","Galería London","Garibaldi Plaza","Giulianova","Godilco","Golf Montevideo","Golino","Greenport","Guaruja","Harbour Bay","Ibirapita","Inmobiliaria Pointer","Irlanda","Isla de las Gaviotas","Ixou Mirlo","Jaime Zudañez","Jambo","Jardines Buschental","Joyería Alianza","Kentaro","Kyoto","La Castellana","La Selva","La Strada","Lancaster","Lars Minas","Lars Rivera","Lazaro Gadea","Le Vieux Paris","Leon","Libertador","Lift Alpha","Lift EME","Lift Paulier","Los Caracoles","Los Olimpicos","Lugano","Luna del Lago","Luzarin","Mar Jonico","Marco Polo","Marcos","Marina de Biarritz","Maria Pita","MAS MIO","Maui","MBC","Met City","Met Tech","Mille Luci","Miramar","Moddo Cavia","Mon Reve","MVD 21","MVD 21 II","MySuit Hotel","Nariño","Necochea","New Park","Nobleza Naviera","Nostrum Malvin","Nostrum Malvin T2","Nostrum Plaza 2","Nuevos Vientos 1 y 2","Nuevos Vientos Biarritz","Nuevos Vientos Golf","Obra HEM","Obra Aprahamian","Obra Barcelona","Obra Ciclades","Obra Cumbre","Obra Garden","Obra HUB","Obra Ixou 21","Obra KIU Rodo","Obra Living Marina","Obra Mercedes","Obra Parking Prado","Obra Press Maua","Obra Randa","Obra Risco","Obra Roosvelt","Obra Torre Alba","Obra UpTown","Omikron","ONN be Hache Colonia","Palatino Flaminio","Palmas de Carrasco","Parma","Parque Esmeralda","Parque Mar","Paseo real","Patria","Patria Golf","Piaro","Playa Oriente","Playa Oriente II","Playas Bavaros","Plaza Libertad","Plaza San Marino","Pocitos","Puerta del Sol","Puerta del Sol 4","Puerto Nautilus","Puerto Pirata","Puerto Vallarta","Punta Brava","Punto Vazquez","Quorum","Rambla","Rambla Luz","Rapallo","Regulus","Renaissance","Residencial Artigas","Residencial Beverly","Residencial Dino","Residencial Malvin","Residencial Setiembre","Riazor","Rocamadour","Rubens","San Francisco","Sarmiento","Sea Side","Shafel","Sigma","Site Italia","Sky Polo","Skylon","Smart Point","Smart Point 2","Solanas del Prado","Solano Antuna","Solano Antuna 2725","Soleil Playa","Soriano","Spazio 4","Strada dei Giardinni","Sun Urquiza","Swing 23","Tempo Rambla","Terrazas de la Loma","The Life","Tiffany","Torre Independencia","Torre Modelo","Torre Plaza","Torre de las Américas","Torre de los Pocitos","Torres García","Toulouse","Tropicana","UCM","UP 1","Valmont","Ventura Tres Cruces","Verde Mora","Villa Romana","Villa di Fiori","Vivo Life Centro","Waterloo","Working Mitre","YES","YES plaza Varela","Ymaguare","Zafiro"
     ];
@@ -2667,6 +2734,38 @@ Euskaro
         modal.setAttribute('aria-hidden', 'true');
     }
 
+    function closeEntryMediaModal() {
+        const modal = document.getElementById('entryMediaModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    function openEntryMediaModal(index) {
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if (!isMobile) return;
+        const item = cio_logs[index];
+        const modal = document.getElementById('entryMediaModal');
+        const meta = document.getElementById('entryMediaMeta');
+        const img = document.getElementById('entryMediaImage');
+        const empty = document.getElementById('entryMediaEmpty');
+        if (!item || !modal || !meta || !img || !empty) return;
+
+        meta.innerHTML = `<strong style="color:var(--accent);">${item.title || 'Novedad'}</strong><br><span style="opacity:0.8;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>`;
+        if (item.imageDataUrl) {
+            img.src = item.imageDataUrl;
+            img.style.display = 'block';
+            empty.style.display = 'none';
+        } else {
+            img.removeAttribute('src');
+            img.style.display = 'none';
+            empty.style.display = 'block';
+        }
+
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+
     function pushMobileNotification(serviceName, kind, text) {
         const normalizedService = normalizeServiceName(serviceName || 'general');
         const key = `${normalizedService}::${kind || 'general'}`;
@@ -3365,7 +3464,8 @@ Euskaro
             return;
         }
 
-        const item = cio_logs[mobileHistoryIdx % cio_logs.length];
+        const itemIndex = mobileHistoryIdx % cio_logs.length;
+        const item = cio_logs[itemIndex];
         const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
         const color = colors[item.priority] || "var(--accent)";
 
@@ -3379,6 +3479,7 @@ Euskaro
                 </div>
                 <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
                 <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
+                <div style="margin-top:10px; text-align:right;"><button onclick="openEntryMediaModal(${itemIndex})" style="background:none; border:1px solid #006465; color:#9ed9d9; border-radius:8px; padding:5px 10px; font-size:0.65rem; cursor:pointer;">Ver más</button></div>
             </div>`;
             slideEl.classList.remove('oculto');
         }, 260);
@@ -3396,7 +3497,7 @@ Euskaro
         }
 
         const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-        slideEl.innerHTML = cio_logs.map((item) => {
+        slideEl.innerHTML = cio_logs.map((item, i) => {
             const color = colors[item.priority] || "var(--accent)";
             return `
             <div class="history-card" style="border-left-color:${color} !important; margin-bottom:0 !important;">
@@ -3406,6 +3507,7 @@ Euskaro
                 </div>
                 <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
                 <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
+                <div style="margin-top:10px; text-align:right;"><button onclick="openEntryMediaModal(${i})" style="background:none; border:1px solid #006465; color:#9ed9d9; border-radius:8px; padding:5px 10px; font-size:0.65rem; cursor:pointer;">Ver más</button></div>
             </div>`;
         }).join('');
     }
@@ -3442,7 +3544,8 @@ Euskaro
                 </div>
                 <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${it.title} ${it.intelligentState ? priorityChipMarkup({ key: it.intelligentState.toLowerCase(), label: it.intelligentState, color: 'var(--accent)' }) : ''}</div>
                 <div style="font-size:0.7rem; opacity:0.7; line-height:1.4;">${it.message}</div>
-                <div style="display:flex; gap:10px; margin-top:15px;">
+                <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+                    <button onclick="openEntryMediaModal(${i})" style="background:none; border:1px solid #006465; color:#9ed9d9; font-size:0.68rem; border-radius:8px; padding:4px 10px; cursor:pointer;">VER MÁS</button>
                     <button onclick="openForm(${i})" style="background:none; border:none; color:var(--accent); font-size:0.7rem; font-weight:bold; cursor:pointer;">EDITAR</button>
                     <button onclick="deleteEntry(${i})" style="background:none; border:none; color:var(--critico); font-size:0.7rem; font-weight:bold; cursor:pointer;">ELIMINAR</button>
                 </div>
@@ -3536,6 +3639,79 @@ Euskaro
         return { valid: true, value: serviceValue.toUpperCase(), isOther };
     }
 
+    function clearNovedadImageSelection() {
+        pendingNovedadImageData = '';
+        pendingNovedadImageName = '';
+        const fileInput = document.getElementById('f-image');
+        const previewBox = document.getElementById('f-image-preview-box');
+        const previewImg = document.getElementById('f-image-preview');
+        const fileName = document.getElementById('f-image-name');
+        if (fileInput) fileInput.value = '';
+        if (previewImg) previewImg.removeAttribute('src');
+        if (fileName) fileName.textContent = '';
+        if (previewBox) previewBox.style.display = 'none';
+    }
+
+    function setNovedadImagePreview(dataUrl, fileName = '') {
+        pendingNovedadImageData = dataUrl || '';
+        pendingNovedadImageName = fileName || '';
+        const previewBox = document.getElementById('f-image-preview-box');
+        const previewImg = document.getElementById('f-image-preview');
+        const nameEl = document.getElementById('f-image-name');
+        if (!previewBox || !previewImg || !nameEl) return;
+        if (!dataUrl) {
+            previewBox.style.display = 'none';
+            previewImg.removeAttribute('src');
+            nameEl.textContent = '';
+            return;
+        }
+        previewImg.src = dataUrl;
+        nameEl.textContent = fileName || 'Imagen seleccionada';
+        previewBox.style.display = 'block';
+    }
+
+    function handleNovedadFileSelection(file) {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Solo se permiten imágenes.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => setNovedadImagePreview(reader.result, file.name || 'Imagen seleccionada');
+        reader.readAsDataURL(file);
+    }
+
+    function initNovedadImageInput() {
+        const fileInput = document.getElementById('f-image');
+        const dropzone = document.getElementById('f-image-dropzone');
+        if (!fileInput || !dropzone) return;
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target?.files?.[0];
+            handleNovedadFileSelection(file);
+        });
+
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropzone.addEventListener(evt, (event) => {
+                event.preventDefault();
+                dropzone.classList.add('dragover');
+            });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            dropzone.addEventListener(evt, (event) => {
+                event.preventDefault();
+                dropzone.classList.remove('dragover');
+            });
+        });
+        dropzone.addEventListener('drop', (event) => {
+            const file = event.dataTransfer?.files?.[0];
+            if (file) {
+                fileInput.files = event.dataTransfer.files;
+                handleNovedadFileSelection(file);
+            }
+        });
+    }
+
     function openForm(index) {
         const isNew = index === null;
         document.getElementById('formTitle').textContent = isNew ? "NUEVA NOVEDAD" : "EDITAR NOVEDAD";
@@ -3555,10 +3731,12 @@ Euskaro
                 toggleOtherServiceField(false);
             }
             document.getElementById('f-msg').value = it.message;
+            setNovedadImagePreview(it.imageDataUrl || '', it.imageName || '');
         } else {
             document.getElementById('mainForm').reset();
             document.getElementById('f-id').value = "";
             toggleOtherServiceField(false);
+            clearNovedadImageSelection();
         }
         openPanel('panelForm');
     }
@@ -3577,6 +3755,8 @@ Euskaro
             service: resolved.value,
             title: resolved.value,
             message: document.getElementById('f-msg').value,
+            imageDataUrl: pendingNovedadImageData || '',
+            imageName: pendingNovedadImageName || '',
             date: formatDateDDMM(),
             time: new Date().toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' })
         };
@@ -3734,6 +3914,12 @@ Euskaro
             if (event.target === mobileNotificationsModalEl) closeMobileNotifications();
         });
     }
+    const entryMediaModalEl = document.getElementById('entryMediaModal');
+    if (entryMediaModalEl) {
+        entryMediaModalEl.addEventListener('click', (event) => {
+            if (event.target === entryMediaModalEl) closeEntryMediaModal();
+        });
+    }
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && document.activeElement && document.activeElement.id === 'mobileServiceQuickInput') {
@@ -3755,6 +3941,10 @@ Euskaro
         }
         if (event.key === 'Escape' && mobileNotificationsModalEl && mobileNotificationsModalEl.classList.contains('active')) {
             closeMobileNotifications();
+        }
+        const entryMediaModalEl = document.getElementById('entryMediaModal');
+        if (event.key === 'Escape' && entryMediaModalEl && entryMediaModalEl.classList.contains('active')) {
+            closeEntryMediaModal();
         }
     });
 
@@ -3778,6 +3968,7 @@ Euskaro
 
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
+    initNovedadImageInput();
     syncData();
     setInterval(syncData, 30000);
     updateTvPerformanceMode();
