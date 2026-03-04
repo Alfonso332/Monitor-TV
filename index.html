@@ -2160,6 +2160,7 @@ Euskaro
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
     const preventiveAlertTracker = {};
     const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
+    const AUTO_OPEN_ISSUES_KEY = 'cio-auto-open-issues-v1';
     let mobileFavorites = new Set(JSON.parse(localStorage.getItem(MOBILE_FAVORITES_KEY) || '[]'));
 
     function getServicePriorityMeta({ fallos = 0, isOffline = false, hasCameraOffline = false }) {
@@ -2172,6 +2173,35 @@ Euskaro
     function priorityChipMarkup(meta) {
         if (!meta || !meta.label) return '';
         return `<span class="priority-chip ${meta.key}">${meta.label}</span>`;
+    }
+
+    function getStoredOpenAutoIssues() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(AUTO_OPEN_ISSUES_KEY) || '{}');
+            return (parsed && typeof parsed === 'object') ? parsed : {};
+        } catch (_) {
+            return {};
+        }
+    }
+
+    function persistOpenAutoIssues(openIssues) {
+        localStorage.setItem(AUTO_OPEN_ISSUES_KEY, JSON.stringify(openIssues || {}));
+    }
+
+    function isAutoIssueOpen(serviceName, issueType) {
+        const key = makeAutoNovedadBlockKey(serviceName, issueType);
+        if (!key || key.startsWith('::')) return false;
+        const openIssues = getStoredOpenAutoIssues();
+        return Boolean(openIssues[key]);
+    }
+
+    function setAutoIssueOpen(serviceName, issueType, isOpen) {
+        const key = makeAutoNovedadBlockKey(serviceName, issueType);
+        if (!key || key.startsWith('::')) return;
+        const openIssues = getStoredOpenAutoIssues();
+        if (isOpen) openIssues[key] = Date.now();
+        else delete openIssues[key];
+        persistOpenAutoIssues(openIssues);
     }
 
     function makeAutoLogEntry(serviceName, priority, message, intelligentState = "", meta = {}) {
@@ -3109,14 +3139,19 @@ Euskaro
                     };
 
 
-                    if (!alarmActive || fallos < 8) return;
+                    if (!alarmActive || fallos < 8) {
+                        setAutoIssueOpen(serviceName, 'alarm_failure', false);
+                        return;
+                    }
 
                     pushMobileNotification(serviceName, 'alarm_failure', `Falla de alarma detectada en ${serviceName}.`);
 
-                    if (canGenerateAutoNovedad(serviceName, 'alarm_failure')) {
+                    const alarmIssueAlreadyOpen = isAutoIssueOpen(serviceName, 'alarm_failure');
+                    if (!alarmIssueAlreadyOpen && canGenerateAutoNovedad(serviceName, 'alarm_failure')) {
                         rememberAutoNovedadBlock(serviceName, 'alarm_failure');
                         autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', `Alarma con falla detectada automáticamente en ${serviceName}`, priorityMeta.label, { autoIssueType: 'alarm_failure' }));
                     }
+                    setAutoIssueOpen(serviceName, 'alarm_failure', true);
 
                     offlineAlarmsCount++;
                     alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla ${priorityChipMarkup(priorityMeta)}</div>`;
@@ -3165,24 +3200,32 @@ Euskaro
                         hasCameraOffline: Boolean(hasCameraIssue)
                     });
 
-                    if (hasCameraIssue && canGenerateAutoNovedad(name, 'camera_failure')) {
-                        rememberAutoNovedadBlock(name, 'camera_failure');
-                        autoLogsToAdd.push(makeAutoLogEntry(name, 'Alta', `Cámara con falla detectada automáticamente en ${name}: ${cameraInfo}`, priorityMeta.label, { autoIssueType: 'camera_failure' }));
-                    }
-
                     if (hasCameraIssue) {
+                        const cameraIssueAlreadyOpen = isAutoIssueOpen(name, 'camera_failure');
+                        if (!cameraIssueAlreadyOpen && canGenerateAutoNovedad(name, 'camera_failure')) {
+                            rememberAutoNovedadBlock(name, 'camera_failure');
+                            autoLogsToAdd.push(makeAutoLogEntry(name, 'Alta', `Cámara con falla detectada automáticamente en ${name}: ${cameraInfo}`, priorityMeta.label, { autoIssueType: 'camera_failure' }));
+                        }
+                        setAutoIssueOpen(name, 'camera_failure', true);
                         pushMobileNotification(name, 'camera_failure', `Falla de cámara en ${name}. ${cameraInfo}`);
-                    }
-
-                    if (effectiveOffline && canGenerateAutoNovedad(name, 'nvr_offline')) {
-                        rememberAutoNovedadBlock(name, 'nvr_offline');
-                        const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
-                        autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey, autoIssueType: 'nvr_offline' }));
+                    } else {
+                        setAutoIssueOpen(name, 'camera_failure', false);
                     }
 
                     if (effectiveOffline) {
+                        const nvrIssueAlreadyOpen = isAutoIssueOpen(name, 'nvr_offline');
+                        if (!nvrIssueAlreadyOpen && canGenerateAutoNovedad(name, 'nvr_offline')) {
+                            rememberAutoNovedadBlock(name, 'nvr_offline');
+                            const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
+                            autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey, autoIssueType: 'nvr_offline' }));
+                        }
+                        setAutoIssueOpen(name, 'nvr_offline', true);
                         pushMobileNotification(name, 'nvr_offline', `Servicio offline: ${name}.`);
-                    } else if (fallos >= 5) {
+                    } else {
+                        setAutoIssueOpen(name, 'nvr_offline', false);
+                    }
+
+                    if (!effectiveOffline && fallos >= 5) {
                         pushMobileNotification(name, 'critical_state', `Nueva novedad crítica en ${name} (${fallos} fallos).`);
                     }
 
