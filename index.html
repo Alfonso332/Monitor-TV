@@ -2439,22 +2439,10 @@ Euskaro
         });
 
         const isFav = mobileFavorites.has(normalized);
+        const availability = getCatalogAvailability(decodedName);
         body.innerHTML = `
-            <div class="service-detail-row mobile-only-section" style="justify-content:space-between;">
-                <strong>Favorito</strong>
-                <button class="favorite-btn ${isFav ? 'active' : ''}" onclick="toggleServiceFavorite(decodeURIComponent('${encodeURIComponent(decodedName || '')}'))">☆</button>
-            </div>
-            <div class="service-detail-row">
-                <strong>Prioridad Inteligente</strong>
-                <span>${priorityChipMarkup(priorityMeta)}</span>
-            </div>
-            <div class="service-detail-row" style="display:block;">
-                <div style="margin-bottom:6px;"><strong>Disponibilidad de carga</strong></div>
-                <div style="display:grid; grid-template-columns:1fr; gap:6px;">
-                    <div>Cámaras: <strong>${getCatalogAvailability(decodedName).cameras ? 'Cargado' : 'No cargado'}</strong></div>
-                    <div>Alarmas: <strong>${getCatalogAvailability(decodedName).alarms ? 'Cargada' : 'No cargada'}</strong></div>
-                    <div>NVR: <strong>${getCatalogAvailability(decodedName).nvr ? 'Cargado' : 'No cargado'}</strong></div>
-                </div>
+            <div class="mobile-only-section" style="display:flex; justify-content:flex-end; margin-bottom:6px;">
+                <button class="favorite-btn ${isFav ? 'active' : ''}" aria-label="Marcar favorito" style="font-size:1.1rem;" onclick="toggleServiceFavorite(decodeURIComponent('${encodeURIComponent(decodedName || '')}'))">☆</button>
             </div>
             <div class="service-detail-row">
                 <strong>Estado NVR</strong>
@@ -2464,10 +2452,22 @@ Euskaro
                 <strong>Alarmas</strong>
                 <span class="${alarmClass}"><span class="status-dot"></span>${alarmText}</span>
             </div>
+            <div class="service-detail-row">
+                <strong>Prioridad</strong>
+                <span>${priorityChipMarkup(priorityMeta)}</span>
+            </div>
             <div class="service-detail-row" style="display:block;">
                 <div style="margin-bottom:6px;"><strong>Cámaras</strong></div>
                 <div>${serviceDetail.camaras || 'Sin datos'}</div>
                 <div style="margin-top:6px; font-size:0.66rem; opacity:0.65;">Fallos consecutivos: ${serviceDetail.fallos ?? '0'}</div>
+            </div>
+            <div class="service-detail-row" style="display:block;">
+                <div style="margin-bottom:6px;"><strong>Disponibilidad de carga</strong></div>
+                <div style="display:grid; grid-template-columns:1fr; gap:6px;">
+                    <div>Cámaras: <strong>${availability.cameras ? 'Cargado' : 'No cargado'}</strong></div>
+                    <div>Alarmas: <strong>${availability.alarms ? 'Cargada' : 'No cargada'}</strong></div>
+                    <div>NVR: <strong>${availability.nvr ? 'Cargado' : 'No cargado'}</strong></div>
+                </div>
             </div>
             <div class="service-detail-row" style="display:block;">
                 <div style="margin-bottom:6px;"><strong>Última caída</strong></div>
