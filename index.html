@@ -2180,6 +2180,8 @@
     const MOBILE_NOTIFICATION_COOLDOWN_MS = 2 * 60 * 1000;
     const shownAutoFailureSlides = new Set();
     const SLIDE_DURATION = 45000;
+    const SYNC_INTERVAL_MS = 5000;
+    const DATA_STALE_MS = 15000;
     let pendingNovedadImageData = '';
     let pendingNovedadImageName = '';
     const LOADED_SERVICES = [
@@ -2704,6 +2706,39 @@ Euskaro
         }
 
         return { date: formatDateDDMM(), time: raw || '--:--' };
+    }
+
+    function parseTelemetryTimestampMs(value = {}) {
+        const rawCandidates = [
+            value.updated_at,
+            value.last_update,
+            value.last_change,
+            value.timestamp,
+            value.fecha_actualizacion,
+            value.hora_actualizacion,
+            value.hora_falla,
+            value.fecha_falla,
+            value.hora_caida
+        ].filter(Boolean);
+
+        for (const candidate of rawCandidates) {
+            const direct = new Date(candidate).getTime();
+            if (!Number.isNaN(direct)) return direct;
+
+            const label = parseDateTimeLabel(candidate);
+            if (label.date && label.time && label.date !== '--/--' && label.time !== '--:--') {
+                const [dd, mm] = label.date.split('/').map(Number);
+                const [hh, min, sec = 0] = label.time.split(':').map(Number);
+                const now = new Date();
+                const guess = new Date(now.getFullYear(), (mm || 1) - 1, dd || 1, hh || 0, min || 0, sec || 0, 0);
+                if (!Number.isNaN(guess.getTime())) {
+                    if (guess.getTime() > now.getTime() + 24 * 60 * 60 * 1000) guess.setFullYear(now.getFullYear() - 1);
+                    return guess.getTime();
+                }
+            }
+        }
+
+        return Number.NaN;
     }
 
     function getEntryDateLabel(entry) {
@@ -3315,13 +3350,13 @@ Euskaro
                 }
             }
 
-            const rE = await fetch(DB_URL);
+            const rE = await fetch(DB_URL, { cache: 'no-store' });
             const dE = await rE.json();
             cio_logs = dE ? (Array.isArray(dE) ? dE : Object.values(dE)) : [];
             renderHistory();
             if(cio_logs.length > 0 && startTime === null) renderSlide();
 
-            const rR = await fetch(RED_URL);
+            const rR = await fetch(RED_URL, { cache: 'no-store' });
             const dR = await rR.json();
 
             const tickerSrv = document.getElementById('ticker-services');
@@ -3359,8 +3394,10 @@ Euskaro
                     const serviceName = id.replace(/^ALARMA_/, '').replace(/_/g, ' ');
                     const alarmNormalizedKey = normalizeServiceName(serviceName);
                     const estado = (value.estado || value.status || '').toString().toLowerCase();
-                    const fallos = Number(value.fallos || 0);
-                    const alarmActive = estado === 'offline' || (value.alarmas || '').toString().toUpperCase().includes('ACTIVA');
+                    const telemetryTs = parseTelemetryTimestampMs(value);
+                    const staleData = !Number.isNaN(telemetryTs) && (Date.now() - telemetryTs) > DATA_STALE_MS;
+                    const fallos = staleData ? 0 : Number(value.fallos || 0);
+                    const alarmActive = !staleData && (estado === 'offline' || (value.alarmas || '').toString().toUpperCase().includes('ACTIVA'));
                     const priorityMeta = getServicePriorityMeta({ fallos, isOffline: alarmActive, hasCameraOffline: false });
                     const fallaDateTime = value.hora_caida || value.hora_falla || value.fecha_falla || value.last_change || 'Desconocida';
                     const fallaStamp = parseDateTimeLabel(fallaDateTime);
@@ -3415,9 +3452,11 @@ Euskaro
                     const name = id.replace(/_/g,' ').toUpperCase();
                     const normalizedName = normalizeServiceName(name);
                     const currentStatus = (v.estado || '').toLowerCase();
-                    const fallos = Number(v.fallos || 0);
-                    const effectiveOffline = fallos >= 8;
-                    const effectiveStatus = effectiveOffline ? 'offline' : (currentStatus || 'online');
+                    const telemetryTs = parseTelemetryTimestampMs(v);
+                    const staleData = !Number.isNaN(telemetryTs) && (Date.now() - telemetryTs) > DATA_STALE_MS;
+                    const fallos = staleData ? 0 : Number(v.fallos || 0);
+                    const effectiveOffline = !staleData && fallos >= 8;
+                    const effectiveStatus = staleData ? 'sin-actualizar' : (effectiveOffline ? 'offline' : (currentStatus || 'online'));
                     currentServiceStatuses[id] = effectiveStatus;
                     const prevStatus = (previousServiceStatuses[id] || '').toLowerCase();
                     if (effectiveOffline && prevStatus && prevStatus !== 'offline') {
@@ -3426,8 +3465,8 @@ Euskaro
 
                     const lastDown = v.hora_caida || 'Desconocida';
                     const offlineStamp = parseDateTimeLabel(lastDown);
-                    const cameraOfflineList = Array.isArray(v.camaras_offline) ? v.camaras_offline : [];
-                    const hasCameraIssue = cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== '');
+                    const cameraOfflineList = staleData ? [] : (Array.isArray(v.camaras_offline) ? v.camaras_offline : []);
+                    const hasCameraIssue = !staleData && (cameraOfflineList.length || (v.alerta_camaras && v.alerta_camaras.trim() !== ''));
                     const cameraInfo = cameraOfflineList.length
                         ? cameraOfflineList.join(', ')
                         : ((v.alerta_camaras && v.alerta_camaras.trim() !== '') ? v.alerta_camaras : 'Sin alerta de cámaras');
@@ -3476,7 +3515,7 @@ Euskaro
                     serviceLiveHistory[historyKey] = historyItems;
                     serviceNamePool.add(name);
                     serviceDetailSnapshot[historyKey] = {
-                        estado: effectiveOffline ? 'OFFLINE' : (v.estado || 'Sin datos').toUpperCase(),
+                        estado: staleData ? 'SIN ACTUALIZAR' : (effectiveOffline ? 'OFFLINE' : (v.estado || 'Sin datos').toUpperCase()),
                         alarmas: 'No aplica en widget NVR',
                         camaras: cameraInfo,
                         horaCaida: `${offlineStamp.date} ${offlineStamp.time}`,
@@ -4250,7 +4289,7 @@ Euskaro
     setInterval(updateLiveClock, 1000);
     initNovedadImageInput();
     syncData();
-    setInterval(syncData, 30000);
+    setInterval(syncData, SYNC_INTERVAL_MS);
     updateTvPerformanceMode();
     refreshServiceOptions();
     setMobileSectionFilter(currentMobileFilter);
