@@ -174,6 +174,24 @@
             padding: 6px 12px;
             gap: 0;
         }
+        #cio-app #ticker-bar.ticker-level-1 {
+            height: 68px;
+            min-height: 68px;
+            padding: 8px 12px;
+            gap: 0;
+        }
+        #cio-app #ticker-bar.ticker-level-2 {
+            height: 94px;
+            min-height: 94px;
+            padding: 9px 13px;
+            gap: 8px;
+        }
+        #cio-app #ticker-bar.ticker-level-3 {
+            height: 124px;
+            min-height: 124px;
+            padding: 10px 14px;
+            gap: 10px;
+        }
         #cio-app #ticker-bar.ticker-compact-ok .ticker-row {
             display: none !important;
         }
@@ -1914,13 +1932,13 @@
     </div>
 
     <div id="ticker-bar">
-        <div class="ticker-row ticker-row-top">
+        <div class="ticker-row ticker-row-top" id="ticker-row-top">
             <div class="ticker-section services" id="ticker-section-services">
                 <span class="ticker-label">Servicios</span>
                 <div id="ticker-services" class="ticker-wrapper"></div>
             </div>
         </div>
-        <div class="ticker-row ticker-row-bottom">
+        <div class="ticker-row ticker-row-bottom" id="ticker-row-bottom">
             <div class="ticker-section cameras" id="ticker-section-cameras">
                 <span class="ticker-label">Cámaras</span>
                 <div id="ticker-cameras" class="ticker-wrapper"></div>
@@ -3639,6 +3657,8 @@ Euskaro
             if (tickerAlarms) tickerAlarms.innerHTML = alarmTickerHtml;
 
             const tickerBar = document.getElementById('ticker-bar');
+            const tickerRowTop = document.getElementById('ticker-row-top');
+            const tickerRowBottom = document.getElementById('ticker-row-bottom');
             const tickerSectionServices = document.getElementById('ticker-section-services');
             const tickerSectionCameras = document.getElementById('ticker-section-cameras');
             const tickerSectionAlarms = document.getElementById('ticker-section-alarms');
@@ -3650,8 +3670,16 @@ Euskaro
             if (tickerSectionCameras) tickerSectionCameras.style.display = hasCameraIncidents ? 'flex' : 'none';
             if (tickerSectionAlarms) tickerSectionAlarms.style.display = hasAlarmIncidents ? 'flex' : 'none';
 
-            const hasAnyIncident = hasServiceIncidents || hasCameraIncidents || hasAlarmIncidents;
-            if (tickerBar) tickerBar.classList.toggle('ticker-compact-ok', !hasAnyIncident);
+            const activeTickerSections = Number(hasServiceIncidents) + Number(hasCameraIncidents) + Number(hasAlarmIncidents);
+            if (tickerRowTop) tickerRowTop.style.display = hasServiceIncidents ? 'flex' : 'none';
+            if (tickerRowBottom) tickerRowBottom.style.display = (hasCameraIncidents || hasAlarmIncidents) ? 'flex' : 'none';
+
+            if (tickerBar) {
+                tickerBar.classList.toggle('ticker-compact-ok', activeTickerSections === 0);
+                tickerBar.classList.toggle('ticker-level-1', activeTickerSections === 1);
+                tickerBar.classList.toggle('ticker-level-2', activeTickerSections === 2);
+                tickerBar.classList.toggle('ticker-level-3', activeTickerSections === 3);
+            }
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
             if (mAlarmList) mAlarmList.innerHTML = alarmHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las alarmas online</div>`;
