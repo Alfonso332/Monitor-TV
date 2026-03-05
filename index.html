@@ -168,6 +168,28 @@
             gap: 10px;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 -8px 28px rgba(0,0,0,0.35);
         }
+        #cio-app #ticker-bar.ticker-compact-ok {
+            height: 36px;
+            min-height: 36px;
+            padding: 6px 12px;
+            gap: 0;
+        }
+        #cio-app #ticker-bar.ticker-compact-ok .ticker-row {
+            display: none !important;
+        }
+        #cio-app .ticker-ok-message {
+            display: none;
+            width: 100%;
+            text-align: center;
+            color: #7dffb0;
+            font-weight: 900;
+            letter-spacing: 0.7px;
+            font-size: 0.92rem;
+            text-transform: uppercase;
+        }
+        #cio-app #ticker-bar.ticker-compact-ok .ticker-ok-message {
+            display: block;
+        }
         #cio-app .ticker-row {
             flex: 1;
             display: flex;
@@ -1893,21 +1915,22 @@
 
     <div id="ticker-bar">
         <div class="ticker-row ticker-row-top">
-            <div class="ticker-section services">
+            <div class="ticker-section services" id="ticker-section-services">
                 <span class="ticker-label">Servicios</span>
                 <div id="ticker-services" class="ticker-wrapper"></div>
             </div>
         </div>
         <div class="ticker-row ticker-row-bottom">
-            <div class="ticker-section cameras">
+            <div class="ticker-section cameras" id="ticker-section-cameras">
                 <span class="ticker-label">Cámaras</span>
                 <div id="ticker-cameras" class="ticker-wrapper"></div>
             </div>
-            <div class="ticker-section alarms">
+            <div class="ticker-section alarms" id="ticker-section-alarms">
                 <span class="ticker-label">Alarmas</span>
                 <div id="ticker-alarms" class="ticker-wrapper"></div>
             </div>
         </div>
+        <div id="tickerOkMessage" class="ticker-ok-message">✔ Infraestructura OK · sin incidentes</div>
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
@@ -3611,9 +3634,24 @@ Euskaro
                 renderHistory();
             }
 
-            tickerSrv.innerHTML = srvHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">SERVICIOS: SIN INCIDENTES</span>`;
-            tickerCam.innerHTML = camTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">CÁMARAS: SIN INCIDENTES</span>`;
-            if (tickerAlarms) tickerAlarms.innerHTML = alarmTickerHtml || `<span style="color:var(--online); font-weight:900; font-size:1.05rem; letter-spacing:0.8px;">ALARMAS: SIN INCIDENTES</span>`;
+            tickerSrv.innerHTML = srvHtml;
+            tickerCam.innerHTML = camTickerHtml;
+            if (tickerAlarms) tickerAlarms.innerHTML = alarmTickerHtml;
+
+            const tickerBar = document.getElementById('ticker-bar');
+            const tickerSectionServices = document.getElementById('ticker-section-services');
+            const tickerSectionCameras = document.getElementById('ticker-section-cameras');
+            const tickerSectionAlarms = document.getElementById('ticker-section-alarms');
+            const hasServiceIncidents = Boolean(srvHtml);
+            const hasCameraIncidents = Boolean(camTickerHtml);
+            const hasAlarmIncidents = Boolean(alarmTickerHtml);
+
+            if (tickerSectionServices) tickerSectionServices.style.display = hasServiceIncidents ? 'flex' : 'none';
+            if (tickerSectionCameras) tickerSectionCameras.style.display = hasCameraIncidents ? 'flex' : 'none';
+            if (tickerSectionAlarms) tickerSectionAlarms.style.display = hasAlarmIncidents ? 'flex' : 'none';
+
+            const hasAnyIncident = hasServiceIncidents || hasCameraIncidents || hasAlarmIncidents;
+            if (tickerBar) tickerBar.classList.toggle('ticker-compact-ok', !hasAnyIncident);
             mNvrList.innerHTML = nvrHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todos los NVR online</div>`;
             mCamList.innerHTML = camHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las cámaras online</div>`;
             if (mAlarmList) mAlarmList.innerHTML = alarmHtml || `<div style="color:var(--online); font-size:0.7rem; text-align:center; padding:15px; border:1px dashed #222; border-radius:15px;">✔ Todas las alarmas online</div>`;
