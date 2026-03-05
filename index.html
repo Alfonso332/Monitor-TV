@@ -2390,6 +2390,7 @@ Euskaro
     const alarmDetailSnapshot = {};
     const serviceStatusLayer = {};
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
+    const AUTO_NOVEDADES_ENABLED = false;
     const AUTO_NOVELTY_COOLDOWN_MS = 5 * 60 * 60 * 1000;
     const AUTO_NOVELTY_BLOCKS_KEY = 'cio-auto-novedad-blocks-v1';
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
@@ -2536,6 +2537,7 @@ Euskaro
     }
 
     function canGenerateAutoNovedad(serviceName, issueType) {
+        if (!AUTO_NOVEDADES_ENABLED) return false;
         const normalizedService = normalizeServiceName(serviceName);
         if (!normalizedService || !issueType) return false;
         const nowMs = Date.now();
@@ -4257,4 +4259,5 @@ Euskaro
 </script>
 </body>
 </html>
+
 
