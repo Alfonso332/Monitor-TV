@@ -130,6 +130,20 @@
             font-size: clamp(18px, 2.5vw, 40px);
             opacity: 0.85; max-width: 95%; line-height: 1.2; font-weight: 300;
         }
+        #cio-app #slideImageDisplay {
+            display: none;
+            width: min(80vw, 900px);
+            max-height: min(42vh, 480px);
+            object-fit: contain;
+            margin: 18px auto 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.38);
+            background: rgba(0,0,0,0.25);
+        }
+        #cio-app.tv-performance #slideImageDisplay.visible {
+            display: block;
+        }
         #cio-app .area-tag { letter-spacing: 8px; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 15px; color: var(--accent); }
        
         #cio-app .info-container { transition: all 0.6s ease-in-out; width: 100%; }
@@ -1914,6 +1928,7 @@
         <div id="infoCont" class="info-container">
             <div id="areaLabel" class="area-tag">MASTERSON</div>
             <h1 id="titleDisplay">INICIANDO SISTEMA</h1>
+            <img id="slideImageDisplay" alt="Imagen de novedad en TV">
             <p id="messageDisplay">Cargando base de datos operativa...</p>
         </div>
     </main>
@@ -2227,6 +2242,27 @@
     const DATA_STALE_MS = 15000;
     let pendingNovedadImageData = '';
     let pendingNovedadImageName = '';
+    let currentSlideItem = null;
+
+    function updateTvSlideMedia(item) {
+        const app = document.getElementById('cio-app');
+        const imageEl = document.getElementById('slideImageDisplay');
+        const messageEl = document.getElementById('messageDisplay');
+        if (!app || !imageEl || !messageEl) return;
+
+        const hasImage = Boolean(item && item.imageDataUrl);
+        const isTvMode = app.classList.contains('tv-performance');
+
+        if (isTvMode && hasImage) {
+            imageEl.src = item.imageDataUrl;
+            imageEl.classList.add('visible');
+        } else {
+            imageEl.classList.remove('visible');
+            imageEl.removeAttribute('src');
+        }
+
+        messageEl.style.marginTop = (isTvMode && hasImage) ? '0' : '';
+    }
 
     function applyKpiBarVisibility() {
         const kpiBar = document.getElementById('kpiBar');
@@ -3820,11 +3856,13 @@ Euskaro
             if (!item) return;
             const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
             const color = colors[item.priority] || "var(--accent)";
+            currentSlideItem = item;
             document.getElementById('cio-app').classList.toggle('pantalla-critica', item.priority === "Crítica");
             document.getElementById('areaLabel').textContent = item.area;
             document.getElementById('areaLabel').style.color = color;
             document.getElementById('titleDisplay').textContent = item.title;
             document.getElementById('messageDisplay').textContent = item.message;
+            updateTvSlideMedia(item);
             const progressLineEl = document.getElementById('progressLine');
             const progressCountdownEl = document.getElementById('progressCountdown');
             if (progressLineEl) {
@@ -3998,6 +4036,7 @@ Euskaro
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const isFullscreenTV = document.fullscreenElement === app;
         app.classList.toggle('tv-performance', !isMobile && isFullscreenTV);
+        updateTvSlideMedia(currentSlideItem);
     }
 
     function toggleOtherServiceField(forceState = null) {
