@@ -1895,6 +1895,220 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
+
+
+        /* --- Rediseño premium mobile: sección Novedades --- */
+        @media (max-width: 768px) {
+            #cio-app .mobile-news-hub {
+                background: transparent;
+                padding: 4px 0 14px;
+            }
+            #cio-app .mobile-news-hub .mobile-news-device {
+                position: relative;
+                border-radius: 42px;
+                padding: 14px 10px 12px;
+                background: linear-gradient(165deg, #141c25, #070b12 38%, #03060c 100%);
+                border: 1px solid rgba(148, 174, 196, 0.26);
+                box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+            }
+            #cio-app .mobile-news-hub .mobile-news-device-top {
+                width: 38%;
+                height: 28px;
+                border-radius: 18px;
+                margin: 0 auto 10px;
+                background: linear-gradient(180deg, rgba(8,12,18,.95), rgba(3,4,8,.85));
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+            }
+            #cio-app .mobile-news-hub .mobile-news-screen {
+                border-radius: 32px;
+                padding: 14px 12px 86px;
+                background:
+                    radial-gradient(circle at 85% 0%, rgba(0, 229, 255, 0.15) 0%, rgba(0, 0, 0, 0) 45%),
+                    linear-gradient(175deg, rgba(11, 18, 29, 0.92), rgba(5, 9, 16, 0.97));
+                border: 1px solid rgba(80, 109, 133, 0.45);
+                backdrop-filter: blur(14px);
+            }
+            #cio-app .mobile-news-header {
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                margin-bottom: 14px;
+            }
+            #cio-app .mobile-news-header h2 {
+                margin:0;
+                font-size: 1.32rem;
+                letter-spacing: .5px;
+            }
+            #cio-app .mobile-news-icon-btn {
+                width: 36px;
+                height: 36px;
+                border-radius: 12px;
+                border: 1px solid rgba(120, 143, 166, 0.44);
+                background: rgba(10, 19, 31, 0.8);
+                color: #ddf6ff;
+                font-size: 1rem;
+            }
+            #cio-app .mobile-news-counter-pill {
+                display: inline-flex;
+                padding: 8px 14px;
+                border-radius: 999px;
+                background: rgba(0, 223, 252, 0.12);
+                border: 1px solid rgba(0, 233, 255, 0.45);
+                color: #90f8ff;
+                font-size: .73rem;
+                font-weight: 800;
+                letter-spacing: .6px;
+                margin-bottom: 12px;
+            }
+            #cio-app .mobile-news-action-row,
+            #cio-app .mobile-news-chip-row {
+                display:flex;
+                gap: 8px;
+                overflow-x:auto;
+                padding-bottom: 2px;
+                margin-bottom: 12px;
+            }
+            #cio-app .mobile-news-action-btn {
+                flex: 1;
+                min-width: 98px;
+                border-radius: 14px;
+                border: 1px solid rgba(108, 137, 159, 0.4);
+                background: linear-gradient(180deg, rgba(17,27,40,.86), rgba(8,15,25,.86));
+                color: #def8ff;
+                font-size: .7rem;
+                font-weight: 700;
+                padding: 9px 10px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:6px;
+            }
+            #cio-app .mobile-news-chip {
+                padding: 7px 12px;
+                border-radius: 999px;
+                border: 1px solid rgba(97, 121, 143, 0.35);
+                background: rgba(7, 16, 27, 0.8);
+                color: #b6c9da;
+                font-size: .66rem;
+                font-weight: 700;
+                white-space: nowrap;
+            }
+            #cio-app .mobile-news-chip.active {
+                color:#042329;
+                background: linear-gradient(140deg, #63f5ff, #21cad7);
+                border-color: rgba(95, 244, 255, 0.9);
+                box-shadow: 0 4px 18px rgba(38, 221, 239, 0.35);
+            }
+            #cio-app .mobile-news-list-window {
+                max-height: 56vh;
+                overflow:auto;
+                padding-right: 2px;
+                background: transparent;
+                border: none;
+            }
+            #cio-app .mobile-news-list {
+                display:flex;
+                flex-direction:column;
+                gap: 12px;
+            }
+            #cio-app .mobile-news-card {
+                border-radius: 20px;
+                padding: 12px 12px 10px;
+                background: linear-gradient(160deg, rgba(21,30,45,.95), rgba(9,15,25,.95));
+                border: 1px solid rgba(102, 128, 158, 0.38);
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 14px 26px rgba(0, 0, 0, 0.38);
+            }
+            #cio-app .mobile-news-card.priority-critica { border-color: rgba(255, 88, 102, 0.74); box-shadow: 0 0 0 1px rgba(255, 88, 102, .24), 0 12px 24px rgba(58,0,4,.45); }
+            #cio-app .mobile-news-card.priority-media { border-color: rgba(255, 204, 90, 0.65); box-shadow: 0 0 0 1px rgba(255, 204, 90, .18), 0 12px 24px rgba(60,44,0,.35); }
+            #cio-app .mobile-news-card.priority-activa { border-color: rgba(64, 238, 255, 0.66); box-shadow: 0 0 0 1px rgba(64, 238, 255, .2), 0 12px 24px rgba(0,27,34,.38); }
+            #cio-app .mobile-news-card-top {
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                margin-bottom: 9px;
+                border-bottom: 1px solid rgba(124, 147, 173, 0.16);
+                padding-bottom: 9px;
+            }
+            #cio-app .mobile-news-badge {
+                border-radius: 999px;
+                padding: 4px 8px;
+                font-size: .6rem;
+                font-weight: 900;
+                letter-spacing: .6px;
+                color: #e8f8ff;
+                background: rgba(255,255,255,.08);
+            }
+            #cio-app .mobile-news-time { font-size: .62rem; color: rgba(223, 233, 245, .66); font-weight: 700; }
+            #cio-app .mobile-news-title { font-size: 1.1rem; font-weight: 900; margin: 0 0 7px; }
+            #cio-app .mobile-news-desc { font-size: .73rem; line-height: 1.45; color: rgba(219,233,247,.82); margin-bottom: 10px; }
+            #cio-app .mobile-news-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 12px; }
+            #cio-app .mobile-news-tag {
+                border-radius: 999px;
+                border: 1px solid rgba(122, 149, 175, 0.35);
+                padding: 4px 8px;
+                font-size: .59rem;
+                color: #c4d6e8;
+                background: rgba(10, 18, 30, 0.8);
+                font-weight: 700;
+            }
+            #cio-app .mobile-news-main-action {
+                width:100%;
+                border-radius: 13px;
+                border: 1px solid rgba(58, 235, 255, 0.6);
+                padding: 9px 10px;
+                font-size: .72rem;
+                font-weight: 800;
+                background: linear-gradient(150deg, rgba(15,38,51,.85), rgba(8,21,31,.9));
+                color:#85f8ff;
+            }
+            #cio-app .mobile-news-sub-actions {
+                margin-top: 10px;
+                padding-top: 9px;
+                border-top: 1px solid rgba(115, 140, 165, 0.18);
+                display:flex;
+                justify-content:space-between;
+                gap:8px;
+            }
+            #cio-app .mobile-news-sub-actions button {
+                flex:1;
+                border: 1px solid rgba(112, 139, 164, 0.35);
+                border-radius: 10px;
+                background: rgba(10, 19, 31, 0.78);
+                color: #d1e4f7;
+                font-size: .64rem;
+                font-weight: 700;
+                padding: 7px 6px;
+            }
+            #cio-app .mobile-news-fab {
+                position: absolute;
+                right: 18px;
+                bottom: 18px;
+                width: 62px;
+                height: 62px;
+                border-radius: 50%;
+                border: 1px solid rgba(111, 249, 255, .8);
+                background: radial-gradient(circle at 30% 20%, #92fcff, #10bfcf 62%, #0c6171 100%);
+                color: #08222b;
+                font-size: 2rem;
+                font-weight: 300;
+                box-shadow: 0 16px 30px rgba(16, 191, 207, .45), inset 0 1px 0 rgba(255,255,255,.6);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                z-index: 2;
+            }
+            #cio-app .mobile-news-fab span {
+                position:absolute;
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: rgba(5, 37, 48, .7);
+                bottom: 9px;
+            }
+            #cio-app .mobile-news-fab span:nth-child(1) { left: 22px; }
+            #cio-app .mobile-news-fab span:nth-child(2) { left: 28px; }
+            #cio-app .mobile-news-fab span:nth-child(3) { left: 34px; }
+        }
     </style>
 </head>
 <body>
@@ -2056,11 +2270,42 @@
             </div>
         </section>
 
-        <section class="mobile-only-section mobile-module mobile-filter-target" data-mobile-group="news">
-            <div class="mobile-module-head">Novedades</div>
-            <div class="mobile-section-header">Novedades Recientes</div>
-            <div id="historyMobileWindow">
-                <div id="historyMobileSlide"></div>
+        <section class="mobile-only-section mobile-module mobile-filter-target mobile-news-hub" data-mobile-group="news">
+            <div class="mobile-news-device">
+                <div class="mobile-news-device-top"></div>
+                <div class="mobile-news-screen">
+                    <header class="mobile-news-header">
+                        <button class="mobile-news-icon-btn" aria-label="Buscar">⌕</button>
+                        <h2>Novedades</h2>
+                        <button class="mobile-news-icon-btn" aria-label="Notificaciones">🔔</button>
+                    </header>
+
+                    <div class="mobile-news-counter-pill">124 activas</div>
+
+                    <div class="mobile-news-action-row">
+                        <button class="mobile-news-action-btn"><span>⎚</span>Filtrar</button>
+                        <button class="mobile-news-action-btn"><span>◷</span>Fecha</button>
+                        <button class="mobile-news-action-btn"><span>⭳</span>Exportar</button>
+                    </div>
+
+                    <div class="mobile-news-chip-row">
+                        <span class="mobile-news-chip active">Monitoreo</span>
+                        <span class="mobile-news-chip">CCTV</span>
+                        <span class="mobile-news-chip">Alarmas</span>
+                        <span class="mobile-news-chip">Portería</span>
+                        <span class="mobile-news-chip">Hoy</span>
+                        <span class="mobile-news-chip">Rango</span>
+                    </div>
+
+                    <div id="historyMobileWindow" class="mobile-news-list-window">
+                        <div id="historyMobileSlide" class="mobile-news-list"></div>
+                    </div>
+
+                    <button class="mobile-news-fab" aria-label="Más acciones">
+                        +
+                        <span></span><span></span><span></span>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -3886,36 +4131,67 @@ Euskaro
         }, 600);
     }
 
-    function renderMobileHistorySlide() {
-        const slideEl = document.getElementById('historyMobileSlide');
-        if (!slideEl) return;
+    function getMobileNewsTone(item) {
+        const msg = (item?.message || '').toLowerCase();
+        const area = (item?.area || '').toLowerCase();
+        const priority = (item?.priority || '').toLowerCase();
 
-        if (!cio_logs.length) {
-            slideEl.innerHTML = '<div class="history-empty">Sin novedades recientes por el momento.</div>';
-            return;
+        if (priority.includes('crítica') || msg.includes('sin conexión') || msg.includes('caído')) {
+            return { cardClass: 'priority-critica', badge: msg.includes('sin conexión') ? 'SIN CONEXIÓN' : 'ALERTA' };
         }
+        if (priority.includes('media')) {
+            return { cardClass: 'priority-media', badge: 'MONITOREO' };
+        }
+        if (area.includes('monitoreo')) {
+            return { cardClass: 'priority-activa', badge: 'MONITOREO' };
+        }
+        return { cardClass: 'priority-activa', badge: 'ALERTA' };
+    }
 
-        const itemIndex = mobileHistoryIdx % cio_logs.length;
-        const item = cio_logs[itemIndex];
-        const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-        const color = colors[item.priority] || "var(--accent)";
+    function escapeNewsHtml(value = '') {
+        return value
+            .toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
-        slideEl.classList.add('oculto');
-        setTimeout(() => {
-            slideEl.innerHTML = `
-            <div class="history-card" style="border-left-color:${color} !important; margin-bottom:0 !important;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
-                    <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
+    function renderMobileNewsCard(item, i) {
+        const tone = getMobileNewsTone(item);
+        const serviceName = escapeNewsHtml(item.service || item.title || 'Servicio sin nombre');
+        const message = escapeNewsHtml(item.message || 'Novedad sin descripción disponible.');
+        const intelligentTag = item.intelligentState ? `<span class="mobile-news-tag">${escapeNewsHtml(item.intelligentState)}</span>` : '';
+
+        return `
+            <article class="mobile-news-card ${tone.cardClass}">
+                <div class="mobile-news-card-top">
+                    <span class="mobile-news-badge">${escapeNewsHtml(tone.badge)}</span>
+                    <span class="mobile-news-time">${escapeNewsHtml(getEntryDateLabel(item))} · ${escapeNewsHtml(item.time || '--:--')}</span>
                 </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
-                <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
-                <div style="margin-top:10px; text-align:right;"><button onclick="openEntryMediaModal(${itemIndex})" style="background:none; border:1px solid #006465; color:#9ed9d9; border-radius:8px; padding:5px 10px; font-size:0.65rem; cursor:pointer;">Ver más</button></div>
-            </div>`;
-            slideEl.classList.remove('oculto');
-        }, 260);
+                <h3 class="mobile-news-title">${serviceName}</h3>
+                <p class="mobile-news-desc">${message}</p>
 
-        mobileHistoryIdx = (mobileHistoryIdx + 1) % cio_logs.length;
+                <div class="mobile-news-tags">
+                    <span class="mobile-news-tag">${escapeNewsHtml(item.priority || 'Media')}</span>
+                    <span class="mobile-news-tag">Activa</span>
+                    <span class="mobile-news-tag">Sistema</span>
+                    ${intelligentTag}
+                </div>
+
+                <button class="mobile-news-main-action" onclick="openEntryMediaModal(${i})">Ver detalle</button>
+
+                <div class="mobile-news-sub-actions">
+                    <button onclick="openEntryMediaModal(${i})">📄 PDF</button>
+                    <button onclick="openEntryMediaModal(${i})">📄 PDF</button>
+                    <button onclick="openForm(${i})">👤 Asignar</button>
+                </div>
+            </article>`;
+    }
+
+    function renderMobileHistorySlide() {
+        renderMobileHistoryFullList();
     }
 
     function renderMobileHistoryFullList() {
@@ -3927,20 +4203,7 @@ Euskaro
             return;
         }
 
-        const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-        slideEl.innerHTML = cio_logs.map((item, i) => {
-            const color = colors[item.priority] || "var(--accent)";
-            return `
-            <div class="history-card" style="border-left-color:${color} !important; margin-bottom:0 !important;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
-                    <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
-                </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
-                <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
-                <div style="margin-top:10px; text-align:right;"><button onclick="openEntryMediaModal(${i})" style="background:none; border:1px solid #006465; color:#9ed9d9; border-radius:8px; padding:5px 10px; font-size:0.65rem; cursor:pointer;">Ver más</button></div>
-            </div>`;
-        }).join('');
+        slideEl.innerHTML = cio_logs.map((item, i) => renderMobileNewsCard(item, i)).join('');
     }
 
     function syncMobileHistoryMode() {
@@ -3951,16 +4214,9 @@ Euskaro
             return;
         }
 
-        if (currentMobileFilter === 'news') {
-            if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
-            mobileHistoryTimer = null;
-            renderMobileHistoryFullList();
-            return;
-        }
-
-        renderMobileHistorySlide();
         if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
-        mobileHistoryTimer = cio_logs.length ? setInterval(renderMobileHistorySlide, 20000) : null;
+        mobileHistoryTimer = null;
+        renderMobileHistoryFullList();
     }
 
     function renderHistory() {
