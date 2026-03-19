@@ -3103,6 +3103,15 @@ Euskaro
         return (entry && entry.date) ? entry.date : formatDateDDMM();
     }
 
+    function isAutomaticOfflineNovedad(entry) {
+        if (!entry) return false;
+        if (entry.autoFailure || entry.autoIssueType) return true;
+        const msg = (entry.message || '').toString().toLowerCase();
+        return msg.includes('sin conexión detectada automáticamente')
+            || msg.includes('alarma con falla detectada automáticamente')
+            || msg.includes('cámara con falla detectada automáticamente');
+    }
+
     function refreshServiceOptions() {
         const dataList = document.getElementById('service-options');
         if (!dataList) return;
@@ -3700,7 +3709,13 @@ Euskaro
 
             const rE = await fetch(DB_URL, { cache: 'no-store' });
             const dE = await rE.json();
-            cio_logs = dE ? (Array.isArray(dE) ? dE : Object.values(dE)) : [];
+            const rawLogs = dE ? (Array.isArray(dE) ? dE : Object.values(dE)) : [];
+            const cleanedLogs = rawLogs.filter(entry => !isAutomaticOfflineNovedad(entry));
+            const removedAutomaticLogs = rawLogs.length !== cleanedLogs.length;
+            if (removedAutomaticLogs) {
+                await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cleanedLogs) });
+            }
+            cio_logs = cleanedLogs;
             renderHistory();
             if(cio_logs.length > 0 && startTime === null) renderSlide();
 
