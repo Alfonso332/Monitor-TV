@@ -207,6 +207,42 @@
             padding: 10px 14px;
             gap: 10px;
         }
+        #cio-app .service-specs-ticker-bar {
+            height: 68px;
+            min-height: 68px;
+            border-top: 1px solid rgba(62, 134, 138, 0.45);
+            border-bottom: 1px solid rgba(62, 134, 138, 0.28);
+            background: linear-gradient(180deg, #010405 0%, #071112 100%);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 8px 12px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 -8px 28px rgba(0,0,0,0.35);
+        }
+        #cio-app .service-specs-ticker-track {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            will-change: transform;
+            position: absolute;
+            left: 0;
+            transform: translateX(0);
+        }
+        #cio-app .service-specs-pill {
+            border: 1px solid rgba(78, 161, 166, 0.52);
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 0.9rem;
+            color: #c9f9f9;
+            background: rgba(8, 25, 27, 0.9);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        #cio-app .service-specs-pill strong {
+            color: #7dffff;
+            margin-right: 4px;
+        }
         #cio-app #ticker-bar.ticker-compact-ok .ticker-row {
             display: none !important;
         }
@@ -406,6 +442,30 @@
             background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white;
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
             text-align: center; display: block; margin-left: auto; margin-right: auto;
+        }
+        #cio-app .service-specs-admin {
+            background:#131313;
+            border:1px solid #2b3b3c;
+            border-radius:12px;
+            padding:12px;
+            margin-bottom:14px;
+        }
+        #cio-app .service-specs-admin textarea { text-align:left; resize: vertical; min-height: 66px; }
+        #cio-app .service-specs-admin-list {
+            max-height: 170px;
+            overflow:auto;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            margin-top:10px;
+        }
+        #cio-app .service-specs-admin-item {
+            background:#0a1011;
+            border:1px solid #224144;
+            border-radius:10px;
+            padding:8px;
+            font-size:0.7rem;
+            line-height:1.35;
         }
 
         #cio-app .image-dropzone {
@@ -1895,6 +1955,199 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
+
+
+        /* --- Rediseño premium mobile: sección Novedades --- */
+        @media (max-width: 768px) {
+            #cio-app .mobile-news-hub {
+                background: transparent;
+                padding: 4px 0 14px;
+            }
+            #cio-app .mobile-news-hub .mobile-news-device {
+                position: relative;
+                border-radius: 42px;
+                padding: 14px 10px 12px;
+                background: linear-gradient(165deg, #141c25, #070b12 38%, #03060c 100%);
+                border: 1px solid rgba(148, 174, 196, 0.26);
+                box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+            }
+            #cio-app .mobile-news-hub .mobile-news-device-top {
+                width: 38%;
+                height: 28px;
+                border-radius: 18px;
+                margin: 0 auto 10px;
+                background: linear-gradient(180deg, rgba(8,12,18,.95), rgba(3,4,8,.85));
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+            }
+            #cio-app .mobile-news-hub .mobile-news-screen {
+                border-radius: 32px;
+                padding: 14px 12px 86px;
+                background:
+                    radial-gradient(circle at 85% 0%, rgba(0, 229, 255, 0.15) 0%, rgba(0, 0, 0, 0) 45%),
+                    linear-gradient(175deg, rgba(11, 18, 29, 0.92), rgba(5, 9, 16, 0.97));
+                border: 1px solid rgba(80, 109, 133, 0.45);
+                backdrop-filter: blur(14px);
+            }
+            #cio-app .mobile-news-header {
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                margin-bottom: 14px;
+                position: relative;
+            }
+            #cio-app .mobile-news-header h2 {
+                margin:0;
+                font-size: 1.32rem;
+                letter-spacing: .5px;
+            }
+            #cio-app .mobile-news-icon-btn {
+                position: absolute;
+                left: 0;
+                width: 36px;
+                height: 36px;
+                border-radius: 12px;
+                border: 1px solid rgba(120, 143, 166, 0.44);
+                background: rgba(10, 19, 31, 0.8);
+                color: #ddf6ff;
+                font-size: 1rem;
+            }
+            #cio-app .mobile-news-search-wrap {
+                margin-bottom: 12px;
+            }
+            #cio-app .mobile-news-search-input {
+                width: 100%;
+                padding: 10px 12px;
+                border-radius: 12px;
+                border: 1px solid rgba(87, 129, 149, 0.55);
+                background: rgba(6, 14, 24, 0.84);
+                color: #d4edff;
+                font-size: 0.72rem;
+                outline: none;
+            }
+            #cio-app .mobile-news-counter-pill {
+                display: inline-flex;
+                padding: 8px 14px;
+                border-radius: 999px;
+                background: rgba(0, 223, 252, 0.12);
+                border: 1px solid rgba(0, 233, 255, 0.45);
+                color: #90f8ff;
+                font-size: .73rem;
+                font-weight: 800;
+                letter-spacing: .6px;
+                margin-bottom: 12px;
+            }
+            #cio-app .mobile-news-action-row,
+            #cio-app .mobile-news-filter-grid {
+                display:flex;
+                gap: 8px;
+                overflow-x:auto;
+                padding-bottom: 2px;
+                margin-bottom: 12px;
+            }
+            #cio-app .mobile-news-action-btn {
+                flex: 1;
+                min-width: 132px;
+                border-radius: 14px;
+                border: 1px solid rgba(108, 137, 159, 0.4);
+                background: linear-gradient(180deg, rgba(17,27,40,.86), rgba(8,15,25,.86));
+                color: #def8ff;
+                font-size: .7rem;
+                font-weight: 700;
+                padding: 9px 10px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:6px;
+            }
+            #cio-app .mobile-news-filter-fields {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 14px;
+                border: 1px solid rgba(82, 125, 151, 0.45);
+                background: rgba(10, 19, 30, 0.6);
+            }
+            #cio-app .mobile-news-filter-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 0;
+            }
+            #cio-app .mobile-news-filter-grid input {
+                width: 100%;
+                padding: 9px 10px;
+                border-radius: 10px;
+                border: 1px solid rgba(105, 140, 165, 0.45);
+                background: rgba(6, 14, 24, 0.9);
+                color: #d4edff;
+                font-size: 0.69rem;
+                outline: none;
+            }
+            #cio-app .mobile-news-filter-grid input:first-child {
+                grid-column: 1 / -1;
+            }
+            #cio-app .mobile-news-list-window {
+                max-height: 56vh;
+                overflow:auto;
+                padding-right: 2px;
+                background: transparent;
+                border: none;
+            }
+            #cio-app .mobile-news-list {
+                display:flex;
+                flex-direction:column;
+                gap: 12px;
+            }
+            #cio-app .mobile-news-card {
+                border-radius: 20px;
+                padding: 12px 12px 10px;
+                background: linear-gradient(160deg, rgba(21,30,45,.95), rgba(9,15,25,.95));
+                border: 1px solid rgba(102, 128, 158, 0.38);
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 14px 26px rgba(0, 0, 0, 0.38);
+            }
+            #cio-app .mobile-news-card.priority-critica { border-color: rgba(255, 88, 102, 0.74); box-shadow: 0 0 0 1px rgba(255, 88, 102, .24), 0 12px 24px rgba(58,0,4,.45); }
+            #cio-app .mobile-news-card.priority-media { border-color: rgba(255, 204, 90, 0.65); box-shadow: 0 0 0 1px rgba(255, 204, 90, .18), 0 12px 24px rgba(60,44,0,.35); }
+            #cio-app .mobile-news-card.priority-activa { border-color: rgba(64, 238, 255, 0.66); box-shadow: 0 0 0 1px rgba(64, 238, 255, .2), 0 12px 24px rgba(0,27,34,.38); }
+            #cio-app .mobile-news-card-top {
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                margin-bottom: 9px;
+                border-bottom: 1px solid rgba(124, 147, 173, 0.16);
+                padding-bottom: 9px;
+            }
+            #cio-app .mobile-news-badge {
+                border-radius: 999px;
+                padding: 4px 8px;
+                font-size: .6rem;
+                font-weight: 900;
+                letter-spacing: .6px;
+                color: #e8f8ff;
+                background: rgba(255,255,255,.08);
+            }
+            #cio-app .mobile-news-time { font-size: .62rem; color: rgba(223, 233, 245, .66); font-weight: 700; }
+            #cio-app .mobile-news-title { font-size: 1.1rem; font-weight: 900; margin: 0 0 7px; }
+            #cio-app .mobile-news-desc { font-size: .73rem; line-height: 1.45; color: rgba(219,233,247,.82); margin-bottom: 10px; }
+            #cio-app .mobile-news-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 12px; }
+            #cio-app .mobile-news-tag {
+                border-radius: 999px;
+                border: 1px solid rgba(122, 149, 175, 0.35);
+                padding: 4px 8px;
+                font-size: .59rem;
+                color: #c4d6e8;
+                background: rgba(10, 18, 30, 0.8);
+                font-weight: 700;
+            }
+            #cio-app .mobile-news-main-action {
+                width:100%;
+                border-radius: 13px;
+                border: 1px solid rgba(58, 235, 255, 0.6);
+                padding: 9px 10px;
+                font-size: .72rem;
+                font-weight: 800;
+                background: linear-gradient(150deg, rgba(15,38,51,.85), rgba(8,21,31,.9));
+                color:#85f8ff;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1904,7 +2157,7 @@
 
     <header class="main-header">
         <div style="display:flex; gap:8px;">
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">＋ Novedad</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
             <button onclick="openFeedbackModal()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">✉ Feedback</button>
         </div>
@@ -1922,6 +2175,10 @@
             <span id="v-calls" class="kpi-value">0</span>
         </div>
         <div class="puestos-container" id="puestos-display"></div>
+    </div>
+
+    <div id="serviceSpecsTickerBar" class="service-specs-ticker-bar" aria-live="polite">
+        <div class="service-specs-ticker-track" id="serviceSpecsTickerTrack"></div>
     </div>
 
     <main id="display-board">
@@ -2056,11 +2313,39 @@
             </div>
         </section>
 
-        <section class="mobile-only-section mobile-module mobile-filter-target" data-mobile-group="news">
-            <div class="mobile-module-head">Novedades</div>
-            <div class="mobile-section-header">Novedades Recientes</div>
-            <div id="historyMobileWindow">
-                <div id="historyMobileSlide"></div>
+        <section class="mobile-only-section mobile-module mobile-filter-target mobile-news-hub" data-mobile-group="news">
+            <div class="mobile-news-device">
+                <div class="mobile-news-device-top"></div>
+                <div class="mobile-news-screen">
+                    <header class="mobile-news-header">
+                        <button id="mobileNewsSearchBtn" class="mobile-news-icon-btn" aria-label="Buscar" onclick="toggleMobileNewsSearch()">⌕</button>
+                        <h2>Novedades</h2>
+                    </header>
+                    <div class="mobile-news-search-wrap" id="mobileNewsSearchWrap" style="display:none;">
+                        <input id="mobileNewsSearchInput" class="mobile-news-search-input" type="search" placeholder="Buscar por servicio o texto..." oninput="applyMobileNewsControls()">
+                    </div>
+
+                    <div class="mobile-news-counter-pill">124 activas</div>
+
+                    <div class="mobile-news-action-row">
+                        <button id="mobileNewsFilterBtn" class="mobile-news-action-btn" onclick="cycleMobileNewsFilter()"><span>⎚</span>Filtrar</button>
+                        <button id="mobileNewsExportBtn" class="mobile-news-action-btn" onclick="exportMobileNews()"><span>⭳</span>Exportar</button>
+                    </div>
+                    <div id="mobileNewsFilterFields" class="mobile-news-filter-fields" style="display:none;">
+                        <div class="mobile-news-filter-grid">
+                            <input id="mobileNewsServiceInput" type="text" placeholder="Servicio..." oninput="applyMobileNewsControls()">
+                            <input id="mobileNewsDateFrom" type="date" onchange="applyMobileNewsControls()">
+                            <input id="mobileNewsDateTo" type="date" onchange="applyMobileNewsControls()">
+                            <input id="mobileNewsTimeFrom" type="time" onchange="applyMobileNewsControls()">
+                            <input id="mobileNewsTimeTo" type="time" onchange="applyMobileNewsControls()">
+                        </div>
+                    </div>
+
+                    <div id="historyMobileWindow" class="mobile-news-list-window">
+                        <div id="historyMobileSlide" class="mobile-news-list"></div>
+                    </div>
+
+                </div>
             </div>
         </section>
 
@@ -2156,16 +2441,12 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
-        <div id="pc-only-controls" style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px;">
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center;">MÉTRICAS</label>
-            <div style="display:flex; gap:10px; margin:10px 0;">
-                <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
-                <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
-                <input type="number" id="in-agents" class="p-field" placeholder="Agentes activos">
-            </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
-            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y tiempo de respuesta &lt;5s por puesto.</div>
-            <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
+        <div class="service-specs-admin">
+            <div style="font-size:0.72rem; letter-spacing:0.8px; opacity:0.9; margin-bottom:8px;">ESPECIFICACIONES DE SERVICIOS</div>
+            <input id="specServiceInput" class="p-field" placeholder="Servicio (ej: Lift Monterroso)">
+            <textarea id="specNoteInput" class="p-field" rows="3" placeholder="Observación especial..."></textarea>
+            <button onclick="addServiceSpecification()" class="btn-pill btn-sec" style="border-radius:10px;">Agregar especificación</button>
+            <div id="serviceSpecsAdminList" class="service-specs-admin-list"></div>
         </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
         <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
@@ -2236,7 +2517,6 @@
     let mobileNotificationFeed = [];
     const mobileNotificationTracker = {};
     const MOBILE_NOTIFICATION_COOLDOWN_MS = 2 * 60 * 1000;
-    const shownAutoFailureSlides = new Set();
     const SLIDE_DURATION = 45000;
     const SYNC_INTERVAL_MS = 5000;
     const DATA_STALE_MS = 15000;
@@ -2477,14 +2757,14 @@ Euskaro
     const alarmDetailSnapshot = {};
     const serviceStatusLayer = {};
     const serviceNamePool = new Set(LOADED_SERVICES.map(s => s.toUpperCase()));
-    const AUTO_NOVEDADES_ENABLED = false;
-    const AUTO_NOVELTY_COOLDOWN_MS = 5 * 60 * 60 * 1000;
-    const AUTO_NOVELTY_BLOCKS_KEY = 'cio-auto-novedad-blocks-v1';
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
     const preventiveAlertTracker = {};
     const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
-    const AUTO_OPEN_ISSUES_KEY = 'cio-auto-open-issues-v1';
+    const SERVICE_SPECS_KEY = 'cio-service-specs-v1';
     let mobileFavorites = new Set(JSON.parse(localStorage.getItem(MOBILE_FAVORITES_KEY) || '[]'));
+    let serviceSpecifications = [];
+    let serviceSpecsTickerAnimFrame = null;
+    let serviceSpecsTickerLastTs = 0;
 
     function getServicePriorityMeta({ fallos = 0, isOffline = false, hasCameraOffline = false }) {
         if (isOffline || Number(fallos) >= 5) return { key: 'critico', label: 'CRÍTICO', color: '#ff4d4d' };
@@ -2496,158 +2776,6 @@ Euskaro
     function priorityChipMarkup(meta) {
         if (!meta || !meta.label) return '';
         return `<span class="priority-chip ${meta.key}">${meta.label}</span>`;
-    }
-
-    function getStoredOpenAutoIssues() {
-        try {
-            const parsed = JSON.parse(localStorage.getItem(AUTO_OPEN_ISSUES_KEY) || '{}');
-            return (parsed && typeof parsed === 'object') ? parsed : {};
-        } catch (_) {
-            return {};
-        }
-    }
-
-    function persistOpenAutoIssues(openIssues) {
-        localStorage.setItem(AUTO_OPEN_ISSUES_KEY, JSON.stringify(openIssues || {}));
-    }
-
-    function isAutoIssueOpen(serviceName, issueType) {
-        const key = makeAutoNovedadBlockKey(serviceName, issueType);
-        if (!key || key.startsWith('::')) return false;
-        const openIssues = getStoredOpenAutoIssues();
-        return Boolean(openIssues[key]);
-    }
-
-    function setAutoIssueOpen(serviceName, issueType, isOpen) {
-        const key = makeAutoNovedadBlockKey(serviceName, issueType);
-        if (!key || key.startsWith('::')) return;
-        const openIssues = getStoredOpenAutoIssues();
-        if (isOpen) openIssues[key] = Date.now();
-        else delete openIssues[key];
-        persistOpenAutoIssues(openIssues);
-    }
-
-    function makeAutoLogEntry(serviceName, priority, message, intelligentState = "", meta = {}) {
-        const now = new Date();
-        return {
-            area: 'Monitoreo',
-            priority,
-            service: serviceName,
-            title: serviceName,
-            message,
-            date: formatDateDDMM(now),
-            time: now.toLocaleTimeString('es-AR', { hour12: false, hour: '2-digit', minute: '2-digit' }),
-            autoGeneratedAt: now.toISOString(),
-            autoIssueType: meta.autoIssueType || '',
-            autoFailure: Boolean(meta.autoFailure),
-            autoFailureKey: meta.autoFailureKey || ''
-        };
-    }
-
-    function getStoredAutoNovedadBlocks() {
-        try {
-            const parsed = JSON.parse(localStorage.getItem(AUTO_NOVELTY_BLOCKS_KEY) || '{}');
-            return (parsed && typeof parsed === 'object') ? parsed : {};
-        } catch (_) {
-            return {};
-        }
-    }
-
-    function persistAutoNovedadBlocks(blocks) {
-        localStorage.setItem(AUTO_NOVELTY_BLOCKS_KEY, JSON.stringify(blocks || {}));
-    }
-
-    function makeAutoNovedadBlockKey(serviceName, issueType) {
-        return `${normalizeServiceName(serviceName)}::${issueType}`;
-    }
-
-    function rememberAutoNovedadBlock(serviceName, issueType, generatedAtMs = Date.now()) {
-        const key = makeAutoNovedadBlockKey(serviceName, issueType);
-        if (!key || key.startsWith('::')) return;
-        const blocks = getStoredAutoNovedadBlocks();
-        const current = Number(blocks[key] || 0);
-        const nextValue = Number(generatedAtMs) || Date.now();
-        blocks[key] = Math.max(current, nextValue);
-        persistAutoNovedadBlocks(blocks);
-    }
-
-    function hasActiveAutoNovedadBlock(serviceName, issueType, nowMs = Date.now()) {
-        const key = makeAutoNovedadBlockKey(serviceName, issueType);
-        const blocks = getStoredAutoNovedadBlocks();
-        const ts = Number(blocks[key] || 0);
-        if (!ts) return false;
-        if ((nowMs - ts) < AUTO_NOVELTY_COOLDOWN_MS) return true;
-        delete blocks[key];
-        persistAutoNovedadBlocks(blocks);
-        return false;
-    }
-
-    function parseEntryTimestampMs(entry) {
-        if (!entry) return Number.NaN;
-        if (entry.autoGeneratedAt) {
-            const parsedIso = new Date(entry.autoGeneratedAt).getTime();
-            if (!Number.isNaN(parsedIso)) return parsedIso;
-        }
-
-        const dateLabel = (entry.date || '').toString().trim();
-        const timeLabel = (entry.time || '').toString().trim();
-        const dateMatch = dateLabel.match(/^(\d{2})\/(\d{2})$/);
-        const timeMatch = timeLabel.match(/^(\d{2}):(\d{2})(?::(\d{2}))?$/);
-        if (dateMatch && timeMatch) {
-            const now = new Date();
-            const dd = Number(dateMatch[1]);
-            const mm = Number(dateMatch[2]) - 1;
-            const hh = Number(timeMatch[1]);
-            const min = Number(timeMatch[2]);
-            const sec = Number(timeMatch[3] || '0');
-            const guess = new Date(now.getFullYear(), mm, dd, hh, min, sec, 0);
-            if (guess.getTime() > now.getTime() + (24 * 60 * 60 * 1000)) {
-                guess.setFullYear(now.getFullYear() - 1);
-            }
-            return guess.getTime();
-        }
-
-        const fallback = new Date(`${dateLabel} ${timeLabel}`).getTime();
-        return Number.isNaN(fallback) ? Number.NaN : fallback;
-    }
-
-    function inferAutoIssueType(entry) {
-        if (!entry) return '';
-        if (entry.autoIssueType) return entry.autoIssueType;
-        if (entry.autoFailure) return 'nvr_offline';
-
-        const msg = (entry.message || '').toString().toLowerCase();
-        if (msg.includes('alarma con falla detectada automáticamente')) return 'alarm_failure';
-        if (msg.includes('cámara con falla detectada automáticamente')) return 'camera_failure';
-        if (msg.includes('sin conexión detectada automáticamente')) return 'nvr_offline';
-        return '';
-    }
-
-    function canGenerateAutoNovedad(serviceName, issueType) {
-        if (!AUTO_NOVEDADES_ENABLED) return false;
-        const normalizedService = normalizeServiceName(serviceName);
-        if (!normalizedService || !issueType) return false;
-        const nowMs = Date.now();
-
-        if (hasActiveAutoNovedadBlock(serviceName, issueType, nowMs)) return false;
-
-        for (const entry of cio_logs) {
-            if (!entry) continue;
-            const entryService = normalizeServiceName(entry.service || entry.title || '');
-            if (entryService !== normalizedService) continue;
-
-            const entryIssueType = inferAutoIssueType(entry);
-            if (entryIssueType !== issueType) continue;
-
-            const entryTs = parseEntryTimestampMs(entry);
-            if (Number.isNaN(entryTs)) continue;
-            if ((nowMs - entryTs) < AUTO_NOVELTY_COOLDOWN_MS) {
-                rememberAutoNovedadBlock(serviceName, issueType, entryTs);
-                return false;
-            }
-        }
-
-        return true;
     }
 
     function showPreventiveMobileAlert(serviceName) {
@@ -2666,6 +2794,107 @@ Euskaro
 
     function persistMobileFavorites() {
         localStorage.setItem(MOBILE_FAVORITES_KEY, JSON.stringify(Array.from(mobileFavorites)));
+    }
+
+    function loadServiceSpecifications() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(SERVICE_SPECS_KEY) || '[]');
+            serviceSpecifications = Array.isArray(parsed) ? parsed.filter(item => item?.service && item?.note) : [];
+        } catch (_) {
+            serviceSpecifications = [];
+        }
+    }
+
+    function persistServiceSpecifications() {
+        localStorage.setItem(SERVICE_SPECS_KEY, JSON.stringify(serviceSpecifications.slice(0, 80)));
+    }
+
+    function renderServiceSpecsTicker() {
+        const tickerBar = document.getElementById('serviceSpecsTickerBar');
+        const track = document.getElementById('serviceSpecsTickerTrack');
+        if (!track || !tickerBar) return;
+        if (serviceSpecsTickerAnimFrame) cancelAnimationFrame(serviceSpecsTickerAnimFrame);
+        serviceSpecsTickerAnimFrame = null;
+        serviceSpecsTickerLastTs = 0;
+
+        if (!serviceSpecifications.length) {
+            track.style.transform = 'translateX(0)';
+            track.innerHTML = '<span class="service-specs-pill"><strong>ESPECIFICACIONES</strong>Sin especificaciones cargadas</span>';
+            return;
+        }
+        const chips = serviceSpecifications.map(item =>
+            `<span class="service-specs-pill"><strong>${escapeNewsHtml(item.service)}</strong>${escapeNewsHtml(item.note)}</span>`
+        ).join('');
+        track.innerHTML = chips;
+        track.dataset.x = String(tickerBar.clientWidth);
+        track.style.transform = `translateX(${tickerBar.clientWidth}px)`;
+        requestAnimationFrame(startServiceSpecsTickerMotion);
+    }
+
+    function startServiceSpecsTickerMotion(timestamp = 0) {
+        const tickerBar = document.getElementById('serviceSpecsTickerBar');
+        const track = document.getElementById('serviceSpecsTickerTrack');
+        if (!tickerBar || !track || !serviceSpecifications.length) return;
+
+        const trackWidth = track.scrollWidth;
+        const barWidth = tickerBar.clientWidth;
+        let currentX = Number(track.dataset.x || barWidth);
+
+        if (!serviceSpecsTickerLastTs) serviceSpecsTickerLastTs = timestamp;
+        const delta = Math.max(0, timestamp - serviceSpecsTickerLastTs);
+        serviceSpecsTickerLastTs = timestamp;
+
+        const speed = 0.065; // px por ms
+        currentX -= delta * speed;
+        if (currentX <= -trackWidth) currentX = barWidth;
+
+        track.dataset.x = String(currentX);
+        track.style.transform = `translateX(${currentX}px)`;
+        serviceSpecsTickerAnimFrame = requestAnimationFrame(startServiceSpecsTickerMotion);
+    }
+
+    function renderServiceSpecsAdminList() {
+        const list = document.getElementById('serviceSpecsAdminList');
+        if (!list) return;
+        if (!serviceSpecifications.length) {
+            list.innerHTML = '<div style="opacity:0.65; font-size:0.68rem;">Sin especificaciones cargadas.</div>';
+            return;
+        }
+        list.innerHTML = serviceSpecifications.map((item, idx) => `
+            <div class="service-specs-admin-item">
+                <div style="display:flex; justify-content:space-between; gap:8px; align-items:center;">
+                    <strong style="color:#91ffff;">${escapeNewsHtml(item.service)}</strong>
+                    <button onclick="removeServiceSpecification(${idx})" style="background:none; border:none; color:#ff8f8f; font-size:0.65rem; cursor:pointer;">Eliminar</button>
+                </div>
+                <div style="margin-top:4px; opacity:0.92;">${escapeNewsHtml(item.note)}</div>
+            </div>
+        `).join('');
+    }
+
+    function addServiceSpecification() {
+        const serviceInput = document.getElementById('specServiceInput');
+        const noteInput = document.getElementById('specNoteInput');
+        if (!serviceInput || !noteInput) return;
+        const service = (serviceInput.value || '').trim();
+        const note = (noteInput.value || '').trim();
+        if (!service || !note) {
+            alert('Completá servicio y observación.');
+            return;
+        }
+        serviceSpecifications.unshift({ service, note, createdAt: Date.now() });
+        serviceSpecifications = serviceSpecifications.slice(0, 80);
+        serviceInput.value = '';
+        noteInput.value = '';
+        persistServiceSpecifications();
+        renderServiceSpecsAdminList();
+        renderServiceSpecsTicker();
+    }
+
+    function removeServiceSpecification(index) {
+        serviceSpecifications.splice(index, 1);
+        persistServiceSpecifications();
+        renderServiceSpecsAdminList();
+        renderServiceSpecsTicker();
     }
 
     function toggleServiceFavorite(rawName) {
@@ -2986,16 +3215,6 @@ Euskaro
         }, {passive: true});
     });
 
-    const pGrid = document.getElementById('p-inputs-grid');
-    for(let i=1; i<=9; i++) {
-        pGrid.innerHTML += `
-            <div style="background:#141414; border:1px solid #2a2a2a; border-radius:10px; padding:8px;">
-                <div style="font-size:0.6rem; opacity:0.72; margin-bottom:6px; text-align:center;">P${i}</div>
-                <input type="number" id="inp-p${i}" class="p-field" placeholder="Llamadas" style="margin-bottom:6px; padding:8px;">
-                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="Tiempo (segundos)" style="margin-bottom:0; padding:8px;">
-            </div>`;
-    }
-
     function formatPuestoSeconds(value) {
         const safeValue = Math.max(0, Number(value) || 0);
         const trimmed = Number.isInteger(safeValue) ? safeValue : safeValue.toFixed(1);
@@ -3138,7 +3357,12 @@ Euskaro
         const empty = document.getElementById('entryMediaEmpty');
         if (!item || !modal || !meta || !img || !empty) return;
 
-        meta.innerHTML = `<strong style="color:var(--accent);">${item.title || 'Novedad'}</strong><br><span style="opacity:0.8;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>`;
+        meta.innerHTML = `
+            <strong style="color:var(--accent); font-size:0.95rem;">${escapeNewsHtml(item.title || item.service || 'Novedad')}</strong><br>
+            <span style="opacity:0.84;">${escapeNewsHtml(getEntryDateLabel(item))} · ${escapeNewsHtml(item.time || '--:--')}</span><br>
+            <span style="opacity:0.9;">Área: ${escapeNewsHtml(item.area || 'Monitoreo')} · Prioridad: ${escapeNewsHtml(item.priority || 'Media')}</span>
+            <div style="margin-top:10px; font-size:0.8rem; color:#deebeb; line-height:1.5;">${escapeNewsHtml(item.message || 'Sin detalle adicional')}</div>
+        `;
         if (item.imageDataUrl) {
             img.src = item.imageDataUrl;
             img.style.display = 'block';
@@ -3422,17 +3646,6 @@ Euskaro
                 renderPuestos(dK.puestos, puestoSlaData);
                 prevSLA = sla;
 
-                if(document.getElementById('panelHistory').classList.contains('active')) {
-                    if(!document.getElementById('in-sla').value) document.getElementById('in-sla').value = dK.sla;
-                    if(!document.getElementById('in-calls').value) document.getElementById('in-calls').value = dK.calls;
-                    if(!document.getElementById('in-agents').value) document.getElementById('in-agents').value = dK.agents || 0;
-                    for(let i=1; i<=9; i++) {
-                        let pInp = document.getElementById(`inp-p${i}`);
-                        if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
-                        let slaInp = document.getElementById(`inp-sla-p${i}`);
-                        if(slaInp && !slaInp.value) slaInp.value = puestoSlaData[`p${i}`] || 0;
-                    }
-                }
             }
 
             const rE = await fetch(DB_URL, { cache: 'no-store' });
@@ -3463,7 +3676,6 @@ Euskaro
             let offlineAlarmsCount = 0;
             const currentServiceStatuses = {};
             const newOfflineServices = [];
-            const autoLogsToAdd = [];
 
             Object.keys(serviceStatusLayer).forEach(k => delete serviceStatusLayer[k]);
 
@@ -3498,19 +3710,9 @@ Euskaro
                     };
 
 
-                    if (!alarmActive || fallos < 8) {
-                        setAutoIssueOpen(serviceName, 'alarm_failure', false);
-                        return;
-                    }
+                    if (!alarmActive || fallos < 8) return;
 
                     pushMobileNotification(serviceName, 'alarm_failure', `Falla de alarma detectada en ${serviceName}.`);
-
-                    const alarmIssueAlreadyOpen = isAutoIssueOpen(serviceName, 'alarm_failure');
-                    if (!alarmIssueAlreadyOpen && canGenerateAutoNovedad(serviceName, 'alarm_failure')) {
-                        rememberAutoNovedadBlock(serviceName, 'alarm_failure');
-                        autoLogsToAdd.push(makeAutoLogEntry(serviceName, 'Crítica', `Alarma con falla detectada automáticamente en ${serviceName}`, priorityMeta.label, { autoIssueType: 'alarm_failure' }));
-                    }
-                    setAutoIssueOpen(serviceName, 'alarm_failure', true);
 
                     offlineAlarmsCount++;
                     alarmTickerHtml += `<div class="capsula-off capsula-alarma">${serviceName} - Falla ${priorityChipMarkup(priorityMeta)}</div>`;
@@ -3562,28 +3764,11 @@ Euskaro
                     });
 
                     if (hasCameraIssue) {
-                        const cameraIssueAlreadyOpen = isAutoIssueOpen(name, 'camera_failure');
-                        if (!cameraIssueAlreadyOpen && canGenerateAutoNovedad(name, 'camera_failure')) {
-                            rememberAutoNovedadBlock(name, 'camera_failure');
-                            autoLogsToAdd.push(makeAutoLogEntry(name, 'Alta', `Cámara con falla detectada automáticamente en ${name}: ${cameraInfo}`, priorityMeta.label, { autoIssueType: 'camera_failure' }));
-                        }
-                        setAutoIssueOpen(name, 'camera_failure', true);
                         pushMobileNotification(name, 'camera_failure', `Falla de cámara en ${name}. ${cameraInfo}`);
-                    } else {
-                        setAutoIssueOpen(name, 'camera_failure', false);
                     }
 
                     if (effectiveOffline) {
-                        const nvrIssueAlreadyOpen = isAutoIssueOpen(name, 'nvr_offline');
-                        if (!nvrIssueAlreadyOpen && canGenerateAutoNovedad(name, 'nvr_offline')) {
-                            rememberAutoNovedadBlock(name, 'nvr_offline');
-                            const autoFailureKey = `${normalizeServiceName(name)}::${offlineStamp.date}::${offlineStamp.time}`;
-                            autoLogsToAdd.push(makeAutoLogEntry(name, 'Crítica', `Servicio ${name} sin conexión detectada automáticamente`, priorityMeta.label, { autoFailure: true, autoFailureKey, autoIssueType: 'nvr_offline' }));
-                        }
-                        setAutoIssueOpen(name, 'nvr_offline', true);
                         pushMobileNotification(name, 'nvr_offline', `Servicio offline: ${name}.`);
-                    } else {
-                        setAutoIssueOpen(name, 'nvr_offline', false);
                     }
 
                     if (!effectiveOffline && fallos >= 5) {
@@ -3690,12 +3875,6 @@ Euskaro
                 serviceWidgetData = { loaded: [], unavailable: [] };
             }
 
-            if (autoLogsToAdd.length) {
-                cio_logs = [...autoLogsToAdd, ...cio_logs].slice(0, 300);
-                await fetch(DB_URL, { method: 'PUT', body: JSON.stringify(cio_logs) });
-                renderHistory();
-            }
-
             tickerSrv.innerHTML = srvHtml;
             tickerCam.innerHTML = camTickerHtml;
             if (tickerAlarms) tickerAlarms.innerHTML = alarmTickerHtml;
@@ -3742,24 +3921,6 @@ Euskaro
             syncInProgress = false;
             setSyncIndicator(false);
         }
-    }
-
-    async function saveKPIs() {
-        const kpiData = {
-            sla: document.getElementById('in-sla').value || 0,
-            calls: document.getElementById('in-calls').value || 0,
-            agents: document.getElementById('in-agents').value || 0,
-            puestos: {},
-            puestosSla: {}
-        };
-        for(let i=1; i<=9; i++) {
-            kpiData.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
-            kpiData.puestosSla[`p${i}`] = document.getElementById(`inp-sla-p${i}`).value || 0;
-        }
-        try {
-            await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(kpiData) });
-            syncData();
-        } catch(e) { console.error("Error al guardar:", e); }
     }
 
     function updateMobileSLA(val) {
@@ -3828,21 +3989,7 @@ Euskaro
     function getNextSlideItem() {
         if (!cio_logs.length) return null;
         const total = cio_logs.length;
-        let item = null;
-
-        for (let i = 0; i < total; i++) {
-            const idx = (currentIdx + i) % total;
-            const candidate = cio_logs[idx];
-            if (!candidate) continue;
-            const isAutoFailure = Boolean(candidate.autoFailure && candidate.autoFailureKey);
-            if (isAutoFailure && shownAutoFailureSlides.has(candidate.autoFailureKey)) continue;
-            item = candidate;
-            currentIdx = (idx + 1) % total;
-            if (isAutoFailure) shownAutoFailureSlides.add(candidate.autoFailureKey);
-            return item;
-        }
-
-        item = cio_logs[currentIdx % total];
+        const item = cio_logs[currentIdx % total];
         currentIdx = (currentIdx + 1) % total;
         return item;
     }
@@ -3886,36 +4033,139 @@ Euskaro
         }, 600);
     }
 
-    function renderMobileHistorySlide() {
-        const slideEl = document.getElementById('historyMobileSlide');
-        if (!slideEl) return;
+    function getMobileNewsTone(item) {
+        const msg = (item?.message || '').toLowerCase();
+        const area = (item?.area || '').toLowerCase();
+        const priority = (item?.priority || '').toLowerCase();
 
-        if (!cio_logs.length) {
-            slideEl.innerHTML = '<div class="history-empty">Sin novedades recientes por el momento.</div>';
-            return;
+        if (priority.includes('crítica') || msg.includes('sin conexión') || msg.includes('caído')) {
+            return { cardClass: 'priority-critica', badge: msg.includes('sin conexión') ? 'SIN CONEXIÓN' : 'ALERTA' };
         }
+        if (priority.includes('media')) {
+            return { cardClass: 'priority-media', badge: 'MONITOREO' };
+        }
+        if (area.includes('monitoreo')) {
+            return { cardClass: 'priority-activa', badge: 'MONITOREO' };
+        }
+        return { cardClass: 'priority-activa', badge: 'ALERTA' };
+    }
 
-        const itemIndex = mobileHistoryIdx % cio_logs.length;
-        const item = cio_logs[itemIndex];
-        const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-        const color = colors[item.priority] || "var(--accent)";
+    function escapeNewsHtml(value = '') {
+        return value
+            .toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
-        slideEl.classList.add('oculto');
-        setTimeout(() => {
-            slideEl.innerHTML = `
-            <div class="history-card" style="border-left-color:${color} !important; margin-bottom:0 !important;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
-                    <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
+    function toggleMobileNewsSearch() {
+        const wrap = document.getElementById('mobileNewsSearchWrap');
+        const input = document.getElementById('mobileNewsSearchInput');
+        if (!wrap || !input) return;
+        const shouldOpen = wrap.style.display === 'none' || !wrap.style.display;
+        wrap.style.display = shouldOpen ? 'block' : 'none';
+        if (shouldOpen) input.focus();
+        if (!shouldOpen) {
+            input.value = '';
+            applyMobileNewsControls();
+        }
+    }
+
+    function cycleMobileNewsFilter() {
+        const fields = document.getElementById('mobileNewsFilterFields');
+        if (!fields) return;
+        const show = fields.style.display === 'none' || !fields.style.display;
+        fields.style.display = show ? 'block' : 'none';
+        const btn = document.getElementById('mobileNewsFilterBtn');
+        if (btn) btn.innerHTML = show ? '<span>⎚</span>Ocultar filtros' : '<span>⎚</span>Filtrar';
+        if (!show) {
+            const serviceInput = document.getElementById('mobileNewsServiceInput');
+            const dateFromInput = document.getElementById('mobileNewsDateFrom');
+            const dateToInput = document.getElementById('mobileNewsDateTo');
+            const timeFromInput = document.getElementById('mobileNewsTimeFrom');
+            const timeToInput = document.getElementById('mobileNewsTimeTo');
+            if (serviceInput) serviceInput.value = '';
+            if (dateFromInput) dateFromInput.value = '';
+            if (dateToInput) dateToInput.value = '';
+            if (timeFromInput) timeFromInput.value = '';
+            if (timeToInput) timeToInput.value = '';
+            applyMobileNewsControls();
+        }
+    }
+
+    function exportMobileNews() {
+        downloadPDF();
+    }
+
+    function getFilteredMobileNewsEntries() {
+        const input = document.getElementById('mobileNewsSearchInput');
+        const query = normalizeServiceName(input?.value || '');
+        const serviceQuery = normalizeServiceName(document.getElementById('mobileNewsServiceInput')?.value || '');
+        const dateFrom = document.getElementById('mobileNewsDateFrom')?.value || '';
+        const dateTo = document.getElementById('mobileNewsDateTo')?.value || '';
+        const timeFrom = document.getElementById('mobileNewsTimeFrom')?.value || '';
+        const timeTo = document.getElementById('mobileNewsTimeTo')?.value || '';
+
+        const parseDateLabel = (label = '') => {
+            const [dd, mm] = (label || '').split('/').map(Number);
+            if (!dd || !mm) return '';
+            const year = new Date().getFullYear();
+            return `${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+        };
+
+        return cio_logs
+            .map((item, index) => ({ item, index }))
+            .filter(({ item }) => {
+                if (!item) return false;
+                const searchable = normalizeServiceName(`${item.service || item.title || ''} ${item.message || ''} ${item.area || ''}`);
+                if (query && !searchable.includes(query)) return false;
+                if (serviceQuery && !normalizeServiceName(item.service || item.title || '').includes(serviceQuery)) return false;
+
+                const itemDateISO = parseDateLabel(getEntryDateLabel(item));
+                if (dateFrom && itemDateISO && itemDateISO < dateFrom) return false;
+                if (dateTo && itemDateISO && itemDateISO > dateTo) return false;
+
+                const itemTime = (item.time || '').slice(0, 5);
+                if (timeFrom && itemTime && itemTime < timeFrom) return false;
+                if (timeTo && itemTime && itemTime > timeTo) return false;
+                return true;
+            });
+    }
+
+    function applyMobileNewsControls() {
+        renderMobileHistoryFullList();
+    }
+
+    function renderMobileNewsCard(item, i) {
+        const tone = getMobileNewsTone(item);
+        const serviceName = escapeNewsHtml(item.service || item.title || 'Servicio sin nombre');
+        const message = escapeNewsHtml(item.message || 'Novedad sin descripción disponible.');
+        const intelligentTag = item.intelligentState ? `<span class="mobile-news-tag">${escapeNewsHtml(item.intelligentState)}</span>` : '';
+
+        return `
+            <article class="mobile-news-card ${tone.cardClass}">
+                <div class="mobile-news-card-top">
+                    <span class="mobile-news-badge">${escapeNewsHtml(tone.badge)}</span>
+                    <span class="mobile-news-time">${escapeNewsHtml(getEntryDateLabel(item))} · ${escapeNewsHtml(item.time || '--:--')}</span>
                 </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
-                <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
-                <div style="margin-top:10px; text-align:right;"><button onclick="openEntryMediaModal(${itemIndex})" style="background:none; border:1px solid #006465; color:#9ed9d9; border-radius:8px; padding:5px 10px; font-size:0.65rem; cursor:pointer;">Ver más</button></div>
-            </div>`;
-            slideEl.classList.remove('oculto');
-        }, 260);
+                <h3 class="mobile-news-title">${serviceName}</h3>
+                <p class="mobile-news-desc">${message}</p>
 
-        mobileHistoryIdx = (mobileHistoryIdx + 1) % cio_logs.length;
+                <div class="mobile-news-tags">
+                    <span class="mobile-news-tag">${escapeNewsHtml(item.priority || 'Media')}</span>
+                    <span class="mobile-news-tag">Activa</span>
+                    <span class="mobile-news-tag">Sistema</span>
+                    ${intelligentTag}
+                </div>
+
+                <button class="mobile-news-main-action" onclick="openEntryMediaModal(${i})">Ver detalle</button>
+            </article>`;
+    }
+
+    function renderMobileHistorySlide() {
+        renderMobileHistoryFullList();
     }
 
     function renderMobileHistoryFullList() {
@@ -3927,20 +4177,12 @@ Euskaro
             return;
         }
 
-        const colors = {"Baja":"var(--online)", "Media":"var(--warning)", "Alta":"var(--orange)", "Crítica":"var(--critico)"};
-        slideEl.innerHTML = cio_logs.map((item, i) => {
-            const color = colors[item.priority] || "var(--accent)";
-            return `
-            <div class="history-card" style="border-left-color:${color} !important; margin-bottom:0 !important;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <span style="font-size:0.6rem; font-weight:900; color:${color}">${item.area.toUpperCase()}</span>
-                    <span style="font-size:0.6rem; opacity:0.4;">${getEntryDateLabel(item)} · ${item.time || '--:--'}</span>
-                </div>
-                <div style="font-weight:900; font-size:0.9rem; margin-bottom:5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">${item.title} ${item.intelligentState ? priorityChipMarkup({ key: item.intelligentState.toLowerCase(), label: item.intelligentState, color: 'var(--accent)' }) : ''}</div>
-                <div style="font-size:0.72rem; opacity:0.8; line-height:1.45;">${item.message}</div>
-                <div style="margin-top:10px; text-align:right;"><button onclick="openEntryMediaModal(${i})" style="background:none; border:1px solid #006465; color:#9ed9d9; border-radius:8px; padding:5px 10px; font-size:0.65rem; cursor:pointer;">Ver más</button></div>
-            </div>`;
-        }).join('');
+        const filteredEntries = getFilteredMobileNewsEntries();
+        if (!filteredEntries.length) {
+            slideEl.innerHTML = '<div class="history-empty">No hay novedades para los filtros seleccionados.</div>';
+            return;
+        }
+        slideEl.innerHTML = filteredEntries.map(({ item, index }) => renderMobileNewsCard(item, index)).join('');
     }
 
     function syncMobileHistoryMode() {
@@ -3951,16 +4193,9 @@ Euskaro
             return;
         }
 
-        if (currentMobileFilter === 'news') {
-            if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
-            mobileHistoryTimer = null;
-            renderMobileHistoryFullList();
-            return;
-        }
-
-        renderMobileHistorySlide();
         if (mobileHistoryTimer) clearInterval(mobileHistoryTimer);
-        mobileHistoryTimer = cio_logs.length ? setInterval(renderMobileHistorySlide, 20000) : null;
+        mobileHistoryTimer = null;
+        renderMobileHistoryFullList();
     }
 
     function renderHistory() {
@@ -4390,11 +4625,15 @@ Euskaro
 
     applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
     applyKpiBarVisibility();
+    loadServiceSpecifications();
+    renderServiceSpecsTicker();
+    renderServiceSpecsAdminList();
 
     window.addEventListener('resize', () => {
         applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
         updateTvPerformanceMode();
         refreshServiceOptions();
+        renderServiceSpecsTicker();
     setMobileSectionFilter(currentMobileFilter);
     });
     document.addEventListener('fullscreenchange', updateTvPerformanceMode);
@@ -4412,6 +4651,3 @@ Euskaro
 </script>
 </body>
 </html>
-
-
-
