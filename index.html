@@ -1971,14 +1971,6 @@
                 border: 1px solid rgba(148, 174, 196, 0.26);
                 box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.25);
             }
-            #cio-app .mobile-news-hub .mobile-news-device-top {
-                width: 38%;
-                height: 28px;
-                border-radius: 18px;
-                margin: 0 auto 10px;
-                background: linear-gradient(180deg, rgba(8,12,18,.95), rgba(3,4,8,.85));
-                box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
-            }
             #cio-app .mobile-news-hub .mobile-news-screen {
                 border-radius: 32px;
                 padding: 14px 12px 86px;
@@ -1999,42 +1991,6 @@
                 margin:0;
                 font-size: 1.32rem;
                 letter-spacing: .5px;
-            }
-            #cio-app .mobile-news-icon-btn {
-                position: absolute;
-                left: 0;
-                width: 36px;
-                height: 36px;
-                border-radius: 12px;
-                border: 1px solid rgba(120, 143, 166, 0.44);
-                background: rgba(10, 19, 31, 0.8);
-                color: #ddf6ff;
-                font-size: 1rem;
-            }
-            #cio-app .mobile-news-search-wrap {
-                margin-bottom: 12px;
-            }
-            #cio-app .mobile-news-search-input {
-                width: 100%;
-                padding: 10px 12px;
-                border-radius: 12px;
-                border: 1px solid rgba(87, 129, 149, 0.55);
-                background: rgba(6, 14, 24, 0.84);
-                color: #d4edff;
-                font-size: 0.72rem;
-                outline: none;
-            }
-            #cio-app .mobile-news-counter-pill {
-                display: inline-flex;
-                padding: 8px 14px;
-                border-radius: 999px;
-                background: rgba(0, 223, 252, 0.12);
-                border: 1px solid rgba(0, 233, 255, 0.45);
-                color: #90f8ff;
-                font-size: .73rem;
-                font-weight: 800;
-                letter-spacing: .6px;
-                margin-bottom: 12px;
             }
             #cio-app .mobile-news-action-row,
             #cio-app .mobile-news-filter-grid {
@@ -2315,17 +2271,10 @@
 
         <section class="mobile-only-section mobile-module mobile-filter-target mobile-news-hub" data-mobile-group="news">
             <div class="mobile-news-device">
-                <div class="mobile-news-device-top"></div>
                 <div class="mobile-news-screen">
                     <header class="mobile-news-header">
-                        <button id="mobileNewsSearchBtn" class="mobile-news-icon-btn" aria-label="Buscar" onclick="toggleMobileNewsSearch()">⌕</button>
                         <h2>Novedades</h2>
                     </header>
-                    <div class="mobile-news-search-wrap" id="mobileNewsSearchWrap" style="display:none;">
-                        <input id="mobileNewsSearchInput" class="mobile-news-search-input" type="search" placeholder="Buscar por servicio o texto..." oninput="applyMobileNewsControls()">
-                    </div>
-
-                    <div class="mobile-news-counter-pill">124 activas</div>
 
                     <div class="mobile-news-action-row">
                         <button id="mobileNewsFilterBtn" class="mobile-news-action-btn" onclick="cycleMobileNewsFilter()"><span>⎚</span>Filtrar</button>
@@ -2336,8 +2285,6 @@
                             <input id="mobileNewsServiceInput" type="text" placeholder="Servicio..." oninput="applyMobileNewsControls()">
                             <input id="mobileNewsDateFrom" type="date" onchange="applyMobileNewsControls()">
                             <input id="mobileNewsDateTo" type="date" onchange="applyMobileNewsControls()">
-                            <input id="mobileNewsTimeFrom" type="time" onchange="applyMobileNewsControls()">
-                            <input id="mobileNewsTimeTo" type="time" onchange="applyMobileNewsControls()">
                         </div>
                     </div>
 
@@ -4125,19 +4072,6 @@ Euskaro
             .replace(/'/g, '&#39;');
     }
 
-    function toggleMobileNewsSearch() {
-        const wrap = document.getElementById('mobileNewsSearchWrap');
-        const input = document.getElementById('mobileNewsSearchInput');
-        if (!wrap || !input) return;
-        const shouldOpen = wrap.style.display === 'none' || !wrap.style.display;
-        wrap.style.display = shouldOpen ? 'block' : 'none';
-        if (shouldOpen) input.focus();
-        if (!shouldOpen) {
-            input.value = '';
-            applyMobileNewsControls();
-        }
-    }
-
     function cycleMobileNewsFilter() {
         const fields = document.getElementById('mobileNewsFilterFields');
         if (!fields) return;
@@ -4149,13 +4083,9 @@ Euskaro
             const serviceInput = document.getElementById('mobileNewsServiceInput');
             const dateFromInput = document.getElementById('mobileNewsDateFrom');
             const dateToInput = document.getElementById('mobileNewsDateTo');
-            const timeFromInput = document.getElementById('mobileNewsTimeFrom');
-            const timeToInput = document.getElementById('mobileNewsTimeTo');
             if (serviceInput) serviceInput.value = '';
             if (dateFromInput) dateFromInput.value = '';
             if (dateToInput) dateToInput.value = '';
-            if (timeFromInput) timeFromInput.value = '';
-            if (timeToInput) timeToInput.value = '';
             applyMobileNewsControls();
         }
     }
@@ -4165,13 +4095,9 @@ Euskaro
     }
 
     function getFilteredMobileNewsEntries() {
-        const input = document.getElementById('mobileNewsSearchInput');
-        const query = normalizeServiceName(input?.value || '');
         const serviceQuery = normalizeServiceName(document.getElementById('mobileNewsServiceInput')?.value || '');
         const dateFrom = document.getElementById('mobileNewsDateFrom')?.value || '';
         const dateTo = document.getElementById('mobileNewsDateTo')?.value || '';
-        const timeFrom = document.getElementById('mobileNewsTimeFrom')?.value || '';
-        const timeTo = document.getElementById('mobileNewsTimeTo')?.value || '';
 
         const parseDateLabel = (label = '') => {
             const [dd, mm] = (label || '').split('/').map(Number);
@@ -4184,17 +4110,11 @@ Euskaro
             .map((item, index) => ({ item, index }))
             .filter(({ item }) => {
                 if (!item) return false;
-                const searchable = normalizeServiceName(`${item.service || item.title || ''} ${item.message || ''} ${item.area || ''}`);
-                if (query && !searchable.includes(query)) return false;
                 if (serviceQuery && !normalizeServiceName(item.service || item.title || '').includes(serviceQuery)) return false;
 
                 const itemDateISO = parseDateLabel(getEntryDateLabel(item));
                 if (dateFrom && itemDateISO && itemDateISO < dateFrom) return false;
                 if (dateTo && itemDateISO && itemDateISO > dateTo) return false;
-
-                const itemTime = (item.time || '').slice(0, 5);
-                if (timeFrom && itemTime && itemTime < timeFrom) return false;
-                if (timeTo && itemTime && itemTime > timeTo) return false;
                 return true;
             });
     }
