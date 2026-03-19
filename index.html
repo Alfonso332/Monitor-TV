@@ -1977,7 +1977,7 @@
                 margin-bottom: 12px;
             }
             #cio-app .mobile-news-action-row,
-            #cio-app .mobile-news-chip-row {
+            #cio-app .mobile-news-filter-grid {
                 display:flex;
                 gap: 8px;
                 overflow-x:auto;
@@ -1999,21 +1999,31 @@
                 justify-content:center;
                 gap:6px;
             }
-            #cio-app .mobile-news-chip {
-                padding: 7px 12px;
-                border-radius: 999px;
-                border: 1px solid rgba(97, 121, 143, 0.35);
-                background: rgba(7, 16, 27, 0.8);
-                color: #b6c9da;
-                font-size: .66rem;
-                font-weight: 700;
-                white-space: nowrap;
+            #cio-app .mobile-news-filter-fields {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 14px;
+                border: 1px solid rgba(82, 125, 151, 0.45);
+                background: rgba(10, 19, 30, 0.6);
             }
-            #cio-app .mobile-news-chip.active {
-                color:#042329;
-                background: linear-gradient(140deg, #63f5ff, #21cad7);
-                border-color: rgba(95, 244, 255, 0.9);
-                box-shadow: 0 4px 18px rgba(38, 221, 239, 0.35);
+            #cio-app .mobile-news-filter-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 0;
+            }
+            #cio-app .mobile-news-filter-grid input {
+                width: 100%;
+                padding: 9px 10px;
+                border-radius: 10px;
+                border: 1px solid rgba(105, 140, 165, 0.45);
+                background: rgba(6, 14, 24, 0.9);
+                color: #d4edff;
+                font-size: 0.69rem;
+                outline: none;
+            }
+            #cio-app .mobile-news-filter-grid input:first-child {
+                grid-column: 1 / -1;
             }
             #cio-app .mobile-news-list-window {
                 max-height: 56vh;
@@ -2087,7 +2097,6 @@
 
     <header class="main-header">
         <div style="display:flex; gap:8px;">
-            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⚙️</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
             <button onclick="openFeedbackModal()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">✉ Feedback</button>
         </div>
@@ -2257,14 +2266,14 @@
                         <button id="mobileNewsFilterBtn" class="mobile-news-action-btn" onclick="cycleMobileNewsFilter()"><span>⎚</span>Filtrar</button>
                         <button id="mobileNewsExportBtn" class="mobile-news-action-btn" onclick="exportMobileNews()"><span>⭳</span>Exportar</button>
                     </div>
-
-                    <div class="mobile-news-chip-row">
-                        <span class="mobile-news-chip active">Monitoreo</span>
-                        <span class="mobile-news-chip">CCTV</span>
-                        <span class="mobile-news-chip">Alarmas</span>
-                        <span class="mobile-news-chip">Portería</span>
-                        <span class="mobile-news-chip">Hoy</span>
-                        <span class="mobile-news-chip">Rango</span>
+                    <div id="mobileNewsFilterFields" class="mobile-news-filter-fields" style="display:none;">
+                        <div class="mobile-news-filter-grid">
+                            <input id="mobileNewsServiceInput" type="text" placeholder="Servicio..." oninput="applyMobileNewsControls()">
+                            <input id="mobileNewsDateFrom" type="date" onchange="applyMobileNewsControls()">
+                            <input id="mobileNewsDateTo" type="date" onchange="applyMobileNewsControls()">
+                            <input id="mobileNewsTimeFrom" type="time" onchange="applyMobileNewsControls()">
+                            <input id="mobileNewsTimeTo" type="time" onchange="applyMobileNewsControls()">
+                        </div>
                     </div>
 
                     <div id="historyMobileWindow" class="mobile-news-list-window">
@@ -2367,17 +2376,6 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
-        <div id="pc-only-controls" style="background:#1a1a1a; padding:15px; border-radius:12px; margin-bottom:20px;">
-            <label style="color:var(--primary); font-size:0.7rem; font-weight:bold; display:block; text-align:center;">MÉTRICAS</label>
-            <div style="display:flex; gap:10px; margin:10px 0;">
-                <input type="number" id="in-sla" class="p-field" placeholder="SLA %">
-                <input type="number" id="in-calls" class="p-field" placeholder="Llamadas">
-                <input type="number" id="in-agents" class="p-field" placeholder="Agentes activos">
-            </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;" id="p-inputs-grid"></div>
-            <div style="opacity:0.65; font-size:0.62rem; text-align:center; margin-top:6px;">Cada tarjeta incluye LLAMADAS y tiempo de respuesta &lt;5s por puesto.</div>
-            <button onclick="saveKPIs()" class="btn-pill" style="margin-top:15px; border-radius: 8px;">GUARDAR CAMBIOS</button>
-        </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
         <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
         <div class="mobile-section-header">Novedades Recientes</div>
@@ -2439,7 +2437,6 @@
     let syncInProgress = false;
     let puestoSlaData = {};
     let currentMobileFilter = 'all';
-    let mobileNewsFilterMode = 'all';
     let feedbackEntries = [];
     let feedbackAuthorized = false;
     let previousServiceStatuses = {};
@@ -3041,16 +3038,6 @@ Euskaro
         }, {passive: true});
     });
 
-    const pGrid = document.getElementById('p-inputs-grid');
-    for(let i=1; i<=9; i++) {
-        pGrid.innerHTML += `
-            <div style="background:#141414; border:1px solid #2a2a2a; border-radius:10px; padding:8px;">
-                <div style="font-size:0.6rem; opacity:0.72; margin-bottom:6px; text-align:center;">P${i}</div>
-                <input type="number" id="inp-p${i}" class="p-field" placeholder="Llamadas" style="margin-bottom:6px; padding:8px;">
-                <input type="number" id="inp-sla-p${i}" class="p-field" placeholder="Tiempo (segundos)" style="margin-bottom:0; padding:8px;">
-            </div>`;
-    }
-
     function formatPuestoSeconds(value) {
         const safeValue = Math.max(0, Number(value) || 0);
         const trimmed = Number.isInteger(safeValue) ? safeValue : safeValue.toFixed(1);
@@ -3482,17 +3469,6 @@ Euskaro
                 renderPuestos(dK.puestos, puestoSlaData);
                 prevSLA = sla;
 
-                if(document.getElementById('panelHistory').classList.contains('active')) {
-                    if(!document.getElementById('in-sla').value) document.getElementById('in-sla').value = dK.sla;
-                    if(!document.getElementById('in-calls').value) document.getElementById('in-calls').value = dK.calls;
-                    if(!document.getElementById('in-agents').value) document.getElementById('in-agents').value = dK.agents || 0;
-                    for(let i=1; i<=9; i++) {
-                        let pInp = document.getElementById(`inp-p${i}`);
-                        if(!pInp.value) pInp.value = dK.puestos[`p${i}`] || 0;
-                        let slaInp = document.getElementById(`inp-sla-p${i}`);
-                        if(slaInp && !slaInp.value) slaInp.value = puestoSlaData[`p${i}`] || 0;
-                    }
-                }
             }
 
             const rE = await fetch(DB_URL, { cache: 'no-store' });
@@ -3770,24 +3746,6 @@ Euskaro
         }
     }
 
-    async function saveKPIs() {
-        const kpiData = {
-            sla: document.getElementById('in-sla').value || 0,
-            calls: document.getElementById('in-calls').value || 0,
-            agents: document.getElementById('in-agents').value || 0,
-            puestos: {},
-            puestosSla: {}
-        };
-        for(let i=1; i<=9; i++) {
-            kpiData.puestos[`p${i}`] = document.getElementById(`inp-p${i}`).value || 0;
-            kpiData.puestosSla[`p${i}`] = document.getElementById(`inp-sla-p${i}`).value || 0;
-        }
-        try {
-            await fetch(KPI_URL, { method: 'PUT', body: JSON.stringify(kpiData) });
-            syncData();
-        } catch(e) { console.error("Error al guardar:", e); }
-    }
-
     function updateMobileSLA(val) {
         const circle = document.getElementById('m-sla-circle');
         const textVal = document.getElementById('m-sla-val');
@@ -3939,20 +3897,25 @@ Euskaro
     }
 
     function cycleMobileNewsFilter() {
-        const flow = ['all', 'critica', 'media', 'alta'];
-        const idx = flow.indexOf(mobileNewsFilterMode);
-        mobileNewsFilterMode = flow[(idx + 1) % flow.length];
+        const fields = document.getElementById('mobileNewsFilterFields');
+        if (!fields) return;
+        const show = fields.style.display === 'none' || !fields.style.display;
+        fields.style.display = show ? 'block' : 'none';
         const btn = document.getElementById('mobileNewsFilterBtn');
-        if (btn) {
-            const labelMap = {
-                all: 'Filtrar',
-                critica: 'Críticas',
-                media: 'Media',
-                alta: 'Alta'
-            };
-            btn.innerHTML = `<span>⎚</span>${labelMap[mobileNewsFilterMode] || 'Filtrar'}`;
+        if (btn) btn.innerHTML = show ? '<span>⎚</span>Ocultar filtros' : '<span>⎚</span>Filtrar';
+        if (!show) {
+            const serviceInput = document.getElementById('mobileNewsServiceInput');
+            const dateFromInput = document.getElementById('mobileNewsDateFrom');
+            const dateToInput = document.getElementById('mobileNewsDateTo');
+            const timeFromInput = document.getElementById('mobileNewsTimeFrom');
+            const timeToInput = document.getElementById('mobileNewsTimeTo');
+            if (serviceInput) serviceInput.value = '';
+            if (dateFromInput) dateFromInput.value = '';
+            if (dateToInput) dateToInput.value = '';
+            if (timeFromInput) timeFromInput.value = '';
+            if (timeToInput) timeToInput.value = '';
+            applyMobileNewsControls();
         }
-        applyMobileNewsControls();
     }
 
     function exportMobileNews() {
@@ -3962,18 +3925,35 @@ Euskaro
     function getFilteredMobileNewsEntries() {
         const input = document.getElementById('mobileNewsSearchInput');
         const query = normalizeServiceName(input?.value || '');
+        const serviceQuery = normalizeServiceName(document.getElementById('mobileNewsServiceInput')?.value || '');
+        const dateFrom = document.getElementById('mobileNewsDateFrom')?.value || '';
+        const dateTo = document.getElementById('mobileNewsDateTo')?.value || '';
+        const timeFrom = document.getElementById('mobileNewsTimeFrom')?.value || '';
+        const timeTo = document.getElementById('mobileNewsTimeTo')?.value || '';
+
+        const parseDateLabel = (label = '') => {
+            const [dd, mm] = (label || '').split('/').map(Number);
+            if (!dd || !mm) return '';
+            const year = new Date().getFullYear();
+            return `${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+        };
+
         return cio_logs
             .map((item, index) => ({ item, index }))
             .filter(({ item }) => {
                 if (!item) return false;
-                const priority = normalizeServiceName(item.priority || '');
-                if (mobileNewsFilterMode === 'critica' && priority !== 'critica') return false;
-                if (mobileNewsFilterMode === 'media' && priority !== 'media') return false;
-                if (mobileNewsFilterMode === 'alta' && priority !== 'alta') return false;
-
-                if (!query) return true;
                 const searchable = normalizeServiceName(`${item.service || item.title || ''} ${item.message || ''} ${item.area || ''}`);
-                return searchable.includes(query);
+                if (query && !searchable.includes(query)) return false;
+                if (serviceQuery && !normalizeServiceName(item.service || item.title || '').includes(serviceQuery)) return false;
+
+                const itemDateISO = parseDateLabel(getEntryDateLabel(item));
+                if (dateFrom && itemDateISO && itemDateISO < dateFrom) return false;
+                if (dateTo && itemDateISO && itemDateISO > dateTo) return false;
+
+                const itemTime = (item.time || '').slice(0, 5);
+                if (timeFrom && itemTime && itemTime < timeFrom) return false;
+                if (timeTo && itemTime && itemTime > timeTo) return false;
+                return true;
             });
     }
 
