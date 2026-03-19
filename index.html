@@ -208,29 +208,32 @@
             gap: 10px;
         }
         #cio-app .service-specs-ticker-bar {
-            height: 34px;
+            height: 124px;
+            min-height: 124px;
             border-top: 1px solid rgba(62, 134, 138, 0.45);
             border-bottom: 1px solid rgba(62, 134, 138, 0.28);
-            background: linear-gradient(90deg, rgba(7,18,20,0.96), rgba(4,11,13,0.95));
+            background: linear-gradient(180deg, #010405 0%, #071112 100%);
             display: flex;
             align-items: center;
             overflow: hidden;
             position: relative;
-            padding: 0 10px;
+            padding: 10px 14px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 -8px 28px rgba(0,0,0,0.35);
         }
         #cio-app .service-specs-ticker-track {
             display: inline-flex;
             align-items: center;
             gap: 10px;
             white-space: nowrap;
-            animation: serviceSpecsMarquee 26s linear infinite;
+            animation: none;
             will-change: transform;
+            transform: translateX(0);
         }
         #cio-app .service-specs-pill {
             border: 1px solid rgba(78, 161, 166, 0.52);
             border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.66rem;
+            padding: 9px 14px;
+            font-size: 0.9rem;
             color: #c9f9f9;
             background: rgba(8, 25, 27, 0.9);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
@@ -239,9 +242,9 @@
             color: #7dffff;
             margin-right: 4px;
         }
-        @keyframes serviceSpecsMarquee {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
+        @keyframes serviceSpecsCycle {
+            from { transform: translateX(100%); }
+            to { transform: translateX(calc(-1 * var(--specs-track-width, 100%))); }
         }
         #cio-app #ticker-bar.ticker-compact-ok .ticker-row {
             display: none !important;
@@ -2808,18 +2811,29 @@ Euskaro
     }
 
     function renderServiceSpecsTicker() {
+        const tickerBar = document.getElementById('serviceSpecsTickerBar');
         const track = document.getElementById('serviceSpecsTickerTrack');
-        if (!track) return;
+        if (!track || !tickerBar) return;
         if (!serviceSpecifications.length) {
             track.style.animation = 'none';
+            track.style.transform = 'translateX(0)';
             track.innerHTML = '<span class="service-specs-pill"><strong>ESPECIFICACIONES</strong>Sin especificaciones cargadas</span>';
             return;
         }
         const chips = serviceSpecifications.map(item =>
             `<span class="service-specs-pill"><strong>${escapeNewsHtml(item.service)}</strong>${escapeNewsHtml(item.note)}</span>`
         ).join('');
-        track.style.animation = '';
-        track.innerHTML = `${chips}${chips}`;
+        track.innerHTML = chips;
+        requestAnimationFrame(() => {
+            const trackWidth = track.scrollWidth;
+            tickerBar.style.setProperty('--specs-track-width', `${trackWidth}px`);
+            const duration = Math.max(16, Math.round(trackWidth / 65));
+            track.style.animation = 'none';
+            track.style.transform = 'translateX(100%)';
+            requestAnimationFrame(() => {
+                track.style.animation = `serviceSpecsCycle ${duration}s linear infinite`;
+            });
+        });
     }
 
     function renderServiceSpecsAdminList() {
@@ -4602,6 +4616,7 @@ Euskaro
         applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
         updateTvPerformanceMode();
         refreshServiceOptions();
+        renderServiceSpecsTicker();
     setMobileSectionFilter(currentMobileFilter);
     });
     document.addEventListener('fullscreenchange', updateTvPerformanceMode);
