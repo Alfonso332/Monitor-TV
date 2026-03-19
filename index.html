@@ -208,8 +208,8 @@
             gap: 10px;
         }
         #cio-app .service-specs-ticker-bar {
-            height: 124px;
-            min-height: 124px;
+            height: 68px;
+            min-height: 68px;
             border-top: 1px solid rgba(62, 134, 138, 0.45);
             border-bottom: 1px solid rgba(62, 134, 138, 0.28);
             background: linear-gradient(180deg, #010405 0%, #071112 100%);
@@ -217,7 +217,7 @@
             align-items: center;
             overflow: hidden;
             position: relative;
-            padding: 10px 14px;
+            padding: 8px 12px;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 -8px 28px rgba(0,0,0,0.35);
         }
         #cio-app .service-specs-ticker-track {
@@ -225,8 +225,9 @@
             align-items: center;
             gap: 10px;
             white-space: nowrap;
-            animation: none;
             will-change: transform;
+            position: absolute;
+            left: 0;
             transform: translateX(0);
         }
         #cio-app .service-specs-pill {
@@ -241,10 +242,6 @@
         #cio-app .service-specs-pill strong {
             color: #7dffff;
             margin-right: 4px;
-        }
-        @keyframes serviceSpecsCycle {
-            from { transform: translateX(100%); }
-            to { transform: translateX(calc(-1 * var(--specs-track-width, 100%))); }
         }
         #cio-app #ticker-bar.ticker-compact-ok .ticker-row {
             display: none !important;
@@ -2766,6 +2763,8 @@ Euskaro
     const SERVICE_SPECS_KEY = 'cio-service-specs-v1';
     let mobileFavorites = new Set(JSON.parse(localStorage.getItem(MOBILE_FAVORITES_KEY) || '[]'));
     let serviceSpecifications = [];
+    let serviceSpecsTickerAnimFrame = null;
+    let serviceSpecsTickerLastTs = 0;
 
     function getServicePriorityMeta({ fallos = 0, isOffline = false, hasCameraOffline = false }) {
         if (isOffline || Number(fallos) >= 5) return { key: 'critico', label: 'CRÍTICO', color: '#ff4d4d' };
@@ -2814,8 +2813,11 @@ Euskaro
         const tickerBar = document.getElementById('serviceSpecsTickerBar');
         const track = document.getElementById('serviceSpecsTickerTrack');
         if (!track || !tickerBar) return;
+        if (serviceSpecsTickerAnimFrame) cancelAnimationFrame(serviceSpecsTickerAnimFrame);
+        serviceSpecsTickerAnimFrame = null;
+        serviceSpecsTickerLastTs = 0;
+
         if (!serviceSpecifications.length) {
-            track.style.animation = 'none';
             track.style.transform = 'translateX(0)';
             track.innerHTML = '<span class="service-specs-pill"><strong>ESPECIFICACIONES</strong>Sin especificaciones cargadas</span>';
             return;
@@ -2824,16 +2826,31 @@ Euskaro
             `<span class="service-specs-pill"><strong>${escapeNewsHtml(item.service)}</strong>${escapeNewsHtml(item.note)}</span>`
         ).join('');
         track.innerHTML = chips;
-        requestAnimationFrame(() => {
-            const trackWidth = track.scrollWidth;
-            tickerBar.style.setProperty('--specs-track-width', `${trackWidth}px`);
-            const duration = Math.max(16, Math.round(trackWidth / 65));
-            track.style.animation = 'none';
-            track.style.transform = 'translateX(100%)';
-            requestAnimationFrame(() => {
-                track.style.animation = `serviceSpecsCycle ${duration}s linear infinite`;
-            });
-        });
+        track.dataset.x = String(tickerBar.clientWidth);
+        track.style.transform = `translateX(${tickerBar.clientWidth}px)`;
+        requestAnimationFrame(startServiceSpecsTickerMotion);
+    }
+
+    function startServiceSpecsTickerMotion(timestamp = 0) {
+        const tickerBar = document.getElementById('serviceSpecsTickerBar');
+        const track = document.getElementById('serviceSpecsTickerTrack');
+        if (!tickerBar || !track || !serviceSpecifications.length) return;
+
+        const trackWidth = track.scrollWidth;
+        const barWidth = tickerBar.clientWidth;
+        let currentX = Number(track.dataset.x || barWidth);
+
+        if (!serviceSpecsTickerLastTs) serviceSpecsTickerLastTs = timestamp;
+        const delta = Math.max(0, timestamp - serviceSpecsTickerLastTs);
+        serviceSpecsTickerLastTs = timestamp;
+
+        const speed = 0.065; // px por ms
+        currentX -= delta * speed;
+        if (currentX <= -trackWidth) currentX = barWidth;
+
+        track.dataset.x = String(currentX);
+        track.style.transform = `translateX(${currentX}px)`;
+        serviceSpecsTickerAnimFrame = requestAnimationFrame(startServiceSpecsTickerMotion);
     }
 
     function renderServiceSpecsAdminList() {
