@@ -2765,6 +2765,7 @@ Euskaro
     let serviceSpecifications = [];
     let serviceSpecsTickerAnimFrame = null;
     let serviceSpecsTickerLastTs = 0;
+    let serviceSpecsSignature = '';
 
     function getServicePriorityMeta({ fallos = 0, isOffline = false, hasCameraOffline = false }) {
         if (isOffline || Number(fallos) >= 5) return { key: 'critico', label: 'CRÍTICO', color: '#ff4d4d' };
@@ -2811,14 +2812,29 @@ Euskaro
             .slice(0, 80);
     }
 
+    function getServiceSpecsSignature(list = []) {
+        return JSON.stringify((list || []).map(item => ({
+            service: item.service,
+            note: item.note,
+            createdAt: Number(item.createdAt || 0)
+        })));
+    }
+
     async function loadServiceSpecifications() {
         try {
             const res = await fetch(SERVICE_SPECS_URL, { cache: 'no-store' });
             const data = await res.json();
-            serviceSpecifications = normalizeServiceSpecsPayload(data);
+            const normalized = normalizeServiceSpecsPayload(data);
+            const nextSignature = getServiceSpecsSignature(normalized);
+            const hasChanges = nextSignature !== serviceSpecsSignature;
+            if (hasChanges) {
+                serviceSpecifications = normalized;
+                serviceSpecsSignature = nextSignature;
+            }
+            return hasChanges;
         } catch (error) {
             console.error('No se pudieron cargar especificaciones de servicios:', error);
-            serviceSpecifications = [];
+            return false;
         }
     }
 
@@ -2907,6 +2923,7 @@ Euskaro
         }
         serviceSpecifications.unshift({ service, note, createdAt: Date.now() });
         serviceSpecifications = serviceSpecifications.slice(0, 80);
+        serviceSpecsSignature = getServiceSpecsSignature(serviceSpecifications);
         serviceInput.value = '';
         noteInput.value = '';
         await persistServiceSpecifications();
@@ -2917,6 +2934,7 @@ Euskaro
 
     async function removeServiceSpecification(index) {
         serviceSpecifications.splice(index, 1);
+        serviceSpecsSignature = getServiceSpecsSignature(serviceSpecifications);
         await persistServiceSpecifications();
         await loadServiceSpecifications();
         renderServiceSpecsAdminList();
@@ -3654,9 +3672,11 @@ Euskaro
         syncInProgress = true;
         setSyncIndicator(true);
         try {
-            await loadServiceSpecifications();
-            renderServiceSpecsTicker();
-            renderServiceSpecsAdminList();
+            const serviceSpecsChanged = await loadServiceSpecifications();
+            if (serviceSpecsChanged) {
+                renderServiceSpecsTicker();
+                renderServiceSpecsAdminList();
+            }
 
             updateShift();
             const rK = await fetch(KPI_URL);
