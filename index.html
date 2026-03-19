@@ -207,6 +207,42 @@
             padding: 10px 14px;
             gap: 10px;
         }
+        #cio-app .service-specs-ticker-bar {
+            height: 34px;
+            border-top: 1px solid rgba(62, 134, 138, 0.45);
+            border-bottom: 1px solid rgba(62, 134, 138, 0.28);
+            background: linear-gradient(90deg, rgba(7,18,20,0.96), rgba(4,11,13,0.95));
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 0 10px;
+        }
+        #cio-app .service-specs-ticker-track {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            animation: serviceSpecsMarquee 26s linear infinite;
+            will-change: transform;
+        }
+        #cio-app .service-specs-pill {
+            border: 1px solid rgba(78, 161, 166, 0.52);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.66rem;
+            color: #c9f9f9;
+            background: rgba(8, 25, 27, 0.9);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        #cio-app .service-specs-pill strong {
+            color: #7dffff;
+            margin-right: 4px;
+        }
+        @keyframes serviceSpecsMarquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
         #cio-app #ticker-bar.ticker-compact-ok .ticker-row {
             display: none !important;
         }
@@ -406,6 +442,30 @@
             background: #1a1a1a; border: 1px solid #333; padding: 12px; color: white;
             border-radius: 8px; width: 100%; margin-bottom: 15px; outline: none; font-size: 16px;
             text-align: center; display: block; margin-left: auto; margin-right: auto;
+        }
+        #cio-app .service-specs-admin {
+            background:#131313;
+            border:1px solid #2b3b3c;
+            border-radius:12px;
+            padding:12px;
+            margin-bottom:14px;
+        }
+        #cio-app .service-specs-admin textarea { text-align:left; resize: vertical; min-height: 66px; }
+        #cio-app .service-specs-admin-list {
+            max-height: 170px;
+            overflow:auto;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            margin-top:10px;
+        }
+        #cio-app .service-specs-admin-item {
+            background:#0a1011;
+            border:1px solid #224144;
+            border-radius:10px;
+            padding:8px;
+            font-size:0.7rem;
+            line-height:1.35;
         }
 
         #cio-app .image-dropzone {
@@ -2097,6 +2157,7 @@
 
     <header class="main-header">
         <div style="display:flex; gap:8px;">
+            <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">＋ Novedad</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
             <button onclick="openFeedbackModal()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">✉ Feedback</button>
         </div>
@@ -2114,6 +2175,10 @@
             <span id="v-calls" class="kpi-value">0</span>
         </div>
         <div class="puestos-container" id="puestos-display"></div>
+    </div>
+
+    <div id="serviceSpecsTickerBar" class="service-specs-ticker-bar" aria-live="polite">
+        <div class="service-specs-ticker-track" id="serviceSpecsTickerTrack"></div>
     </div>
 
     <main id="display-board">
@@ -2376,6 +2441,13 @@
 
     <aside id="panelHistory" class="side-panel">
         <h2 style="color:var(--accent); text-align:center; margin-bottom:20px;">SISTEMA</h2>
+        <div class="service-specs-admin">
+            <div style="font-size:0.72rem; letter-spacing:0.8px; opacity:0.9; margin-bottom:8px;">ESPECIFICACIONES DE SERVICIOS</div>
+            <input id="specServiceInput" class="p-field" placeholder="Servicio (ej: Lift Monterroso)">
+            <textarea id="specNoteInput" class="p-field" rows="3" placeholder="Observación especial..."></textarea>
+            <button onclick="addServiceSpecification()" class="btn-pill btn-sec" style="border-radius:10px;">Agregar especificación</button>
+            <div id="serviceSpecsAdminList" class="service-specs-admin-list"></div>
+        </div>
         <button onclick="openForm(null)" class="btn-pill" id="btn-nueva-novedad" style="background:var(--online); color:#000; border-radius: 8px;">＋ NUEVA NOVEDAD</button>
         <button onclick="downloadPDF()" class="btn-pill btn-sec" style="border-radius: 8px;">⬇ DESCARGAR PDF</button>
         <div class="mobile-section-header">Novedades Recientes</div>
@@ -2688,7 +2760,9 @@ Euskaro
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
     const preventiveAlertTracker = {};
     const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
+    const SERVICE_SPECS_KEY = 'cio-service-specs-v1';
     let mobileFavorites = new Set(JSON.parse(localStorage.getItem(MOBILE_FAVORITES_KEY) || '[]'));
+    let serviceSpecifications = [];
 
     function getServicePriorityMeta({ fallos = 0, isOffline = false, hasCameraOffline = false }) {
         if (isOffline || Number(fallos) >= 5) return { key: 'critico', label: 'CRÍTICO', color: '#ff4d4d' };
@@ -2718,6 +2792,78 @@ Euskaro
 
     function persistMobileFavorites() {
         localStorage.setItem(MOBILE_FAVORITES_KEY, JSON.stringify(Array.from(mobileFavorites)));
+    }
+
+    function loadServiceSpecifications() {
+        try {
+            const parsed = JSON.parse(localStorage.getItem(SERVICE_SPECS_KEY) || '[]');
+            serviceSpecifications = Array.isArray(parsed) ? parsed.filter(item => item?.service && item?.note) : [];
+        } catch (_) {
+            serviceSpecifications = [];
+        }
+    }
+
+    function persistServiceSpecifications() {
+        localStorage.setItem(SERVICE_SPECS_KEY, JSON.stringify(serviceSpecifications.slice(0, 80)));
+    }
+
+    function renderServiceSpecsTicker() {
+        const track = document.getElementById('serviceSpecsTickerTrack');
+        if (!track) return;
+        if (!serviceSpecifications.length) {
+            track.style.animation = 'none';
+            track.innerHTML = '<span class="service-specs-pill"><strong>ESPECIFICACIONES</strong>Sin especificaciones cargadas</span>';
+            return;
+        }
+        const chips = serviceSpecifications.map(item =>
+            `<span class="service-specs-pill"><strong>${escapeNewsHtml(item.service)}</strong>${escapeNewsHtml(item.note)}</span>`
+        ).join('');
+        track.style.animation = '';
+        track.innerHTML = `${chips}${chips}`;
+    }
+
+    function renderServiceSpecsAdminList() {
+        const list = document.getElementById('serviceSpecsAdminList');
+        if (!list) return;
+        if (!serviceSpecifications.length) {
+            list.innerHTML = '<div style="opacity:0.65; font-size:0.68rem;">Sin especificaciones cargadas.</div>';
+            return;
+        }
+        list.innerHTML = serviceSpecifications.map((item, idx) => `
+            <div class="service-specs-admin-item">
+                <div style="display:flex; justify-content:space-between; gap:8px; align-items:center;">
+                    <strong style="color:#91ffff;">${escapeNewsHtml(item.service)}</strong>
+                    <button onclick="removeServiceSpecification(${idx})" style="background:none; border:none; color:#ff8f8f; font-size:0.65rem; cursor:pointer;">Eliminar</button>
+                </div>
+                <div style="margin-top:4px; opacity:0.92;">${escapeNewsHtml(item.note)}</div>
+            </div>
+        `).join('');
+    }
+
+    function addServiceSpecification() {
+        const serviceInput = document.getElementById('specServiceInput');
+        const noteInput = document.getElementById('specNoteInput');
+        if (!serviceInput || !noteInput) return;
+        const service = (serviceInput.value || '').trim();
+        const note = (noteInput.value || '').trim();
+        if (!service || !note) {
+            alert('Completá servicio y observación.');
+            return;
+        }
+        serviceSpecifications.unshift({ service, note, createdAt: Date.now() });
+        serviceSpecifications = serviceSpecifications.slice(0, 80);
+        serviceInput.value = '';
+        noteInput.value = '';
+        persistServiceSpecifications();
+        renderServiceSpecsAdminList();
+        renderServiceSpecsTicker();
+    }
+
+    function removeServiceSpecification(index) {
+        serviceSpecifications.splice(index, 1);
+        persistServiceSpecifications();
+        renderServiceSpecsAdminList();
+        renderServiceSpecsTicker();
     }
 
     function toggleServiceFavorite(rawName) {
@@ -4448,6 +4594,9 @@ Euskaro
 
     applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
     applyKpiBarVisibility();
+    loadServiceSpecifications();
+    renderServiceSpecsTicker();
+    renderServiceSpecsAdminList();
 
     window.addEventListener('resize', () => {
         applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
