@@ -2496,6 +2496,7 @@
     const RED_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/estatus_red.json";
     const KPI_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/kpis_v2.json";
     const FEEDBACK_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/feedback_mobile.json";
+    const SERVICE_SPECS_URL = "https://monitor-tv-3745c-default-rtdb.firebaseio.com/service_specs.json";
     const SHOW_KPI_BAR = false; // Toggle rápido para volver a mostrar la barra cuando se normalicen los datos.
 
     let cio_logs = [], currentIdx = 0, startTime = null;
@@ -2760,7 +2761,6 @@ Euskaro
     const PREVENTIVE_ALERT_COOLDOWN_MS = 8 * 60 * 1000;
     const preventiveAlertTracker = {};
     const MOBILE_FAVORITES_KEY = 'cio-mobile-favorites';
-    const SERVICE_SPECS_KEY = 'cio-service-specs-v1';
     let mobileFavorites = new Set(JSON.parse(localStorage.getItem(MOBILE_FAVORITES_KEY) || '[]'));
     let serviceSpecifications = [];
     let serviceSpecsTickerAnimFrame = null;
@@ -2796,17 +2796,41 @@ Euskaro
         localStorage.setItem(MOBILE_FAVORITES_KEY, JSON.stringify(Array.from(mobileFavorites)));
     }
 
-    function loadServiceSpecifications() {
+    function normalizeServiceSpecsPayload(payload) {
+        if (!payload) return [];
+        const list = Array.isArray(payload) ? payload : Object.values(payload);
+        return list
+            .filter(item => item?.service && item?.note)
+            .map(item => ({
+                service: String(item.service).trim(),
+                note: String(item.note).trim(),
+                createdAt: Number(item.createdAt || Date.now())
+            }))
+            .filter(item => item.service && item.note)
+            .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0))
+            .slice(0, 80);
+    }
+
+    async function loadServiceSpecifications() {
         try {
-            const parsed = JSON.parse(localStorage.getItem(SERVICE_SPECS_KEY) || '[]');
-            serviceSpecifications = Array.isArray(parsed) ? parsed.filter(item => item?.service && item?.note) : [];
-        } catch (_) {
+            const res = await fetch(SERVICE_SPECS_URL, { cache: 'no-store' });
+            const data = await res.json();
+            serviceSpecifications = normalizeServiceSpecsPayload(data);
+        } catch (error) {
+            console.error('No se pudieron cargar especificaciones de servicios:', error);
             serviceSpecifications = [];
         }
     }
 
-    function persistServiceSpecifications() {
-        localStorage.setItem(SERVICE_SPECS_KEY, JSON.stringify(serviceSpecifications.slice(0, 80)));
+    async function persistServiceSpecifications() {
+        try {
+            await fetch(SERVICE_SPECS_URL, {
+                method: 'PUT',
+                body: JSON.stringify(serviceSpecifications.slice(0, 80))
+            });
+        } catch (error) {
+            console.error('No se pudieron guardar especificaciones de servicios:', error);
+        }
     }
 
     function renderServiceSpecsTicker() {
@@ -2871,7 +2895,7 @@ Euskaro
         `).join('');
     }
 
-    function addServiceSpecification() {
+    async function addServiceSpecification() {
         const serviceInput = document.getElementById('specServiceInput');
         const noteInput = document.getElementById('specNoteInput');
         if (!serviceInput || !noteInput) return;
@@ -2885,14 +2909,16 @@ Euskaro
         serviceSpecifications = serviceSpecifications.slice(0, 80);
         serviceInput.value = '';
         noteInput.value = '';
-        persistServiceSpecifications();
+        await persistServiceSpecifications();
+        await loadServiceSpecifications();
         renderServiceSpecsAdminList();
         renderServiceSpecsTicker();
     }
 
-    function removeServiceSpecification(index) {
+    async function removeServiceSpecification(index) {
         serviceSpecifications.splice(index, 1);
-        persistServiceSpecifications();
+        await persistServiceSpecifications();
+        await loadServiceSpecifications();
         renderServiceSpecsAdminList();
         renderServiceSpecsTicker();
     }
@@ -3628,6 +3654,10 @@ Euskaro
         syncInProgress = true;
         setSyncIndicator(true);
         try {
+            await loadServiceSpecifications();
+            renderServiceSpecsTicker();
+            renderServiceSpecsAdminList();
+
             updateShift();
             const rK = await fetch(KPI_URL);
             const dK = await rK.json();
@@ -4625,7 +4655,6 @@ Euskaro
 
     applyMobileTheme(localStorage.getItem(MOBILE_THEME_KEY) || 'dark');
     applyKpiBarVisibility();
-    loadServiceSpecifications();
     renderServiceSpecsTicker();
     renderServiceSpecsAdminList();
 
