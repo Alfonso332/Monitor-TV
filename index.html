@@ -436,6 +436,44 @@
             overflow-y: auto;
         }
         #cio-app .side-panel.active { transform: translateX(0); }
+        #cio-app .kpi-browser-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 8, 12, 0.98);
+            z-index: 10250;
+            display: none;
+            flex-direction: column;
+        }
+        #cio-app .kpi-browser-modal.active { display: flex; }
+        #cio-app .kpi-browser-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(0, 209, 209, 0.3);
+            background: #040b0f;
+        }
+        #cio-app .kpi-browser-title {
+            font-size: 0.74rem;
+            font-weight: 900;
+            letter-spacing: 0.9px;
+            color: #98ffff;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #cio-app .kpi-browser-frame-wrap {
+            flex: 1;
+            min-height: 0;
+        }
+        #cio-app .kpi-browser-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+        }
        
         /* FORMULARIOS Y BOTONES CENTRADOS */
         #cio-app .p-field {
@@ -2114,6 +2152,7 @@
     <header class="main-header">
         <div style="display:flex; gap:8px;">
             <button onclick="openPanel('panelHistory')" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">＋ Novedad</button>
+            <button onclick="openKpiBrowser()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">KPI´s</button>
             <button onclick="toggleFS()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">⛶ TV</button>
             <button onclick="openFeedbackModal()" class="btn-pill btn-sec" style="width:auto; padding:8px 12px; margin:0; font-size:0.7rem;">✉ Feedback</button>
         </div>
@@ -2178,6 +2217,16 @@
             </div>
         </div>
         <div id="tickerOkMessage" class="ticker-ok-message">✔ Infraestructura OK · sin incidentes</div>
+    </div>
+
+    <div id="kpiBrowserModal" class="kpi-browser-modal" aria-hidden="true">
+        <div class="kpi-browser-header">
+            <div class="kpi-browser-title">KPI´s · qmetrics.netsolutions.uy</div>
+            <button onclick="closeKpiBrowser()" class="btn-pill btn-sec" style="width:auto; margin:0; padding:8px 12px; font-size:0.66rem;">Cerrar</button>
+        </div>
+        <div class="kpi-browser-frame-wrap">
+            <iframe id="kpiBrowserFrame" class="kpi-browser-frame" title="Panel KPI´s" loading="lazy" referrerpolicy="no-referrer" src="about:blank"></iframe>
+        </div>
     </div>
 
     <aside id="panelMobileDash" class="side-panel">
@@ -4220,6 +4269,25 @@ Euskaro
         document.getElementById('cio-overlay').style.display = 'none';
     }
 
+    function openKpiBrowser() {
+        const modalEl = document.getElementById('kpiBrowserModal');
+        const frameEl = document.getElementById('kpiBrowserFrame');
+        if (!modalEl || !frameEl) return;
+        if (!frameEl.dataset.loaded) {
+            frameEl.src = 'https://qmetrics.netsolutions.uy/menu/';
+            frameEl.dataset.loaded = 'true';
+        }
+        modalEl.classList.add('active');
+        modalEl.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeKpiBrowser() {
+        const modalEl = document.getElementById('kpiBrowserModal');
+        if (!modalEl) return;
+        modalEl.classList.remove('active');
+        modalEl.setAttribute('aria-hidden', 'true');
+    }
+
     function toggleScrollTopButton() {
         const btn = document.getElementById('scrollTopMobile');
         const panel = document.getElementById('panelMobileDash');
@@ -4597,6 +4665,10 @@ Euskaro
         const entryMediaModalEl = document.getElementById('entryMediaModal');
         if (event.key === 'Escape' && entryMediaModalEl && entryMediaModalEl.classList.contains('active')) {
             closeEntryMediaModal();
+        }
+        const kpiBrowserModalEl = document.getElementById('kpiBrowserModal');
+        if (event.key === 'Escape' && kpiBrowserModalEl && kpiBrowserModalEl.classList.contains('active')) {
+            closeKpiBrowser();
         }
     });
 
